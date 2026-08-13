@@ -1,6 +1,7 @@
 package com.example.attendancemanagementbackend.controller;
 
 import com.example.attendancemanagementbackend.dto.AuthResponse;
+import com.example.attendancemanagementbackend.dto.LoginRequest;
 import com.example.attendancemanagementbackend.dto.RegisterRequest;
 import com.example.attendancemanagementbackend.entity.User;
 import com.example.attendancemanagementbackend.service.AuthService;
@@ -25,10 +26,17 @@ public class AuthController {
 
         return new AuthResponse(
                 "Registration successful",
+                null,
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole()
         );
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody LoginRequest request) {
+
+        return authService.login(request);
     }
 }

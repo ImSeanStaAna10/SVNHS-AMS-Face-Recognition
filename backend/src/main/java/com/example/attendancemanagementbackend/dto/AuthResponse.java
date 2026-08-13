@@ -5,6 +5,7 @@ import com.example.attendancemanagementbackend.entity.Role;
 public class AuthResponse {
 
     private String message;
+    private String token;
     private String userId;
     private String name;
     private String email;
@@ -12,12 +13,14 @@ public class AuthResponse {
 
     public AuthResponse(
             String message,
+            String token,
             String userId,
             String name,
             String email,
             Role role
     ) {
         this.message = message;
+        this.token = token;
         this.userId = userId;
         this.name = name;
         this.email = email;
@@ -26,6 +29,10 @@ public class AuthResponse {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getToken() {
+        return token;
     }
 
     public String getUserId() {
