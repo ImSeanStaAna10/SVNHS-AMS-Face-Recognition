@@ -1,7 +1,10 @@
 package com.example.attendancemanagementbackend.controller;
 
 import com.example.attendancemanagementbackend.dto.UserResponse;
+import com.example.attendancemanagementbackend.dto.adviser.CreateAdviserRequest;
 import com.example.attendancemanagementbackend.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,5 +22,17 @@ public class UserController {
     @GetMapping
     public List<UserResponse> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+    //CREATE ADVISER - Councilor allowed only
+    @PostMapping("/advisers")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse createAdviser(
+            @Valid @RequestBody CreateAdviserRequest request
+    ) {
+
+        //debugging logs - di mahanap ng endpoint kung san nag hihit error
+        System.out.println("=== CREATE ADVISER ENDPOINT HIT ===");
+        return userService.createAdviser(request);
     }
 }

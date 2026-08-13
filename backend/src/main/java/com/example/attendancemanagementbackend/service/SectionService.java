@@ -7,6 +7,8 @@ import com.example.attendancemanagementbackend.entity.Section;
 import com.example.attendancemanagementbackend.entity.User;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
 import com.example.attendancemanagementbackend.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,11 +63,33 @@ public class SectionService {
         );
     }
 
-    // GET ALL SECTIONS
+    // GET SECTIONS
     public List<SectionResponse> getAllSections() {
 
-        return sectionRepository.findAll()
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String userId = authentication.getName();
+
+        boolean isCouncilor = authentication.getAuthorities()
                 .stream()
+                .anyMatch(authority ->
+                        authority.getAuthority().equals("ROLE_COUNCILOR")
+                );
+
+        List<Section> sections;
+
+        if (isCouncilor) {
+            // Councilor can see all sections
+            sections = sectionRepository.findAll();
+        } else {
+            // Adviser can only see assigned sections
+            sections = sectionRepository.findByAdviserId(userId);
+        }
+
+        return sections.stream()
                 .map(section -> new SectionResponse(
                         section.getId(),
                         section.getName(),

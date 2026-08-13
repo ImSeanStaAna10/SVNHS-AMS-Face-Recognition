@@ -34,14 +34,27 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
 
+                        .requestMatchers("/api/auth/**")
+                        .permitAll()
+
+                        // Councilor only
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/users/advisers"
+                        )
+                        .hasRole("COUNCILOR")
+
+                        // Councilor only
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/sections"
-                        ).hasRole("COUNCILOR")
+                        )
+                        .hasRole("COUNCILOR")
 
-                        .anyRequest().authenticated()
+                        // Everything else requires authentication
+                        .anyRequest()
+                        .authenticated()
                 )
 
                 .addFilterBefore(
