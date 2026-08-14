@@ -15,7 +15,9 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -38,21 +40,24 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**")
                         .permitAll()
 
-                        // Councilor only
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/users/advisers"
                         )
                         .hasRole("COUNCILOR")
 
-                        // Councilor only
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/sections"
                         )
                         .hasRole("COUNCILOR")
 
-                        // Everything else requires authentication
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/students/*/face"
+                        )
+                        .authenticated()
+
                         .anyRequest()
                         .authenticated()
                 )
