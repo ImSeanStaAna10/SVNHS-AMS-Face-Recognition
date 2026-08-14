@@ -20,6 +20,14 @@ pnpm-debug.log*
 # Spring Boot local configuration
 application-local.properties
 
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.python-version
+
 # OS
 .DS_Store
 Thumbs.db
