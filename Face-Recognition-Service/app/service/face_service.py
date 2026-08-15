@@ -24,6 +24,19 @@ class FaceService:
         image: UploadFile
     ):
 
+        embedding = await self.extract_embedding(image)
+
+        return {
+            "success": True,
+            "student_id": student_id,
+            "embedding": embedding
+        }
+
+    async def extract_embedding(
+        self,
+        image: UploadFile
+    ):
+
         # Read uploaded image
         image_bytes = await image.read()
 
@@ -52,23 +65,16 @@ class FaceService:
                 "Please provide an image with one face."
             )
 
-        # Get the only detected face
+        # Get detected face
         face = faces[0]
 
-        # Generate face embedding
+        # Generate embedding
         embedding = face.embedding
 
-        # Validate embedding dimensions
         if embedding is None or len(embedding) != 512:
             raise ValueError(
-                "Invalid face embedding. Expected 512 dimensions."
+                "Invalid face embedding. "
+                "Expected 512 dimensions."
             )
 
-        # Convert NumPy array to regular Python list
-        embedding = embedding.tolist()
-
-        return {
-            "success": True,
-            "student_id": student_id,
-            "embedding": embedding
-        }
+        return embedding.tolist()

@@ -1,13 +1,17 @@
 package com.example.attendancemanagementbackend.service;
 
+import com.example.attendancemanagementbackend.dto.FaceMatchResult;
 import com.example.attendancemanagementbackend.entity.Student;
+import com.example.attendancemanagementbackend.exception.ApiException;
 import com.example.attendancemanagementbackend.repository.StudentFaceRepository;
 import com.example.attendancemanagementbackend.repository.StudentRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +32,9 @@ public class StudentFaceService {
         this.faceRecognitionClient = faceRecognitionClient;
     }
 
+    /**
+     * Enroll a student's face.
+     */
     @Transactional
     public void enrollFace(
             String studentId,
@@ -35,22 +42,32 @@ public class StudentFaceService {
     ) throws IOException {
 
         // 1. Find student
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() ->
-                        new RuntimeException("Student not found")
-                );
+        Student student =
+                studentRepository.findById(studentId)
+                        .orElseThrow(() ->
+                                new ApiException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Student not found"
+                                )
+                        );
 
-        // 2. Check if student already has a registered face
-        if (studentFaceRepository
-                .findByStudentId(studentId)
-                .isPresent()) {
+        // 2. Validate image
+        if (image == null || image.isEmpty()) {
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Image is required"
+            );
+        }
 
-            throw new RuntimeException(
+        // 3. Check if student already has a registered face
+        if (studentFaceRepository.existsByStudentId(studentId)) {
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
                     "Student already has a registered face"
             );
         }
 
-        // 3. Send image to Python Face Recognition Service
+        // 4. Send image to Python Face Recognition Service
         FaceRecognitionClient.FaceEnrollmentResult result =
                 faceRecognitionClient.enrollFace(
                         studentId,
@@ -58,48 +75,87 @@ public class StudentFaceService {
                         image.getOriginalFilename()
                 );
 
-        // 4. Validate Python response
-        if (result == null || !result.success()) {
-            throw new RuntimeException(
+        // 5. Validate Python response
+        if (result == null ||
+                !result.success() ||
+                result.embedding() == null) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
                     "Face enrollment failed"
             );
         }
 
-        // 5. Convert embedding to PostgreSQL vector format
-        String embedding = toVectorString(
-                result.embedding()
-        );
+        // 6. Convert embedding to PostgreSQL vector format
+        String embedding =
+                toVectorString(
+                        result.embedding()
+                );
 
-        // 6. Generate ID
-        String faceId = UUID.randomUUID().toString();
+        // 7. Generate face ID
+        String faceId =
+                UUID.randomUUID().toString();
 
-        // 7. Insert embedding using native SQL
+        LocalDateTime now =
+                LocalDateTime.now();
+
+        // 8. Insert embedding using native SQL
         studentFaceRepository.insertFaceEmbedding(
                 faceId,
-                studentId,
+                student.getId(),
                 embedding,
-                java.time.LocalDateTime.now(),
-                java.time.LocalDateTime.now()
+                now,
+                now
         );
     }
 
+    /**
+     * Convert a 512-dimensional face embedding
+     * into PostgreSQL pgvector format.
+     */
     private String toVectorString(
             List<Double> embedding
     ) {
 
         if (embedding == null) {
-            throw new RuntimeException(
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
                     "Face embedding is null"
             );
         }
 
         if (embedding.size() != 512) {
-            throw new RuntimeException(
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
                     "Invalid face embedding. Expected 512 dimensions, got "
                             + embedding.size()
             );
         }
 
         return embedding.toString();
+    }
+
+    /**
+     * Find the registered face with the smallest
+     * cosine distance from the supplied embedding.
+     */
+    @Transactional(readOnly = true)
+    public FaceMatchResult findMostSimilarFace(
+            List<Double> embedding
+    ) {
+
+        // 1. Validate and convert embedding
+        String vector =
+                toVectorString(embedding);
+
+        // 2. Find nearest registered face
+        return studentFaceRepository
+                .findMostSimilarFace(vector)
+                .orElseThrow(() ->
+                        new ApiException(
+                                HttpStatus.NOT_FOUND,
+                                "No registered face found"
+                        )
+                );
     }
 }

@@ -15,7 +15,9 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public UserController(
+            UserService userService
+    ) {
         this.userService = userService;
     }
 
@@ -24,15 +26,12 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    //CREATE ADVISER - Councilor allowed only
+    // CREATE ADVISER - Councilor only
     @PostMapping("/advisers")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse createAdviser(
             @Valid @RequestBody CreateAdviserRequest request
     ) {
-
-        //debugging logs - di mahanap ng endpoint kung san nag hihit error
-        System.out.println("=== CREATE ADVISER ENDPOINT HIT ===");
         return userService.createAdviser(request);
     }
 }

@@ -1,18 +1,28 @@
 from fastapi import APIRouter, File, UploadFile, Form
 
-from app.schemas.face import FaceEnrollmentResponse
+from app.schemas.face import (
+    FaceEnrollmentResponse,
+    FaceRecognitionResponse
+)
+
 from app.service.face_service import FaceService
 
-
-router = APIRouter(
-    prefix="/enrollment",
-    tags=["Face Enrollment"]
-)
 
 face_service = FaceService()
 
 
-@router.post(
+enrollment_router = APIRouter(
+    prefix="/enrollment",
+    tags=["Face Enrollment"]
+)
+
+recognition_router = APIRouter(
+    prefix="/recognize",
+    tags=["Face Recognition"]
+)
+
+
+@enrollment_router.post(
     "",
     response_model=FaceEnrollmentResponse
 )
@@ -32,3 +42,20 @@ async def enroll_face(
         embedding=result["embedding"]
     )
 
+
+@recognition_router.post(
+    "",
+    response_model=FaceRecognitionResponse
+)
+async def recognize_face(
+    image: UploadFile = File(...)
+):
+
+    embedding = await face_service.extract_embedding(
+        image
+    )
+
+    return FaceRecognitionResponse(
+        success=True,
+        embedding=embedding
+    )

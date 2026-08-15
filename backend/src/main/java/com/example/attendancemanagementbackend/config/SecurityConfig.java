@@ -37,12 +37,30 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/api/auth/**")
+                        // PUBLIC
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/login"
+                        )
                         .permitAll()
 
+                        // Disable old registration endpoint
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/register"
+                        )
+                        .denyAll()
+
+                        // COUNCILOR ONLY
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/users/advisers"
+                        )
+                        .hasRole("COUNCILOR")
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/users"
                         )
                         .hasRole("COUNCILOR")
 
@@ -52,12 +70,14 @@ public class SecurityConfig {
                         )
                         .hasRole("COUNCILOR")
 
+                        // ADVISER ONLY
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/students/*/face"
                         )
-                        .authenticated()
+                        .hasRole("ADVISER")
 
+                        // EVERYTHING ELSE REQUIRES LOGIN
                         .anyRequest()
                         .authenticated()
                 )

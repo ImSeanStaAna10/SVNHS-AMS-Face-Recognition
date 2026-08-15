@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 
-from app.routes.enrollment import router as enrollment_router
+from app.routes.enrollment import (
+    enrollment_router,
+    recognition_router
+)
 
 
 app = FastAPI(
@@ -18,3 +21,4 @@ def health_check():
 
 
 app.include_router(enrollment_router)
+app.include_router(recognition_router)

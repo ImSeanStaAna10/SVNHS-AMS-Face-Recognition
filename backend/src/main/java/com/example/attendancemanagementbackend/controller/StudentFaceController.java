@@ -1,6 +1,7 @@
 package com.example.attendancemanagementbackend.controller;
 
 import com.example.attendancemanagementbackend.service.StudentFaceService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,10 @@ public class StudentFaceController {
         this.studentFaceService = studentFaceService;
     }
 
-    @PostMapping("/{studentId}/face")
+    @PostMapping(
+            value = "/{studentId}/face",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<Map<String, Object>> enrollFace(
             @PathVariable String studentId,
             @RequestParam("image") MultipartFile image

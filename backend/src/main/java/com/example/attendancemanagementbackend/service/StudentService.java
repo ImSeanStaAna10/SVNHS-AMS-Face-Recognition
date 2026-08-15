@@ -4,8 +4,10 @@ import com.example.attendancemanagementbackend.dto.student.CreateStudentRequest;
 import com.example.attendancemanagementbackend.dto.student.StudentResponse;
 import com.example.attendancemanagementbackend.entity.Section;
 import com.example.attendancemanagementbackend.entity.Student;
+import com.example.attendancemanagementbackend.exception.ApiException;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
 import com.example.attendancemanagementbackend.repository.StudentRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -41,26 +43,38 @@ public class StudentService {
         Section section = sectionRepository
                 .findById(request.getSectionId())
                 .orElseThrow(() ->
-                        new RuntimeException("Section not found")
+                        new ApiException(
+                                HttpStatus.NOT_FOUND,
+                                "Section not found"
+                        )
                 );
 
         // Make sure this section belongs to the logged-in adviser
-        if (!section.getAdviser().getId().equals(adviserId)) {
-            throw new RuntimeException(
+        if (section.getAdviser() == null ||
+                !section.getAdviser()
+                        .getId()
+                        .equals(adviserId)) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
                     "You are not assigned to this section"
             );
         }
 
         if (!section.isActive()) {
-            throw new RuntimeException(
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
                     "Section is inactive"
             );
         }
 
         if (studentRepository
-                .existsByStudentNumber(request.getStudentNumber())) {
+                .existsByStudentNumber(
+                        request.getStudentNumber()
+                )) {
 
-            throw new RuntimeException(
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
                     "Student number already exists"
             );
         }
@@ -94,7 +108,9 @@ public class StudentService {
                 .toList();
     }
 
-    private StudentResponse mapToResponse(Student student) {
+    private StudentResponse mapToResponse(
+            Student student
+    ) {
 
         return new StudentResponse(
                 student.getId(),

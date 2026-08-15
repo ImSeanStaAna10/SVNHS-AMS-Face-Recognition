@@ -1,7 +1,7 @@
-
 package com.example.attendancemanagementbackend.security;
 
 import com.example.attendancemanagementbackend.service.JwtService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +26,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public JwtAuthenticationFilter(
+            JwtService jwtService
+    ) {
         this.jwtService = jwtService;
     }
 
@@ -37,114 +39,106 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String requestUri = request.getRequestURI();
-        String method = request.getMethod();
+        String authHeader =
+                request.getHeader("Authorization");
 
-        logger.info(
-                "[JWT] Request received: {} {}",
-                method,
-                requestUri
-        );
+        // No Authorization header
+        if (authHeader == null ||
+                !authHeader.startsWith("Bearer ")) {
 
-        String authHeader = request.getHeader("Authorization");
+            filterChain.doFilter(
+                    request,
+                    response
+            );
 
-        if (authHeader == null) {
-
-            logger.warn("[JWT] Authorization header is missing");
-
-            filterChain.doFilter(request, response);
             return;
         }
 
-        if (!authHeader.startsWith("Bearer ")) {
+        String token =
+                authHeader.substring(7);
 
-            logger.warn("[JWT] Authorization header is not Bearer");
-
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        logger.info("[JWT] Bearer token detected");
-
-        String token = authHeader.substring(7);
-
+        // Empty token
         if (token.isBlank()) {
 
-            logger.warn("[JWT] Token is empty");
+            filterChain.doFilter(
+                    request,
+                    response
+            );
 
-            filterChain.doFilter(request, response);
             return;
         }
-
-        boolean valid;
 
         try {
 
-            valid = jwtService.isTokenValid(token);
+            // Parse and validate JWT only once
+            Claims claims =
+                    jwtService.extractAllClaims(token);
+
+            String userId =
+                    claims.getSubject();
+
+            String role =
+                    claims.get(
+                            "role",
+                            String.class
+                    );
+
+            if (userId == null ||
+                    role == null) {
+
+                filterChain.doFilter(
+                        request,
+                        response
+                );
+
+                return;
+            }
+
+            // Avoid replacing existing authentication
+            if (SecurityContextHolder
+                    .getContext()
+                    .getAuthentication() == null) {
+
+                SimpleGrantedAuthority authority =
+                        new SimpleGrantedAuthority(
+                                "ROLE_" + role
+                        );
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userId,
+                                null,
+                                Collections.singletonList(
+                                        authority
+                                )
+                        );
+
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request)
+                );
+
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(
+                                authentication
+                        );
+            }
 
         } catch (Exception exception) {
 
-            logger.error(
-                    "[JWT] Token validation threw an exception: {}",
+            logger.warn(
+                    "[JWT] Invalid or expired token: {}",
                     exception.getMessage()
             );
 
-            filterChain.doFilter(request, response);
-            return;
+            // Don't authenticate.
+            // Spring Security will handle protected endpoints.
         }
 
-        if (!valid) {
-
-            logger.warn("[JWT] Token is INVALID");
-
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        logger.info("[JWT] Token is VALID");
-
-        String userId = jwtService.extractUserId(token);
-        String role = jwtService.extractRole(token);
-
-        logger.info("[JWT] User ID: {}", userId);
-        logger.info("[JWT] Role: {}", role);
-
-        if (userId == null || role == null) {
-
-            logger.warn(
-                    "[JWT] User ID or role is missing from token"
-            );
-
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        SimpleGrantedAuthority authority =
-                new SimpleGrantedAuthority("ROLE_" + role);
-
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                        userId,
-                        null,
-                        Collections.singletonList(authority)
-                );
-
-        authentication.setDetails(
-                new WebAuthenticationDetailsSource()
-                        .buildDetails(request)
+        filterChain.doFilter(
+                request,
+                response
         );
-
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(authentication);
-
-        logger.info(
-                "[JWT] Authentication set successfully | userId={} | authority={}",
-                userId,
-                authority.getAuthority()
-        );
-
-        filterChain.doFilter(request, response);
     }
 }
-

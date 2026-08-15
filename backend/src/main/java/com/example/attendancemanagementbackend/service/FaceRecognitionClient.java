@@ -24,15 +24,17 @@ public class FaceRecognitionClient {
             String filename
     ) {
 
-        ByteArrayResource imageResource = new ByteArrayResource(imageBytes) {
+        ByteArrayResource imageResource =
+                new ByteArrayResource(imageBytes) {
 
-            @Override
-            public String getFilename() {
-                return filename;
-            }
-        };
+                    @Override
+                    public String getFilename() {
+                        return filename;
+                    }
+                };
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        MultiValueMap<String, Object> body =
+                new LinkedMultiValueMap<>();
 
         body.add("student_id", studentId);
         body.add("image", imageResource);
@@ -45,11 +47,43 @@ public class FaceRecognitionClient {
                 .body(FaceEnrollmentResult.class);
     }
 
+    public FaceRecognitionResult recognizeFace(
+            byte[] imageBytes,
+            String filename
+    ) {
+
+        ByteArrayResource imageResource =
+                new ByteArrayResource(imageBytes) {
+
+                    @Override
+                    public String getFilename() {
+                        return filename;
+                    }
+                };
+
+        MultiValueMap<String, Object> body =
+                new LinkedMultiValueMap<>();
+
+        body.add("image", imageResource);
+
+        return restClient.post()
+                .uri("/recognize")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(body)
+                .retrieve()
+                .body(FaceRecognitionResult.class);
+    }
+
     public record FaceEnrollmentResult(
             boolean success,
             String student_id,
             java.util.List<Double> embedding
     ) {
     }
-}
 
+    public record FaceRecognitionResult(
+            boolean success,
+            java.util.List<Double> embedding
+    ) {
+    }
+}

@@ -1,11 +1,10 @@
 package com.example.attendancemanagementbackend.entity;
 
-import com.pgvector.PGvector;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,12 +24,13 @@ public class StudentFace {
     private Student student;
 
     @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = 512)
     @Column(
             name = "embedding",
             columnDefinition = "vector(512)",
             nullable = false
     )
-    private PGvector embedding;
+    private float[] embedding;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -42,11 +42,10 @@ public class StudentFace {
 
     public StudentFace(
             Student student,
-            String embedding
-    ) throws SQLException {
-
+            float[] embedding
+    ) {
         this.student = student;
-        this.embedding = new PGvector(embedding);
+        this.embedding = embedding;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -63,11 +62,11 @@ public class StudentFace {
         this.student = student;
     }
 
-    public PGvector getEmbedding() {
+    public float[] getEmbedding() {
         return embedding;
     }
 
-    public void setEmbedding(PGvector embedding) {
+    public void setEmbedding(float[] embedding) {
         this.embedding = embedding;
     }
 
