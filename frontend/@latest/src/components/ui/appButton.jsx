@@ -10,7 +10,7 @@ function AppButton({
     <button
       type={type}
       disabled={disabled || loading}
-      className={`btn btn-primary ${className}`}
+      className={`btn app-button ${className}`}
       {...props}
     >
       {loading ? (
@@ -19,7 +19,7 @@ function AppButton({
             className="spinner-border spinner-border-sm me-2"
             aria-hidden="true"
           />
-          Please wait...
+          Signing in...
         </>
       ) : (
         children

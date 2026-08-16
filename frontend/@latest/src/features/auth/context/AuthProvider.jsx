@@ -29,6 +29,8 @@ function AuthProvider({ children }) {
 
   const value = {
     userId: auth?.userId ?? null,
+    name: auth?.name ?? null,
+    email: auth?.email ?? null,
     role: auth?.role ?? null,
     token: auth?.token ?? null,
 

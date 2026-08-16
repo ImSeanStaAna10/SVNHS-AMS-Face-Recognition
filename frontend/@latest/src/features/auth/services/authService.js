@@ -6,6 +6,8 @@ export async function login(credentials) {
   return {
     token: response.token,
     userId: response.userId,
+    name: response.name,
+    email: response.email,
     role: response.role,
   };
 }
