@@ -1,5 +1,6 @@
 package com.example.attendancemanagementbackend.controller;
 
+import com.example.attendancemanagementbackend.dto.AttendanceOverviewResponse;
 import com.example.attendancemanagementbackend.dto.AttendanceRecordResponse;
 import com.example.attendancemanagementbackend.entity.AttendanceRecord;
 import com.example.attendancemanagementbackend.service.AttendanceRecordService;
@@ -77,6 +78,27 @@ public class AttendanceRecordController {
                         "sessionId", sessionId,
                         "count", records.size(),
                         "records", records
+                )
+        );
+    }
+
+    /**
+     * COUNCILOR ATTENDANCE OVERVIEW
+     *
+     * GET
+     * /api/attendance-records/overview
+     */
+    @GetMapping("/overview")
+    public ResponseEntity<Map<String, Object>> getAttendanceOverview() {
+
+        List<AttendanceOverviewResponse> overview =
+                attendanceRecordService.getAttendanceOverview();
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "success", true,
+                        "count", overview.size(),
+                        "records", overview
                 )
         );
     }
