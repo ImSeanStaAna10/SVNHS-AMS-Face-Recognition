@@ -1,0 +1,29 @@
+:root {
+  /* Brand */
+  --brand-navy-900: #071b4a;
+  --brand-navy-800: #0b2868;
+  --brand-blue-700: #173f91;
+
+  --brand-red-700: #b52632;
+  --brand-red-600: #cf303b;
+  --brand-red-200: #e9a3a5;
+
+  /* Neutral */
+  --color-white: #ffffff;
+  --color-background: #f5f7fb;
+  --color-surface: #ffffff;
+
+  --color-text-primary: #172033;
+  --color-text-secondary: #687386;
+
+  --color-border: #e2e7ef;
+
+  /* Layout */
+  --border-radius-sm: 0.5rem;
+  --border-radius-md: 0.75rem;
+  --border-radius-lg: 1rem;
+
+  /* Shadow */
+  --shadow-sm: 0 2px 8px rgba(7, 27, 74, 0.06);
+  --shadow-md: 0 10px 30px rgba(7, 27, 74, 0.1);
+}
