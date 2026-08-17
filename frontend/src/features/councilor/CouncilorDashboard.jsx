@@ -174,15 +174,17 @@ function CouncilorDashboard() {
             <span>Sections</span>
           </button>
 
-          <button type="button" className="councilor-nav-item" disabled>
-            <span className="councilor-nav-icon" aria-hidden="true">
-              ◷
-            </span>
+         <button
+  type="button"
+  className="councilor-nav-item"
+  onClick={() => navigate("/councilor/attendance")}
+>
+  <span className="councilor-nav-icon" aria-hidden="true">
+    ◷
+  </span>
 
-            <span>Attendance</span>
-
-            <small>SOON</small>
-          </button>
+  <span>Attendance</span>
+</button>
         </nav>
 
         {/* SIDEBAR FOOTER */}

@@ -4,6 +4,7 @@ import com.example.attendancemanagementbackend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,12 +14,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter
+            jwtAuthenticationFilter;
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationFilter =
+                jwtAuthenticationFilter;
     }
 
     @Bean
@@ -27,60 +30,172 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-                .csrf(AbstractHttpConfigurer::disable)
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
+                /* =================================================
+                   CORS
+                ================================================= */
+
+                .cors(
+                        Customizer.withDefaults()
                 )
 
-                .authorizeHttpRequests(auth -> auth
+                /* =================================================
+                   CSRF
 
-                        // PUBLIC
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/auth/login"
-                        )
-                        .permitAll()
+                   Disabled because authentication is stateless JWT.
+                ================================================= */
 
-                        // Disable old registration endpoint
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/auth/register"
-                        )
-                        .denyAll()
-
-                        // COUNCILOR ONLY
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/users/advisers"
-                        )
-                        .hasRole("COUNCILOR")
-
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/users"
-                        )
-                        .hasRole("COUNCILOR")
-
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/sections"
-                        )
-                        .hasRole("COUNCILOR")
-
-                        // ADVISER ONLY
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/students/*/face"
-                        )
-                        .hasRole("ADVISER")
-
-                        // EVERYTHING ELSE REQUIRES LOGIN
-                        .anyRequest()
-                        .authenticated()
+                .csrf(
+                        AbstractHttpConfigurer::disable
                 )
+
+                /* =================================================
+                   SESSION
+
+                   No server-side HTTP session.
+                ================================================= */
+
+                .sessionManagement(
+                        session ->
+                                session.sessionCreationPolicy(
+                                        SessionCreationPolicy.STATELESS
+                                )
+                )
+
+                /* =================================================
+                   AUTHORIZATION
+                ================================================= */
+
+                .authorizeHttpRequests(
+                        auth -> auth
+
+                                /* =================================
+                                   CORS PREFLIGHT
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.OPTIONS,
+                                        "/**"
+                                )
+                                .permitAll()
+
+                                /* =================================
+                                   PUBLIC
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.POST,
+                                        "/api/auth/login"
+                                )
+                                .permitAll()
+
+                                /* =================================
+                                   DISABLED REGISTRATION
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.POST,
+                                        "/api/auth/register"
+                                )
+                                .denyAll()
+
+                                /* =================================
+                                   COUNCILOR
+                                   USER MANAGEMENT
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.POST,
+                                        "/api/users/advisers"
+                                )
+                                .hasRole("COUNCILOR")
+
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/api/users"
+                                )
+                                .hasRole("COUNCILOR")
+
+                                /* =================================
+                                   COUNCILOR
+                                   SECTION MANAGEMENT
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.POST,
+                                        "/api/sections"
+                                )
+                                .hasRole("COUNCILOR")
+
+                                /* =================================
+                                   COUNCILOR
+                                   ATTENDANCE REPORTING
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/api/attendance-reports/**"
+                                )
+                                .hasRole("COUNCILOR")
+
+                                /* =================================
+                                   ADVISER
+                                   STUDENT MANAGEMENT
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.POST,
+                                        "/api/students"
+                                )
+                                .hasRole("ADVISER")
+
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/api/students"
+                                )
+                                .hasRole("ADVISER")
+
+                                .requestMatchers(
+                                        HttpMethod.POST,
+                                        "/api/students/*/face"
+                                )
+                                .hasRole("ADVISER")
+
+                                /* =================================
+                                   ADVISER
+                                   ATTENDANCE SESSION OPERATIONS
+                                ================================= */
+
+                                .requestMatchers(
+                                        "/api/attendance-sessions/**"
+                                )
+                                .hasRole("ADVISER")
+
+                                /* =================================
+                                   ADVISER
+                                   ATTENDANCE RECORD OPERATIONS
+
+                                   Councilor reporting does NOT use
+                                   this route. Reporting has its own
+                                   /attendance-reports/** endpoint.
+                                ================================= */
+
+                                .requestMatchers(
+                                        "/api/attendance-records/**"
+                                )
+                                .hasRole("ADVISER")
+
+                                /* =================================
+                                   EVERYTHING ELSE
+                                ================================= */
+
+                                .anyRequest()
+                                .authenticated()
+                )
+
+                /* =================================================
+                   JWT FILTER
+                ================================================= */
 
                 .addFilterBefore(
                         jwtAuthenticationFilter,

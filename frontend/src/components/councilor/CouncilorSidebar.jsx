@@ -75,15 +75,13 @@ function CouncilorSidebar() {
 
         {/* ATTENDANCE */}
 
-        <button type="button" className="councilor-nav-item" disabled>
+        <NavLink to="/councilor/attendance" className={getNavClassName}>
           <span className="councilor-nav-icon" aria-hidden="true">
             ◷
           </span>
 
           <span>Attendance</span>
-
-          <small>SOON</small>
-        </button>
+        </NavLink>
       </nav>
 
       {/* ===============================================

@@ -1,53 +1,72 @@
 package com.example.attendancemanagementbackend.service;
 
+import com.example.attendancemanagementbackend.entity.AttendanceRecord;
 import com.example.attendancemanagementbackend.entity.AttendanceSession;
 import com.example.attendancemanagementbackend.entity.AttendanceSessionStatus;
+import com.example.attendancemanagementbackend.entity.AttendanceStatus;
 import com.example.attendancemanagementbackend.entity.Section;
+import com.example.attendancemanagementbackend.entity.Student;
 import com.example.attendancemanagementbackend.exception.ApiException;
+import com.example.attendancemanagementbackend.repository.AttendanceRecordRepository;
 import com.example.attendancemanagementbackend.repository.AttendanceSessionRepository;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
+import com.example.attendancemanagementbackend.repository.StudentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class AttendanceSessionService {
 
-    private final AttendanceSessionRepository attendanceSessionRepository;
-    private final SectionRepository sectionRepository;
+    private final AttendanceSessionRepository
+            attendanceSessionRepository;
+
+    private final AttendanceRecordRepository
+            attendanceRecordRepository;
+
+    private final SectionRepository
+            sectionRepository;
+
+    private final StudentRepository
+            studentRepository;
 
     public AttendanceSessionService(
             AttendanceSessionRepository attendanceSessionRepository,
-            SectionRepository sectionRepository
+            AttendanceRecordRepository attendanceRecordRepository,
+            SectionRepository sectionRepository,
+            StudentRepository studentRepository
     ) {
-        this.attendanceSessionRepository = attendanceSessionRepository;
-        this.sectionRepository = sectionRepository;
+        this.attendanceSessionRepository =
+                attendanceSessionRepository;
+
+        this.attendanceRecordRepository =
+                attendanceRecordRepository;
+
+        this.sectionRepository =
+                sectionRepository;
+
+        this.studentRepository =
+                studentRepository;
     }
 
-    /**
-     * Start a new attendance session.
-     *
-     * sectionId + adviserId
-     *        ↓
-     * validate section
-     *        ↓
-     * validate adviser ownership
-     *        ↓
-     * ensure no active session exists
-     *        ↓
-     * create attendance session
-     */
+    /* =========================================================
+       START ATTENDANCE SESSION
+    ========================================================= */
+
     @Transactional
     public AttendanceSession startSession(
             String sectionId,
             String adviserId
     ) {
 
-        // 1. Find section
         Section section =
-                sectionRepository.findById(sectionId)
+                sectionRepository
+                        .findById(sectionId)
                         .orElseThrow(() ->
                                 new ApiException(
                                         HttpStatus.NOT_FOUND,
@@ -55,7 +74,10 @@ public class AttendanceSessionService {
                                 )
                         );
 
-        // 2. Verify adviser owns this section
+        /* =====================================================
+           VERIFY ADVISER OWNERSHIP
+        ===================================================== */
+
         if (section.getAdviser() == null ||
                 !section.getAdviser()
                         .getId()
@@ -67,7 +89,21 @@ public class AttendanceSessionService {
             );
         }
 
-        // 3. Prevent multiple active sessions
+        /* =====================================================
+           VERIFY SECTION STATUS
+        ===================================================== */
+
+        if (!section.isActive()) {
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "Section is inactive"
+            );
+        }
+
+        /* =====================================================
+           PREVENT MULTIPLE ACTIVE SESSIONS
+        ===================================================== */
+
         attendanceSessionRepository
                 .findBySectionIdAndStatus(
                         sectionId,
@@ -80,36 +116,51 @@ public class AttendanceSessionService {
                     );
                 });
 
-        // 4. Create attendance session
-        AttendanceSession session =
-                new AttendanceSession(section);
+        /* =====================================================
+           PREVENT MULTIPLE DAILY SESSIONS
+        ===================================================== */
 
-        // 5. Save
-        return attendanceSessionRepository.save(session);
+        LocalDate attendanceDate =
+                LocalDate.now();
+
+        if (attendanceSessionRepository
+                .existsBySectionIdAndAttendanceDate(
+                        sectionId,
+                        attendanceDate
+                )) {
+
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "Attendance has already been recorded for this section today"
+            );
+        }
+
+        /* =====================================================
+           CREATE SESSION
+        ===================================================== */
+
+        AttendanceSession session =
+                new AttendanceSession(
+                        section
+                );
+
+        return attendanceSessionRepository
+                .save(session);
     }
 
-    /**
-     * End an active attendance session.
-     *
-     * sessionId + adviserId
-     *        ↓
-     * validate session
-     *        ↓
-     * validate adviser ownership
-     *        ↓
-     * ensure session has not already ended
-     *        ↓
-     * mark session as ended
-     */
+    /* =========================================================
+       END ATTENDANCE SESSION
+    ========================================================= */
+
     @Transactional
     public AttendanceSession endSession(
             String sessionId,
             String adviserId
     ) {
 
-        // 1. Find attendance session
         AttendanceSession session =
-                attendanceSessionRepository.findById(sessionId)
+                attendanceSessionRepository
+                        .findById(sessionId)
                         .orElseThrow(() ->
                                 new ApiException(
                                         HttpStatus.NOT_FOUND,
@@ -117,9 +168,13 @@ public class AttendanceSessionService {
                                 )
                         );
 
-        Section section = session.getSection();
+        Section section =
+                session.getSection();
 
-        // 2. Verify adviser owns this section
+        /* =====================================================
+           VERIFY ADVISER OWNERSHIP
+        ===================================================== */
+
         if (section == null ||
                 section.getAdviser() == null ||
                 !section.getAdviser()
@@ -132,7 +187,10 @@ public class AttendanceSessionService {
             );
         }
 
-        // 3. Prevent ending an already-ended session
+        /* =====================================================
+           VERIFY SESSION STATUS
+        ===================================================== */
+
         if (session.getStatus() ==
                 AttendanceSessionStatus.ENDED) {
 
@@ -142,7 +200,18 @@ public class AttendanceSessionService {
             );
         }
 
-        // 4. End session
+        /* =====================================================
+           FINALIZE ABSENT STUDENTS
+        ===================================================== */
+
+        finalizeAbsentStudents(
+                session
+        );
+
+        /* =====================================================
+           END SESSION
+        ===================================================== */
+
         session.setStatus(
                 AttendanceSessionStatus.ENDED
         );
@@ -151,14 +220,77 @@ public class AttendanceSessionService {
                 LocalDateTime.now()
         );
 
-        // 5. Save changes
-        return attendanceSessionRepository.save(session);
+        return attendanceSessionRepository
+                .save(session);
     }
 
-    /**
-     * Get the currently active attendance session
-     * for a section.
-     */
+    /* =========================================================
+       FINALIZE ABSENT STUDENTS
+    ========================================================= */
+
+    private void finalizeAbsentStudents(
+            AttendanceSession session
+    ) {
+
+        String sectionId =
+                session.getSection().getId();
+
+        String sessionId =
+                session.getId();
+
+        List<Student> students =
+                studentRepository
+                        .findBySectionId(
+                                sectionId
+                        );
+
+        List<AttendanceRecord> absentRecords =
+                new ArrayList<>();
+
+        for (Student student : students) {
+
+            /*
+             * Ignore inactive students.
+             */
+            if (!student.isActive()) {
+                continue;
+            }
+
+            boolean alreadyRecorded =
+                    attendanceRecordRepository
+                            .existsBySessionIdAndStudentId(
+                                    sessionId,
+                                    student.getId()
+                            );
+
+            if (alreadyRecorded) {
+                continue;
+            }
+
+            AttendanceRecord absentRecord =
+                    new AttendanceRecord(
+                            session,
+                            student,
+                            AttendanceStatus.ABSENT
+                    );
+
+            absentRecords.add(
+                    absentRecord
+            );
+        }
+
+        if (!absentRecords.isEmpty()) {
+            attendanceRecordRepository
+                    .saveAll(
+                            absentRecords
+                    );
+        }
+    }
+
+    /* =========================================================
+       GET ACTIVE SESSION
+    ========================================================= */
+
     @Transactional(readOnly = true)
     public AttendanceSession getActiveSession(
             String sectionId

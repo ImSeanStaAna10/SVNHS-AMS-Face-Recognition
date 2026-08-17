@@ -46,6 +46,12 @@ const PAGE_CONFIG = {
     title: "Sections",
     description: "Manage school sections and adviser assignments.",
   },
+
+  "/councilor/attendance": {
+    eyebrow: "ATTENDANCE REPORTING",
+    title: "Attendance",
+    description: "Monitor school attendance and generate detailed reports.",
+  },
 };
 
 function CouncilorTopbar() {
