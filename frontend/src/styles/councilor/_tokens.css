@@ -1,0 +1,388 @@
+/* =========================================================
+   SVNHS COUNCILOR PORTAL
+   DESIGN TOKENS
+========================================================= */
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --c-navy-950: #071b42;
+  --c-navy-900: #10244b;
+
+  --c-blue-900: #123d7e;
+  --c-blue-800: #24559a;
+  --c-blue-700: #315891;
+  --c-blue-600: #3f6ba7;
+
+  --c-red-700: #a91522;
+  --c-red-600: #c51f2d;
+
+  --c-gold: #f7c945;
+
+  /* Page */
+  --c-page-start: #f8f9fc;
+  --c-page-end: #f5f7fb;
+
+  /* Surfaces */
+  --c-sidebar-start: #ffffff;
+  --c-sidebar-end: #fbfcfe;
+
+  --c-header-start: rgba(255, 255, 255, 0.98);
+  --c-header-mid: rgba(255, 255, 255, 0.98);
+  --c-header-end: rgba(255, 255, 255, 0.98);
+
+  --c-surface: #ffffff;
+  --c-surface-soft: #fcfdff;
+
+  --c-table-head: #fafbfd;
+  --c-input-bg: #ffffff;
+  --c-logo-bg: #ffffff;
+
+  /* Typography */
+  --c-text-primary: #10244b;
+  --c-text-secondary: #23365b;
+  --c-text-body: #6b7280;
+  --c-text-muted: #9aa3b2;
+
+  /* Borders */
+  --c-border: #d7dce5;
+  --c-border-soft: #e7e9ee;
+  --c-brand-border: rgba(18, 61, 126, 0.14);
+
+  /* Navigation */
+  --c-nav-text: #68778b;
+  --c-nav-hover-bg: #f5f8fc;
+  --c-nav-hover-text: #24559a;
+
+  --c-nav-active-start: #eaf1fa;
+  --c-nav-active-end: #f2f6fb;
+  --c-nav-active-text: #123d7e;
+
+  --c-nav-soon-bg: #f0f2f5;
+  --c-nav-soon-text: #929ba8;
+
+  /* Icons / badges */
+  --c-icon-bg: #edf3fb;
+  --c-icon-text: #315891;
+
+  --c-role-bg: #edf3fb;
+  --c-role-text: #123d7e;
+
+  /* Secondary button */
+  --c-secondary-bg: #ffffff;
+  --c-secondary-text: #315891;
+  --c-secondary-border: #d7dce5;
+
+  --c-secondary-hover-bg: #f5f8fc;
+  --c-secondary-hover-text: #123d7e;
+  --c-secondary-hover-border: #b8c1d0;
+
+  /* Inputs */
+  --c-input-text: #182b4e;
+  --c-input-placeholder: #9aa3b2;
+  --c-input-hover-border: #b8c1d0;
+
+  --c-focus-color: #24559a;
+  --c-focus-ring: rgba(36, 85, 154, 0.12);
+
+  /* Table */
+  --c-table-text: #6b7280;
+  --c-table-title: #23365b;
+  --c-table-muted: #9aa3b2;
+  --c-table-hover: #fafcff;
+
+  /* Status */
+  --c-success-bg: #eaf7ef;
+  --c-success-text: #277748;
+  --c-success-dot: #35a363;
+  --c-success-border: #ccebd8;
+
+  --c-inactive-bg: #f1f3f5;
+  --c-inactive-text: #747f8e;
+  --c-inactive-dot: #929ba8;
+
+  --c-error-bg: #fff2f3;
+  --c-error-text: #a91e2b;
+  --c-error-border: #f1c2c7;
+
+  /* Hero */
+  --c-hero-bg: #071b42;
+  --c-hero-border: transparent;
+
+  --c-hero-overlay: linear-gradient(
+    90deg,
+    rgba(7, 27, 66, 0.96) 0%,
+    rgba(7, 27, 66, 0.86) 42%,
+    rgba(7, 27, 66, 0.55) 100%
+  );
+
+  --c-hero-pattern: rgba(255, 255, 255, 0.045);
+
+  --c-hero-seal-bg: rgba(255, 255, 255, 0.12);
+  --c-hero-seal-border: rgba(255, 255, 255, 0.25);
+
+  /* Feature welcome */
+  --c-welcome-bg: linear-gradient(
+    120deg,
+    #071b42 0%,
+    #123d7e 48%,
+    #6c1b2b 80%,
+    #a91522 100%
+  );
+
+  /* Shadows */
+  --c-sidebar-shadow: none;
+
+  --c-header-shadow:
+    0 2px 10px rgba(7, 27, 66, 0.025);
+
+  --c-card-shadow:
+    0 5px 17px rgba(7, 27, 66, 0.04);
+
+  --c-card-hover-shadow:
+    0 10px 24px rgba(7, 27, 66, 0.08);
+
+  --c-panel-shadow:
+    0 5px 18px rgba(7, 27, 66, 0.04);
+
+  /* Modal */
+  --c-modal-backdrop: rgba(7, 27, 66, 0.62);
+  --c-modal-bg: #ffffff;
+
+  --c-modal-shadow:
+    0 30px 80px rgba(7, 27, 66, 0.3),
+    0 8px 25px rgba(7, 27, 66, 0.12);
+
+  /* Theme toggle */
+  --c-toggle-track-bg: #f5f7fb;
+  --c-toggle-track-border: #d7dce5;
+
+  --c-toggle-sun: #d89d14;
+  --c-toggle-moon: #315891;
+
+  --c-toggle-thumb-bg: #ffffff;
+  --c-toggle-thumb-text: #d89d14;
+
+  --c-toggle-thumb-x: 0px;
+
+  --c-toggle-shadow:
+    0 2px 7px rgba(7, 27, 66, 0.18);
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Page */
+  --c-page-start: #091a35;
+  --c-page-end: #22121d;
+
+  /* Surfaces */
+  --c-sidebar-start: #0b2344;
+  --c-sidebar-end: #191521;
+
+  --c-header-start: #0d294f;
+  --c-header-mid: #132540;
+  --c-header-end: #28141e;
+
+  --c-surface: #132c4b;
+  --c-surface-soft: #17263b;
+
+  --c-table-head: #102641;
+  --c-input-bg: #101f36;
+
+  --c-logo-bg: rgba(255, 255, 255, 0.97);
+
+  /* Typography */
+  --c-text-primary: #f5f8fd;
+  --c-text-secondary: #d9e3ef;
+  --c-text-body: #b5c1d1;
+  --c-text-muted: #8795a8;
+
+  /* Borders */
+  --c-border: rgba(106, 163, 222, 0.18);
+  --c-border-soft: rgba(197, 31, 45, 0.1);
+
+  --c-brand-border: rgba(197, 31, 45, 0.2);
+
+  /* Navigation */
+  --c-nav-text: #a9b9cc;
+
+  --c-nav-hover-bg: linear-gradient(
+    90deg,
+    rgba(47, 111, 181, 0.13),
+    rgba(197, 31, 45, 0.07)
+  );
+
+  --c-nav-hover-text: #ffffff;
+
+  --c-nav-active-start: rgba(44, 105, 177, 0.3);
+  --c-nav-active-end: rgba(197, 31, 45, 0.15);
+
+  --c-nav-active-text: #ffffff;
+
+  --c-nav-soon-bg: rgba(255, 255, 255, 0.06);
+  --c-nav-soon-text: #8291a5;
+
+  /* Icons */
+  --c-icon-bg: linear-gradient(
+    135deg,
+    rgba(74, 143, 214, 0.17),
+    rgba(197, 31, 45, 0.1)
+  );
+
+  --c-icon-text: #8ec5ff;
+
+  --c-role-bg: rgba(61, 128, 201, 0.16);
+  --c-role-text: #9dccff;
+
+  /* Secondary button */
+  --c-secondary-bg: linear-gradient(
+    135deg,
+    rgba(66, 130, 199, 0.08),
+    rgba(197, 31, 45, 0.06)
+  );
+
+  --c-secondary-text: #cedbeb;
+
+  --c-secondary-border:
+    rgba(116, 169, 224, 0.18);
+
+  --c-secondary-hover-bg: linear-gradient(
+    135deg,
+    rgba(61, 133, 208, 0.15),
+    rgba(197, 31, 45, 0.1)
+  );
+
+  --c-secondary-hover-text: #ffffff;
+
+  --c-secondary-hover-border:
+    rgba(197, 31, 45, 0.3);
+
+  /* Inputs */
+  --c-input-text: #f5f8fd;
+  --c-input-placeholder: #78899d;
+
+  --c-input-hover-border:
+    rgba(116, 169, 224, 0.3);
+
+  --c-focus-color: #5d9fe3;
+  --c-focus-ring: rgba(197, 31, 45, 0.12);
+
+  /* Table */
+  --c-table-text: #b9c6d6;
+  --c-table-title: #edf4fc;
+  --c-table-muted: #8090a4;
+
+  --c-table-hover: linear-gradient(
+    90deg,
+    rgba(63, 130, 202, 0.05),
+    rgba(197, 31, 45, 0.035)
+  );
+
+  /* Status */
+  --c-success-bg: rgba(44, 143, 82, 0.18);
+  --c-success-text: #82dda3;
+  --c-success-dot: #5bc581;
+
+  --c-success-border:
+    rgba(71, 183, 110, 0.24);
+
+  --c-inactive-bg: rgba(255, 255, 255, 0.06);
+  --c-inactive-text: #9cabbb;
+  --c-inactive-dot: #8391a3;
+
+  --c-error-bg: rgba(197, 31, 45, 0.14);
+  --c-error-text: #ff949d;
+  --c-error-border: rgba(225, 60, 73, 0.3);
+
+  /* Hero */
+  --c-hero-bg: #071b42;
+
+  --c-hero-border:
+    rgba(197, 31, 45, 0.18);
+
+  --c-hero-overlay: linear-gradient(
+    90deg,
+    rgba(7, 27, 66, 0.97) 0%,
+    rgba(18, 61, 126, 0.88) 48%,
+    rgba(126, 21, 34, 0.62) 100%
+  );
+
+  --c-hero-pattern:
+    rgba(197, 31, 45, 0.09);
+
+  --c-hero-seal-bg:
+    rgba(255, 255, 255, 0.1);
+
+  --c-hero-seal-border:
+    rgba(255, 255, 255, 0.2);
+
+  /* Feature welcome */
+  --c-welcome-bg: linear-gradient(
+    120deg,
+    #071b42 0%,
+    #123d7e 45%,
+    #6c1b2b 78%,
+    #a91522 100%
+  );
+
+  /* Shadows */
+  --c-sidebar-shadow:
+    5px 0 22px rgba(0, 0, 0, 0.12);
+
+  --c-header-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.16);
+
+  --c-card-shadow:
+    0 7px 20px rgba(0, 0, 0, 0.14);
+
+  --c-card-hover-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.22);
+
+  --c-panel-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.16);
+
+  /* Modal */
+  --c-modal-backdrop:
+    rgba(4, 11, 25, 0.8);
+
+  --c-modal-bg: #132c4b;
+
+  --c-modal-shadow:
+    0 32px 85px rgba(0, 0, 0, 0.48);
+
+  /* Theme toggle */
+  --c-toggle-track-bg: linear-gradient(
+    90deg,
+    #123d7e,
+    #5b1b2a
+  );
+
+  --c-toggle-track-border:
+    rgba(197, 31, 45, 0.22);
+
+  --c-toggle-sun: #8192a6;
+  --c-toggle-moon: #f7c945;
+
+  --c-toggle-thumb-bg: linear-gradient(
+    135deg,
+    #377fc4,
+    #c51f2d
+  );
+
+  --c-toggle-thumb-text: #ffffff;
+
+  --c-toggle-thumb-x: 32px;
+
+  --c-toggle-shadow:
+    0 4px 12px rgba(197, 31, 45, 0.22);
+}

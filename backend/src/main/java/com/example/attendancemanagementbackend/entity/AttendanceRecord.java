@@ -10,7 +10,10 @@ import java.time.LocalDateTime;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_attendance_session_student",
-                        columnNames = {"session_id", "student_id"}
+                        columnNames = {
+                                "session_id",
+                                "student_id"
+                        }
                 )
         }
 )
@@ -44,14 +47,36 @@ public class AttendanceRecord {
     public AttendanceRecord() {
     }
 
+    /**
+     * Default attendance record.
+     * Manual and face recognition attendance
+     * automatically mark the student PRESENT.
+     */
     public AttendanceRecord(
             AttendanceSession session,
             Student student
     ) {
+        this(
+                session,
+                student,
+                AttendanceStatus.PRESENT
+        );
+    }
+
+    /**
+     * Attendance record with explicit status.
+     * Used when finalizing a session and marking
+     * students without attendance as ABSENT.
+     */
+    public AttendanceRecord(
+            AttendanceSession session,
+            Student student,
+            AttendanceStatus status
+    ) {
         this.session = session;
         this.student = student;
+        this.status = status;
         this.recordedAt = LocalDateTime.now();
-        this.status = AttendanceStatus.PRESENT;
     }
 
     public String getId() {
@@ -62,7 +87,9 @@ public class AttendanceRecord {
         return session;
     }
 
-    public void setSession(AttendanceSession session) {
+    public void setSession(
+            AttendanceSession session
+    ) {
         this.session = session;
     }
 
@@ -70,7 +97,9 @@ public class AttendanceRecord {
         return student;
     }
 
-    public void setStudent(Student student) {
+    public void setStudent(
+            Student student
+    ) {
         this.student = student;
     }
 
@@ -82,7 +111,9 @@ public class AttendanceRecord {
         return status;
     }
 
-    public void setStatus(AttendanceStatus status) {
+    public void setStatus(
+            AttendanceStatus status
+    ) {
         this.status = status;
     }
 }
