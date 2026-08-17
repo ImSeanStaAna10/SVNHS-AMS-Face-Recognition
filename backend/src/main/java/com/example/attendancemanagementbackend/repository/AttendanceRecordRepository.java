@@ -38,17 +38,6 @@ public interface AttendanceRecordRepository
 
     /* =========================================================
        COUNCILOR SECTION ATTENDANCE REPORT
-
-       One aggregated record per section.
-
-       Supports:
-       - Date range
-       - Section filter
-       - Adviser filter
-       - Search
-       - Server-side pagination
-
-       Only ENDED attendance sessions are included.
     ========================================================= */
 
     @Query(
@@ -232,8 +221,6 @@ public interface AttendanceRecordRepository
 
     /* =========================================================
        SCHOOL-WIDE ATTENDANCE SUMMARY
-
-       Uses exactly the same filters as the section cards.
     ========================================================= */
 
     @Query(
@@ -339,5 +326,212 @@ public interface AttendanceRecordRepository
 
             @Param("search")
             String search
+    );
+
+    /* =========================================================
+       DETAILED STUDENT ATTENDANCE REPORT
+
+       Returns one aggregated row per student.
+
+       Supports:
+       - Section
+       - Date range
+       - Student name / number search
+       - Server-side pagination
+    ========================================================= */
+
+    @Query(
+            value = """
+                    SELECT
+                        st.id AS "studentId",
+
+                        st.student_number AS "studentNumber",
+
+                        st.name AS "studentName",
+
+                        COUNT(
+                            DISTINCT ats.id
+                        ) AS "sessionCount",
+
+                        COUNT(*) FILTER (
+                            WHERE ar.status = 'PRESENT'
+                        ) AS "presentCount",
+
+                        COUNT(*) FILTER (
+                            WHERE ar.status = 'LATE'
+                        ) AS "lateCount",
+
+                        COUNT(*) FILTER (
+                            WHERE ar.status = 'ABSENT'
+                        ) AS "absentCount",
+
+                        COUNT(
+                            ar.id
+                        ) AS "totalRecords"
+
+                    FROM public.attendance_records ar
+
+                    INNER JOIN public.attendance_sessions ats
+                        ON ats.id = ar.session_id
+
+                    INNER JOIN public.students st
+                        ON st.id = ar.student_id
+
+                    WHERE
+                        ats.status = 'ENDED'
+
+                        AND ats.section_id = :sectionId
+
+                        AND ats.attendance_date
+                            BETWEEN :fromDate AND :toDate
+
+                        AND (
+                            :search = ''
+
+                            OR LOWER(st.name)
+                                LIKE CONCAT(
+                                    '%',
+                                    :search,
+                                    '%'
+                                )
+
+                            OR LOWER(st.student_number)
+                                LIKE CONCAT(
+                                    '%',
+                                    :search,
+                                    '%'
+                                )
+                        )
+
+                    GROUP BY
+                        st.id,
+                        st.student_number,
+                        st.name
+
+                    ORDER BY
+                        st.name ASC
+                    """,
+
+            countQuery = """
+                    SELECT
+                        COUNT(
+                            DISTINCT st.id
+                        )
+
+                    FROM public.attendance_records ar
+
+                    INNER JOIN public.attendance_sessions ats
+                        ON ats.id = ar.session_id
+
+                    INNER JOIN public.students st
+                        ON st.id = ar.student_id
+
+                    WHERE
+                        ats.status = 'ENDED'
+
+                        AND ats.section_id = :sectionId
+
+                        AND ats.attendance_date
+                            BETWEEN :fromDate AND :toDate
+
+                        AND (
+                            :search = ''
+
+                            OR LOWER(st.name)
+                                LIKE CONCAT(
+                                    '%',
+                                    :search,
+                                    '%'
+                                )
+
+                            OR LOWER(st.student_number)
+                                LIKE CONCAT(
+                                    '%',
+                                    :search,
+                                    '%'
+                                )
+                        )
+                    """,
+
+            nativeQuery = true
+    )
+    Page<AttendanceStudentReportProjection>
+    findStudentAttendanceReport(
+
+            @Param("sectionId")
+            String sectionId,
+
+            @Param("fromDate")
+            LocalDate fromDate,
+
+            @Param("toDate")
+            LocalDate toDate,
+
+            @Param("search")
+            String search,
+
+            Pageable pageable
+    );
+
+    /* =========================================================
+       SECTION DETAIL SUMMARY
+    ========================================================= */
+
+    @Query(
+            value = """
+                    SELECT
+                        COUNT(
+                            DISTINCT ats.id
+                        ) AS "sessionCount",
+
+                        COUNT(
+                            DISTINCT st.id
+                        ) AS "studentCount",
+
+                        COUNT(*) FILTER (
+                            WHERE ar.status = 'PRESENT'
+                        ) AS "presentCount",
+
+                        COUNT(*) FILTER (
+                            WHERE ar.status = 'LATE'
+                        ) AS "lateCount",
+
+                        COUNT(*) FILTER (
+                            WHERE ar.status = 'ABSENT'
+                        ) AS "absentCount",
+
+                        COUNT(
+                            ar.id
+                        ) AS "totalRecords"
+
+                    FROM public.attendance_records ar
+
+                    INNER JOIN public.attendance_sessions ats
+                        ON ats.id = ar.session_id
+
+                    INNER JOIN public.students st
+                        ON st.id = ar.student_id
+
+                    WHERE
+                        ats.status = 'ENDED'
+
+                        AND ats.section_id = :sectionId
+
+                        AND ats.attendance_date
+                            BETWEEN :fromDate AND :toDate
+                    """,
+            nativeQuery = true
+    )
+    AttendanceSectionDetailSummaryProjection
+    findSectionDetailSummary(
+
+            @Param("sectionId")
+            String sectionId,
+
+            @Param("fromDate")
+            LocalDate fromDate,
+
+            @Param("toDate")
+            LocalDate toDate
     );
 }

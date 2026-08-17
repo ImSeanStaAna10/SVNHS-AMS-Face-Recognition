@@ -1,4 +1,16 @@
 package com.example.attendancemanagementbackend.repository;
 
-public class AttendanceSectionDetailSummaryProjection {
+public interface AttendanceSectionDetailSummaryProjection {
+
+    Long getSessionCount();
+
+    Long getStudentCount();
+
+    Long getPresentCount();
+
+    Long getLateCount();
+
+    Long getAbsentCount();
+
+    Long getTotalRecords();
 }

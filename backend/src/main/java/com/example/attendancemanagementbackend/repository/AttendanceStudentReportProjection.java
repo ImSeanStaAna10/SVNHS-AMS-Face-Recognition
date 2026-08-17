@@ -1,4 +1,20 @@
 package com.example.attendancemanagementbackend.repository;
 
-public class AttendanceStudentReportProjection {
+public interface AttendanceStudentReportProjection {
+
+    String getStudentId();
+
+    String getStudentNumber();
+
+    String getStudentName();
+
+    Long getSessionCount();
+
+    Long getPresentCount();
+
+    Long getLateCount();
+
+    Long getAbsentCount();
+
+    Long getTotalRecords();
 }
