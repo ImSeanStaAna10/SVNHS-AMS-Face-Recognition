@@ -7,73 +7,105 @@ import authService from "../../services/authService";
 function CouncilorSidebar() {
   const navigate = useNavigate();
 
+  const getNavClassName = ({ isActive }) =>
+    `councilor-nav-item ${isActive ? "active" : ""}`;
+
   const handleLogout = () => {
     authService.logout();
-    navigate("/login", { replace: true });
+
+    navigate("/login", {
+      replace: true,
+    });
   };
 
   return (
     <aside className="councilor-sidebar">
-      <div className="councilor-sidebar-brand">
-        <img
-          src={shsLogo}
-          alt="Signal Village National High School"
-        />
+      {/* ===============================================
+          BRAND
+      ================================================ */}
 
-        <div>
+      <div className="councilor-brand">
+        <div className="councilor-brand-logo">
+          <img src={shsLogo} alt="Signal Village National High School" />
+        </div>
+
+        <div className="councilor-brand-copy">
           <strong>SVNHS</strong>
-          <span>Attendance System</span>
+
+          <span>Attendance Management System</span>
         </div>
       </div>
 
-      <div className="councilor-sidebar-divider" />
+      {/* ===============================================
+          NAVIGATION
+      ================================================ */}
 
-      <nav className="councilor-navigation">
-        <p className="councilor-nav-label">MAIN MENU</p>
+      <span className="councilor-nav-label">MAIN MENU</span>
 
-        <NavLink
-          to="/councilor/dashboard"
-          className={({ isActive }) =>
-            `councilor-nav-item ${
-              isActive ? "active" : ""
-            }`
-          }
-        >
-          <span className="councilor-nav-icon">⌂</span>
+      <nav className="councilor-nav" aria-label="Councilor navigation">
+        {/* DASHBOARD */}
+
+        <NavLink to="/councilor/dashboard" className={getNavClassName} end>
+          <span className="councilor-nav-icon" aria-hidden="true">
+            ▦
+          </span>
+
           <span>Dashboard</span>
         </NavLink>
 
-        <NavLink
-          to="/councilor/advisers"
-          className="councilor-nav-item"
-        >
-          <span className="councilor-nav-icon">◉</span>
+        {/* ADVISERS */}
+
+        <NavLink to="/councilor/advisers" className={getNavClassName}>
+          <span className="councilor-nav-icon" aria-hidden="true">
+            ♙
+          </span>
+
           <span>Advisers</span>
         </NavLink>
 
-        <NavLink
-          to="/councilor/sections"
-          className="councilor-nav-item"
-        >
-          <span className="councilor-nav-icon">▦</span>
+        {/* SECTIONS */}
+
+        <NavLink to="/councilor/sections" className={getNavClassName}>
+          <span className="councilor-nav-icon" aria-hidden="true">
+            ▤
+          </span>
+
           <span>Sections</span>
         </NavLink>
+
+        {/* ATTENDANCE */}
+
+        <button type="button" className="councilor-nav-item" disabled>
+          <span className="councilor-nav-icon" aria-hidden="true">
+            ◷
+          </span>
+
+          <span>Attendance</span>
+
+          <small>SOON</small>
+        </button>
       </nav>
 
-      <div className="councilor-sidebar-bottom">
+      {/* ===============================================
+          SIDEBAR FOOTER
+      ================================================ */}
+
+      <div className="councilor-sidebar-footer">
+        <div className="councilor-sidebar-school">
+          <span>SCHOOL SYSTEM</span>
+
+          <strong>Signal Village National High School</strong>
+        </div>
+
         <button
           type="button"
           className="councilor-logout"
           onClick={handleLogout}
         >
-          <span>↪</span>
+          <span aria-hidden="true">↪</span>
+
           <span>Logout</span>
         </button>
-
-        <div className="councilor-sidebar-footer">
-          <strong>SVNHS</strong>
-          <span>Attendance Management System</span>
-        </div>
       </div>
     </aside>
   );

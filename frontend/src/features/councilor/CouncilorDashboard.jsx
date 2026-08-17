@@ -54,28 +54,15 @@ function CouncilorDashboard() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const data =
-          await councilorService.getAdvisers();
+        const data = await councilorService.getAdvisers();
 
-        setAdvisers(
-          Array.isArray(data)
-            ? data
-            : [],
-        );
+        setAdvisers(Array.isArray(data) ? data : []);
 
         setError("");
       } catch (err) {
-        console.error(
-          "Councilor dashboard error:",
-          err,
-        );
+        console.error("Councilor dashboard error:", err);
 
-        setError(
-          getErrorMessage(
-            err,
-            "Unable to load councilor dashboard.",
-          ),
-        );
+        setError(getErrorMessage(err, "Unable to load councilor dashboard."));
       } finally {
         setLoading(false);
       }
@@ -90,6 +77,10 @@ function CouncilorDashboard() {
 
   const goToAdvisers = () => {
     navigate("/councilor/advisers");
+  };
+
+  const goToSections = () => {
+    navigate("/councilor/sections");
   };
 
   // =========================
@@ -108,12 +99,9 @@ function CouncilorDashboard() {
   // DERIVED DATA
   // =========================
 
-  const firstName =
-    user?.name?.trim()?.split(/\s+/)[0] ||
-    "Councilor";
+  const firstName = user?.name?.trim()?.split(/\s+/)[0] || "Councilor";
 
-  const recentAdvisers =
-    advisers.slice(0, 5);
+  const recentAdvisers = advisers.slice(0, 5);
 
   // =========================
   // RENDER
@@ -139,33 +127,23 @@ function CouncilorDashboard() {
           <div className="councilor-brand-copy">
             <strong>SVNHS</strong>
 
-            <span>
-              Attendance Management System
-            </span>
+            <span>Attendance Management System</span>
           </div>
         </div>
 
         {/* NAV LABEL */}
 
-        <span className="councilor-nav-label">
-          MAIN MENU
-        </span>
+        <span className="councilor-nav-label">MAIN MENU</span>
 
         {/* NAVIGATION */}
 
-        <nav
-          className="councilor-nav"
-          aria-label="Councilor navigation"
-        >
+        <nav className="councilor-nav" aria-label="Councilor navigation">
           <button
             type="button"
             className="councilor-nav-item active"
             aria-current="page"
           >
-            <span
-              className="councilor-nav-icon"
-              aria-hidden="true"
-            >
+            <span className="councilor-nav-icon" aria-hidden="true">
               ▦
             </span>
 
@@ -177,10 +155,7 @@ function CouncilorDashboard() {
             className="councilor-nav-item"
             onClick={goToAdvisers}
           >
-            <span
-              className="councilor-nav-icon"
-              aria-hidden="true"
-            >
+            <span className="councilor-nav-icon" aria-hidden="true">
               ♙
             </span>
 
@@ -190,29 +165,17 @@ function CouncilorDashboard() {
           <button
             type="button"
             className="councilor-nav-item"
-            disabled
+            onClick={goToSections}
           >
-            <span
-              className="councilor-nav-icon"
-              aria-hidden="true"
-            >
+            <span className="councilor-nav-icon" aria-hidden="true">
               ▤
             </span>
 
             <span>Sections</span>
-
-            <small>SOON</small>
           </button>
 
-          <button
-            type="button"
-            className="councilor-nav-item"
-            disabled
-          >
-            <span
-              className="councilor-nav-icon"
-              aria-hidden="true"
-            >
+          <button type="button" className="councilor-nav-item" disabled>
+            <span className="councilor-nav-icon" aria-hidden="true">
               ◷
             </span>
 
@@ -226,13 +189,9 @@ function CouncilorDashboard() {
 
         <div className="councilor-sidebar-footer">
           <div className="councilor-sidebar-school">
-            <span>
-              SCHOOL SYSTEM
-            </span>
+            <span>SCHOOL SYSTEM</span>
 
-            <strong>
-              Signal Village National High School
-            </strong>
+            <strong>Signal Village National High School</strong>
           </div>
 
           <button
@@ -240,10 +199,7 @@ function CouncilorDashboard() {
             className="councilor-logout"
             onClick={handleLogout}
           >
-            <span aria-hidden="true">
-              ↪
-            </span>
-
+            <span aria-hidden="true">↪</span>
             Logout
           </button>
         </div>
@@ -262,15 +218,11 @@ function CouncilorDashboard() {
           {/* HEADER TITLE */}
 
           <div className="councilor-header-copy">
-            <span className="councilor-eyebrow">
-              COUNCILOR PORTAL
-            </span>
+            <span className="councilor-eyebrow">COUNCILOR PORTAL</span>
 
             <h1>Dashboard</h1>
 
-            <p>
-              Attendance Management System
-            </p>
+            <p>Attendance Management System</p>
           </div>
 
           {/* HEADER ACTIONS */}
@@ -282,24 +234,19 @@ function CouncilorDashboard() {
               className="councilor-header-logos"
               aria-label="Institutional logos"
             >
-              {INSTITUTIONAL_LOGOS.map(
-                (logo) => (
-                  <img
-                    key={logo.alt}
-                    src={logo.src}
-                    alt={logo.alt}
-                    title={logo.alt}
-                  />
-                ),
-              )}
+              {INSTITUTIONAL_LOGOS.map((logo) => (
+                <img
+                  key={logo.alt}
+                  src={logo.src}
+                  alt={logo.alt}
+                  title={logo.alt}
+                />
+              ))}
             </div>
 
             {/* DIVIDER */}
 
-            <div
-              className="councilor-header-divider"
-              aria-hidden="true"
-            />
+            <div className="councilor-header-divider" aria-hidden="true" />
 
             {/* THEME TOGGLE */}
 
@@ -307,29 +254,19 @@ function CouncilorDashboard() {
 
             {/* DIVIDER */}
 
-            <div
-              className="councilor-header-divider"
-              aria-hidden="true"
-            />
+            <div className="councilor-header-divider" aria-hidden="true" />
 
             {/* USER */}
 
             <div className="councilor-user">
               <div className="councilor-avatar">
-                {user?.name
-                  ?.charAt(0)
-                  ?.toUpperCase() || "U"}
+                {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
 
               <div className="councilor-user-copy">
-                <strong>
-                  {user?.name ||
-                    "Councilor"}
-                </strong>
+                <strong>{user?.name || "Councilor"}</strong>
 
-                <span>
-                  School Councilor
-                </span>
+                <span>School Councilor</span>
               </div>
             </div>
           </div>
@@ -345,61 +282,37 @@ function CouncilorDashboard() {
           ================================================== */}
 
           <section className="councilor-hero">
-            <img
-              src={schoolBuilding}
-              alt=""
-              className="councilor-hero-image"
-            />
+            <img src={schoolBuilding} alt="" className="councilor-hero-image" />
 
-            <div
-              className="councilor-hero-overlay"
-              aria-hidden="true"
-            />
+            <div className="councilor-hero-overlay" aria-hidden="true" />
 
-            <div
-              className="councilor-hero-pattern"
-              aria-hidden="true"
-            />
+            <div className="councilor-hero-pattern" aria-hidden="true" />
 
             {/* HERO CONTENT */}
 
             <div className="councilor-hero-content">
-              <span className="councilor-hero-kicker">
-                WELCOME BACK
-              </span>
+              <span className="councilor-hero-kicker">WELCOME BACK</span>
 
-              <h2>
-                Good day, {firstName}.
-              </h2>
+              <h2>Good day, {firstName}.</h2>
 
               <p>
-                Monitor advisers, sections, and
-                attendance activity across Signal
-                Village National High School.
+                Monitor advisers, sections, and attendance activity across
+                Signal Village National High School.
               </p>
 
               <div className="councilor-hero-meta">
                 <span>SVNHS</span>
 
-                <span
-                  className="councilor-hero-meta-dot"
-                  aria-hidden="true"
-                />
+                <span className="councilor-hero-meta-dot" aria-hidden="true" />
 
-                <span>
-                  Attendance Management
-                </span>
+                <span>Attendance Management</span>
               </div>
             </div>
 
             {/* SCHOOL SEAL */}
 
             <div className="councilor-hero-seal">
-              <img
-                src={seniorHighSchoolLogo}
-                alt=""
-                aria-hidden="true"
-              />
+              <img src={seniorHighSchoolLogo} alt="" aria-hidden="true" />
             </div>
           </section>
 
@@ -415,24 +328,15 @@ function CouncilorDashboard() {
 
             <article className="councilor-stat-card">
               <div className="councilor-stat-top">
-                <span
-                  className="councilor-stat-icon"
-                  aria-hidden="true"
-                >
+                <span className="councilor-stat-icon" aria-hidden="true">
                   ♙
                 </span>
 
-                <span className="councilor-stat-tag">
-                  USERS
-                </span>
+                <span className="councilor-stat-tag">USERS</span>
               </div>
 
               <div className="councilor-stat-content">
-                <strong>
-                  {loading
-                    ? "—"
-                    : advisers.length}
-                </strong>
+                <strong>{loading ? "—" : advisers.length}</strong>
 
                 <p>Total Advisers</p>
               </div>
@@ -446,16 +350,11 @@ function CouncilorDashboard() {
 
             <article className="councilor-stat-card">
               <div className="councilor-stat-top">
-                <span
-                  className="councilor-stat-icon"
-                  aria-hidden="true"
-                >
+                <span className="councilor-stat-icon" aria-hidden="true">
                   ▤
                 </span>
 
-                <span className="councilor-stat-tag">
-                  ACADEMIC
-                </span>
+                <span className="councilor-stat-tag">ACADEMIC</span>
               </div>
 
               <div className="councilor-stat-content">
@@ -473,16 +372,11 @@ function CouncilorDashboard() {
 
             <article className="councilor-stat-card">
               <div className="councilor-stat-top">
-                <span
-                  className="councilor-stat-icon"
-                  aria-hidden="true"
-                >
+                <span className="councilor-stat-icon" aria-hidden="true">
                   ✓
                 </span>
 
-                <span className="councilor-stat-tag">
-                  RECORDS
-                </span>
+                <span className="councilor-stat-tag">RECORDS</span>
               </div>
 
               <div className="councilor-stat-content">
@@ -500,16 +394,11 @@ function CouncilorDashboard() {
 
             <article className="councilor-stat-card">
               <div className="councilor-stat-top">
-                <span
-                  className="councilor-stat-icon"
-                  aria-hidden="true"
-                >
+                <span className="councilor-stat-icon" aria-hidden="true">
                   %
                 </span>
 
-                <span className="councilor-stat-tag">
-                  PERFORMANCE
-                </span>
+                <span className="councilor-stat-tag">PERFORMANCE</span>
               </div>
 
               <div className="councilor-stat-content">
@@ -533,24 +422,14 @@ function CouncilorDashboard() {
 
             <div className="councilor-panel-header">
               <div>
-                <span>
-                  ACCOUNT MANAGEMENT
-                </span>
+                <span>ACCOUNT MANAGEMENT</span>
 
                 <h2>
                   Adviser Overview
-
-                  {!loading && (
-                    <small>
-                      {advisers.length}
-                    </small>
-                  )}
+                  {!loading && <small>{advisers.length}</small>}
                 </h2>
 
-                <p>
-                  Recently registered adviser
-                  accounts.
-                </p>
+                <p>Recently registered adviser accounts.</p>
               </div>
 
               <div className="councilor-panel-actions">
@@ -577,13 +456,8 @@ function CouncilorDashboard() {
             ================================================== */}
 
             {error && (
-              <div
-                className="councilor-error"
-                role="alert"
-              >
-                <span aria-hidden="true">
-                  !
-                </span>
+              <div className="councilor-error" role="alert">
+                <span aria-hidden="true">!</span>
 
                 <p>{error}</p>
               </div>
@@ -597,38 +471,23 @@ function CouncilorDashboard() {
               /* LOADING */
 
               <div className="councilor-empty">
-                <div
-                  className="councilor-loading-spinner"
-                  aria-hidden="true"
-                />
+                <div className="councilor-loading-spinner" aria-hidden="true" />
 
-                <strong>
-                  Loading advisers
-                </strong>
+                <strong>Loading advisers</strong>
 
-                <p>
-                  Fetching adviser accounts...
-                </p>
+                <p>Fetching adviser accounts...</p>
               </div>
             ) : advisers.length === 0 ? (
               /* EMPTY */
 
               <div className="councilor-empty">
-                <div
-                  className="councilor-empty-icon"
-                  aria-hidden="true"
-                >
+                <div className="councilor-empty-icon" aria-hidden="true">
                   ♙
                 </div>
 
-                <strong>
-                  No advisers yet
-                </strong>
+                <strong>No advisers yet</strong>
 
-                <p>
-                  Create your first adviser account
-                  to get started.
-                </p>
+                <p>Create your first adviser account to get started.</p>
 
                 <button
                   type="button"
@@ -645,90 +504,62 @@ function CouncilorDashboard() {
                 <table className="councilor-table">
                   <thead>
                     <tr>
-                      <th scope="col">
-                        ADVISER
-                      </th>
+                      <th scope="col">ADVISER</th>
 
-                      <th scope="col">
-                        EMAIL ADDRESS
-                      </th>
+                      <th scope="col">EMAIL ADDRESS</th>
 
-                      <th scope="col">
-                        ROLE
-                      </th>
+                      <th scope="col">ROLE</th>
 
-                      <th scope="col">
-                        STATUS
-                      </th>
+                      <th scope="col">STATUS</th>
                     </tr>
                   </thead>
 
                   <tbody>
-                    {recentAdvisers.map(
-                      (adviser) => (
-                        <tr key={adviser.id}>
-                          {/* ADVISER */}
+                    {recentAdvisers.map((adviser) => (
+                      <tr key={adviser.id}>
+                        {/* ADVISER */}
 
-                          <td>
-                            <div className="councilor-person">
-                              <div className="councilor-person-avatar">
-                                {adviser.name
-                                  ?.charAt(0)
-                                  ?.toUpperCase() ||
-                                  "A"}
-                              </div>
-
-                              <div>
-                                <strong>
-                                  {adviser.name}
-                                </strong>
-
-                                <span>
-                                  School Adviser
-                                </span>
-                              </div>
+                        <td>
+                          <div className="councilor-person">
+                            <div className="councilor-person-avatar">
+                              {adviser.name?.charAt(0)?.toUpperCase() || "A"}
                             </div>
-                          </td>
 
-                          {/* EMAIL */}
+                            <div>
+                              <strong>{adviser.name}</strong>
 
-                          <td>
-                            {adviser.email}
-                          </td>
+                              <span>School Adviser</span>
+                            </div>
+                          </div>
+                        </td>
 
-                          {/* ROLE */}
+                        {/* EMAIL */}
 
-                          <td>
-                            <span className="councilor-role">
-                              {adviser.role ||
-                                "ADVISER"}
-                            </span>
-                          </td>
+                        <td>{adviser.email}</td>
 
-                          {/* STATUS */}
+                        {/* ROLE */}
 
-                          <td>
-                            <span
-                              className={`councilor-status ${
-                                adviser.active ===
-                                false
-                                  ? "inactive"
-                                  : ""
-                              }`}
-                            >
-                              <span
-                                aria-hidden="true"
-                              />
+                        <td>
+                          <span className="councilor-role">
+                            {adviser.role || "ADVISER"}
+                          </span>
+                        </td>
 
-                              {adviser.active ===
-                              false
-                                ? "Inactive"
-                                : "Active"}
-                            </span>
-                          </td>
-                        </tr>
-                      ),
-                    )}
+                        {/* STATUS */}
+
+                        <td>
+                          <span
+                            className={`councilor-status ${
+                              adviser.active === false ? "inactive" : ""
+                            }`}
+                          >
+                            <span aria-hidden="true" />
+
+                            {adviser.active === false ? "Inactive" : "Active"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -738,22 +569,15 @@ function CouncilorDashboard() {
                 PANEL FOOTER
             ================================================== */}
 
-            {!loading &&
-              advisers.length > 5 && (
-                <div className="councilor-panel-footer">
-                  <span>
-                    Showing 5 of{" "}
-                    {advisers.length} advisers
-                  </span>
+            {!loading && advisers.length > 5 && (
+              <div className="councilor-panel-footer">
+                <span>Showing 5 of {advisers.length} advisers</span>
 
-                  <button
-                    type="button"
-                    onClick={goToAdvisers}
-                  >
-                    View all advisers →
-                  </button>
-                </div>
-              )}
+                <button type="button" onClick={goToAdvisers}>
+                  View all advisers →
+                </button>
+              </div>
+            )}
           </section>
         </div>
       </section>
