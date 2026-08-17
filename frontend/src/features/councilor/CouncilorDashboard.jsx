@@ -1,79 +1,395 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import { useNavigate } from "react-router-dom";
 
-import ThemeToggle from "../../common/themeToggle";
+import CouncilorLayout from "../../layouts/CouncilorLayout";
 
 import authService from "../../services/authService";
 import councilorService from "../../services/councilorService";
 
-import bagongPilipinasLogo from "../../assets/bagong-pilipinas-logo.svg";
-import depedLogo from "../../assets/kagawaran-educ-logo.svg";
 import schoolBuilding from "../../assets/school-background.png";
-import schoolDivisionLogo from "../../assets/school-division-logo.svg";
 import seniorHighSchoolLogo from "../../assets/shs-logo.svg";
 
 import "../../styles/councilor.css";
 
-const INSTITUTIONAL_LOGOS = [
-  {
-    src: bagongPilipinasLogo,
-    alt: "Bagong Pilipinas",
-  },
-  {
-    src: depedLogo,
-    alt: "Department of Education",
-  },
-  {
-    src: schoolDivisionLogo,
-    alt: "Schools Division Office",
-  },
-  {
-    src: seniorHighSchoolLogo,
-    alt: "Signal Village National High School",
-  },
-];
+/* =========================================================
+   CONSTANTS
+========================================================= */
 
-const getErrorMessage = (error, fallbackMessage) =>
-  error?.response?.data?.message ||
-  error?.response?.data?.error ||
-  fallbackMessage;
+const DEFAULT_ATTENDANCE_SUMMARY = {
+  sections: 0,
+  sessions: 0,
+  students: 0,
+  present: 0,
+  late: 0,
+  absent: 0,
+  totalRecords: 0,
+  presentRate: 0,
+  lateRate: 0,
+  attendanceRate: 0,
+  absenceRate: 0,
+};
+
+const INITIAL_DATA_STATUS = {
+  advisers: "loading",
+  sections: "loading",
+  attendance: "loading",
+};
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function getToday() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+
+  const month = String(
+    now.getMonth() + 1,
+  ).padStart(2, "0");
+
+  const day = String(
+    now.getDate(),
+  ).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function formatNumber(value) {
+  const number = Number(value ?? 0);
+
+  if (!Number.isFinite(number)) {
+    return "0";
+  }
+
+  return number.toLocaleString("en-PH");
+}
+
+function formatPercentage(value) {
+  const number = Number(value ?? 0);
+
+  if (!Number.isFinite(number)) {
+    return "0.0%";
+  }
+
+  return `${number.toFixed(1)}%`;
+}
+
+function clampPercentage(value) {
+  const number = Number(value ?? 0);
+
+  if (!Number.isFinite(number)) {
+    return 0;
+  }
+
+  return Math.min(
+    Math.max(number, 0),
+    100,
+  );
+}
+
+function formatDisplayDate(value) {
+  if (!value) {
+    return "—";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-PH",
+    {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    },
+  ).format(
+    new Date(`${value}T00:00:00`),
+  );
+}
+
+/* =========================================================
+   COMPONENT
+========================================================= */
 
 function CouncilorDashboard() {
   const navigate = useNavigate();
 
   const user = authService.getUser();
 
-  const [advisers, setAdvisers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const today = useMemo(
+    () => getToday(),
+    [],
+  );
 
-  // =========================
-  // LOAD DASHBOARD
-  // =========================
+  /* =======================================================
+     DATA STATE
+  ======================================================= */
+
+  const [advisers, setAdvisers] =
+    useState([]);
+
+  const [sections, setSections] =
+    useState([]);
+
+  const [attendanceReport, setAttendanceReport] =
+    useState(null);
+
+  /* =======================================================
+     REQUEST STATE
+  ======================================================= */
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [dataStatus, setDataStatus] =
+    useState(INITIAL_DATA_STATUS);
+
+  const [error, setError] =
+    useState("");
+
+  /* =======================================================
+     LOAD DASHBOARD
+  ======================================================= */
 
   useEffect(() => {
+    let isMounted = true;
+
+    const controller =
+      new AbortController();
+
     const loadDashboard = async () => {
-      try {
-        const data = await councilorService.getAdvisers();
+      setLoading(true);
+      setError("");
 
-        setAdvisers(Array.isArray(data) ? data : []);
+      const [
+        adviserResult,
+        sectionResult,
+        attendanceResult,
+      ] = await Promise.allSettled([
+        councilorService.getAdvisers(),
 
-        setError("");
-      } catch (err) {
-        console.error("Councilor dashboard error:", err);
+        councilorService.getSections(),
 
-        setError(getErrorMessage(err, "Unable to load councilor dashboard."));
-      } finally {
-        setLoading(false);
+        councilorService.getAttendanceReport({
+          from: today,
+          to: today,
+          sectionId: "",
+          adviserId: "",
+          search: "",
+          page: 0,
+          size: 5,
+          signal: controller.signal,
+        }),
+      ]);
+
+      if (!isMounted) {
+        return;
       }
+
+      const nextStatus = {
+        advisers:
+          adviserResult.status === "fulfilled"
+            ? "ready"
+            : "error",
+
+        sections:
+          sectionResult.status === "fulfilled"
+            ? "ready"
+            : "error",
+
+        attendance:
+          attendanceResult.status === "fulfilled"
+            ? "ready"
+            : "error",
+      };
+
+      /* =====================================================
+         ADVISERS
+      ===================================================== */
+
+      if (adviserResult.status === "fulfilled") {
+        const adviserData =
+          Array.isArray(adviserResult.value)
+            ? adviserResult.value.filter(
+                (account) =>
+                  account.role === "ADVISER",
+              )
+            : [];
+
+        setAdvisers(adviserData);
+      } else {
+        setAdvisers([]);
+      }
+
+      /* =====================================================
+         SECTIONS
+      ===================================================== */
+
+      if (sectionResult.status === "fulfilled") {
+        setSections(
+          Array.isArray(sectionResult.value)
+            ? sectionResult.value
+            : [],
+        );
+      } else {
+        setSections([]);
+      }
+
+      /* =====================================================
+         ATTENDANCE
+      ===================================================== */
+
+      if (
+        attendanceResult.status ===
+        "fulfilled"
+      ) {
+        setAttendanceReport(
+          attendanceResult.value ?? null,
+        );
+      } else {
+        setAttendanceReport(null);
+      }
+
+      setDataStatus(nextStatus);
+
+      /* =====================================================
+         PARTIAL FAILURE MESSAGE
+      ===================================================== */
+
+      const unavailableModules = [];
+
+      if (nextStatus.advisers === "error") {
+        unavailableModules.push("adviser accounts");
+      }
+
+      if (nextStatus.sections === "error") {
+        unavailableModules.push("sections");
+      }
+
+      if (nextStatus.attendance === "error") {
+        unavailableModules.push(
+          "today's attendance",
+        );
+      }
+
+      if (unavailableModules.length > 0) {
+        setError(
+          `Some dashboard data could not be loaded: ${unavailableModules.join(
+            ", ",
+          )}.`,
+        );
+      }
+
+      setLoading(false);
     };
 
     void loadDashboard();
-  }, []);
 
-  // =========================
-  // NAVIGATION
-  // =========================
+    return () => {
+      isMounted = false;
+
+      controller.abort();
+    };
+  }, [today]);
+
+  /* =======================================================
+     DERIVED DATA
+  ======================================================= */
+
+  const firstName =
+    user?.name
+      ?.trim()
+      ?.split(/\s+/)[0] ||
+    "Councilor";
+
+  const attendanceSummary =
+    attendanceReport?.summary ??
+    DEFAULT_ATTENDANCE_SUMMARY;
+
+  const activeAdvisers =
+    useMemo(
+      () =>
+        advisers.filter(
+          (adviser) =>
+            adviser.active !== false,
+        ).length,
+      [advisers],
+    );
+
+  const inactiveAdvisers =
+    advisers.length -
+    activeAdvisers;
+
+  const activeSections =
+    useMemo(
+      () =>
+        sections.filter(
+          (section) =>
+            section.active !== false,
+        ).length,
+      [sections],
+    );
+
+  const activeAdviserRate =
+    advisers.length > 0
+      ? (activeAdvisers /
+          advisers.length) *
+        100
+      : 0;
+
+  const activeSectionRate =
+    sections.length > 0
+      ? (activeSections /
+          sections.length) *
+        100
+      : 0;
+
+  const reportingCoverage =
+    sections.length > 0
+      ? Math.min(
+          (Number(
+            attendanceSummary.sections ??
+              0,
+          ) /
+            sections.length) *
+            100,
+          100,
+        )
+      : 0;
+
+  const adviserSnapshot =
+    useMemo(
+      () =>
+        [...advisers]
+          .sort((first, second) =>
+            (first.name ?? "").localeCompare(
+              second.name ?? "",
+            ),
+          )
+          .slice(0, 5),
+      [advisers],
+    );
+
+  /* =======================================================
+     DATA FLAGS
+  ======================================================= */
+
+  const advisersReady =
+    dataStatus.advisers === "ready";
+
+  const sectionsReady =
+    dataStatus.sections === "ready";
+
+  const attendanceReady =
+    dataStatus.attendance === "ready";
+
+  /* =======================================================
+     NAVIGATION
+  ======================================================= */
 
   const goToAdvisers = () => {
     navigate("/councilor/advisers");
@@ -83,507 +399,890 @@ function CouncilorDashboard() {
     navigate("/councilor/sections");
   };
 
-  // =========================
-  // LOGOUT
-  // =========================
-
-  const handleLogout = () => {
-    authService.logout();
-
-    navigate("/login", {
-      replace: true,
-    });
+  const goToAttendance = () => {
+    navigate("/councilor/attendance");
   };
 
-  // =========================
-  // DERIVED DATA
-  // =========================
-
-  const firstName = user?.name?.trim()?.split(/\s+/)[0] || "Councilor";
-
-  const recentAdvisers = advisers.slice(0, 5);
-
-  // =========================
-  // RENDER
-  // =========================
+  /* =======================================================
+     RENDER
+  ======================================================= */
 
   return (
-    <main className="councilor-page">
-      {/* =====================================================
-          SIDEBAR
-      ====================================================== */}
+    <CouncilorLayout>
+      <section className="dashboard-page">
+        {/* =================================================
+            HERO
+        ================================================== */}
 
-      <aside className="councilor-sidebar">
-        {/* BRAND */}
+        <section className="councilor-hero">
+          <img
+            src={schoolBuilding}
+            alt=""
+            className="councilor-hero-image"
+          />
 
-        <div className="councilor-brand">
-          <div className="councilor-brand-logo">
+          <div
+            className="councilor-hero-overlay"
+            aria-hidden="true"
+          />
+
+          <div
+            className="councilor-hero-pattern"
+            aria-hidden="true"
+          />
+
+          <div className="councilor-hero-content">
+            <span className="councilor-hero-kicker">
+              SCHOOL OVERVIEW
+            </span>
+
+            <h2>
+              Good day, {firstName}.
+            </h2>
+
+            <p>
+              Review today's attendance activity,
+              adviser accounts, and academic section
+              operations across Signal Village
+              National High School.
+            </p>
+
+            <div className="councilor-hero-meta">
+              <span>
+                {formatDisplayDate(today)}
+              </span>
+
+              <span
+                className="councilor-hero-meta-dot"
+                aria-hidden="true"
+              />
+
+              <span>
+                SVNHS Attendance Management
+              </span>
+            </div>
+
+            <div className="dashboard-hero-actions">
+              <button
+                type="button"
+                className="dashboard-hero-primary"
+                onClick={goToAttendance}
+              >
+                <span aria-hidden="true">
+                  ◷
+                </span>
+
+                View Attendance
+              </button>
+
+              <button
+                type="button"
+                className="dashboard-hero-secondary"
+                onClick={goToSections}
+              >
+                Manage Sections
+              </button>
+            </div>
+          </div>
+
+          <div
+            className="councilor-hero-seal"
+            aria-hidden="true"
+          >
             <img
               src={seniorHighSchoolLogo}
-              alt="Signal Village National High School"
+              alt=""
             />
           </div>
+        </section>
 
-          <div className="councilor-brand-copy">
-            <strong>SVNHS</strong>
+        {/* =================================================
+            ERROR / PARTIAL DATA WARNING
+        ================================================== */}
 
-            <span>Attendance Management System</span>
-          </div>
-        </div>
-
-        {/* NAV LABEL */}
-
-        <span className="councilor-nav-label">MAIN MENU</span>
-
-        {/* NAVIGATION */}
-
-        <nav className="councilor-nav" aria-label="Councilor navigation">
-          <button
-            type="button"
-            className="councilor-nav-item active"
-            aria-current="page"
+        {error && (
+          <div
+            className="dashboard-data-warning"
+            role="status"
           >
-            <span className="councilor-nav-icon" aria-hidden="true">
-              ▦
+            <span aria-hidden="true">
+              !
             </span>
 
-            <span>Dashboard</span>
-          </button>
-
-          <button
-            type="button"
-            className="councilor-nav-item"
-            onClick={goToAdvisers}
-          >
-            <span className="councilor-nav-icon" aria-hidden="true">
-              ♙
-            </span>
-
-            <span>Advisers</span>
-          </button>
-
-          <button
-            type="button"
-            className="councilor-nav-item"
-            onClick={goToSections}
-          >
-            <span className="councilor-nav-icon" aria-hidden="true">
-              ▤
-            </span>
-
-            <span>Sections</span>
-          </button>
-
-         <button
-  type="button"
-  className="councilor-nav-item"
-  onClick={() => navigate("/councilor/attendance")}
->
-  <span className="councilor-nav-icon" aria-hidden="true">
-    ◷
-  </span>
-
-  <span>Attendance</span>
-</button>
-        </nav>
-
-        {/* SIDEBAR FOOTER */}
-
-        <div className="councilor-sidebar-footer">
-          <div className="councilor-sidebar-school">
-            <span>SCHOOL SYSTEM</span>
-
-            <strong>Signal Village National High School</strong>
-          </div>
-
-          <button
-            type="button"
-            className="councilor-logout"
-            onClick={handleLogout}
-          >
-            <span aria-hidden="true">↪</span>
-            Logout
-          </button>
-        </div>
-      </aside>
-
-      {/* =====================================================
-          MAIN
-      ====================================================== */}
-
-      <section className="councilor-main">
-        {/* ===================================================
-            HEADER
-        ==================================================== */}
-
-        <header className="councilor-header">
-          {/* HEADER TITLE */}
-
-          <div className="councilor-header-copy">
-            <span className="councilor-eyebrow">COUNCILOR PORTAL</span>
-
-            <h1>Dashboard</h1>
-
-            <p>Attendance Management System</p>
-          </div>
-
-          {/* HEADER ACTIONS */}
-
-          <div className="councilor-header-actions">
-            {/* INSTITUTIONAL LOGOS */}
-
-            <div
-              className="councilor-header-logos"
-              aria-label="Institutional logos"
-            >
-              {INSTITUTIONAL_LOGOS.map((logo) => (
-                <img
-                  key={logo.alt}
-                  src={logo.src}
-                  alt={logo.alt}
-                  title={logo.alt}
-                />
-              ))}
-            </div>
-
-            {/* DIVIDER */}
-
-            <div className="councilor-header-divider" aria-hidden="true" />
-
-            {/* THEME TOGGLE */}
-
-            <ThemeToggle />
-
-            {/* DIVIDER */}
-
-            <div className="councilor-header-divider" aria-hidden="true" />
-
-            {/* USER */}
-
-            <div className="councilor-user">
-              <div className="councilor-avatar">
-                {user?.name?.charAt(0)?.toUpperCase() || "U"}
-              </div>
-
-              <div className="councilor-user-copy">
-                <strong>{user?.name || "Councilor"}</strong>
-
-                <span>School Councilor</span>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* ===================================================
-            CONTENT
-        ==================================================== */}
-
-        <div className="councilor-content">
-          {/* =================================================
-              HERO
-          ================================================== */}
-
-          <section className="councilor-hero">
-            <img src={schoolBuilding} alt="" className="councilor-hero-image" />
-
-            <div className="councilor-hero-overlay" aria-hidden="true" />
-
-            <div className="councilor-hero-pattern" aria-hidden="true" />
-
-            {/* HERO CONTENT */}
-
-            <div className="councilor-hero-content">
-              <span className="councilor-hero-kicker">WELCOME BACK</span>
-
-              <h2>Good day, {firstName}.</h2>
+            <div>
+              <strong>
+                Some information is unavailable
+              </strong>
 
               <p>
-                Monitor advisers, sections, and attendance activity across
-                Signal Village National High School.
+                {error} Other available dashboard
+                information is shown normally.
               </p>
+            </div>
+          </div>
+        )}
 
-              <div className="councilor-hero-meta">
-                <span>SVNHS</span>
+        {/* =================================================
+            KPI GRID
+        ================================================== */}
 
-                <span className="councilor-hero-meta-dot" aria-hidden="true" />
+        <section
+          className="dashboard-kpi-grid"
+          aria-label="School dashboard summary"
+        >
+          {/* ADVISERS */}
 
-                <span>Attendance Management</span>
-              </div>
+          <article className="dashboard-kpi-card">
+            <div className="dashboard-kpi-header">
+              <span
+                className="dashboard-kpi-icon"
+                aria-hidden="true"
+              >
+                ♙
+              </span>
+
+              <span className="dashboard-kpi-tag">
+                ACCOUNTS
+              </span>
             </div>
 
-            {/* SCHOOL SEAL */}
+            <strong className="dashboard-kpi-value">
+              {loading ||
+              !advisersReady
+                ? "—"
+                : formatNumber(
+                    advisers.length,
+                  )}
+            </strong>
 
-            <div className="councilor-hero-seal">
-              <img src={seniorHighSchoolLogo} alt="" aria-hidden="true" />
+            <h3>
+              Adviser Accounts
+            </h3>
+
+            <p>
+              {advisersReady
+                ? `${formatNumber(
+                    activeAdvisers,
+                  )} active · ${formatNumber(
+                    inactiveAdvisers,
+                  )} inactive`
+                : "Account information unavailable"}
+            </p>
+          </article>
+
+          {/* SECTIONS */}
+
+          <article className="dashboard-kpi-card">
+            <div className="dashboard-kpi-header">
+              <span
+                className="dashboard-kpi-icon"
+                aria-hidden="true"
+              >
+                ▤
+              </span>
+
+              <span className="dashboard-kpi-tag">
+                ACADEMIC
+              </span>
             </div>
-          </section>
 
-          {/* =================================================
-              STATISTICS
-          ================================================== */}
+            <strong className="dashboard-kpi-value">
+              {loading ||
+              !sectionsReady
+                ? "—"
+                : formatNumber(
+                    sections.length,
+                  )}
+            </strong>
 
-          <section
-            className="councilor-stat-grid"
-            aria-label="Dashboard statistics"
-          >
-            {/* TOTAL ADVISERS */}
+            <h3>
+              School Sections
+            </h3>
 
-            <article className="councilor-stat-card">
-              <div className="councilor-stat-top">
-                <span className="councilor-stat-icon" aria-hidden="true">
-                  ♙
-                </span>
+            <p>
+              {sectionsReady
+                ? `${formatNumber(
+                    activeSections,
+                  )} currently active`
+                : "Section information unavailable"}
+            </p>
+          </article>
 
-                <span className="councilor-stat-tag">USERS</span>
-              </div>
+          {/* SESSIONS */}
 
-              <div className="councilor-stat-content">
-                <strong>{loading ? "—" : advisers.length}</strong>
-
-                <p>Total Advisers</p>
-              </div>
-
-              <span className="councilor-stat-description">
-                Registered adviser accounts
+          <article className="dashboard-kpi-card dashboard-kpi-accent">
+            <div className="dashboard-kpi-header">
+              <span
+                className="dashboard-kpi-icon"
+                aria-hidden="true"
+              >
+                ◷
               </span>
-            </article>
 
-            {/* TOTAL SECTIONS */}
-
-            <article className="councilor-stat-card">
-              <div className="councilor-stat-top">
-                <span className="councilor-stat-icon" aria-hidden="true">
-                  ▤
-                </span>
-
-                <span className="councilor-stat-tag">ACADEMIC</span>
-              </div>
-
-              <div className="councilor-stat-content">
-                <strong>—</strong>
-
-                <p>Total Sections</p>
-              </div>
-
-              <span className="councilor-stat-description">
-                Managed school sections
+              <span className="dashboard-kpi-tag">
+                TODAY
               </span>
-            </article>
+            </div>
 
-            {/* ATTENDANCE SESSIONS */}
+            <strong className="dashboard-kpi-value">
+              {loading ||
+              !attendanceReady
+                ? "—"
+                : formatNumber(
+                    attendanceSummary.sessions,
+                  )}
+            </strong>
 
-            <article className="councilor-stat-card">
-              <div className="councilor-stat-top">
-                <span className="councilor-stat-icon" aria-hidden="true">
-                  ✓
-                </span>
+            <h3>
+              Attendance Sessions
+            </h3>
 
-                <span className="councilor-stat-tag">RECORDS</span>
-              </div>
+            <p>
+              {attendanceReady
+                ? `${formatNumber(
+                    attendanceSummary.sections,
+                  )} reporting sections today`
+                : "Attendance information unavailable"}
+            </p>
+          </article>
 
-              <div className="councilor-stat-content">
-                <strong>—</strong>
+          {/* ATTENDANCE RATE */}
 
-                <p>Sessions</p>
-              </div>
-
-              <span className="councilor-stat-description">
-                Attendance sessions recorded
+          <article className="dashboard-kpi-card dashboard-kpi-success">
+            <div className="dashboard-kpi-header">
+              <span
+                className="dashboard-kpi-icon"
+                aria-hidden="true"
+              >
+                ✓
               </span>
-            </article>
 
-            {/* ATTENDANCE RATE */}
-
-            <article className="councilor-stat-card">
-              <div className="councilor-stat-top">
-                <span className="councilor-stat-icon" aria-hidden="true">
-                  %
-                </span>
-
-                <span className="councilor-stat-tag">PERFORMANCE</span>
-              </div>
-
-              <div className="councilor-stat-content">
-                <strong>—</strong>
-
-                <p>Attendance Rate</p>
-              </div>
-
-              <span className="councilor-stat-description">
-                Overall student attendance
+              <span className="dashboard-kpi-tag">
+                PERFORMANCE
               </span>
-            </article>
-          </section>
+            </div>
 
-          {/* =================================================
-              ADVISER PANEL
-          ================================================== */}
+            <strong className="dashboard-kpi-value">
+              {loading ||
+              !attendanceReady
+                ? "—"
+                : formatPercentage(
+                    attendanceSummary.attendanceRate,
+                  )}
+            </strong>
 
-          <section className="councilor-panel">
-            {/* PANEL HEADER */}
+            <h3>
+              Attendance Today
+            </h3>
 
-            <div className="councilor-panel-header">
+            <p>
+              {attendanceReady
+                ? `${formatNumber(
+                    attendanceSummary.totalRecords,
+                  )} attendance records`
+                : "Attendance information unavailable"}
+            </p>
+          </article>
+        </section>
+
+        {/* =================================================
+            OPERATIONAL OVERVIEW
+        ================================================== */}
+
+        <section className="dashboard-operational-grid">
+          {/* ===============================================
+              TODAY'S ATTENDANCE
+          ================================================ */}
+
+          <article className="dashboard-panel dashboard-attendance-panel">
+            <header className="dashboard-panel-header">
               <div>
-                <span>ACCOUNT MANAGEMENT</span>
+                <span>
+                  TODAY'S OPERATIONS
+                </span>
 
                 <h2>
-                  Adviser Overview
-                  {!loading && <small>{advisers.length}</small>}
+                  Attendance Snapshot
                 </h2>
 
-                <p>Recently registered adviser accounts.</p>
+                <p>
+                  School-wide attendance performance
+                  for {formatDisplayDate(today)}.
+                </p>
               </div>
 
-              <div className="councilor-panel-actions">
-                <button
-                  type="button"
-                  className="councilor-secondary-button"
-                  onClick={goToAdvisers}
-                >
-                  View All
-                </button>
+              <button
+                type="button"
+                className="dashboard-panel-link"
+                onClick={goToAttendance}
+              >
+                Full Report
+                <span aria-hidden="true">
+                  →
+                </span>
+              </button>
+            </header>
 
-                <button
-                  type="button"
-                  className="councilor-primary-button"
-                  onClick={goToAdvisers}
-                >
-                  + Add Adviser
-                </button>
-              </div>
-            </div>
+            {!attendanceReady ? (
+              <div className="dashboard-panel-empty">
+                <span aria-hidden="true">
+                  ◷
+                </span>
 
-            {/* =================================================
-                ERROR
-            ================================================== */}
+                <strong>
+                  Attendance data unavailable
+                </strong>
 
-            {error && (
-              <div className="councilor-error" role="alert">
-                <span aria-hidden="true">!</span>
-
-                <p>{error}</p>
-              </div>
-            )}
-
-            {/* =================================================
-                LOADING / EMPTY / TABLE
-            ================================================== */}
-
-            {loading ? (
-              /* LOADING */
-
-              <div className="councilor-empty">
-                <div className="councilor-loading-spinner" aria-hidden="true" />
-
-                <strong>Loading advisers</strong>
-
-                <p>Fetching adviser accounts...</p>
-              </div>
-            ) : advisers.length === 0 ? (
-              /* EMPTY */
-
-              <div className="councilor-empty">
-                <div className="councilor-empty-icon" aria-hidden="true">
-                  ♙
-                </div>
-
-                <strong>No advisers yet</strong>
-
-                <p>Create your first adviser account to get started.</p>
+                <p>
+                  Open Attendance Reports to review
+                  available reporting information.
+                </p>
 
                 <button
                   type="button"
-                  className="councilor-primary-button"
-                  onClick={goToAdvisers}
+                  onClick={goToAttendance}
                 >
-                  + Add Adviser
+                  Open Attendance
                 </button>
               </div>
             ) : (
-              /* TABLE */
+              <>
+                {/* =========================================
+                    OVERALL RATE
+                ========================================== */}
 
-              <div className="councilor-table-wrapper">
-                <table className="councilor-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">ADVISER</th>
+                <div className="dashboard-attendance-overall">
+                  <div>
+                    <span>
+                      OVERALL ATTENDANCE
+                    </span>
 
-                      <th scope="col">EMAIL ADDRESS</th>
+                    <strong>
+                      {formatPercentage(
+                        attendanceSummary.attendanceRate,
+                      )}
+                    </strong>
 
-                      <th scope="col">ROLE</th>
+                    <p>
+                      Based on{" "}
+                      {formatNumber(
+                        attendanceSummary.totalRecords,
+                      )}{" "}
+                      attendance records today.
+                    </p>
+                  </div>
 
-                      <th scope="col">STATUS</th>
-                    </tr>
-                  </thead>
+                  <div className="dashboard-attendance-session-box">
+                    <strong>
+                      {formatNumber(
+                        attendanceSummary.sessions,
+                      )}
+                    </strong>
 
-                  <tbody>
-                    {recentAdvisers.map((adviser) => (
-                      <tr key={adviser.id}>
-                        {/* ADVISER */}
+                    <span>
+                      Sessions Today
+                    </span>
+                  </div>
+                </div>
 
-                        <td>
-                          <div className="councilor-person">
-                            <div className="councilor-person-avatar">
-                              {adviser.name?.charAt(0)?.toUpperCase() || "A"}
-                            </div>
+                <div className="dashboard-main-progress">
+                  <div
+                    style={{
+                      "--dashboard-progress":
+                        `${clampPercentage(
+                          attendanceSummary.attendanceRate,
+                        )}%`,
+                    }}
+                  />
+                </div>
 
-                            <div>
-                              <strong>{adviser.name}</strong>
+                {/* =========================================
+                    ATTENDANCE BREAKDOWN
+                ========================================== */}
 
-                              <span>School Adviser</span>
-                            </div>
-                          </div>
-                        </td>
+                <div className="dashboard-attendance-breakdown">
+                  {/* PRESENT */}
 
-                        {/* EMAIL */}
+                  <div className="dashboard-attendance-metric dashboard-attendance-present">
+                    <span
+                      className="dashboard-attendance-dot"
+                      aria-hidden="true"
+                    />
 
-                        <td>{adviser.email}</td>
+                    <div>
+                      <span>
+                        Present
+                      </span>
 
-                        {/* ROLE */}
+                      <strong>
+                        {formatPercentage(
+                          attendanceSummary.presentRate,
+                        )}
+                      </strong>
 
-                        <td>
-                          <span className="councilor-role">
-                            {adviser.role || "ADVISER"}
-                          </span>
-                        </td>
+                      <small>
+                        {formatNumber(
+                          attendanceSummary.present,
+                        )}{" "}
+                        records
+                      </small>
+                    </div>
+                  </div>
 
-                        {/* STATUS */}
+                  {/* LATE */}
 
-                        <td>
-                          <span
-                            className={`councilor-status ${
-                              adviser.active === false ? "inactive" : ""
-                            }`}
-                          >
-                            <span aria-hidden="true" />
+                  <div className="dashboard-attendance-metric dashboard-attendance-late">
+                    <span
+                      className="dashboard-attendance-dot"
+                      aria-hidden="true"
+                    />
 
-                            {adviser.active === false ? "Inactive" : "Active"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    <div>
+                      <span>
+                        Late
+                      </span>
+
+                      <strong>
+                        {formatPercentage(
+                          attendanceSummary.lateRate,
+                        )}
+                      </strong>
+
+                      <small>
+                        {formatNumber(
+                          attendanceSummary.late,
+                        )}{" "}
+                        records
+                      </small>
+                    </div>
+                  </div>
+
+                  {/* ABSENT */}
+
+                  <div className="dashboard-attendance-metric dashboard-attendance-absent">
+                    <span
+                      className="dashboard-attendance-dot"
+                      aria-hidden="true"
+                    />
+
+                    <div>
+                      <span>
+                        Absent
+                      </span>
+
+                      <strong>
+                        {formatPercentage(
+                          attendanceSummary.absenceRate,
+                        )}
+                      </strong>
+
+                      <small>
+                        {formatNumber(
+                          attendanceSummary.absent,
+                        )}{" "}
+                        records
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
+          </article>
 
-            {/* =================================================
-                PANEL FOOTER
-            ================================================== */}
+          {/* ===============================================
+              SYSTEM READINESS
+          ================================================ */}
 
-            {!loading && advisers.length > 5 && (
-              <div className="councilor-panel-footer">
-                <span>Showing 5 of {advisers.length} advisers</span>
+          <article className="dashboard-panel dashboard-readiness-panel">
+            <header className="dashboard-panel-header">
+              <div>
+                <span>
+                  SYSTEM STATUS
+                </span>
 
-                <button type="button" onClick={goToAdvisers}>
+                <h2>
+                  Operational Readiness
+                </h2>
+
+                <p>
+                  Account, section, and reporting
+                  availability.
+                </p>
+              </div>
+            </header>
+
+            <div className="dashboard-readiness-list">
+              {/* ACTIVE ADVISERS */}
+
+              <div className="dashboard-readiness-item">
+                <div className="dashboard-readiness-top">
+                  <div>
+                    <strong>
+                      Active Advisers
+                    </strong>
+
+                    <span>
+                      {advisersReady
+                        ? `${formatNumber(
+                            activeAdvisers,
+                          )} of ${formatNumber(
+                            advisers.length,
+                          )}`
+                        : "Unavailable"}
+                    </span>
+                  </div>
+
+                  <strong>
+                    {advisersReady
+                      ? formatPercentage(
+                          activeAdviserRate,
+                        )
+                      : "—"}
+                  </strong>
+                </div>
+
+                <div className="dashboard-readiness-progress">
+                  <div
+                    style={{
+                      "--dashboard-progress":
+                        `${clampPercentage(
+                          activeAdviserRate,
+                        )}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* ACTIVE SECTIONS */}
+
+              <div className="dashboard-readiness-item">
+                <div className="dashboard-readiness-top">
+                  <div>
+                    <strong>
+                      Active Sections
+                    </strong>
+
+                    <span>
+                      {sectionsReady
+                        ? `${formatNumber(
+                            activeSections,
+                          )} of ${formatNumber(
+                            sections.length,
+                          )}`
+                        : "Unavailable"}
+                    </span>
+                  </div>
+
+                  <strong>
+                    {sectionsReady
+                      ? formatPercentage(
+                          activeSectionRate,
+                        )
+                      : "—"}
+                  </strong>
+                </div>
+
+                <div className="dashboard-readiness-progress">
+                  <div
+                    style={{
+                      "--dashboard-progress":
+                        `${clampPercentage(
+                          activeSectionRate,
+                        )}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* REPORTING COVERAGE */}
+
+              <div className="dashboard-readiness-item">
+                <div className="dashboard-readiness-top">
+                  <div>
+                    <strong>
+                      Reporting Coverage
+                    </strong>
+
+                    <span>
+                      {attendanceReady &&
+                      sectionsReady
+                        ? `${formatNumber(
+                            attendanceSummary.sections,
+                          )} of ${formatNumber(
+                            sections.length,
+                          )} sections`
+                        : "Unavailable"}
+                    </span>
+                  </div>
+
+                  <strong>
+                    {attendanceReady &&
+                    sectionsReady
+                      ? formatPercentage(
+                          reportingCoverage,
+                        )
+                      : "—"}
+                  </strong>
+                </div>
+
+                <div className="dashboard-readiness-progress">
+                  <div
+                    style={{
+                      "--dashboard-progress":
+                        `${clampPercentage(
+                          reportingCoverage,
+                        )}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* =============================================
+                QUICK ACTIONS
+            ============================================== */}
+
+            <div className="dashboard-quick-actions">
+              <button
+                type="button"
+                onClick={goToAdvisers}
+              >
+                <span aria-hidden="true">
+                  ♙
+                </span>
+
+                <div>
+                  <strong>
+                    Adviser Accounts
+                  </strong>
+
+                  <small>
+                    Manage school advisers
+                  </small>
+                </div>
+
+                <span aria-hidden="true">
+                  →
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={goToSections}
+              >
+                <span aria-hidden="true">
+                  ▤
+                </span>
+
+                <div>
+                  <strong>
+                    School Sections
+                  </strong>
+
+                  <small>
+                    Manage section assignments
+                  </small>
+                </div>
+
+                <span aria-hidden="true">
+                  →
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={goToAttendance}
+              >
+                <span aria-hidden="true">
+                  ◷
+                </span>
+
+                <div>
+                  <strong>
+                    Attendance Reports
+                  </strong>
+
+                  <small>
+                    Review school attendance
+                  </small>
+                </div>
+
+                <span aria-hidden="true">
+                  →
+                </span>
+              </button>
+            </div>
+          </article>
+        </section>
+
+        {/* =================================================
+            ADVISER SNAPSHOT
+        ================================================== */}
+
+        <section className="dashboard-panel dashboard-adviser-panel">
+          <header className="dashboard-panel-header dashboard-adviser-header">
+            <div>
+              <span>
+                ACCOUNT OVERVIEW
+              </span>
+
+              <h2>
+                Adviser Account Snapshot
+              </h2>
+
+              <p>
+                Quick visibility into registered
+                school adviser accounts.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="dashboard-panel-link"
+              onClick={goToAdvisers}
+            >
+              Manage Advisers
+              <span aria-hidden="true">
+                →
+              </span>
+            </button>
+          </header>
+
+          {loading ? (
+            <div className="dashboard-panel-empty">
+              <div
+                className="councilor-loading-spinner"
+                aria-hidden="true"
+              />
+
+              <strong>
+                Loading adviser accounts
+              </strong>
+
+              <p>
+                Fetching current account information.
+              </p>
+            </div>
+          ) : !advisersReady ? (
+            <div className="dashboard-panel-empty">
+              <span aria-hidden="true">
+                !
+              </span>
+
+              <strong>
+                Adviser accounts unavailable
+              </strong>
+
+              <p>
+                Adviser information could not be
+                loaded.
+              </p>
+            </div>
+          ) : adviserSnapshot.length === 0 ? (
+            <div className="dashboard-panel-empty">
+              <span aria-hidden="true">
+                ♙
+              </span>
+
+              <strong>
+                No adviser accounts yet
+              </strong>
+
+              <p>
+                Create an adviser account to begin
+                assigning academic sections.
+              </p>
+
+              <button
+                type="button"
+                onClick={goToAdvisers}
+              >
+                Manage Advisers
+              </button>
+            </div>
+          ) : (
+            <div className="dashboard-adviser-list">
+              {adviserSnapshot.map(
+                (adviser) => {
+                  const isActive =
+                    adviser.active !== false;
+
+                  const initial =
+                    adviser.name
+                      ?.trim()
+                      ?.charAt(0)
+                      ?.toUpperCase() ||
+                    "A";
+
+                  return (
+                    <article
+                      key={adviser.id}
+                      className="dashboard-adviser-row"
+                    >
+                      <div className="dashboard-adviser-person">
+                        <div className="dashboard-adviser-avatar">
+                          {initial}
+                        </div>
+
+                        <div>
+                          <strong>
+                            {adviser.name}
+                          </strong>
+
+                          <span>
+                            {adviser.email}
+                          </span>
+                        </div>
+                      </div>
+
+                      <span className="dashboard-adviser-role">
+                        ADVISER
+                      </span>
+
+                      <span
+                        className={`dashboard-adviser-status ${
+                          isActive
+                            ? ""
+                            : "inactive"
+                        }`}
+                      >
+                        <span
+                          aria-hidden="true"
+                        />
+
+                        {isActive
+                          ? "Active"
+                          : "Inactive"}
+                      </span>
+                    </article>
+                  );
+                },
+              )}
+            </div>
+          )}
+
+          {advisersReady &&
+            advisers.length > 5 && (
+              <footer className="dashboard-adviser-footer">
+                <span>
+                  Showing 5 of{" "}
+                  {formatNumber(
+                    advisers.length,
+                  )}{" "}
+                  adviser accounts
+                </span>
+
+                <button
+                  type="button"
+                  onClick={goToAdvisers}
+                >
                   View all advisers →
                 </button>
-              </div>
+              </footer>
             )}
-          </section>
-        </div>
+        </section>
       </section>
-    </main>
+    </CouncilorLayout>
   );
 }
 

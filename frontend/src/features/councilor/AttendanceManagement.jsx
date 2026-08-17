@@ -4,34 +4,167 @@ import {
   useState,
 } from "react";
 
+import { Link } from "react-router-dom";
+
 import CouncilorLayout from "../../layouts/CouncilorLayout";
+
 import councilorService from "../../services/councilorService";
+
 import "../../styles/councilor.css";
 
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
 const PAGE_SIZE = 9;
+
 const SEARCH_DELAY = 350;
 
-function getToday() {
-  const now = new Date();
+/*
+ * These are UI reporting bands only.
+ * Adjust them later if SVNHS adopts official thresholds.
+ */
+const ATTENDANCE_BANDS = [
+  {
+    key: "high",
+    min: 90,
+    title: "90%+ Attendance",
+    label: "HIGH",
+    description:
+      "Sections showing higher attendance within the selected reporting period.",
+  },
+  {
+    key: "moderate",
+    min: 75,
+    title: "75–89.9% Attendance",
+    label: "MODERATE",
+    description:
+      "Sections with moderate attendance that may benefit from closer monitoring.",
+  },
+  {
+    key: "low",
+    min: 0,
+    title: "Below 75% Attendance",
+    label: "REVIEW",
+    description:
+      "Sections with lower attendance in the selected reporting period.",
+  },
+];
 
-  const year = now.getFullYear();
+const DEFAULT_SUMMARY = {
+  sections: 0,
+  sessions: 0,
+  students: 0,
+  present: 0,
+  late: 0,
+  absent: 0,
+  totalRecords: 0,
+  presentRate: 0,
+  lateRate: 0,
+  attendanceRate: 0,
+  absenceRate: 0,
+};
+
+const DEFAULT_SECTION_PAGE = {
+  content: [],
+  page: 0,
+  size: PAGE_SIZE,
+  totalElements: 0,
+  totalPages: 0,
+  first: true,
+  last: true,
+};
+
+/* =========================================================
+   DATE HELPERS
+========================================================= */
+
+function toDateInputValue(date) {
+  const year =
+    date.getFullYear();
+
   const month = String(
-    now.getMonth() + 1,
-  ).padStart(2, "0");
+    date.getMonth() + 1,
+  ).padStart(
+    2,
+    "0",
+  );
 
   const day = String(
-    now.getDate(),
-  ).padStart(2, "0");
+    date.getDate(),
+  ).padStart(
+    2,
+    "0",
+  );
 
   return `${year}-${month}-${day}`;
 }
 
+function getToday() {
+  return toDateInputValue(
+    new Date(),
+  );
+}
+
+function getDateOffset(
+  baseDate,
+  offsetDays,
+) {
+  const date =
+    new Date(
+      `${baseDate}T00:00:00`,
+    );
+
+  date.setDate(
+    date.getDate() +
+      offsetDays,
+  );
+
+  return toDateInputValue(
+    date,
+  );
+}
+
+/* =========================================================
+   FORMATTERS
+========================================================= */
+
 function formatNumber(value) {
-  return Number(value ?? 0).toLocaleString();
+  const number =
+    Number(
+      value ?? 0,
+    );
+
+  if (
+    !Number.isFinite(
+      number,
+    )
+  ) {
+    return "0";
+  }
+
+  return number.toLocaleString(
+    "en-PH",
+  );
 }
 
 function formatPercentage(value) {
-  return `${Number(value ?? 0).toFixed(2)}%`;
+  const number =
+    Number(
+      value ?? 0,
+    );
+
+  if (
+    !Number.isFinite(
+      number,
+    )
+  ) {
+    return "0.0%";
+  }
+
+  return `${number.toFixed(
+    1,
+  )}%`;
 }
 
 function formatDate(value) {
@@ -47,116 +180,337 @@ function formatDate(value) {
       year: "numeric",
     },
   ).format(
-    new Date(`${value}T00:00:00`),
+    new Date(
+      `${value}T00:00:00`,
+    ),
   );
 }
 
-function AttendanceManagement() {
-  const today = useMemo(
-    () => getToday(),
-    [],
+function formatDateRange(
+  from,
+  to,
+) {
+  if (from === to) {
+    return formatDate(
+      from,
+    );
+  }
+
+  return `${formatDate(
+    from,
+  )} – ${formatDate(
+    to,
+  )}`;
+}
+
+function clampPercentage(value) {
+  const number =
+    Number(
+      value ?? 0,
+    );
+
+  if (
+    !Number.isFinite(
+      number,
+    )
+  ) {
+    return 0;
+  }
+
+  return Math.min(
+    Math.max(
+      number,
+      0,
+    ),
+    100,
+  );
+}
+
+
+function getSectionAbbreviation(sectionName) {
+  const value = (sectionName ?? "")
+    .trim()
+    .toUpperCase();
+
+  if (!value) {
+    return "SECTION";
+  }
+
+  const knownTracks = [
+    "STEM",
+    "HUMSS",
+    "ABM",
+    "GAS",
+    "ICT",
+    "TVL",
+    "HE",
+    "SMAW",
+  ];
+
+  const matchedTrack = knownTracks.find((track) =>
+    new RegExp(`\\b${track}\\b`).test(value),
   );
 
-  const [report, setReport] =
-    useState(null);
+  if (matchedTrack) {
+    return matchedTrack;
+  }
 
-  const [sections, setSections] =
-    useState([]);
+  const words = value
+    .split(/[\s\-–—_/]+/)
+    .filter(Boolean)
+    .filter((word) => !/^\d+$/.test(word));
 
-  const [advisers, setAdvisers] =
-    useState([]);
+  if (words.length === 0) {
+    return "SECTION";
+  }
 
-  const [loading, setLoading] =
-    useState(true);
+  if (words[0].length <= 6) {
+    return words[0].slice(0, 6);
+  }
 
-  const [error, setError] =
-    useState("");
+  return words
+    .slice(0, 2)
+    .map((word) => word.charAt(0))
+    .join("")
+    .slice(0, 5);
+}
+/* =========================================================
+   PERFORMANCE BAND
+========================================================= */
 
-  const [searchInput, setSearchInput] =
-    useState("");
+function getAttendanceBand(
+  rate,
+) {
+  const number =
+    Number(
+      rate ?? 0,
+    );
 
-  const [debouncedSearch, setDebouncedSearch] =
-    useState("");
+  return (
+    ATTENDANCE_BANDS.find(
+      (band) =>
+        number >=
+        band.min,
+    ) ??
+    ATTENDANCE_BANDS[
+      ATTENDANCE_BANDS.length -
+        1
+    ]
+  );
+}
 
-  const [fromDate, setFromDate] =
-    useState(today);
+/* =========================================================
+   COMPONENT
+========================================================= */
 
-  const [toDate, setToDate] =
-    useState(today);
+function AttendanceManagement() {
+  const today =
+    useMemo(
+      () => getToday(),
+      [],
+    );
 
-  const [sectionId, setSectionId] =
-    useState("");
+  /* =======================================================
+     REPORT DATA
+  ======================================================= */
 
-  const [adviserId, setAdviserId] =
-    useState("");
+  const [
+    report,
+    setReport,
+  ] = useState(null);
 
-  const [page, setPage] =
-    useState(0);
+  const [
+    sections,
+    setSections,
+  ] = useState([]);
 
-  /* =========================================================
-     LOAD FILTER OPTIONS ONCE
-  ========================================================= */
+  const [
+    advisers,
+    setAdvisers,
+  ] = useState([]);
+
+  /* =======================================================
+     REQUEST STATE
+  ======================================================= */
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    filtersLoading,
+    setFiltersLoading,
+  ] = useState(true);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    filterError,
+    setFilterError,
+  ] = useState("");
+
+  /* =======================================================
+     FILTER STATE
+  ======================================================= */
+
+  const [
+    searchInput,
+    setSearchInput,
+  ] = useState("");
+
+  const [
+    debouncedSearch,
+    setDebouncedSearch,
+  ] = useState("");
+
+  const [
+    fromDate,
+    setFromDate,
+  ] = useState(today);
+
+  const [
+    toDate,
+    setToDate,
+  ] = useState(today);
+
+  const [
+    sectionId,
+    setSectionId,
+  ] = useState("");
+
+  const [
+    adviserId,
+    setAdviserId,
+  ] = useState("");
+
+  const [
+    page,
+    setPage,
+  ] = useState(0);
+
+  /* =======================================================
+     LOAD FILTER OPTIONS
+  ======================================================= */
 
   useEffect(() => {
     let ignore = false;
 
-    const loadFilterOptions = async () => {
-      try {
+    const loadFilterOptions =
+      async () => {
+        setFiltersLoading(
+          true,
+        );
+
+        setFilterError("");
+
         const [
-          sectionData,
-          adviserData,
-        ] = await Promise.all([
-          councilorService.getSections(),
-          councilorService.getAdvisers(),
-        ]);
+          sectionResult,
+          adviserResult,
+        ] =
+          await Promise.allSettled(
+            [
+              councilorService.getSections(),
+
+              councilorService.getAdvisers(),
+            ],
+          );
 
         if (ignore) {
           return;
         }
 
-        setSections(
-          Array.isArray(sectionData)
-            ? sectionData
-            : [],
-        );
+        const unavailable =
+          [];
 
-        setAdvisers(
-          Array.isArray(adviserData)
-            ? adviserData.filter(
-                (adviser) =>
-                  adviser.role === "ADVISER" &&
-                  adviser.active !== false,
-              )
-            : [],
-        );
-      } catch {
-        /*
-         * Attendance reporting can still work even
-         * if filter metadata fails to load.
-         */
-      }
-    };
+        if (
+          sectionResult.status ===
+          "fulfilled"
+        ) {
+          setSections(
+            Array.isArray(
+              sectionResult.value,
+            )
+              ? sectionResult.value
+              : [],
+          );
+        } else {
+          setSections([]);
 
-    loadFilterOptions();
+          unavailable.push(
+            "section options",
+          );
+        }
+
+        if (
+          adviserResult.status ===
+          "fulfilled"
+        ) {
+          setAdvisers(
+            Array.isArray(
+              adviserResult.value,
+            )
+              ? adviserResult.value.filter(
+                  (
+                    adviser,
+                  ) =>
+                    adviser.role ===
+                      "ADVISER" &&
+                    adviser.active !==
+                      false,
+                )
+              : [],
+          );
+        } else {
+          setAdvisers([]);
+
+          unavailable.push(
+            "adviser options",
+          );
+        }
+
+        if (
+          unavailable.length >
+          0
+        ) {
+          setFilterError(
+            `Some filter options are unavailable: ${unavailable.join(
+              ", ",
+            )}. Attendance reports can still be viewed.`,
+          );
+        }
+
+        setFiltersLoading(
+          false,
+        );
+      };
+
+    void loadFilterOptions();
 
     return () => {
       ignore = true;
     };
   }, []);
 
-  /* =========================================================
-     DEBOUNCE SEARCH
-  ========================================================= */
+  /* =======================================================
+     SEARCH DEBOUNCE
+  ======================================================= */
 
   useEffect(() => {
     const timeoutId =
-      window.setTimeout(() => {
-        setDebouncedSearch(
-          searchInput.trim(),
-        );
+      window.setTimeout(
+        () => {
+          setDebouncedSearch(
+            searchInput.trim(),
+          );
 
-        setPage(0);
-      }, SEARCH_DELAY);
+          setPage(0);
+        },
+        SEARCH_DELAY,
+      );
 
     return () => {
       window.clearTimeout(
@@ -165,62 +519,80 @@ function AttendanceManagement() {
     };
   }, [searchInput]);
 
-  /* =========================================================
-     LOAD ATTENDANCE REPORT
-  ========================================================= */
+  /* =======================================================
+     LOAD REPORT
+  ======================================================= */
 
   useEffect(() => {
     const controller =
       new AbortController();
 
-    const loadReport = async () => {
-      setLoading(true);
-      setError("");
+    const loadReport =
+      async () => {
+        setLoading(true);
 
-      try {
-        const data =
-          await councilorService
-            .getAttendanceReport({
-              from: fromDate,
-              to: toDate,
-              sectionId,
-              adviserId,
-              search:
-                debouncedSearch,
-              page,
-              size: PAGE_SIZE,
-              signal:
-                controller.signal,
-            });
+        setError("");
 
-        setReport(data);
-      } catch (requestError) {
-        if (
-          requestError?.code ===
-            "ERR_CANCELED" ||
-          requestError?.name ===
-            "CanceledError"
+        try {
+          const data =
+            await councilorService.getAttendanceReport(
+              {
+                from: fromDate,
+
+                to: toDate,
+
+                sectionId,
+
+                adviserId,
+
+                search:
+                  debouncedSearch,
+
+                page,
+
+                size: PAGE_SIZE,
+
+                signal:
+                  controller.signal,
+              },
+            );
+
+          setReport(
+            data,
+          );
+        } catch (
+          requestError
         ) {
-          return;
+          if (
+            requestError?.code ===
+              "ERR_CANCELED" ||
+            requestError?.name ===
+              "CanceledError"
+          ) {
+            return;
+          }
+
+          setReport(null);
+
+          setError(
+            requestError
+              ?.response?.data
+              ?.message ||
+              "Unable to load attendance reports.",
+          );
+        } finally {
+          if (
+            !controller.signal
+              .aborted
+          ) {
+            setLoading(
+              false,
+            );
+          }
         }
+      };
 
-        setReport(null);
-
-        setError(
-          requestError?.response?.data
-            ?.message ||
-            "Unable to load attendance reports.",
-        );
-      } finally {
-        if (
-          !controller.signal.aborted
-        ) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadReport();
+    void loadReport();
 
     return () => {
       controller.abort();
@@ -234,41 +606,25 @@ function AttendanceManagement() {
     page,
   ]);
 
-  /* =========================================================
-     DERIVED DATA
-  ========================================================= */
+  /* =======================================================
+     DERIVED REPORT DATA
+  ======================================================= */
 
   const summary =
-    report?.summary ?? {
-      sections: 0,
-      sessions: 0,
-      students: 0,
-      present: 0,
-      late: 0,
-      absent: 0,
-      totalRecords: 0,
-      presentRate: 0,
-      lateRate: 0,
-      attendanceRate: 0,
-      absenceRate: 0,
-    };
+    report?.summary ??
+    DEFAULT_SUMMARY;
 
   const sectionPage =
-    report?.sections ?? {
-      content: [],
-      page: 0,
-      size: PAGE_SIZE,
-      totalElements: 0,
-      totalPages: 0,
-      first: true,
-      last: true,
-    };
+    report?.sections ??
+    DEFAULT_SECTION_PAGE;
 
   const attendanceSections =
-    sectionPage.content ?? [];
+    sectionPage.content ??
+    [];
 
   const startRecord =
-    sectionPage.totalElements > 0
+    sectionPage.totalElements >
+    0
       ? sectionPage.page *
           sectionPage.size +
         1
@@ -276,14 +632,225 @@ function AttendanceManagement() {
 
   const endRecord =
     Math.min(
-      (sectionPage.page + 1) *
+      (sectionPage.page +
+        1) *
         sectionPage.size,
+
       sectionPage.totalElements,
     );
 
-  /* =========================================================
+  /* =======================================================
+     SCHOOL SCOPE
+  ======================================================= */
+
+  const activeSectionCount =
+    useMemo(
+      () =>
+        sections.filter(
+          (section) =>
+            section.active !==
+            false,
+        ).length,
+      [sections],
+    );
+
+  const hasScopeFilter =
+    Boolean(
+      searchInput.trim() ||
+        sectionId ||
+        adviserId,
+    );
+
+  const reportingCoverage =
+    !hasScopeFilter &&
+    activeSectionCount > 0
+      ? Math.min(
+          (Number(
+            summary.sections ??
+              0,
+          ) /
+            activeSectionCount) *
+            100,
+          100,
+        )
+      : null;
+
+  const overallBand =
+    getAttendanceBand(
+      summary.attendanceRate,
+    );
+
+  /* =======================================================
+     GROUP SECTION RESULTS
+  ======================================================= */
+
+  const sectionGroups =
+    useMemo(() => {
+      const grouped =
+        new Map();
+
+      ATTENDANCE_BANDS.forEach(
+        (band) => {
+          grouped.set(
+            band.key,
+            {
+              ...band,
+
+              sections: [],
+            },
+          );
+        },
+      );
+
+      attendanceSections.forEach(
+        (section) => {
+          const band =
+            getAttendanceBand(
+              section.attendanceRate,
+            );
+
+          grouped
+            .get(band.key)
+            ?.sections.push(
+              section,
+            );
+        },
+      );
+
+      return ATTENDANCE_BANDS.map(
+        (band) =>
+          grouped.get(
+            band.key,
+          ),
+      ).filter(
+        (group) =>
+          group.sections
+            .length > 0,
+      );
+    }, [
+      attendanceSections,
+    ]);
+
+  /* =======================================================
+     SELECTED FILTER LABELS
+  ======================================================= */
+
+  const selectedSectionName =
+    useMemo(
+      () =>
+        sections.find(
+          (section) =>
+            String(
+              section.id,
+            ) ===
+            String(
+              sectionId,
+            ),
+        )?.name ?? "",
+      [
+        sections,
+        sectionId,
+      ],
+    );
+
+  const selectedAdviserName =
+    useMemo(
+      () =>
+        advisers.find(
+          (adviser) =>
+            String(
+              adviser.id,
+            ) ===
+            String(
+              adviserId,
+            ),
+        )?.name ?? "",
+      [
+        advisers,
+        adviserId,
+      ],
+    );
+
+  const isDefaultPeriod =
+    fromDate === today &&
+    toDate === today;
+
+  const hasCustomFilters =
+    Boolean(
+      searchInput.trim() ||
+        sectionId ||
+        adviserId ||
+        !isDefaultPeriod,
+    );
+
+  const activeFilterCount =
+    [
+      Boolean(
+        searchInput.trim(),
+      ),
+
+      Boolean(sectionId),
+
+      Boolean(adviserId),
+
+      !isDefaultPeriod,
+    ].filter(Boolean).length;
+
+  /* =======================================================
+     DETAIL URL
+  ======================================================= */
+
+  const getDetailUrl = (
+    selectedSectionId,
+  ) => {
+    const params =
+      new URLSearchParams();
+
+    params.set(
+      "from",
+      fromDate,
+    );
+
+    params.set(
+      "to",
+      toDate,
+    );
+
+    return `/councilor/attendance/${selectedSectionId}?${params.toString()}`;
+  };
+
+  /* =======================================================
+     DATE PRESETS
+  ======================================================= */
+
+  const applyDatePreset = (
+    days,
+  ) => {
+    setFromDate(
+      getDateOffset(
+        today,
+        -(days - 1),
+      ),
+    );
+
+    setToDate(today);
+
+    setPage(0);
+  };
+
+  const isPresetActive = (
+    days,
+  ) =>
+    fromDate ===
+      getDateOffset(
+        today,
+        -(days - 1),
+      ) &&
+    toDate === today;
+
+  /* =======================================================
      FILTER HANDLERS
-  ========================================================= */
+  ======================================================= */
 
   const handleFromDateChange = (
     event,
@@ -325,233 +892,786 @@ function AttendanceManagement() {
     setPage(0);
   };
 
-  const handleResetFilters = () => {
-    setSearchInput("");
-    setDebouncedSearch("");
+  const handleResetFilters =
+    () => {
+      setSearchInput("");
 
-    setFromDate(today);
-    setToDate(today);
-
-    setSectionId("");
-    setAdviserId("");
-
-    setPage(0);
-  };
-
-  const goToPreviousPage = () => {
-    if (!sectionPage.first) {
-      setPage(
-        (currentPage) =>
-          currentPage - 1,
+      setDebouncedSearch(
+        "",
       );
-    }
-  };
 
-  const goToNextPage = () => {
-    if (!sectionPage.last) {
-      setPage(
-        (currentPage) =>
-          currentPage + 1,
+      setFromDate(today);
+
+      setToDate(today);
+
+      setSectionId("");
+
+      setAdviserId("");
+
+      setPage(0);
+    };
+
+  /* =======================================================
+     PAGINATION
+  ======================================================= */
+
+  const goToPreviousPage =
+    () => {
+      if (
+        !sectionPage.first
+      ) {
+        setPage(
+          (currentPage) =>
+            currentPage -
+            1,
+        );
+      }
+    };
+
+  const goToNextPage =
+    () => {
+      if (
+        !sectionPage.last
+      ) {
+        setPage(
+          (currentPage) =>
+            currentPage +
+            1,
+        );
+      }
+    };
+
+  /* =======================================================
+     SECTION CARD
+  ======================================================= */
+
+  const renderSectionCard = (
+    section,
+  ) => {
+    const band =
+      getAttendanceBand(
+        section.attendanceRate,
       );
-    }
+
+    return (
+      <Link
+        key={
+          section.sectionId
+        }
+        to={getDetailUrl(
+          section.sectionId,
+        )}
+        className="attendance-section-card-link"
+        aria-label={`View detailed attendance report for ${section.sectionName}`}
+      >
+        <article
+  className={`attendance-section-card attendance-band-${band.key}`}
+  data-room-label={getSectionAbbreviation(section.sectionName)}
+>
+          {/* =============================================
+              CARD HEADER
+          ============================================== */}
+
+          <header className="attendance-card-header">
+            <div
+              className="attendance-card-section-icon"
+              aria-hidden="true"
+            >
+              ▤
+            </div>
+
+            <div className="attendance-card-title">
+              <span>
+                SCHOOL SECTION
+              </span>
+
+              <h3>
+                {
+                  section.sectionName
+                }
+              </h3>
+
+              <p>
+                {section.adviserName
+                  ? `Adviser: ${section.adviserName}`
+                  : "No adviser assigned"}
+              </p>
+            </div>
+
+            <span
+              className={`attendance-card-health attendance-card-health-${band.key}`}
+            >
+              {band.label}
+            </span>
+          </header>
+
+          {/* =============================================
+              OPERATIONAL INFORMATION
+          ============================================== */}
+
+          <div className="attendance-card-operations">
+            <div>
+              <span>
+                STUDENTS
+              </span>
+
+              <strong>
+                {formatNumber(
+                  section.studentCount,
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>
+                SESSIONS
+              </span>
+
+              <strong>
+                {formatNumber(
+                  section.sessionCount,
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>
+                RECORDS
+              </span>
+
+              <strong>
+                {formatNumber(
+                  section.totalRecords,
+                )}
+              </strong>
+            </div>
+          </div>
+
+          {/* =============================================
+              ATTENDANCE PERFORMANCE
+          ============================================== */}
+
+          <section className="attendance-card-performance">
+            <div className="attendance-card-rate-heading">
+              <div>
+                <span>
+                  OVERALL ATTENDANCE
+                </span>
+
+                <small>
+                  Selected report period
+                </small>
+              </div>
+
+              <strong>
+                {formatPercentage(
+                  section.attendanceRate,
+                )}
+              </strong>
+            </div>
+
+            <div
+              className="attendance-progress"
+              aria-hidden="true"
+            >
+              <span
+                style={{
+                  width: `${clampPercentage(
+                    section.attendanceRate,
+                  )}%`,
+                }}
+              />
+            </div>
+          </section>
+
+          {/* =============================================
+              STATUS BREAKDOWN
+          ============================================== */}
+
+          <div className="attendance-card-breakdown">
+            <div className="attendance-card-status-item attendance-card-status-present">
+              <span
+                className="attendance-dot"
+                aria-hidden="true"
+              />
+
+              <div>
+                <span>
+                  PRESENT
+                </span>
+
+                <strong>
+                  {formatPercentage(
+                    section.presentRate,
+                  )}
+                </strong>
+              </div>
+            </div>
+
+            <div className="attendance-card-status-item attendance-card-status-late">
+              <span
+                className="attendance-dot"
+                aria-hidden="true"
+              />
+
+              <div>
+                <span>
+                  LATE
+                </span>
+
+                <strong>
+                  {formatPercentage(
+                    section.lateRate,
+                  )}
+                </strong>
+              </div>
+            </div>
+
+            <div className="attendance-card-status-item attendance-card-status-absent">
+              <span
+                className="attendance-dot"
+                aria-hidden="true"
+              />
+
+              <div>
+                <span>
+                  ABSENT
+                </span>
+
+                <strong>
+                  {formatPercentage(
+                    section.absenceRate,
+                  )}
+                </strong>
+              </div>
+            </div>
+          </div>
+
+          {/* =============================================
+              CARD FOOTER
+          ============================================== */}
+
+          <footer className="attendance-card-footer">
+            <span>
+              Detailed student and
+              session records
+            </span>
+
+            <strong className="attendance-card-report-label">
+              Open Report
+              <span
+                aria-hidden="true"
+              >
+                →
+              </span>
+            </strong>
+          </footer>
+        </article>
+      </Link>
+    );
   };
 
-  /* =========================================================
+  /* =======================================================
      RENDER
-  ========================================================= */
+  ======================================================= */
 
   return (
     <CouncilorLayout>
       <section className="attendance-page">
+        {/* =================================================
+            HERO
+        ================================================== */}
+
         <header className="attendance-hero">
           <div className="attendance-hero-copy">
             <span className="attendance-eyebrow">
-              ATTENDANCE REPORTING
+              ATTENDANCE
+              INTELLIGENCE
             </span>
 
             <h1>
-              School Attendance Reports
+              School Attendance
+              Reports
             </h1>
 
             <p>
-              Monitor section attendance,
-              review school-wide performance,
-              and prepare detailed attendance
-              reports.
+              Review school-wide
+              attendance performance,
+              identify sections that
+              may need closer
+              monitoring, and open
+              detailed student-level
+              attendance reports.
             </p>
+
+            <div className="attendance-hero-meta">
+              <span>
+                SVNHS
+              </span>
+
+              <span
+                aria-hidden="true"
+              >
+                •
+              </span>
+
+              <span>
+                Councilor Reporting
+                Portal
+              </span>
+            </div>
           </div>
 
           <div className="attendance-hero-period">
             <span>
-              REPORT PERIOD
+              CURRENT REPORT PERIOD
             </span>
 
             <strong>
-              {formatDate(fromDate)}
-              {fromDate !== toDate
-                ? ` – ${formatDate(toDate)}`
-                : ""}
+              {formatDateRange(
+                fromDate,
+                toDate,
+              )}
             </strong>
+
+            <small>
+              {activeFilterCount >
+              0
+                ? `${activeFilterCount} additional ${
+                    activeFilterCount ===
+                    1
+                      ? "filter"
+                      : "filters"
+                  } applied`
+                : "School-wide reporting scope"}
+            </small>
           </div>
         </header>
 
-        {/* ===================================================
-            SUMMARY
-        =================================================== */}
+        {/* =================================================
+            SCHOOL ATTENDANCE OVERVIEW
+        ================================================== */}
 
-        <section
-          className="attendance-summary-grid"
-          aria-label="Attendance summary"
-        >
-          <article className="attendance-summary-card">
-            <div className="attendance-summary-card-top">
-              <span className="attendance-summary-icon">
-                ♙
-              </span>
+        <section className="attendance-overview-grid">
+          {/* ===============================================
+              OVERALL HEALTH
+          ================================================ */}
 
-              <span>
-                Students
+          <article className="attendance-health-panel">
+            <header className="attendance-overview-header">
+              <div>
+                <span>
+                  SCHOOL OVERVIEW
+                </span>
+
+                <h2>
+                  Attendance Health
+                </h2>
+
+                <p>
+                  Overall attendance
+                  performance for the
+                  selected reporting
+                  scope.
+                </p>
+              </div>
+
+              <span
+                className={`attendance-overall-band attendance-overall-band-${overallBand.key}`}
+              >
+                {
+                  overallBand.label
+                }
               </span>
+            </header>
+
+            <div className="attendance-overall-rate">
+              <div>
+                <span>
+                  OVERALL ATTENDANCE
+                </span>
+
+                <strong>
+                  {loading
+                    ? "—"
+                    : formatPercentage(
+                        summary.attendanceRate,
+                      )}
+                </strong>
+
+                <p>
+                  Based on{" "}
+                  {formatNumber(
+                    summary.totalRecords,
+                  )}{" "}
+                  attendance records.
+                </p>
+              </div>
+
+              {!hasScopeFilter &&
+                reportingCoverage !==
+                  null && (
+                  <div className="attendance-coverage-box">
+                    <strong>
+                      {formatPercentage(
+                        reportingCoverage,
+                      )}
+                    </strong>
+
+                    <span>
+                      Reporting
+                      Coverage
+                    </span>
+
+                    <small>
+                      {formatNumber(
+                        summary.sections,
+                      )}{" "}
+                      of{" "}
+                      {formatNumber(
+                        activeSectionCount,
+                      )}{" "}
+                      active sections
+                    </small>
+                  </div>
+                )}
             </div>
 
-            <strong>
-              {formatNumber(
-                summary.students,
-              )}
-            </strong>
+            <div className="attendance-overall-progress">
+              <span
+                style={{
+                  width: `${clampPercentage(
+                    summary.attendanceRate,
+                  )}%`,
+                }}
+              />
+            </div>
 
-            <small>
-              Across{" "}
-              {formatNumber(
-                summary.sections,
-              )}{" "}
-              reporting sections
-            </small>
+            <div className="attendance-overview-metrics">
+              <div>
+                <span>
+                  STUDENTS
+                </span>
+
+                <strong>
+                  {loading
+                    ? "—"
+                    : formatNumber(
+                        summary.students,
+                      )}
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  REPORTING
+                  SECTIONS
+                </span>
+
+                <strong>
+                  {loading
+                    ? "—"
+                    : formatNumber(
+                        summary.sections,
+                      )}
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  SESSIONS
+                </span>
+
+                <strong>
+                  {loading
+                    ? "—"
+                    : formatNumber(
+                        summary.sessions,
+                      )}
+                </strong>
+              </div>
+
+              <div>
+                <span>
+                  RECORDS
+                </span>
+
+                <strong>
+                  {loading
+                    ? "—"
+                    : formatNumber(
+                        summary.totalRecords,
+                      )}
+                </strong>
+              </div>
+            </div>
           </article>
 
-          <article className="attendance-summary-card attendance-summary-present">
-            <div className="attendance-summary-card-top">
-              <span className="attendance-summary-icon">
-                ✓
-              </span>
+          {/* ===============================================
+              STATUS BREAKDOWN
+          ================================================ */}
 
-              <span>
-                Present
-              </span>
+          <article className="attendance-status-panel">
+            <header className="attendance-overview-header">
+              <div>
+                <span>
+                  STATUS BREAKDOWN
+                </span>
+
+                <h2>
+                  Attendance
+                  Distribution
+                </h2>
+
+                <p>
+                  Present, late, and
+                  absent attendance
+                  records.
+                </p>
+              </div>
+            </header>
+
+            <div className="attendance-status-list">
+              {/* PRESENT */}
+
+              <div className="attendance-status-row attendance-status-present">
+                <span
+                  className="attendance-status-indicator"
+                  aria-hidden="true"
+                />
+
+                <div className="attendance-status-copy">
+                  <strong>
+                    Present
+                  </strong>
+
+                  <span>
+                    {formatNumber(
+                      summary.present,
+                    )}{" "}
+                    records
+                  </span>
+                </div>
+
+                <strong className="attendance-status-rate">
+                  {loading
+                    ? "—"
+                    : formatPercentage(
+                        summary.presentRate,
+                      )}
+                </strong>
+              </div>
+
+              {/* LATE */}
+
+              <div className="attendance-status-row attendance-status-late">
+                <span
+                  className="attendance-status-indicator"
+                  aria-hidden="true"
+                />
+
+                <div className="attendance-status-copy">
+                  <strong>
+                    Late
+                  </strong>
+
+                  <span>
+                    {formatNumber(
+                      summary.late,
+                    )}{" "}
+                    records
+                  </span>
+                </div>
+
+                <strong className="attendance-status-rate">
+                  {loading
+                    ? "—"
+                    : formatPercentage(
+                        summary.lateRate,
+                      )}
+                </strong>
+              </div>
+
+              {/* ABSENT */}
+
+              <div className="attendance-status-row attendance-status-absent">
+                <span
+                  className="attendance-status-indicator"
+                  aria-hidden="true"
+                />
+
+                <div className="attendance-status-copy">
+                  <strong>
+                    Absent
+                  </strong>
+
+                  <span>
+                    {formatNumber(
+                      summary.absent,
+                    )}{" "}
+                    records
+                  </span>
+                </div>
+
+                <strong className="attendance-status-rate">
+                  {loading
+                    ? "—"
+                    : formatPercentage(
+                        summary.absenceRate,
+                      )}
+                </strong>
+              </div>
             </div>
 
-            <strong>
-              {formatPercentage(
-                summary.presentRate,
-              )}
-            </strong>
-
-            <small>
-              {formatNumber(
-                summary.present,
-              )}{" "}
-              attendance records
-            </small>
-          </article>
-
-          <article className="attendance-summary-card attendance-summary-late">
-            <div className="attendance-summary-card-top">
-              <span className="attendance-summary-icon">
-                ◷
+            <div className="attendance-status-note">
+              <span
+                aria-hidden="true"
+              >
+                i
               </span>
 
-              <span>
-                Late
-              </span>
+              <p>
+                Rates reflect the
+                currently selected
+                dates and filters.
+              </p>
             </div>
-
-            <strong>
-              {formatPercentage(
-                summary.lateRate,
-              )}
-            </strong>
-
-            <small>
-              {formatNumber(
-                summary.late,
-              )}{" "}
-              attendance records
-            </small>
-          </article>
-
-          <article className="attendance-summary-card attendance-summary-absent">
-            <div className="attendance-summary-card-top">
-              <span className="attendance-summary-icon">
-                ×
-              </span>
-
-              <span>
-                Absent
-              </span>
-            </div>
-
-            <strong>
-              {formatPercentage(
-                summary.absenceRate,
-              )}
-            </strong>
-
-            <small>
-              {formatNumber(
-                summary.absent,
-              )}{" "}
-              attendance records
-            </small>
           </article>
         </section>
 
-        {/* ===================================================
-            FILTERS
-        =================================================== */}
+        {/* =================================================
+            REPORT CONTROLS
+        ================================================== */}
 
-        <section className="attendance-report-panel">
-          <div className="attendance-report-heading">
+        <section className="attendance-controls-panel">
+          <header className="attendance-controls-header">
             <div>
-              <span className="attendance-section-label">
-                REPORT DIRECTORY
+              <span>
+                REPORT CONTROLS
               </span>
 
               <h2>
-                Section Attendance
+                Build your report
+                scope
               </h2>
 
               <p>
-                Select a reporting period
-                and review attendance by
-                section.
+                Choose a reporting
+                period and narrow the
+                report by section,
+                adviser, or search
+                term.
               </p>
             </div>
 
-            <div className="attendance-session-count">
+            <div className="attendance-filter-count">
               <strong>
-                {formatNumber(
-                  summary.sessions,
-                )}
+                {
+                  activeFilterCount
+                }
               </strong>
 
               <span>
-                Sessions
+                Active{" "}
+                {activeFilterCount ===
+                1
+                  ? "Filter"
+                  : "Filters"}
               </span>
+            </div>
+          </header>
+
+          {/* ===============================================
+              DATE PRESETS
+          ================================================ */}
+
+          <div className="attendance-date-presets">
+            <span>
+              QUICK PERIOD
+            </span>
+
+            <div>
+              <button
+                type="button"
+                className={
+                  isPresetActive(
+                    1,
+                  )
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  applyDatePreset(
+                    1,
+                  )
+                }
+              >
+                Today
+              </button>
+
+              <button
+                type="button"
+                className={
+                  isPresetActive(
+                    7,
+                  )
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  applyDatePreset(
+                    7,
+                  )
+                }
+              >
+                Last 7 Days
+              </button>
+
+              <button
+                type="button"
+                className={
+                  isPresetActive(
+                    30,
+                  )
+                    ? "active"
+                    : ""
+                }
+                onClick={() =>
+                  applyDatePreset(
+                    30,
+                  )
+                }
+              >
+                Last 30 Days
+              </button>
             </div>
           </div>
 
+          {/* ===============================================
+              FILTER GRID
+          ================================================ */}
+
           <div className="attendance-filter-bar">
+            {/* SEARCH */}
+
             <label className="attendance-search">
-              <span aria-hidden="true">
+              <span
+                aria-hidden="true"
+              >
                 ⌕
               </span>
 
               <input
                 type="search"
-                value={searchInput}
-                onChange={(event) =>
+                value={
+                  searchInput
+                }
+                onChange={(
+                  event,
+                ) =>
                   setSearchInput(
-                    event.target.value,
+                    event.target
+                      .value,
                   )
                 }
                 placeholder="Search section or adviser..."
@@ -559,45 +1679,69 @@ function AttendanceManagement() {
               />
             </label>
 
+            {/* FROM */}
+
             <label className="attendance-filter-field">
               <span>
-                From
+                FROM DATE
               </span>
 
               <input
                 type="date"
-                value={fromDate}
-                max={toDate}
+                value={
+                  fromDate
+                }
+                max={
+                  toDate
+                }
                 onChange={
                   handleFromDateChange
                 }
               />
             </label>
 
+            {/* TO */}
+
             <label className="attendance-filter-field">
               <span>
-                To
+                TO DATE
               </span>
 
               <input
                 type="date"
-                value={toDate}
-                min={fromDate}
+                value={
+                  toDate
+                }
+                min={
+                  fromDate
+                }
+                max={
+                  today
+                }
                 onChange={
                   handleToDateChange
                 }
               />
             </label>
 
+            {/* SECTION */}
+
             <label className="attendance-filter-field">
               <span>
-                Section
+                SECTION
               </span>
 
               <select
-                value={sectionId}
+                value={
+                  sectionId
+                }
                 onChange={
                   handleSectionChange
+                }
+                disabled={
+                  filtersLoading ||
+                  sections.length ===
+                    0
                 }
               >
                 <option value="">
@@ -607,25 +1751,40 @@ function AttendanceManagement() {
                 {sections.map(
                   (section) => (
                     <option
-                      key={section.id}
-                      value={section.id}
+                      key={
+                        section.id
+                      }
+                      value={
+                        section.id
+                      }
                     >
-                      {section.name}
+                      {
+                        section.name
+                      }
                     </option>
                   ),
                 )}
               </select>
             </label>
 
+            {/* ADVISER */}
+
             <label className="attendance-filter-field">
               <span>
-                Adviser
+                ADVISER
               </span>
 
               <select
-                value={adviserId}
+                value={
+                  adviserId
+                }
                 onChange={
                   handleAdviserChange
+                }
+                disabled={
+                  filtersLoading ||
+                  advisers.length ===
+                    0
                 }
               >
                 <option value="">
@@ -635,15 +1794,23 @@ function AttendanceManagement() {
                 {advisers.map(
                   (adviser) => (
                     <option
-                      key={adviser.id}
-                      value={adviser.id}
+                      key={
+                        adviser.id
+                      }
+                      value={
+                        adviser.id
+                      }
                     >
-                      {adviser.name}
+                      {
+                        adviser.name
+                      }
                     </option>
                   ),
                 )}
               </select>
             </label>
+
+            {/* RESET */}
 
             <button
               type="button"
@@ -651,241 +1818,372 @@ function AttendanceManagement() {
               onClick={
                 handleResetFilters
               }
+              disabled={
+                !hasCustomFilters
+              }
             >
               Reset
             </button>
           </div>
 
-          {/* =================================================
-              STATUS
-          ================================================= */}
+          {/* ===============================================
+              ACTIVE SCOPE
+          ================================================ */}
+
+          {hasCustomFilters && (
+            <div className="attendance-active-scope">
+              <span className="attendance-active-scope-label">
+                ACTIVE SCOPE
+              </span>
+
+              <div className="attendance-scope-chips">
+                {!isDefaultPeriod && (
+                  <span>
+                    Period:
+                    <strong>
+                      {formatDateRange(
+                        fromDate,
+                        toDate,
+                      )}
+                    </strong>
+                  </span>
+                )}
+
+                {selectedSectionName && (
+                  <span>
+                    Section:
+                    <strong>
+                      {
+                        selectedSectionName
+                      }
+                    </strong>
+                  </span>
+                )}
+
+                {selectedAdviserName && (
+                  <span>
+                    Adviser:
+                    <strong>
+                      {
+                        selectedAdviserName
+                      }
+                    </strong>
+                  </span>
+                )}
+
+                {searchInput.trim() && (
+                  <span>
+                    Search:
+                    <strong>
+                      “
+                      {searchInput.trim()}
+                      ”
+                    </strong>
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ===============================================
+              FILTER OPTION WARNING
+          ================================================ */}
+
+          {filterError && (
+            <div className="attendance-filter-warning">
+              <span
+                aria-hidden="true"
+              >
+                !
+              </span>
+
+              <p>
+                {
+                  filterError
+                }
+              </p>
+            </div>
+          )}
+        </section>
+
+        {/* =================================================
+            SECTION REPORT DIRECTORY
+        ================================================== */}
+
+        <section className="attendance-directory-panel">
+          {/* ===============================================
+              DIRECTORY HEADER
+          ================================================ */}
+
+          <header className="attendance-directory-header">
+            <div>
+              <span>
+                SECTION REPORTS
+              </span>
+
+              <h2>
+                Attendance by
+                Section
+              </h2>
+
+              <p>
+                Sections are separated
+                by attendance band to
+                make report review
+                faster and easier to
+                prioritize.
+              </p>
+            </div>
+
+            <div className="attendance-directory-summary">
+              <div>
+                <strong>
+                  {loading
+                    ? "—"
+                    : formatNumber(
+                        sectionPage.totalElements,
+                      )}
+                </strong>
+
+                <span>
+                  Sections
+                </span>
+              </div>
+
+              <div>
+                <strong>
+                  {loading
+                    ? "—"
+                    : formatNumber(
+                        summary.sessions,
+                      )}
+                </strong>
+
+                <span>
+                  Sessions
+                </span>
+              </div>
+            </div>
+          </header>
+
+          {/* ===============================================
+              PERFORMANCE BAND NOTE
+          ================================================ */}
+
+          <div className="attendance-band-guide">
+            <span>
+              PERFORMANCE BANDS
+            </span>
+
+            <div>
+              <span className="attendance-band-guide-high">
+                <i />
+                90%+
+              </span>
+
+              <span className="attendance-band-guide-moderate">
+                <i />
+                75–89.9%
+              </span>
+
+              <span className="attendance-band-guide-low">
+                <i />
+                Below 75%
+              </span>
+            </div>
+
+            <small>
+              Visual reporting aid
+              only; thresholds can be
+              adjusted to match
+              official school policy.
+            </small>
+          </div>
+
+          {/* ===============================================
+              REPORT ERROR
+          ================================================ */}
 
           {error && (
             <div
               className="councilor-error"
               role="alert"
             >
-              {error}
+              <span
+                aria-hidden="true"
+              >
+                !
+              </span>
+
+              <p>
+                {error}
+              </p>
             </div>
           )}
+
+          {/* ===============================================
+              LOADING
+          ================================================ */}
 
           {loading && (
             <div className="attendance-loading">
-              <span
-                className="councilor-spinner"
+              <div
+                className="councilor-loading-spinner"
                 aria-hidden="true"
               />
 
-              <span>
+              <strong>
                 Loading attendance
-                reports...
+                reports
+              </strong>
+
+              <span>
+                Preparing section
+                performance and
+                attendance records...
               </span>
             </div>
           )}
+
+          {/* ===============================================
+              EMPTY
+          ================================================ */}
 
           {!loading &&
             !error &&
             attendanceSections.length ===
               0 && (
               <div className="attendance-empty">
-                <div className="attendance-empty-icon">
+                <div
+                  className="attendance-empty-icon"
+                  aria-hidden="true"
+                >
                   ▦
                 </div>
 
                 <h3>
-                  No attendance reports
-                  found
+                  No attendance
+                  reports found
                 </h3>
 
                 <p>
-                  There are no completed
-                  attendance sessions for
-                  the selected reporting
-                  period or filters.
+                  There are no
+                  completed attendance
+                  sessions matching the
+                  selected report
+                  period and filters.
                 </p>
+
+                {hasCustomFilters && (
+                  <button
+                    type="button"
+                    onClick={
+                      handleResetFilters
+                    }
+                  >
+                    Reset Report
+                    Filters
+                  </button>
+                )}
               </div>
             )}
 
-          {/* =================================================
-              SECTION CARDS
-          ================================================= */}
+          {/* ===============================================
+              GROUPED SECTION REPORTS
+          ================================================ */}
 
           {!loading &&
             !error &&
             attendanceSections.length >
               0 && (
               <>
-                <div className="attendance-section-grid">
-                  {attendanceSections.map(
-                    (section) => (
-                      <article
-                        className="attendance-section-card"
+                <div className="attendance-section-groups">
+                  {sectionGroups.map(
+                    (group) => (
+                      <section
                         key={
-                          section.sectionId
+                          group.key
                         }
+                        className={`attendance-section-group attendance-section-group-${group.key}`}
                       >
-                        <div className="attendance-card-header">
-                          <div className="attendance-card-section-icon">
-                            ▤
-                          </div>
+                        {/* =================================
+                            GROUP HEADER
+                        ================================== */}
 
-                          <div className="attendance-card-title">
-                            <span>
-                              SECTION
-                            </span>
-
-                            <h3>
-                              {
-                                section.sectionName
-                              }
-                            </h3>
-
-                            <p>
-                              Adviser:{" "}
-                              {section.adviserName ||
-                                "Unassigned"}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="attendance-card-meta">
-                          <div>
-                            <span>
-                              Students
-                            </span>
-
-                            <strong>
-                              {formatNumber(
-                                section.studentCount,
-                              )}
-                            </strong>
-                          </div>
-
-                          <div>
-                            <span>
-                              Sessions
-                            </span>
-
-                            <strong>
-                              {formatNumber(
-                                section.sessionCount,
-                              )}
-                            </strong>
-                          </div>
-                        </div>
-
-                        <div className="attendance-card-rate">
-                          <div className="attendance-card-rate-heading">
-                            <span>
-                              Attendance Rate
-                            </span>
-
-                            <strong>
-                              {formatPercentage(
-                                section.attendanceRate,
-                              )}
-                            </strong>
-                          </div>
-
-                          <div className="attendance-progress">
+                        <header className="attendance-section-group-header">
+                          <div className="attendance-section-group-title">
                             <span
-                              style={{
-                                width: `${Math.min(
-                                  Math.max(
-                                    Number(
-                                      section.attendanceRate ??
-                                        0,
-                                    ),
-                                    0,
-                                  ),
-                                  100,
-                                )}%`,
-                              }}
+                              className="attendance-section-group-dot"
+                              aria-hidden="true"
                             />
-                          </div>
-                        </div>
-
-                        <div className="attendance-card-breakdown">
-                          <div>
-                            <span className="attendance-dot attendance-dot-present" />
 
                             <div>
-                              <span>
-                                Present
-                              </span>
+                              <div>
+                                <span>
+                                  {
+                                    group.label
+                                  }
+                                </span>
 
-                              <strong>
-                                {formatPercentage(
-                                  section.presentRate,
-                                )}
-                              </strong>
+                                <strong>
+                                  {
+                                    group.sections
+                                      .length
+                                  }
+                                </strong>
+                              </div>
+
+                              <h3>
+                                {
+                                  group.title
+                                }
+                              </h3>
+
+                              <p>
+                                {
+                                  group.description
+                                }
+                              </p>
                             </div>
                           </div>
+                        </header>
 
-                          <div>
-                            <span className="attendance-dot attendance-dot-late" />
+                        {/* =================================
+                            SECTION CARDS
+                        ================================== */}
 
-                            <div>
-                              <span>
-                                Late
-                              </span>
-
-                              <strong>
-                                {formatPercentage(
-                                  section.lateRate,
-                                )}
-                              </strong>
-                            </div>
-                          </div>
-
-                          <div>
-                            <span className="attendance-dot attendance-dot-absent" />
-
-                            <div>
-                              <span>
-                                Absent
-                              </span>
-
-                              <strong>
-                                {formatPercentage(
-                                  section.absenceRate,
-                                )}
-                              </strong>
-                            </div>
-                          </div>
+                        <div className="attendance-section-grid">
+                          {group.sections.map(
+                            (
+                              section,
+                            ) =>
+                              renderSectionCard(
+                                section,
+                              ),
+                          )}
                         </div>
-
-                        <div className="attendance-card-footer">
-                          <span>
-                            {formatNumber(
-                              section.totalRecords,
-                            )}{" "}
-                            attendance records
-                          </span>
-
-                          <span className="attendance-card-report-label">
-                            Detailed report
-                            coming next →
-                          </span>
-                        </div>
-                      </article>
+                      </section>
                     ),
                   )}
                 </div>
 
-                {/* ===========================================
+                {/* =========================================
                     PAGINATION
-                =========================================== */}
+                ========================================== */}
 
-                <div className="attendance-pagination">
+                <footer className="attendance-pagination">
                   <p>
                     Showing{" "}
                     <strong>
-                      {startRecord}
+                      {
+                        startRecord
+                      }
                     </strong>
                     {" – "}
                     <strong>
-                      {endRecord}
+                      {
+                        endRecord
+                      }
                     </strong>{" "}
                     of{" "}
                     <strong>
@@ -938,7 +2236,7 @@ function AttendanceManagement() {
                       Next →
                     </button>
                   </div>
-                </div>
+                </footer>
               </>
             )}
         </section>

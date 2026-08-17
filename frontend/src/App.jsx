@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./features/auth/Login";
 
 import Advisers from "./features/councilor/AdviserManagement";
+import AttendanceDetails from "./features/councilor/AttendanceDetail";
 import AttendanceManagement from "./features/councilor/AttendanceManagement";
 import CouncilorDashboard from "./features/councilor/CouncilorDashboard";
 import SectionManagement from "./features/councilor/SectionManagement";
@@ -30,6 +31,11 @@ function App() {
         <Route
           path="/councilor/attendance"
           element={<AttendanceManagement />}
+        />
+
+        <Route
+          path="/councilor/attendance/:sectionId"
+          element={<AttendanceDetails />}
         />
 
         {/* =====================================================

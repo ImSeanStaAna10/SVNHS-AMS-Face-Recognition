@@ -67,7 +67,6 @@ function Advisers() {
   ======================================================= */
 
   const [advisers, setAdvisers] = useState([]);
-
   const [search, setSearch] = useState("");
 
   /* =======================================================
@@ -75,7 +74,6 @@ function Advisers() {
   ======================================================= */
 
   const [loading, setLoading] = useState(true);
-
   const [creating, setCreating] = useState(false);
 
   /* =======================================================
@@ -83,7 +81,6 @@ function Advisers() {
   ======================================================= */
 
   const [error, setError] = useState("");
-
   const [success, setSuccess] = useState("");
 
   /* =======================================================
@@ -91,9 +88,7 @@ function Advisers() {
   ======================================================= */
 
   const [showModal, setShowModal] = useState(false);
-
   const [formData, setFormData] = useState(INITIAL_FORM);
-
   const [formError, setFormError] = useState("");
 
   /* =======================================================
@@ -112,7 +107,6 @@ function Advisers() {
         }
 
         setAdvisers(Array.isArray(data) ? data : []);
-
         setError("");
       } catch (err) {
         console.error("Unable to load advisers:", err);
@@ -161,7 +155,6 @@ function Advisers() {
 
     return () => {
       document.body.style.overflow = previousOverflow;
-
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [showModal, creating]);
@@ -179,7 +172,6 @@ function Advisers() {
 
     return advisers.filter((adviser) => {
       const name = adviser.name?.toLowerCase() ?? "";
-
       const email = adviser.email?.toLowerCase() ?? "";
 
       return name.includes(keyword) || email.includes(keyword);
@@ -203,6 +195,10 @@ function Advisers() {
 
   const goToSections = () => {
     navigate("/councilor/sections");
+  };
+
+  const goToAttendance = () => {
+    navigate("/councilor/attendance");
   };
 
   /* =======================================================
@@ -258,7 +254,6 @@ function Advisers() {
     }
 
     setShowModal(false);
-
     resetForm();
   };
 
@@ -268,9 +263,7 @@ function Advisers() {
 
   const validateForm = () => {
     const name = formData.name.trim();
-
     const email = formData.email.trim().toLowerCase();
-
     const password = formData.password;
 
     if (!name || !email || !password) {
@@ -434,14 +427,16 @@ function Advisers() {
 
           {/* ATTENDANCE */}
 
-          <button type="button" className="councilor-nav-item" disabled>
+          <button
+            type="button"
+            className="councilor-nav-item"
+            onClick={goToAttendance}
+          >
             <span className="councilor-nav-icon" aria-hidden="true">
               ◷
             </span>
 
             <span>Attendance</span>
-
-            <small>SOON</small>
           </button>
         </nav>
 
@@ -476,8 +471,6 @@ function Advisers() {
         ================================================== */}
 
         <header className="councilor-header">
-          {/* PAGE TITLE */}
-
           <div className="councilor-header-copy">
             <span className="councilor-eyebrow">ACCOUNT MANAGEMENT</span>
 
@@ -485,8 +478,6 @@ function Advisers() {
 
             <p>Manage adviser accounts for your school.</p>
           </div>
-
-          {/* HEADER ACTIONS */}
 
           <div className="councilor-header-actions">
             {/* LOGOS */}
@@ -506,8 +497,6 @@ function Advisers() {
             </div>
 
             <div className="councilor-header-divider" aria-hidden="true" />
-
-            {/* THEME */}
 
             <ThemeToggle />
 
@@ -533,101 +522,121 @@ function Advisers() {
             CONTENT
         ================================================== */}
 
-        <div className="councilor-content">
+        <div className="councilor-content councilor-advisers-page">
           {/* ===============================================
-              WELCOME CARD
+              ADVISER OVERVIEW
           ================================================ */}
 
-          <section className="councilor-welcome-card">
-            <div>
-              <span>ADVISER MANAGEMENT</span>
+          <section className="councilor-adviser-overview">
+            {/* =============================================
+                MANAGEMENT HERO
+            ============================================== */}
 
-              <h2>Manage adviser accounts</h2>
+            <section className="councilor-welcome-card">
+              <div className="councilor-welcome-copy">
+                <span>ADVISER MANAGEMENT</span>
 
-              <p>
-                Create, search, and manage registered adviser accounts for
-                Signal Village National High School.
-              </p>
-            </div>
+                <h2>Manage adviser accounts</h2>
 
-            <div className="councilor-welcome-badge" aria-hidden="true">
-              SVNHS
-            </div>
-          </section>
+                <p>
+                  Create, organize, and manage registered adviser accounts for
+                  Signal Village National High School.
+                </p>
 
-          {/* ===============================================
-              STATISTICS
-          ================================================ */}
+                <div className="councilor-welcome-meta">
+                  <span>SVNHS</span>
 
-          <section
-            className="councilor-stat-grid councilor-adviser-stats"
-            aria-label="Adviser statistics"
-          >
-            {/* TOTAL */}
+                  <span
+                    className="councilor-welcome-meta-dot"
+                    aria-hidden="true"
+                  />
 
-            <article className="councilor-stat-card">
-              <div className="councilor-stat-top">
-                <span className="councilor-stat-icon" aria-hidden="true">
+                  <span>Account Administration</span>
+                </div>
+              </div>
+
+              <div className="councilor-welcome-badge" aria-hidden="true">
+                <img src={seniorHighSchoolLogo} alt="" />
+              </div>
+            </section>
+
+            {/* =============================================
+                SUMMARY METRICS
+            ============================================== */}
+
+            <section
+              className="councilor-adviser-metrics"
+              aria-label="Adviser statistics"
+            >
+              {/* TOTAL */}
+
+              <article className="councilor-adviser-metric">
+                <div
+                  className="councilor-adviser-metric-icon"
+                  aria-hidden="true"
+                >
                   ♙
-                </span>
+                </div>
 
-                <span className="councilor-stat-tag">ACCOUNTS</span>
-              </div>
+                <div className="councilor-adviser-metric-copy">
+                  <span>REGISTERED</span>
 
-              <div className="councilor-stat-content">
-                <strong>{loading ? "—" : advisers.length}</strong>
+                  <p>Total Advisers</p>
 
-                <p>Total Advisers</p>
-              </div>
+                  <small>All adviser accounts</small>
+                </div>
 
-              <span className="councilor-stat-description">
-                Registered adviser accounts
-              </span>
-            </article>
+                <strong className="councilor-adviser-metric-value">
+                  {loading ? "—" : advisers.length}
+                </strong>
+              </article>
 
-            {/* ACTIVE */}
+              {/* ACTIVE */}
 
-            <article className="councilor-stat-card">
-              <div className="councilor-stat-top">
-                <span className="councilor-stat-icon" aria-hidden="true">
+              <article className="councilor-adviser-metric is-active">
+                <div
+                  className="councilor-adviser-metric-icon"
+                  aria-hidden="true"
+                >
                   ✓
-                </span>
+                </div>
 
-                <span className="councilor-stat-tag">ACTIVE</span>
-              </div>
+                <div className="councilor-adviser-metric-copy">
+                  <span>ACTIVE</span>
 
-              <div className="councilor-stat-content">
-                <strong>{loading ? "—" : activeAdvisers}</strong>
+                  <p>Active Advisers</p>
 
-                <p>Active Advisers</p>
-              </div>
+                  <small>Currently enabled</small>
+                </div>
 
-              <span className="councilor-stat-description">
-                Adviser accounts currently active
-              </span>
-            </article>
+                <strong className="councilor-adviser-metric-value">
+                  {loading ? "—" : activeAdvisers}
+                </strong>
+              </article>
 
-            {/* INACTIVE */}
+              {/* INACTIVE */}
 
-            <article className="councilor-stat-card">
-              <div className="councilor-stat-top">
-                <span className="councilor-stat-icon" aria-hidden="true">
+              <article className="councilor-adviser-metric is-inactive">
+                <div
+                  className="councilor-adviser-metric-icon"
+                  aria-hidden="true"
+                >
                   —
-                </span>
+                </div>
 
-                <span className="councilor-stat-tag">INACTIVE</span>
-              </div>
+                <div className="councilor-adviser-metric-copy">
+                  <span>INACTIVE</span>
 
-              <div className="councilor-stat-content">
-                <strong>{loading ? "—" : inactiveAdvisers}</strong>
+                  <p>Inactive Advisers</p>
 
-                <p>Inactive Advisers</p>
-              </div>
+                  <small>Disabled accounts</small>
+                </div>
 
-              <span className="councilor-stat-description">
-                Disabled adviser accounts
-              </span>
-            </article>
+                <strong className="councilor-adviser-metric-value">
+                  {loading ? "—" : inactiveAdvisers}
+                </strong>
+              </article>
+            </section>
           </section>
 
           {/* ===============================================
@@ -654,7 +663,7 @@ function Advisers() {
               ADVISER DIRECTORY
           ================================================ */}
 
-          <section className="councilor-panel">
+          <section className="councilor-panel councilor-adviser-directory">
             {/* PANEL HEADER */}
 
             <div className="councilor-panel-header">
@@ -676,6 +685,7 @@ function Advisers() {
                   onClick={openModal}
                 >
                   <span aria-hidden="true">+</span>
+
                   Add Adviser
                 </button>
               </div>

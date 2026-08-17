@@ -40,20 +40,9 @@ const createSection = async ({ name, adviserId }) => {
 };
 
 /* =========================================================
-   ATTENDANCE REPORTS
+   ATTENDANCE — SECTION OVERVIEW
 ========================================================= */
 
-/**
- * Get the Councilor school attendance report.
- *
- * Supports:
- * - Date range
- * - Section filter
- * - Adviser filter
- * - Search
- * - Server-side pagination
- * - Request cancellation
- */
 const getAttendanceReport = async ({
   from,
   to,
@@ -68,19 +57,41 @@ const getAttendanceReport = async ({
     params: {
       from: from || undefined,
       to: to || undefined,
-
       sectionId: sectionId || undefined,
-
       adviserId: adviserId || undefined,
-
       search: search || undefined,
-
       page,
       size,
     },
 
     signal,
   });
+
+  return response.data;
+};
+
+/* =========================================================
+   ATTENDANCE — DETAILED SECTION REPORT
+========================================================= */
+
+const getSectionAttendanceReport = async (
+  sectionId,
+  { from, to, search = "", page = 0, size = 25, signal } = {},
+) => {
+  const response = await api.get(
+    `/attendance-reports/sections/${sectionId}/students`,
+    {
+      params: {
+        from: from || undefined,
+        to: to || undefined,
+        search: search || undefined,
+        page,
+        size,
+      },
+
+      signal,
+    },
+  );
 
   return response.data;
 };
@@ -100,6 +111,7 @@ const councilorService = {
 
   /* Attendance */
   getAttendanceReport,
+  getSectionAttendanceReport,
 };
 
 export default councilorService;

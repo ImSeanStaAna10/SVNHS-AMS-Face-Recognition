@@ -1,0 +1,1189 @@
+/* =========================================================
+   COUNCILOR — SECTION MANAGEMENT
+   PREMIUM OPERATIONAL UI
+========================================================= */
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.section-management-page {
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+/* =========================================================
+   OVERVIEW
+========================================================= */
+
+.section-management-overview {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.75fr)
+    minmax(290px, 0.72fr);
+
+  align-items: stretch;
+
+  gap: 16px;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.section-welcome-card {
+  position: relative;
+  isolation: isolate;
+
+  min-width: 0;
+  min-height: 228px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 36px;
+
+  overflow: hidden;
+
+  padding: 38px 40px;
+
+  border: 1px solid var(--c-hero-border);
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      118deg,
+      rgba(6, 25, 61, 0.99) 0%,
+      rgba(8, 43, 96, 0.97) 47%,
+      rgba(12, 69, 143, 0.92) 100%
+    ),
+    var(--c-welcome-bg);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 1px 2px rgba(7, 27, 66, 0.04),
+    0 8px 24px rgba(7, 27, 66, 0.08),
+    0 20px 50px rgba(7, 27, 66, 0.15);
+
+  transition:
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+/* =========================================================
+   TOP ACCENT
+========================================================= */
+
+.section-welcome-card::before {
+  content: "";
+
+  position: absolute;
+
+  z-index: 4;
+
+  top: 0;
+  right: 0;
+  left: 0;
+
+  height: 3px;
+
+  background: linear-gradient(
+    90deg,
+    var(--c-red-600) 0%,
+    var(--c-red-600) 27%,
+    var(--c-gold) 27%,
+    var(--c-gold) 30%,
+    rgba(255, 255, 255, 0.6) 30%,
+    rgba(255, 255, 255, 0.6) 33%,
+    var(--c-blue-900) 33%,
+    var(--c-blue-900) 100%
+  );
+}
+
+/* =========================================================
+   HERO DECORATION
+========================================================= */
+
+.section-welcome-card::after {
+  content: "";
+
+  position: absolute;
+
+  z-index: -1;
+
+  top: -145px;
+  right: -85px;
+
+  width: 330px;
+  height: 330px;
+
+  border: 50px solid rgba(255, 255, 255, 0.045);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   HERO CONTENT
+========================================================= */
+
+.section-welcome-content {
+  position: relative;
+
+  z-index: 2;
+
+  min-width: 0;
+  max-width: 670px;
+}
+
+.section-welcome-content::before {
+  content: "";
+
+  position: absolute;
+
+  z-index: -1;
+
+  top: -180px;
+  left: -190px;
+
+  width: 430px;
+  height: 430px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(55, 137, 255, 0.18) 0%,
+    rgba(55, 137, 255, 0.06) 38%,
+    transparent 70%
+  );
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   HERO EYEBROW
+========================================================= */
+
+.section-welcome-content > span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: var(--c-gold);
+
+  font-size: 8.5px;
+  font-weight: 850;
+
+  line-height: 1;
+
+  letter-spacing: 0.17em;
+
+  text-transform: uppercase;
+}
+
+.section-welcome-content > span::before {
+  content: "";
+
+  width: 23px;
+  height: 2px;
+
+  flex: 0 0 auto;
+
+  border-radius: 999px;
+
+  background: var(--c-gold);
+
+  box-shadow: 0 0 11px rgba(255, 202, 66, 0.28);
+}
+
+/* =========================================================
+   HERO TITLE
+========================================================= */
+
+.section-welcome-content h2 {
+  max-width: 580px;
+
+  margin: 11px 0 8px;
+
+  color: #ffffff;
+
+  font-size: clamp(26px, 2.5vw, 32px);
+
+  font-weight: 790;
+
+  line-height: 1.12;
+
+  letter-spacing: -0.035em;
+
+  text-wrap: balance;
+
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
+}
+
+/* =========================================================
+   HERO DESCRIPTION
+========================================================= */
+
+.section-welcome-content p {
+  max-width: 600px;
+
+  margin: 0;
+
+  color: rgba(240, 246, 255, 0.79);
+
+  font-size: 11.5px;
+  font-weight: 430;
+
+  line-height: 1.7;
+
+  text-wrap: pretty;
+}
+
+/* =========================================================
+   HERO META
+========================================================= */
+
+.section-welcome-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+  margin-top: 20px;
+
+  color: rgba(232, 241, 253, 0.61);
+
+  font-size: 8px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  letter-spacing: 0.075em;
+
+  text-transform: uppercase;
+}
+
+.section-welcome-meta-dot {
+  width: 4px;
+  height: 4px;
+
+  flex: 0 0 4px;
+
+  border-radius: 50%;
+
+  background: var(--c-gold);
+}
+
+/* =========================================================
+   SCHOOL BADGE
+========================================================= */
+
+.section-welcome-badge {
+  position: relative;
+
+  z-index: 2;
+
+  width: 106px;
+  height: 106px;
+
+  flex: 0 0 106px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0.055)
+  );
+
+  box-shadow:
+    0 18px 38px rgba(0, 18, 50, 0.21),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 0 7px rgba(255, 255, 255, 0.025);
+
+  backdrop-filter: blur(14px) saturate(1.15);
+
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease;
+}
+
+.section-welcome-badge::before {
+  content: "";
+
+  position: absolute;
+
+  inset: -7px;
+
+  border: 1px solid rgba(255, 255, 255, 0.075);
+
+  border-radius: inherit;
+}
+
+.section-welcome-badge img {
+  position: relative;
+
+  z-index: 2;
+
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  filter: drop-shadow(0 7px 12px rgba(0, 0, 0, 0.18));
+}
+
+@media (hover: hover) {
+  .section-welcome-card:hover {
+    border-color: rgba(105, 158, 228, 0.32);
+
+    box-shadow:
+      0 1px 2px rgba(7, 27, 66, 0.04),
+      0 10px 28px rgba(7, 27, 66, 0.1),
+      0 25px 58px rgba(7, 27, 66, 0.17);
+  }
+
+  .section-welcome-card:hover .section-welcome-badge {
+    transform: translateY(-2px) scale(1.025);
+  }
+}
+
+/* =========================================================
+   OPERATIONAL METRICS
+========================================================= */
+
+.section-management-metrics {
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+/* =========================================================
+   METRIC CARD
+========================================================= */
+
+.section-management-metric {
+  position: relative;
+
+  min-width: 0;
+
+  display: grid;
+  align-items: center;
+
+  grid-template-columns:
+    43px
+    minmax(0, 1fr)
+    auto;
+
+  gap: 13px;
+
+  overflow: hidden;
+
+  padding: 14px 16px;
+
+  border: 1px solid var(--c-border-soft);
+
+  border-radius: 13px;
+
+  background: var(--c-surface);
+
+  box-shadow:
+    0 1px 2px rgba(7, 27, 66, 0.025),
+    0 7px 20px rgba(7, 27, 66, 0.055);
+
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.section-management-metric::before {
+  content: "";
+
+  position: absolute;
+
+  top: 13px;
+  bottom: 13px;
+  left: 0;
+
+  width: 3px;
+
+  border-radius: 0 999px 999px 0;
+
+  background: var(--c-blue-900);
+}
+
+.section-management-metric.is-assigned::before {
+  background: var(--c-success-text);
+}
+
+.section-management-metric.is-adviser::before {
+  background: var(--c-gold);
+}
+
+/* =========================================================
+   METRIC ICON
+========================================================= */
+
+.section-management-metric-icon {
+  width: 43px;
+  height: 43px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 11px;
+
+  background: var(--c-icon-bg);
+
+  color: var(--c-icon-text);
+
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.section-management-metric.is-assigned .section-management-metric-icon {
+  background: var(--c-success-bg);
+
+  color: var(--c-success-text);
+}
+
+/* =========================================================
+   METRIC COPY
+========================================================= */
+
+.section-management-metric-copy {
+  min-width: 0;
+}
+
+.section-management-metric-copy > span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: var(--c-text-muted);
+
+  font-size: 6.5px;
+  font-weight: 850;
+
+  line-height: 1;
+
+  letter-spacing: 0.13em;
+}
+
+.section-management-metric-copy p {
+  margin: 0;
+
+  overflow: hidden;
+
+  color: var(--c-text-primary);
+
+  font-size: 10.5px;
+  font-weight: 760;
+
+  line-height: 1.25;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-management-metric-copy small {
+  display: block;
+
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: var(--c-text-muted);
+
+  font-size: 7.5px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-management-metric > strong {
+  min-width: 40px;
+
+  color: var(--c-text-primary);
+
+  font-size: 25px;
+  font-weight: 820;
+
+  line-height: 1;
+
+  letter-spacing: -0.045em;
+
+  text-align: right;
+}
+
+/* =========================================================
+   METRIC HOVER
+========================================================= */
+
+@media (hover: hover) {
+  .section-management-metric:hover {
+    transform: translateY(-1px);
+
+    border-color: rgba(32, 89, 165, 0.2);
+
+    box-shadow:
+      0 2px 4px rgba(7, 27, 66, 0.025),
+      0 11px 26px rgba(7, 27, 66, 0.085);
+  }
+}
+
+/* =========================================================
+   ASSIGNMENT HEALTH
+========================================================= */
+
+.section-assignment-health {
+  display: grid;
+  align-items: center;
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    minmax(190px, 0.45fr);
+
+  gap: 16px;
+
+  padding: 15px 18px;
+
+  border: 1px solid var(--c-border-soft);
+
+  border-radius: 13px;
+
+  background: var(--c-surface);
+
+  box-shadow: 0 4px 18px rgba(7, 27, 66, 0.04);
+}
+
+.section-assignment-health.has-warning {
+  border-color: rgba(204, 147, 25, 0.22);
+}
+
+.section-assignment-health.is-complete {
+  border-color: rgba(34, 142, 78, 0.2);
+}
+
+/* =========================================================
+   HEALTH ICON
+========================================================= */
+
+.section-assignment-health-icon {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  background: rgba(215, 157, 28, 0.1);
+
+  color: #a26b00;
+
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.section-assignment-health.is-complete .section-assignment-health-icon {
+  background: var(--c-success-bg);
+
+  color: var(--c-success-text);
+}
+
+/* =========================================================
+   HEALTH COPY
+========================================================= */
+
+.section-assignment-health-copy {
+  min-width: 0;
+}
+
+.section-assignment-health-copy > span {
+  display: block;
+
+  color: var(--c-text-muted);
+
+  font-size: 6.5px;
+  font-weight: 850;
+
+  letter-spacing: 0.13em;
+}
+
+.section-assignment-health-copy strong {
+  display: block;
+
+  margin-top: 4px;
+
+  color: var(--c-text-primary);
+
+  font-size: 10px;
+  font-weight: 740;
+}
+
+.section-assignment-health-copy p {
+  margin: 4px 0 0;
+
+  color: var(--c-text-muted);
+
+  font-size: 8px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   HEALTH PROGRESS
+========================================================= */
+
+.section-assignment-health-progress {
+  min-width: 0;
+}
+
+.section-assignment-health-progress-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  color: var(--c-text-muted);
+
+  font-size: 7px;
+}
+
+.section-assignment-health-progress-top strong {
+  color: var(--c-text-primary);
+
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.section-assignment-progress-track {
+  height: 6px;
+
+  margin-top: 7px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: var(--c-surface-soft);
+}
+
+.section-assignment-progress-track > div {
+  width: var(--section-progress, 0%);
+
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: linear-gradient(90deg, var(--c-blue-900), #3b82d4);
+
+  transition: width 420ms ease;
+}
+
+.section-assignment-health.is-complete
+  .section-assignment-progress-track
+  > div {
+  background: var(--c-success-text);
+}
+
+/* =========================================================
+   DATA WARNING
+========================================================= */
+
+.section-data-warning {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 11px;
+
+  padding: 13px 15px;
+
+  border: 1px solid rgba(197, 31, 45, 0.2);
+
+  border-radius: 11px;
+
+  background: rgba(197, 31, 45, 0.045);
+}
+
+.section-data-warning > span {
+  width: 24px;
+  height: 24px;
+
+  flex: 0 0 24px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--c-red-600);
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.section-data-warning strong {
+  display: block;
+
+  color: var(--c-text-primary);
+
+  font-size: 9px;
+}
+
+.section-data-warning p {
+  margin: 4px 0 0;
+
+  color: var(--c-text-muted);
+
+  font-size: 8px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   DIRECTORY PANEL
+========================================================= */
+
+.section-directory-panel {
+  margin-top: 0;
+
+  overflow: hidden;
+
+  border-radius: 15px;
+
+  box-shadow:
+    0 1px 2px rgba(7, 27, 66, 0.025),
+    0 8px 26px rgba(7, 27, 66, 0.065);
+}
+
+/* =========================================================
+   DIRECTORY HEADER
+========================================================= */
+
+.section-directory-panel .councilor-panel-header {
+  min-height: 88px;
+
+  padding: 22px 25px;
+}
+
+.section-directory-panel .councilor-panel-header h2 {
+  margin-top: 5px;
+
+  font-size: 18px;
+
+  letter-spacing: -0.025em;
+}
+
+.section-directory-panel .councilor-panel-header p {
+  margin-top: 6px;
+
+  font-size: 9px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   DIRECTORY TOOLBAR
+========================================================= */
+
+.section-directory-panel .councilor-toolbar {
+  min-height: 67px;
+
+  padding: 13px 25px;
+
+  background: var(--c-surface-soft);
+}
+
+.section-directory-panel .councilor-search {
+  width: min(420px, 100%);
+}
+
+.section-directory-panel .councilor-search input {
+  height: 41px;
+}
+
+/* =========================================================
+   DIRECTORY SUMMARY
+========================================================= */
+
+.section-directory-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 7px;
+
+  color: var(--c-text-muted);
+
+  font-size: 7.5px;
+  font-weight: 650;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.section-directory-panel .councilor-table th {
+  padding: 13px 25px;
+}
+
+.section-directory-panel .councilor-table td {
+  padding: 15px 25px;
+}
+
+/* =========================================================
+   UNASSIGNED LABEL
+========================================================= */
+
+.section-unassigned {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 28px;
+
+  padding: 5px 9px;
+
+  border: 1px solid rgba(204, 147, 25, 0.2);
+
+  border-radius: 6px;
+
+  background: rgba(215, 157, 28, 0.07);
+
+  color: #98701a;
+
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   ASSIGNMENT STATUS
+========================================================= */
+
+.section-assignment-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 7.5px;
+  font-weight: 700;
+}
+
+.section-assignment-status > span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+}
+
+.section-assignment-status.assigned {
+  color: var(--c-success-text);
+}
+
+.section-assignment-status.assigned > span {
+  background: var(--c-success-dot);
+}
+
+.section-assignment-status.unassigned {
+  color: #98701a;
+}
+
+.section-assignment-status.unassigned > span {
+  background: var(--c-gold);
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .section-welcome-card {
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.24);
+}
+
+/* =========================================================
+   RESPONSIVE — MEDIUM DESKTOP
+========================================================= */
+
+@media (max-width: 1180px) {
+  .section-management-overview {
+    grid-template-columns:
+      minmax(0, 1.5fr)
+      minmax(280px, 0.72fr);
+  }
+
+  .section-welcome-card {
+    padding: 34px;
+  }
+
+  .section-welcome-badge {
+    width: 94px;
+    height: 94px;
+
+    flex-basis: 94px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 1040px) {
+  .section-management-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .section-welcome-card {
+    min-height: 190px;
+  }
+
+  .section-management-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    grid-template-rows: none;
+  }
+
+  .section-management-metric {
+    min-height: 104px;
+
+    grid-template-columns:
+      40px
+      minmax(0, 1fr);
+
+    align-content: center;
+
+    padding: 14px;
+  }
+
+  .section-management-metric > strong {
+    grid-column: 1 / -1;
+
+    margin-top: 3px;
+
+    text-align: left;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 720px) {
+  .section-management-page {
+    gap: 16px;
+  }
+
+  .section-management-overview {
+    gap: 12px;
+  }
+
+  .section-welcome-card {
+    min-height: 185px;
+
+    gap: 24px;
+
+    padding: 29px 25px;
+
+    border-radius: 15px;
+  }
+
+  .section-welcome-content h2 {
+    font-size: 24px;
+  }
+
+  .section-welcome-content p {
+    font-size: 11px;
+  }
+
+  .section-welcome-badge {
+    width: 80px;
+    height: 80px;
+
+    flex-basis: 80px;
+
+    padding: 11px;
+  }
+
+  .section-management-metrics {
+    gap: 8px;
+  }
+
+  .section-management-metric-copy small {
+    display: none;
+  }
+
+  .section-assignment-health {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+
+    padding: 14px 16px;
+  }
+
+  .section-assignment-health-progress {
+    grid-column: 1 / -1;
+  }
+
+  .section-directory-panel .councilor-panel-header {
+    padding: 19px;
+  }
+
+  .section-directory-panel .councilor-toolbar {
+    padding: 13px 19px;
+  }
+
+  .section-directory-panel .councilor-table th,
+  .section-directory-panel .councilor-table td {
+    padding-right: 19px;
+    padding-left: 19px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — SMALL MOBILE
+========================================================= */
+
+@media (max-width: 560px) {
+  .section-welcome-card {
+    min-height: 178px;
+
+    padding: 27px 21px;
+
+    border-radius: 13px;
+  }
+
+  .section-welcome-badge {
+    display: none;
+  }
+
+  .section-welcome-content h2 {
+    font-size: 22px;
+  }
+
+  .section-welcome-content p {
+    font-size: 10.8px;
+  }
+
+  .section-welcome-meta {
+    font-size: 7.5px;
+  }
+
+  .section-management-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .section-management-metric {
+    min-height: 76px;
+
+    grid-template-columns:
+      40px
+      minmax(0, 1fr)
+      auto;
+
+    padding: 12px 14px;
+  }
+
+  .section-management-metric > strong {
+    grid-column: auto;
+
+    margin-top: 0;
+
+    font-size: 22px;
+
+    text-align: right;
+  }
+
+  .section-management-metric-copy small {
+    display: block;
+  }
+
+  .section-assignment-health {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+
+    gap: 11px;
+  }
+
+  .section-directory-summary {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .section-welcome-card {
+    padding: 25px 18px;
+  }
+
+  .section-welcome-content h2 {
+    font-size: 20px;
+  }
+
+  .section-welcome-meta {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: 6px;
+  }
+
+  .section-welcome-meta-dot {
+    display: none;
+  }
+
+  .section-management-metric {
+    gap: 10px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .section-welcome-card,
+  .section-welcome-badge,
+  .section-management-metric,
+  .section-assignment-progress-track > div {
+    transition: none;
+  }
+
+  .section-welcome-card:hover .section-welcome-badge,
+  .section-management-metric:hover {
+    transform: none;
+  }
+}

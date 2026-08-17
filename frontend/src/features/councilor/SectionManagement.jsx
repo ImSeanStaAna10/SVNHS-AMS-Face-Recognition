@@ -8,6 +8,8 @@ import CouncilorLayout from "../../layouts/CouncilorLayout";
 
 import councilorService from "../../services/councilorService";
 
+import seniorHighSchoolLogo from "../../assets/shs-logo.svg";
+
 import "../../styles/councilor.css";
 
 /* =========================================================
@@ -17,6 +19,11 @@ import "../../styles/councilor.css";
 const INITIAL_FORM = {
   name: "",
   adviserId: "",
+};
+
+const INITIAL_DATA_STATUS = {
+  sections: "loading",
+  advisers: "loading",
 };
 
 /* =========================================================
@@ -49,6 +56,31 @@ const fetchAdvisers = async () => {
     : [];
 };
 
+const formatNumber = (value) =>
+  Number(value ?? 0).toLocaleString(
+    "en-PH",
+  );
+
+const formatPercentage = (value) => {
+  const number =
+    Number(value ?? 0);
+
+  if (!Number.isFinite(number)) {
+    return "0.0%";
+  }
+
+  return `${number.toFixed(1)}%`;
+};
+
+const clampPercentage = (value) =>
+  Math.min(
+    Math.max(
+      Number(value ?? 0),
+      0,
+    ),
+    100,
+  );
+
 /* =========================================================
    COMPONENT
 ========================================================= */
@@ -76,6 +108,9 @@ function SectionManagement() {
 
   const [creating, setCreating] =
     useState(false);
+
+  const [dataStatus, setDataStatus] =
+    useState(INITIAL_DATA_STATUS);
 
   /* =======================================================
      FEEDBACK STATE
@@ -109,44 +144,91 @@ function SectionManagement() {
 
     const loadInitialData =
       async () => {
-        try {
-          const [
-            sectionData,
-            adviserData,
-          ] = await Promise.all([
+        setLoading(true);
+        setError("");
+
+        const [
+          sectionResult,
+          adviserResult,
+        ] =
+          await Promise.allSettled([
             fetchSections(),
             fetchAdvisers(),
           ]);
 
-          if (!isMounted) {
-            return;
-          }
-
-          setSections(sectionData);
-          setAdvisers(adviserData);
-
-          setError("");
-        } catch (err) {
-          console.error(
-            "Unable to load section management data:",
-            err,
-          );
-
-          if (!isMounted) {
-            return;
-          }
-
-          setError(
-            getErrorMessage(
-              err,
-              "Unable to load section management data.",
-            ),
-          );
-        } finally {
-          if (isMounted) {
-            setLoading(false);
-          }
+        if (!isMounted) {
+          return;
         }
+
+        const nextStatus = {
+          sections:
+            sectionResult.status ===
+            "fulfilled"
+              ? "ready"
+              : "error",
+
+          advisers:
+            adviserResult.status ===
+            "fulfilled"
+              ? "ready"
+              : "error",
+        };
+
+        if (
+          sectionResult.status ===
+          "fulfilled"
+        ) {
+          setSections(
+            sectionResult.value,
+          );
+        } else {
+          setSections([]);
+        }
+
+        if (
+          adviserResult.status ===
+          "fulfilled"
+        ) {
+          setAdvisers(
+            adviserResult.value,
+          );
+        } else {
+          setAdvisers([]);
+        }
+
+        setDataStatus(nextStatus);
+
+        const unavailable = [];
+
+        if (
+          nextStatus.sections ===
+          "error"
+        ) {
+          unavailable.push(
+            "sections",
+          );
+        }
+
+        if (
+          nextStatus.advisers ===
+          "error"
+        ) {
+          unavailable.push(
+            "adviser accounts",
+          );
+        }
+
+        if (
+          unavailable.length > 0
+        ) {
+          setError(
+            `Some section management data could not be loaded: ${unavailable.join(
+              ", ",
+            )}.`,
+          );
+        }
+
+        setLoading(false);
       };
 
     void loadInitialData();
@@ -171,13 +253,19 @@ function SectionManagement() {
     document.body.style.overflow =
       "hidden";
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (
+      event,
+    ) => {
       if (
         event.key === "Escape" &&
         !creating
       ) {
         setShowModal(false);
-        setFormData(INITIAL_FORM);
+
+        setFormData(
+          INITIAL_FORM,
+        );
+
         setFormError("");
       }
     };
@@ -196,17 +284,29 @@ function SectionManagement() {
         handleKeyDown,
       );
     };
-  }, [showModal, creating]);
+  }, [
+    showModal,
+    creating,
+  ]);
 
   /* =======================================================
      DERIVED DATA
   ======================================================= */
 
+  const sectionsReady =
+    dataStatus.sections ===
+    "ready";
+
+  const advisersReady =
+    dataStatus.advisers ===
+    "ready";
+
   const activeAdvisers =
     useMemo(() => {
       return advisers.filter(
         (adviser) =>
-          adviser.role === "ADVISER" &&
+          adviser.role ===
+            "ADVISER" &&
           adviser.active !== false,
       );
     }, [advisers]);
@@ -225,26 +325,36 @@ function SectionManagement() {
         (section) => {
           const sectionName =
             section.name
-              ?.toLowerCase() ?? "";
+              ?.toLowerCase() ??
+            "";
 
           const adviserName =
             section.adviserName
-              ?.toLowerCase() ?? "";
+              ?.toLowerCase() ??
+            "";
 
           return (
-            sectionName.includes(keyword) ||
-            adviserName.includes(keyword)
+            sectionName.includes(
+              keyword,
+            ) ||
+            adviserName.includes(
+              keyword,
+            )
           );
         },
       );
-    }, [sections, search]);
+    }, [
+      sections,
+      search,
+    ]);
 
   const activeSectionCount =
     useMemo(
       () =>
         sections.filter(
           (section) =>
-            section.active !== false,
+            section.active !==
+            false,
         ).length,
       [sections],
     );
@@ -253,17 +363,65 @@ function SectionManagement() {
     sections.length -
     activeSectionCount;
 
+  const assignedSectionCount =
+    useMemo(
+      () =>
+        sections.filter(
+          (section) =>
+            Boolean(
+              section.adviserId ||
+                section.adviserName,
+            ),
+        ).length,
+      [sections],
+    );
+
+  const unassignedSectionCount =
+    sections.length -
+    assignedSectionCount;
+
+  const assignmentCoverage =
+    sections.length > 0
+      ? (assignedSectionCount /
+          sections.length) *
+        100
+      : 0;
+
   /* =======================================================
      REFRESH SECTIONS
   ======================================================= */
 
   const refreshSections =
     async () => {
-      const data =
-        await fetchSections();
+      try {
+        const data =
+          await fetchSections();
 
-      setSections(data);
-      setError("");
+        setSections(data);
+
+        setDataStatus(
+          (current) => ({
+            ...current,
+            sections: "ready",
+          }),
+        );
+
+        setError("");
+      } catch (err) {
+        console.error(
+          "Unable to refresh sections:",
+          err,
+        );
+
+        setDataStatus(
+          (current) => ({
+            ...current,
+            sections: "error",
+          }),
+        );
+
+        throw err;
+      }
     };
 
   /* =======================================================
@@ -272,19 +430,24 @@ function SectionManagement() {
 
   const resetForm = () => {
     setFormData(INITIAL_FORM);
+
     setFormError("");
   };
 
-  const handleFormChange = (event) => {
+  const handleFormChange = (
+    event,
+  ) => {
     const {
       name,
       value,
     } = event.target;
 
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
+    setFormData(
+      (current) => ({
+        ...current,
+        [name]: value,
+      }),
+    );
 
     if (formError) {
       setFormError("");
@@ -310,6 +473,7 @@ function SectionManagement() {
     }
 
     setShowModal(false);
+
     resetForm();
   };
 
@@ -327,6 +491,7 @@ function SectionManagement() {
     if (!name) {
       return {
         valid: false,
+
         message:
           "Please enter a section name.",
       };
@@ -335,6 +500,7 @@ function SectionManagement() {
     if (!adviserId) {
       return {
         valid: false,
+
         message:
           "Please select an adviser.",
       };
@@ -412,686 +578,964 @@ function SectionManagement() {
 
   return (
     <CouncilorLayout>
-      {/* ===================================================
-          PAGE HERO
-      ==================================================== */}
+      <div className="section-management-page">
+        {/* =================================================
+            PAGE OVERVIEW
+        ================================================== */}
 
-      <section className="section-welcome-card">
-        <div className="section-welcome-content">
-          <span>
-            SECTION MANAGEMENT
-          </span>
+        <section className="section-management-overview">
+          {/* ===============================================
+              HERO
+          ================================================ */}
 
-          <h2>
-            Manage school sections
-          </h2>
+          <section className="section-welcome-card">
+            <div className="section-welcome-content">
+              <span>
+                ACADEMIC MANAGEMENT
+              </span>
 
-          <p>
-            Create and organize academic sections
-            and manage adviser assignments for
-            Signal Village National High School.
-          </p>
-        </div>
+              <h2>
+                Organize school sections
+              </h2>
 
-        <div
-          className="section-welcome-badge"
-          aria-hidden="true"
-        >
-          SVNHS
-        </div>
-      </section>
+              <p>
+                Create academic sections,
+                assign active advisers, and
+                monitor section readiness
+                across Signal Village
+                National High School.
+              </p>
 
-      {/* ===================================================
-          OVERVIEW STATISTICS
-      ==================================================== */}
+              <div className="section-welcome-meta">
+                <span>
+                  {sectionsReady
+                    ? `${formatNumber(
+                        sections.length,
+                      )} Sections`
+                    : "Sections unavailable"}
+                </span>
 
-      <section
-        className="section-stat-grid"
-        aria-label="Section statistics"
-      >
-        {/* TOTAL SECTIONS */}
+                <span
+                  className="section-welcome-meta-dot"
+                  aria-hidden="true"
+                />
 
-        <article className="section-stat-card">
-          <div className="section-stat-header">
-            <div
-              className="section-stat-icon"
-              aria-hidden="true"
-            >
-              ▦
+                <span>
+                  {advisersReady
+                    ? `${formatNumber(
+                        activeAdvisers.length,
+                      )} Active Advisers`
+                    : "Adviser data unavailable"}
+                </span>
+              </div>
             </div>
 
-            <span>
-              SECTIONS
-            </span>
-          </div>
-
-          <strong>
-            {loading
-              ? "—"
-              : sections.length}
-          </strong>
-
-          <h3>
-            Total Sections
-          </h3>
-
-          <p>
-            Registered school sections
-          </p>
-        </article>
-
-        {/* ACTIVE SECTIONS */}
-
-        <article className="section-stat-card">
-          <div className="section-stat-header">
             <div
-              className="section-stat-icon"
+              className="section-welcome-badge"
+              aria-hidden="true"
+            >
+              <img
+                src={
+                  seniorHighSchoolLogo
+                }
+                alt=""
+              />
+            </div>
+          </section>
+
+          {/* ===============================================
+              OPERATIONAL METRICS
+          ================================================ */}
+
+          <section
+            className="section-management-metrics"
+            aria-label="Section management summary"
+          >
+            {/* ACTIVE */}
+
+            <article className="section-management-metric">
+              <div
+                className="section-management-metric-icon"
+                aria-hidden="true"
+              >
+                ▦
+              </div>
+
+              <div className="section-management-metric-copy">
+                <span>
+                  ACTIVE
+                </span>
+
+                <p>
+                  Active Sections
+                </p>
+
+                <small>
+                  Currently enabled
+                </small>
+              </div>
+
+              <strong>
+                {loading ||
+                !sectionsReady
+                  ? "—"
+                  : formatNumber(
+                      activeSectionCount,
+                    )}
+              </strong>
+            </article>
+
+            {/* ASSIGNED */}
+
+            <article className="section-management-metric is-assigned">
+              <div
+                className="section-management-metric-icon"
+                aria-hidden="true"
+              >
+                ✓
+              </div>
+
+              <div className="section-management-metric-copy">
+                <span>
+                  ASSIGNMENT
+                </span>
+
+                <p>
+                  Adviser Coverage
+                </p>
+
+                <small>
+                  Sections with advisers
+                </small>
+              </div>
+
+              <strong>
+                {loading ||
+                !sectionsReady
+                  ? "—"
+                  : formatPercentage(
+                      assignmentCoverage,
+                    )}
+              </strong>
+            </article>
+
+            {/* ADVISERS */}
+
+            <article className="section-management-metric is-adviser">
+              <div
+                className="section-management-metric-icon"
+                aria-hidden="true"
+              >
+                ♙
+              </div>
+
+              <div className="section-management-metric-copy">
+                <span>
+                  AVAILABLE
+                </span>
+
+                <p>
+                  Active Advisers
+                </p>
+
+                <small>
+                  Eligible for assignment
+                </small>
+              </div>
+
+              <strong>
+                {loading ||
+                !advisersReady
+                  ? "—"
+                  : formatNumber(
+                      activeAdvisers.length,
+                    )}
+              </strong>
+            </article>
+          </section>
+        </section>
+
+        {/* =================================================
+            ASSIGNMENT HEALTH
+        ================================================== */}
+
+        {sectionsReady &&
+          sections.length > 0 && (
+            <section
+              className={`section-assignment-health ${
+                unassignedSectionCount >
+                0
+                  ? "has-warning"
+                  : "is-complete"
+              }`}
+            >
+              <div className="section-assignment-health-icon">
+                {unassignedSectionCount >
+                0
+                  ? "!"
+                  : "✓"}
+              </div>
+
+              <div className="section-assignment-health-copy">
+                <span>
+                  ADVISER ASSIGNMENT
+                </span>
+
+                <strong>
+                  {unassignedSectionCount >
+                  0
+                    ? `${formatNumber(
+                        unassignedSectionCount,
+                      )} ${
+                        unassignedSectionCount ===
+                        1
+                          ? "section needs"
+                          : "sections need"
+                      } an adviser`
+                    : "All sections have assigned advisers"}
+                </strong>
+
+                <p>
+                  {unassignedSectionCount >
+                  0
+                    ? `${formatNumber(
+                        assignedSectionCount,
+                      )} of ${formatNumber(
+                        sections.length,
+                      )} sections currently have adviser assignments.`
+                    : `${formatNumber(
+                        assignedSectionCount,
+                      )} of ${formatNumber(
+                        sections.length,
+                      )} sections are covered by adviser assignments.`}
+                </p>
+              </div>
+
+              <div className="section-assignment-health-progress">
+                <div className="section-assignment-health-progress-top">
+                  <span>
+                    Assignment Coverage
+                  </span>
+
+                  <strong>
+                    {formatPercentage(
+                      assignmentCoverage,
+                    )}
+                  </strong>
+                </div>
+
+                <div className="section-assignment-progress-track">
+                  <div
+                    style={{
+                      "--section-progress": `${clampPercentage(
+                        assignmentCoverage,
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            </section>
+          )}
+
+        {/* =================================================
+            SUCCESS MESSAGE
+        ================================================== */}
+
+        {success && (
+          <div
+            className="councilor-success"
+            role="status"
+            aria-live="polite"
+          >
+            <span
               aria-hidden="true"
             >
               ✓
-            </div>
-
-            <span>
-              ACTIVE
             </span>
-          </div>
-
-          <strong>
-            {loading
-              ? "—"
-              : activeSectionCount}
-          </strong>
-
-          <h3>
-            Active Sections
-          </h3>
-
-          <p>
-            Sections currently active
-          </p>
-        </article>
-
-        {/* INACTIVE SECTIONS */}
-
-        <article className="section-stat-card">
-          <div className="section-stat-header">
-            <div
-              className="section-stat-icon"
-              aria-hidden="true"
-            >
-              —
-            </div>
-
-            <span>
-              INACTIVE
-            </span>
-          </div>
-
-          <strong>
-            {loading
-              ? "—"
-              : inactiveSectionCount}
-          </strong>
-
-          <h3>
-            Inactive Sections
-          </h3>
-
-          <p>
-            Sections currently inactive
-          </p>
-        </article>
-      </section>
-
-      {/* ===================================================
-          SUCCESS MESSAGE
-      ==================================================== */}
-
-      {success && (
-        <div
-          className="councilor-success"
-          role="status"
-          aria-live="polite"
-        >
-          <span aria-hidden="true">
-            ✓
-          </span>
-
-          <p>
-            {success}
-          </p>
-
-          <button
-            type="button"
-            onClick={() =>
-              setSuccess("")
-            }
-            aria-label="Dismiss success message"
-          >
-            ×
-          </button>
-        </div>
-      )}
-
-      {/* ===================================================
-          SECTION DIRECTORY
-      ==================================================== */}
-
-      <section className="councilor-panel">
-        {/* =================================================
-            PANEL HEADER
-        ================================================== */}
-
-        <div className="councilor-panel-header">
-          <div>
-            <span>
-              ACADEMIC MANAGEMENT
-            </span>
-
-            <h2>
-              Section Directory
-
-              {!loading && (
-                <small>
-                  {sections.length}
-                </small>
-              )}
-            </h2>
 
             <p>
-              View and manage registered school
-              sections and adviser assignments.
+              {success}
             </p>
-          </div>
 
-          <div className="councilor-panel-actions">
             <button
               type="button"
-              className="councilor-primary-button"
-              onClick={openModal}
-            >
-              <span aria-hidden="true">
-                +
-              </span>
-
-              Add Section
-            </button>
-          </div>
-        </div>
-
-        {/* =================================================
-            TOOLBAR
-        ================================================== */}
-
-        <div className="councilor-toolbar">
-          <div className="councilor-search">
-            <span aria-hidden="true">
-              ⌕
-            </span>
-
-            <input
-              type="search"
-              aria-label="Search sections"
-              placeholder="Search by section or adviser..."
-              value={search}
-              onChange={(event) =>
-                setSearch(
-                  event.target.value,
-                )
+              onClick={() =>
+                setSuccess("")
               }
-            />
-          </div>
-
-          <span className="councilor-result-count">
-            {loading
-              ? "Loading..."
-              : `${filteredSections.length} ${
-                  filteredSections.length === 1
-                    ? "section"
-                    : "sections"
-                }`}
-          </span>
-        </div>
-
-        {/* =================================================
-            ERROR STATE
-        ================================================== */}
-
-        {error && (
-          <div
-            className="councilor-error"
-            role="alert"
-          >
-            <span aria-hidden="true">
-              !
-            </span>
-
-            <p>
-              {error}
-            </p>
+              aria-label="Dismiss success message"
+            >
+              ×
+            </button>
           </div>
         )}
 
         {/* =================================================
-            LOADING / EMPTY / TABLE
+            PARTIAL DATA ERROR
         ================================================== */}
 
-        {loading ? (
-          <div className="councilor-empty">
-            <div
-              className="councilor-loading-spinner"
-              aria-hidden="true"
-            />
-
-            <strong>
-              Loading sections
-            </strong>
-
-            <p>
-              Fetching registered school
-              sections...
-            </p>
-          </div>
-        ) : filteredSections.length ===
-          0 ? (
-          /* =============================================
-             EMPTY STATE
-          ============================================== */
-
-          <div className="councilor-empty">
-            <div
-              className="councilor-empty-icon"
+        {error && (
+          <div
+            className="section-data-warning"
+            role="status"
+          >
+            <span
               aria-hidden="true"
             >
-              ▦
+              !
+            </span>
+
+            <div>
+              <strong>
+                Some information is
+                unavailable
+              </strong>
+
+              <p>
+                {error}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* =================================================
+            SECTION DIRECTORY
+        ================================================== */}
+
+        <section className="councilor-panel section-directory-panel">
+          {/* ===============================================
+              PANEL HEADER
+          ================================================ */}
+
+          <div className="councilor-panel-header">
+            <div>
+              <span>
+                ACADEMIC DIRECTORY
+              </span>
+
+              <h2>
+                Section Directory
+
+                {!loading &&
+                  sectionsReady && (
+                    <small>
+                      {
+                        sections.length
+                      }
+                    </small>
+                  )}
+              </h2>
+
+              <p>
+                Review registered
+                sections, adviser
+                assignments, and
+                operational status.
+              </p>
             </div>
 
-            <strong>
-              {search
-                ? "No sections found"
-                : "No sections yet"}
-            </strong>
-
-            <p>
-              {search
-                ? "Try searching with a different section or adviser name."
-                : "Create your first school section to get started."}
-            </p>
-
-            {!search && (
+            <div className="councilor-panel-actions">
               <button
                 type="button"
                 className="councilor-primary-button"
-                onClick={openModal}
+                onClick={
+                  openModal
+                }
+                disabled={
+                  !advisersReady ||
+                  activeAdvisers.length ===
+                    0
+                }
               >
-                + Add Section
+                <span
+                  aria-hidden="true"
+                >
+                  +
+                </span>
+
+                Add Section
               </button>
-            )}
+            </div>
           </div>
-        ) : (
-          /* =============================================
-             SECTION TABLE
-          ============================================== */
 
-          <div className="councilor-table-wrapper">
-            <table className="councilor-table">
-              <thead>
-                <tr>
-                  <th scope="col">
-                    SECTION
-                  </th>
+          {/* ===============================================
+              TOOLBAR
+          ================================================ */}
 
-                  <th scope="col">
-                    ADVISER
-                  </th>
+          <div className="councilor-toolbar">
+            <div className="councilor-search">
+              <span
+                aria-hidden="true"
+              >
+                ⌕
+              </span>
 
-                  <th scope="col">
-                    STATUS
-                  </th>
-                </tr>
-              </thead>
+              <input
+                type="search"
+                aria-label="Search sections"
+                placeholder="Search by section or adviser..."
+                value={search}
+                onChange={(
+                  event,
+                ) =>
+                  setSearch(
+                    event.target
+                      .value,
+                  )
+                }
+              />
+            </div>
 
-              <tbody>
-                {filteredSections.map(
-                  (section) => {
-                    const isActive =
-                      section.active !==
-                      false;
+            <div className="section-directory-summary">
+              {!loading &&
+                sectionsReady && (
+                  <>
+                    <span>
+                      {
+                        filteredSections.length
+                      }{" "}
+                      {filteredSections.length ===
+                      1
+                        ? "section"
+                        : "sections"}
+                    </span>
 
-                    const sectionInitial =
-                      section.name
-                        ?.trim()
-                        ?.charAt(0)
-                        ?.toUpperCase() ||
-                      "S";
+                    <span
+                      aria-hidden="true"
+                    >
+                      •
+                    </span>
 
-                    const adviserInitial =
-                      section.adviserName
-                        ?.trim()
-                        ?.charAt(0)
-                        ?.toUpperCase() ||
-                      "A";
+                    <span>
+                      {formatNumber(
+                        inactiveSectionCount,
+                      )}{" "}
+                      inactive
+                    </span>
+                  </>
+                )}
+            </div>
+          </div>
 
-                    return (
-                      <tr
-                        key={section.id}
-                      >
-                        {/* SECTION */}
+          {/* ===============================================
+              LOADING / ERROR / EMPTY / TABLE
+          ================================================ */}
 
-                        <td>
-                          <div className="councilor-person">
-                            <div className="councilor-person-avatar">
-                              {
-                                sectionInitial
-                              }
-                            </div>
+          {loading ? (
+            <div className="councilor-empty">
+              <div
+                className="councilor-loading-spinner"
+                aria-hidden="true"
+              />
 
-                            <div>
-                              <strong>
-                                {section.name}
-                              </strong>
+              <strong>
+                Loading sections
+              </strong>
 
-                              <span>
-                                School Section
-                              </span>
-                            </div>
-                          </div>
-                        </td>
+              <p>
+                Fetching school section
+                and assignment
+                information...
+              </p>
+            </div>
+          ) : !sectionsReady ? (
+            <div className="councilor-empty">
+              <div
+                className="councilor-empty-icon"
+                aria-hidden="true"
+              >
+                !
+              </div>
 
-                        {/* ADVISER */}
+              <strong>
+                Sections unavailable
+              </strong>
 
-                        <td>
-                          {section.adviserName ? (
+              <p>
+                Section information
+                could not be loaded.
+              </p>
+            </div>
+          ) : filteredSections.length ===
+            0 ? (
+            <div className="councilor-empty">
+              <div
+                className="councilor-empty-icon"
+                aria-hidden="true"
+              >
+                ▦
+              </div>
+
+              <strong>
+                {search
+                  ? "No sections found"
+                  : "No sections yet"}
+              </strong>
+
+              <p>
+                {search
+                  ? "Try searching with a different section or adviser name."
+                  : "Create your first school section to begin organizing academic assignments."}
+              </p>
+
+              {!search &&
+                advisersReady &&
+                activeAdvisers.length >
+                  0 && (
+                  <button
+                    type="button"
+                    className="councilor-primary-button"
+                    onClick={
+                      openModal
+                    }
+                  >
+                    + Add Section
+                  </button>
+                )}
+            </div>
+          ) : (
+            <div className="councilor-table-wrapper">
+              <table className="councilor-table">
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      SECTION
+                    </th>
+
+                    <th scope="col">
+                      ADVISER
+                    </th>
+
+                    <th scope="col">
+                      ASSIGNMENT
+                    </th>
+
+                    <th scope="col">
+                      STATUS
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredSections.map(
+                    (section) => {
+                      const isActive =
+                        section.active !==
+                        false;
+
+                      const hasAdviser =
+                        Boolean(
+                          section.adviserId ||
+                            section.adviserName,
+                        );
+
+                      const sectionInitial =
+                        section.name
+                          ?.trim()
+                          ?.charAt(0)
+                          ?.toUpperCase() ||
+                        "S";
+
+                      const adviserInitial =
+                        section.adviserName
+                          ?.trim()
+                          ?.charAt(0)
+                          ?.toUpperCase() ||
+                        "A";
+
+                      return (
+                        <tr
+                          key={
+                            section.id
+                          }
+                        >
+                          {/* SECTION */}
+
+                          <td>
                             <div className="councilor-person">
                               <div className="councilor-person-avatar">
                                 {
-                                  adviserInitial
+                                  sectionInitial
                                 }
                               </div>
 
                               <div>
                                 <strong>
                                   {
-                                    section.adviserName
+                                    section.name
                                   }
                                 </strong>
 
                                 <span>
-                                  Assigned Adviser
+                                  Academic
+                                  Section
                                 </span>
                               </div>
                             </div>
-                          ) : (
-                            <span className="section-unassigned">
-                              No adviser assigned
-                            </span>
-                          )}
-                        </td>
+                          </td>
 
-                        {/* STATUS */}
+                          {/* ADVISER */}
 
-                        <td>
-                          <span
-                            className={`councilor-status ${
-                              isActive
-                                ? ""
-                                : "inactive"
-                            }`}
-                          >
+                          <td>
+                            {section.adviserName ? (
+                              <div className="councilor-person">
+                                <div className="councilor-person-avatar">
+                                  {
+                                    adviserInitial
+                                  }
+                                </div>
+
+                                <div>
+                                  <strong>
+                                    {
+                                      section.adviserName
+                                    }
+                                  </strong>
+
+                                  <span>
+                                    Assigned
+                                    Adviser
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="section-unassigned">
+                                No adviser
+                                assigned
+                              </span>
+                            )}
+                          </td>
+
+                          {/* ASSIGNMENT */}
+
+                          <td>
                             <span
-                              aria-hidden="true"
-                            />
+                              className={`section-assignment-status ${
+                                hasAdviser
+                                  ? "assigned"
+                                  : "unassigned"
+                              }`}
+                            >
+                              <span
+                                aria-hidden="true"
+                              />
 
-                            {isActive
-                              ? "Active"
-                              : "Inactive"}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  },
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+                              {hasAdviser
+                                ? "Assigned"
+                                : "Unassigned"}
+                            </span>
+                          </td>
 
-        {/* =================================================
-            PANEL FOOTER
-        ================================================== */}
+                          {/* STATUS */}
 
-        {!loading &&
-          filteredSections.length >
-            0 && (
-            <div className="councilor-panel-footer">
-              <span>
-                Showing{" "}
-                {
-                  filteredSections.length
-                }{" "}
-                of{" "}
-                {sections.length}{" "}
-                {sections.length === 1
-                  ? "section"
-                  : "sections"}
-              </span>
+                          <td>
+                            <span
+                              className={`councilor-status ${
+                                isActive
+                                  ? ""
+                                  : "inactive"
+                              }`}
+                            >
+                              <span
+                                aria-hidden="true"
+                              />
+
+                              {isActive
+                                ? "Active"
+                                : "Inactive"}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    },
+                  )}
+                </tbody>
+              </table>
             </div>
           )}
-      </section>
 
-      {/* ===================================================
-          ADD SECTION MODAL
-      ==================================================== */}
+          {/* ===============================================
+              PANEL FOOTER
+          ================================================ */}
 
-      {showModal && (
-        <div
-          className="councilor-modal-backdrop"
-          onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
-              closeModal();
-            }
-          }}
-        >
-          <div
-            className="councilor-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="add-section-title"
-          >
-            {/* ===========================================
-                MODAL HEADER
-            ============================================ */}
-
-            <div className="councilor-modal-header">
-              <div>
+          {!loading &&
+            sectionsReady &&
+            filteredSections.length >
+              0 && (
+              <div className="councilor-panel-footer">
                 <span>
-                  ACADEMIC MANAGEMENT
+                  Showing{" "}
+                  {
+                    filteredSections.length
+                  }{" "}
+                  of{" "}
+                  {
+                    sections.length
+                  }{" "}
+                  {sections.length ===
+                  1
+                    ? "section"
+                    : "sections"}
                 </span>
 
-                <h2 id="add-section-title">
-                  Add Section
-                </h2>
-
-                <p>
-                  Create a new school section
-                  and assign an adviser.
-                </p>
+                <span>
+                  {formatNumber(
+                    assignedSectionCount,
+                  )}{" "}
+                  assigned ·{" "}
+                  {formatNumber(
+                    unassignedSectionCount,
+                  )}{" "}
+                  unassigned
+                </span>
               </div>
+            )}
+        </section>
 
-              <button
-                type="button"
-                className="councilor-modal-close"
-                onClick={closeModal}
-                disabled={creating}
-                aria-label="Close modal"
-              >
-                ×
-              </button>
-            </div>
+        {/* =================================================
+            ADD SECTION MODAL
+        ================================================== */}
 
-            {/* ===========================================
-                FORM
-            ============================================ */}
-
-            <form
-              className="councilor-modal-form"
-              onSubmit={
-                handleCreateSection
+        {showModal && (
+          <div
+            className="councilor-modal-backdrop"
+            onMouseDown={(
+              event,
+            ) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                closeModal();
               }
-              noValidate
+            }}
+          >
+            <div
+              className="councilor-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="add-section-title"
             >
-              {/* SECTION NAME */}
-
-              <div className="councilor-modal-field">
-                <label htmlFor="section-name">
-                  Section Name
-                </label>
-
-                <input
-                  id="section-name"
-                  name="name"
-                  type="text"
-                  placeholder="e.g. STEM 11 - Newton"
-                  value={
-                    formData.name
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                  autoComplete="off"
-                  disabled={creating}
-                  autoFocus
-                />
-              </div>
-
-              {/* ADVISER */}
-
-              <div className="councilor-modal-field">
-                <label htmlFor="section-adviser">
-                  Assign Adviser
-                </label>
-
-                <select
-                  id="section-adviser"
-                  name="adviserId"
-                  value={
-                    formData.adviserId
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                  disabled={
-                    creating ||
-                    activeAdvisers.length ===
-                      0
-                  }
-                >
-                  <option value="">
-                    Select an adviser
-                  </option>
-
-                  {activeAdvisers.map(
-                    (adviser) => (
-                      <option
-                        key={adviser.id}
-                        value={adviser.id}
-                      >
-                        {adviser.name} —{" "}
-                        {adviser.email}
-                      </option>
-                    ),
-                  )}
-                </select>
-
-                <span className="councilor-field-hint">
-                  Only active adviser accounts
-                  can be assigned to a section.
-                </span>
-              </div>
-
-              {/* NO ACTIVE ADVISER */}
-
-              {activeAdvisers.length ===
-                0 && (
-                <div
-                  className="councilor-modal-error"
-                  role="alert"
-                >
-                  <span
-                    aria-hidden="true"
-                  >
-                    !
-                  </span>
-
-                  <p>
-                    No active adviser accounts
-                    are available. Create or
-                    activate an adviser first.
-                  </p>
-                </div>
-              )}
-
-              {/* FORM ERROR */}
-
-              {formError && (
-                <div
-                  className="councilor-modal-error"
-                  role="alert"
-                >
-                  <span
-                    aria-hidden="true"
-                  >
-                    !
-                  </span>
-
-                  <p>
-                    {formError}
-                  </p>
-                </div>
-              )}
-
               {/* =========================================
-                  ACTIONS
+                  MODAL HEADER
               ========================================== */}
 
-              <div className="councilor-modal-actions">
+              <div className="councilor-modal-header">
+                <div>
+                  <span>
+                    ACADEMIC
+                    MANAGEMENT
+                  </span>
+
+                  <h2 id="add-section-title">
+                    Add Section
+                  </h2>
+
+                  <p>
+                    Create a new
+                    academic section
+                    and assign an active
+                    adviser.
+                  </p>
+                </div>
+
                 <button
                   type="button"
-                  className="councilor-secondary-button"
-                  onClick={closeModal}
-                  disabled={creating}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className="councilor-primary-button"
-                  disabled={
-                    creating ||
-                    activeAdvisers.length ===
-                      0
+                  className="councilor-modal-close"
+                  onClick={
+                    closeModal
                   }
+                  disabled={
+                    creating
+                  }
+                  aria-label="Close modal"
                 >
-                  {creating && (
-                    <span
-                      className="councilor-button-spinner"
-                      aria-hidden="true"
-                    />
-                  )}
-
-                  {creating
-                    ? "Creating..."
-                    : "Create Section"}
+                  ×
                 </button>
               </div>
-            </form>
+
+              {/* =========================================
+                  FORM
+              ========================================== */}
+
+              <form
+                className="councilor-modal-form"
+                onSubmit={
+                  handleCreateSection
+                }
+                noValidate
+              >
+                {/* SECTION NAME */}
+
+                <div className="councilor-modal-field">
+                  <label htmlFor="section-name">
+                    Section Name
+                  </label>
+
+                  <input
+                    id="section-name"
+                    name="name"
+                    type="text"
+                    placeholder="e.g. STEM 11 - Newton"
+                    value={
+                      formData.name
+                    }
+                    onChange={
+                      handleFormChange
+                    }
+                    autoComplete="off"
+                    disabled={
+                      creating
+                    }
+                    autoFocus
+                  />
+                </div>
+
+                {/* ADVISER */}
+
+                <div className="councilor-modal-field">
+                  <label htmlFor="section-adviser">
+                    Assign Adviser
+                  </label>
+
+                  <select
+                    id="section-adviser"
+                    name="adviserId"
+                    value={
+                      formData.adviserId
+                    }
+                    onChange={
+                      handleFormChange
+                    }
+                    disabled={
+                      creating ||
+                      activeAdvisers.length ===
+                        0
+                    }
+                  >
+                    <option value="">
+                      Select an
+                      adviser
+                    </option>
+
+                    {activeAdvisers.map(
+                      (
+                        adviser,
+                      ) => (
+                        <option
+                          key={
+                            adviser.id
+                          }
+                          value={
+                            adviser.id
+                          }
+                        >
+                          {
+                            adviser.name
+                          }{" "}
+                          —{" "}
+                          {
+                            adviser.email
+                          }
+                        </option>
+                      ),
+                    )}
+                  </select>
+
+                  <span className="councilor-field-hint">
+                    Only active
+                    adviser accounts
+                    can be assigned to
+                    a section.
+                  </span>
+                </div>
+
+                {/* NO ACTIVE ADVISER */}
+
+                {activeAdvisers.length ===
+                  0 && (
+                  <div
+                    className="councilor-modal-error"
+                    role="alert"
+                  >
+                    <span
+                      aria-hidden="true"
+                    >
+                      !
+                    </span>
+
+                    <p>
+                      No active
+                      adviser accounts
+                      are available.
+                      Create or activate
+                      an adviser first.
+                    </p>
+                  </div>
+                )}
+
+                {/* FORM ERROR */}
+
+                {formError && (
+                  <div
+                    className="councilor-modal-error"
+                    role="alert"
+                  >
+                    <span
+                      aria-hidden="true"
+                    >
+                      !
+                    </span>
+
+                    <p>
+                      {
+                        formError
+                      }
+                    </p>
+                  </div>
+                )}
+
+                {/* ACTIONS */}
+
+                <div className="councilor-modal-actions">
+                  <button
+                    type="button"
+                    className="councilor-secondary-button"
+                    onClick={
+                      closeModal
+                    }
+                    disabled={
+                      creating
+                    }
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="councilor-primary-button"
+                    disabled={
+                      creating ||
+                      activeAdvisers.length ===
+                        0
+                    }
+                  >
+                    {creating && (
+                      <span
+                        className="councilor-button-spinner"
+                        aria-hidden="true"
+                      />
+                    )}
+
+                    {creating
+                      ? "Creating..."
+                      : "Create Section"}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </CouncilorLayout>
   );
 }
