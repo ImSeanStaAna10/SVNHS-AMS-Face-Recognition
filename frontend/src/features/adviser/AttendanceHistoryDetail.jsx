@@ -4,13 +4,15 @@ import {
   useState,
 } from "react";
 
-import * as XLSX from "xlsx";
-
 import {
   useLocation,
   useNavigate,
   useParams,
 } from "react-router-dom";
+
+import { jsPDF } from "jspdf";
+import { autoTable } from "jspdf-autotable";
+import * as XLSX from "xlsx";
 
 import AdviserLayout from "../../layouts/AdviserLayout";
 
@@ -27,6 +29,27 @@ import "../../styles/adviser/attendanceHistoryDetail.css";
 ========================================================= */
 
 const PH_TIME_ZONE = "Asia/Manila";
+
+const PDF_COLORS = {
+  navy: [11, 46, 103],
+  navyDark: [6, 26, 63],
+  blue: [36, 95, 158],
+
+  red: [181, 34, 50],
+  amber: [194, 146, 31],
+  green: [36, 122, 80],
+
+  text: [25, 40, 64],
+  muted: [100, 116, 139],
+  border: [205, 214, 226],
+
+  softBlue: [240, 246, 252],
+  softGreen: [238, 248, 243],
+  softAmber: [255, 248, 232],
+  softRed: [255, 241, 243],
+
+  white: [255, 255, 255],
+};
 
 /* =========================================================
    DATA HELPERS
@@ -91,8 +114,7 @@ const getRecordStatus = (record) =>
     .toUpperCase();
 
 const safeNumber = (value) => {
-  const parsed =
-    Number(value);
+  const parsed = Number(value);
 
   return Number.isNaN(parsed)
     ? 0
@@ -111,8 +133,7 @@ const hasExplicitTimezone = (value) => {
     return false;
   }
 
-  const raw =
-    value.trim();
+  const raw = value.trim();
 
   if (raw.endsWith("Z")) {
     return true;
@@ -135,8 +156,7 @@ const toTwelveHourTime = (
   secondValue,
   includeSeconds = false,
 ) => {
-  const hour =
-    Number(hourValue);
+  const hour = Number(hourValue);
 
   if (Number.isNaN(hour)) {
     return "—";
@@ -181,15 +201,16 @@ const formatTime = (
     typeof value === "string" &&
     !hasExplicitTimezone(value)
   ) {
-    const raw =
-      value.trim();
+    const raw = value.trim();
 
     const localDateTime =
       raw.length >= 16 &&
       raw[4] === "-" &&
       raw[7] === "-" &&
-      (raw[10] === "T" ||
-        raw[10] === " ");
+      (
+        raw[10] === "T" ||
+        raw[10] === " "
+      );
 
     if (localDateTime) {
       return toTwelveHourTime(
@@ -220,11 +241,14 @@ const formatTime = (
     "en-PH",
     {
       timeZone: PH_TIME_ZONE,
+
       hour: "numeric",
       minute: "2-digit",
+
       second: includeSeconds
         ? "2-digit"
         : undefined,
+
       hour12: true,
     },
   ).format(date);
@@ -276,6 +300,7 @@ const formatDate = (value) => {
     "en-PH",
     {
       timeZone: PH_TIME_ZONE,
+
       month: "long",
       day: "numeric",
       year: "numeric",
@@ -288,20 +313,19 @@ const formatGeneratedAt = () =>
     "en-PH",
     {
       timeZone: PH_TIME_ZONE,
+
       dateStyle: "long",
       timeStyle: "short",
     },
-  ).format(new Date());
+  ).format(
+    new Date(),
+  );
 
 /* =========================================================
    FILE NAME
 ========================================================= */
 
 const sanitizeFileName = (value) => {
-  /*
-   * Deliberately regex-free because the old
-   * sanitizer caused escaping/parser issues.
-   */
   const invalidCharacters = [
     "<",
     ">",
@@ -367,7 +391,9 @@ const getAttendanceHealth = (rate) => {
   if (value >= 90) {
     return {
       key: "strong",
+
       label: "Strong",
+
       description:
         "This completed session recorded a high attendance rate.",
     };
@@ -376,7 +402,9 @@ const getAttendanceHealth = (rate) => {
   if (value >= 75) {
     return {
       key: "monitor",
+
       label: "Monitor",
+
       description:
         "Attendance is moderate and may benefit from routine monitoring.",
     };
@@ -384,10 +412,915 @@ const getAttendanceHealth = (rate) => {
 
   return {
     key: "review",
+
     label: "For Review",
+
     description:
       "Attendance for this session is lower and may require follow-up.",
   };
+};
+
+/* =========================================================
+   PDF IMAGE HELPER
+========================================================= */
+
+const loadImageAsPngDataUrl = (
+  source,
+) =>
+  new Promise(
+    (resolve, reject) => {
+      const image =
+        new Image();
+
+      image.onload = () => {
+        try {
+          const naturalWidth =
+            image.naturalWidth ||
+            256;
+
+          const naturalHeight =
+            image.naturalHeight ||
+            256;
+
+          const maximumSize =
+            256;
+
+          const scale =
+            Math.min(
+              maximumSize /
+                naturalWidth,
+
+              maximumSize /
+                naturalHeight,
+
+              1,
+            );
+
+          const width =
+            Math.max(
+              Math.round(
+                naturalWidth *
+                  scale,
+              ),
+              1,
+            );
+
+          const height =
+            Math.max(
+              Math.round(
+                naturalHeight *
+                  scale,
+              ),
+              1,
+            );
+
+          const canvas =
+            document.createElement(
+              "canvas",
+            );
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const context =
+            canvas.getContext(
+              "2d",
+            );
+
+          if (!context) {
+            reject(
+              new Error(
+                "Unable to create image canvas.",
+              ),
+            );
+
+            return;
+          }
+
+          context.clearRect(
+            0,
+            0,
+            width,
+            height,
+          );
+
+          context.drawImage(
+            image,
+            0,
+            0,
+            width,
+            height,
+          );
+
+          resolve(
+            canvas.toDataURL(
+              "image/png",
+            ),
+          );
+        } catch (imageError) {
+          reject(imageError);
+        }
+      };
+
+      image.onerror = () => {
+        reject(
+          new Error(
+            "Unable to load PDF logo.",
+          ),
+        );
+      };
+
+      image.src = source;
+    },
+  );
+
+/* =========================================================
+   PDF HEADER
+========================================================= */
+
+const drawPdfHeader = ({
+  document,
+  depedImage,
+  schoolImage,
+}) => {
+  const pageWidth =
+    document.internal.pageSize.getWidth();
+
+  /* WHITE HEADER */
+
+  document.setFillColor(
+    ...PDF_COLORS.white,
+  );
+
+  document.rect(
+    0,
+    0,
+    pageWidth,
+    23,
+    "F",
+  );
+
+  /* LOGOS */
+
+  if (depedImage) {
+    document.addImage(
+      depedImage,
+      "PNG",
+      10,
+      7,
+      11,
+      11,
+      undefined,
+      "FAST",
+    );
+  }
+
+  if (schoolImage) {
+    document.addImage(
+      schoolImage,
+      "PNG",
+      23,
+      7,
+      11,
+      11,
+      undefined,
+      "FAST",
+    );
+  }
+
+  /* REPUBLIC */
+
+  document.setTextColor(
+    ...PDF_COLORS.muted,
+  );
+
+  document.setFont(
+    "helvetica",
+    "normal",
+  );
+
+  document.setFontSize(6.2);
+
+  document.text(
+    "REPUBLIC OF THE PHILIPPINES",
+    pageWidth / 2,
+    7.8,
+    {
+      align: "center",
+    },
+  );
+
+  /* SCHOOL */
+
+  document.setTextColor(
+    ...PDF_COLORS.navyDark,
+  );
+
+  document.setFont(
+    "helvetica",
+    "bold",
+  );
+
+  document.setFontSize(11);
+
+  document.text(
+    "SIGNAL VILLAGE NATIONAL HIGH SCHOOL",
+    pageWidth / 2,
+    12.5,
+    {
+      align: "center",
+    },
+  );
+
+  document.setTextColor(
+    ...PDF_COLORS.muted,
+  );
+
+  document.setFont(
+    "helvetica",
+    "normal",
+  );
+
+  document.setFontSize(6.5);
+
+  document.text(
+    "Attendance Management System · Adviser Portal",
+    pageWidth / 2,
+    16.5,
+    {
+      align: "center",
+    },
+  );
+
+  /* DOCUMENT TYPE */
+
+  document.setTextColor(
+    ...PDF_COLORS.red,
+  );
+
+  document.setFont(
+    "helvetica",
+    "bold",
+  );
+
+  document.setFontSize(6.3);
+
+  document.text(
+    "OFFICIAL SCHOOL RECORD",
+    pageWidth - 10,
+    10,
+    {
+      align: "right",
+    },
+  );
+
+  document.setTextColor(
+    ...PDF_COLORS.navyDark,
+  );
+
+  document.setFontSize(7);
+
+  document.text(
+    "ATTENDANCE SESSION RECORD",
+    pageWidth - 10,
+    14,
+    {
+      align: "right",
+    },
+  );
+
+  /* ACCENT */
+
+  document.setFillColor(
+    ...PDF_COLORS.red,
+  );
+
+  document.rect(
+    0,
+    20.5,
+    pageWidth * 0.32,
+    1.5,
+    "F",
+  );
+
+  document.setFillColor(
+    ...PDF_COLORS.amber,
+  );
+
+  document.rect(
+    pageWidth * 0.32,
+    20.5,
+    pageWidth * 0.04,
+    1.5,
+    "F",
+  );
+
+  document.setFillColor(
+    ...PDF_COLORS.navy,
+  );
+
+  document.rect(
+    pageWidth * 0.36,
+    20.5,
+    pageWidth * 0.64,
+    1.5,
+    "F",
+  );
+};
+
+/* =========================================================
+   PDF SESSION META
+========================================================= */
+
+const drawPdfMeta = ({
+  document,
+  sectionName,
+  adviserName,
+  attendanceDate,
+  startedAt,
+  endedAt,
+}) => {
+  const pageWidth =
+    document.internal.pageSize.getWidth();
+
+  const left = 10;
+  const right = 10;
+
+  const availableWidth =
+    pageWidth -
+    left -
+    right;
+
+  const width =
+    availableWidth / 5;
+
+  const items = [
+    {
+      label: "SECTION",
+
+      value:
+        sectionName ||
+        "—",
+    },
+
+    {
+      label: "ADVISER",
+
+      value:
+        adviserName ||
+        "Class Adviser",
+    },
+
+    {
+      label:
+        "ATTENDANCE DATE",
+
+      value:
+        formatDate(
+          attendanceDate,
+        ),
+    },
+
+    {
+      label:
+        "SESSION STARTED",
+
+      value:
+        formatTime(
+          startedAt,
+        ),
+    },
+
+    {
+      label:
+        "SESSION ENDED",
+
+      value:
+        formatTime(
+          endedAt,
+        ),
+    },
+  ];
+
+  items.forEach(
+    (item, index) => {
+      const x =
+        left +
+        width * index;
+
+      document.setFillColor(
+        ...PDF_COLORS.softBlue,
+      );
+
+      document.setDrawColor(
+        ...PDF_COLORS.border,
+      );
+
+      document.setLineWidth(
+        0.2,
+      );
+
+      document.rect(
+        x,
+        26,
+        width,
+        13,
+        "FD",
+      );
+
+      document.setTextColor(
+        ...PDF_COLORS.muted,
+      );
+
+      document.setFont(
+        "helvetica",
+        "bold",
+      );
+
+      document.setFontSize(
+        5.2,
+      );
+
+      document.text(
+        item.label,
+        x + 3,
+        30.2,
+      );
+
+      document.setTextColor(
+        ...PDF_COLORS.text,
+      );
+
+      document.setFontSize(
+        6.8,
+      );
+
+      const text =
+        document.splitTextToSize(
+          String(
+            item.value ||
+              "—",
+          ),
+          width - 6,
+        );
+
+      document.text(
+        text.slice(0, 2),
+        x + 3,
+        34.5,
+      );
+    },
+  );
+};
+
+/* =========================================================
+   PDF SUMMARY
+========================================================= */
+
+const drawPdfSummary = ({
+  document,
+  totalStudents,
+  presentCount,
+  lateCount,
+  absentCount,
+  attendanceRate,
+}) => {
+  const pageWidth =
+    document.internal.pageSize.getWidth();
+
+  const left = 10;
+  const right = 10;
+
+  const gap = 2;
+
+  const items = [
+    {
+      label: "Students",
+
+      value:
+        String(
+          totalStudents,
+        ),
+
+      color:
+        PDF_COLORS.navy,
+    },
+
+    {
+      label: "Present",
+
+      value:
+        String(
+          presentCount,
+        ),
+
+      color:
+        PDF_COLORS.green,
+    },
+
+    {
+      label: "Late",
+
+      value:
+        String(
+          lateCount,
+        ),
+
+      color:
+        PDF_COLORS.amber,
+    },
+
+    {
+      label: "Absent",
+
+      value:
+        String(
+          absentCount,
+        ),
+
+      color:
+        PDF_COLORS.red,
+    },
+
+    {
+      label:
+        "Attendance",
+
+      value:
+        `${Number(
+          attendanceRate,
+        ).toFixed(1)}%`,
+
+      color:
+        PDF_COLORS.navyDark,
+    },
+  ];
+
+  const availableWidth =
+    pageWidth -
+    left -
+    right -
+    gap *
+      (items.length - 1);
+
+  const cardWidth =
+    availableWidth /
+    items.length;
+
+  items.forEach(
+    (item, index) => {
+      const x =
+        left +
+        index *
+          (cardWidth + gap);
+
+      document.setFillColor(
+        250,
+        252,
+        254,
+      );
+
+      document.setDrawColor(
+        ...PDF_COLORS.border,
+      );
+
+      document.roundedRect(
+        x,
+        42,
+        cardWidth,
+        11,
+        1.2,
+        1.2,
+        "FD",
+      );
+
+      document.setFillColor(
+        ...item.color,
+      );
+
+      document.rect(
+        x,
+        42,
+        1.4,
+        11,
+        "F",
+      );
+
+      document.setTextColor(
+        ...PDF_COLORS.muted,
+      );
+
+      document.setFont(
+        "helvetica",
+        "bold",
+      );
+
+      document.setFontSize(
+        5.2,
+      );
+
+      document.text(
+        item.label.toUpperCase(),
+        x + 4,
+        45.6,
+      );
+
+      document.setTextColor(
+        ...item.color,
+      );
+
+      document.setFontSize(
+        8,
+      );
+
+      document.text(
+        item.value,
+        x + 4,
+        50.2,
+      );
+    },
+  );
+};
+
+/* =========================================================
+   PDF SIGNATURES
+========================================================= */
+
+const drawPdfSignatures = ({
+  document,
+  adviserName,
+  depedImage,
+  schoolImage,
+}) => {
+  const pageWidth =
+    document.internal.pageSize.getWidth();
+
+  const pageHeight =
+    document.internal.pageSize.getHeight();
+
+  const finalTableY =
+    document.lastAutoTable
+      ?.finalY ??
+    60;
+
+  let signatureY =
+    finalTableY + 16;
+
+  /*
+   * If the table already consumes most
+   * of the last page, put certification
+   * on its own clean page.
+   */
+  if (
+    signatureY >
+    pageHeight - 35
+  ) {
+    document.addPage();
+
+    drawPdfHeader({
+      document,
+      depedImage,
+      schoolImage,
+    });
+
+    signatureY = 42;
+  }
+
+  /* CERTIFICATION */
+
+  document.setTextColor(
+    ...PDF_COLORS.muted,
+  );
+
+  document.setFont(
+    "helvetica",
+    "bold",
+  );
+
+  document.setFontSize(5.6);
+
+  document.text(
+    "CERTIFICATION",
+    10,
+    signatureY,
+  );
+
+  document.setTextColor(
+    ...PDF_COLORS.text,
+  );
+
+  document.setFont(
+    "helvetica",
+    "normal",
+  );
+
+  document.setFontSize(6.3);
+
+  document.text(
+    "This document represents the official attendance entries recorded for the completed class session.",
+    10,
+    signatureY + 4.2,
+  );
+
+  const lineY =
+    signatureY + 19;
+
+  const leftCenter =
+    pageWidth * 0.31;
+
+  const rightCenter =
+    pageWidth * 0.69;
+
+  const signatureWidth =
+    62;
+
+  /* ADVISER */
+
+  document.setDrawColor(
+    ...PDF_COLORS.muted,
+  );
+
+  document.setLineWidth(
+    0.25,
+  );
+
+  document.line(
+    leftCenter -
+      signatureWidth / 2,
+    lineY,
+
+    leftCenter +
+      signatureWidth / 2,
+    lineY,
+  );
+
+  document.setFont(
+    "helvetica",
+    "bold",
+  );
+
+  document.setFontSize(7);
+
+  document.setTextColor(
+    ...PDF_COLORS.text,
+  );
+
+  document.text(
+    adviserName ||
+      "Class Adviser",
+    leftCenter,
+    lineY + 4.5,
+    {
+      align: "center",
+    },
+  );
+
+  document.setFont(
+    "helvetica",
+    "normal",
+  );
+
+  document.setFontSize(5.8);
+
+  document.setTextColor(
+    ...PDF_COLORS.muted,
+  );
+
+  document.text(
+    "Class Adviser",
+    leftCenter,
+    lineY + 8,
+    {
+      align: "center",
+    },
+  );
+
+  /* SCHOOL OFFICIAL */
+
+  document.setDrawColor(
+    ...PDF_COLORS.muted,
+  );
+
+  document.line(
+    rightCenter -
+      signatureWidth / 2,
+    lineY,
+
+    rightCenter +
+      signatureWidth / 2,
+    lineY,
+  );
+
+  document.setFont(
+    "helvetica",
+    "bold",
+  );
+
+  document.setFontSize(7);
+
+  document.setTextColor(
+    ...PDF_COLORS.text,
+  );
+
+  document.text(
+    "School Official",
+    rightCenter,
+    lineY + 4.5,
+    {
+      align: "center",
+    },
+  );
+
+  document.setFont(
+    "helvetica",
+    "normal",
+  );
+
+  document.setFontSize(5.8);
+
+  document.setTextColor(
+    ...PDF_COLORS.muted,
+  );
+
+  document.text(
+    "Authorized Signature",
+    rightCenter,
+    lineY + 8,
+    {
+      align: "center",
+    },
+  );
+};
+
+/* =========================================================
+   PDF FOOTERS
+========================================================= */
+
+const drawPdfFooters = ({
+  document,
+  generatedAt,
+}) => {
+  const totalPages =
+    document.getNumberOfPages();
+
+  const pageWidth =
+    document.internal.pageSize.getWidth();
+
+  const pageHeight =
+    document.internal.pageSize.getHeight();
+
+  for (
+    let pageNumber = 1;
+    pageNumber <= totalPages;
+    pageNumber += 1
+  ) {
+    document.setPage(
+      pageNumber,
+    );
+
+    document.setDrawColor(
+      ...PDF_COLORS.border,
+    );
+
+    document.setLineWidth(
+      0.2,
+    );
+
+    document.line(
+      10,
+      pageHeight - 9,
+      pageWidth - 10,
+      pageHeight - 9,
+    );
+
+    document.setFont(
+      "helvetica",
+      "normal",
+    );
+
+    document.setFontSize(
+      5.7,
+    );
+
+    document.setTextColor(
+      ...PDF_COLORS.muted,
+    );
+
+    document.text(
+      `Generated by SVNHS Attendance Management System · ${generatedAt}`,
+      10,
+      pageHeight - 5.2,
+    );
+
+    document.text(
+      `Page ${pageNumber} of ${totalPages}`,
+      pageWidth - 10,
+      pageHeight - 5.2,
+      {
+        align: "right",
+      },
+    );
+  }
 };
 
 /* =========================================================
@@ -395,8 +1328,9 @@ const getAttendanceHealth = (rate) => {
 ========================================================= */
 
 function AttendanceHistoryDetail() {
-  const { sessionId } =
-    useParams();
+  const {
+    sessionId,
+  } = useParams();
 
   const location =
     useLocation();
@@ -505,6 +1439,7 @@ function AttendanceHistoryDetail() {
     const load = async () => {
       try {
         setLoading(true);
+
         setError("");
 
         if (!sessionId) {
@@ -556,7 +1491,9 @@ function AttendanceHistoryDetail() {
     return () => {
       mounted = false;
     };
-  }, [sessionId]);
+  }, [
+    sessionId,
+  ]);
 
   /* =======================================================
      FALLBACK SESSION METADATA
@@ -593,11 +1530,13 @@ function AttendanceHistoryDetail() {
 
       return {
         sessionId,
+
         sectionName:
           getRecordSectionName(
             firstRecord,
           ) ||
           "Assigned Section",
+
         attendanceDate:
           recordedAt
             ? String(
@@ -607,9 +1546,12 @@ function AttendanceHistoryDetail() {
                 10,
               )
             : "",
+
         studentCount:
           records.length,
-        status: "ENDED",
+
+        status:
+          "ENDED",
       };
     }, [
       records,
@@ -623,7 +1565,7 @@ function AttendanceHistoryDetail() {
     null;
 
   /* =======================================================
-     DERIVED DATA
+     STATUS COUNTS
   ======================================================= */
 
   const statusCounts =
@@ -640,15 +1582,18 @@ function AttendanceHistoryDetail() {
               );
 
             if (
-              status === "PRESENT"
+              status ===
+              "PRESENT"
             ) {
               totals.present += 1;
             } else if (
-              status === "LATE"
+              status ===
+              "LATE"
             ) {
               totals.late += 1;
             } else if (
-              status === "ABSENT"
+              status ===
+              "ABSENT"
             ) {
               totals.absent += 1;
             }
@@ -661,7 +1606,9 @@ function AttendanceHistoryDetail() {
             absent: 0,
           },
         ),
-      [records],
+      [
+        records,
+      ],
     );
 
   const presentCount =
@@ -687,8 +1634,10 @@ function AttendanceHistoryDetail() {
   const attendanceRate =
     totalStudents > 0
       ? Math.round(
-          (attendedCount /
-            totalStudents) *
+          (
+            attendedCount /
+            totalStudents
+          ) *
             1000,
         ) / 10
       : 0;
@@ -696,8 +1645,10 @@ function AttendanceHistoryDetail() {
   const presentRate =
     totalStudents > 0
       ? Math.round(
-          (presentCount /
-            totalStudents) *
+          (
+            presentCount /
+            totalStudents
+          ) *
             1000,
         ) / 10
       : 0;
@@ -705,8 +1656,10 @@ function AttendanceHistoryDetail() {
   const lateRate =
     totalStudents > 0
       ? Math.round(
-          (lateCount /
-            totalStudents) *
+          (
+            lateCount /
+            totalStudents
+          ) *
             1000,
         ) / 10
       : 0;
@@ -714,8 +1667,10 @@ function AttendanceHistoryDetail() {
   const absenceRate =
     totalStudents > 0
       ? Math.round(
-          (absentCount /
-            totalStudents) *
+          (
+            absentCount /
+            totalStudents
+          ) *
             1000,
         ) / 10
       : 0;
@@ -782,8 +1737,12 @@ function AttendanceHistoryDetail() {
             ).toLowerCase();
 
           return (
-            name.includes(query) ||
-            number.includes(query)
+            name.includes(
+              query,
+            ) ||
+            number.includes(
+              query,
+            )
           );
         },
       );
@@ -794,7 +1753,7 @@ function AttendanceHistoryDetail() {
     ]);
 
   /* =======================================================
-     EXPORT DATA
+     COMPLETE EXPORT DATA
   ======================================================= */
 
   const exportRows =
@@ -805,19 +1764,24 @@ function AttendanceHistoryDetail() {
             record,
             index,
           ) => ({
-            No: index + 1,
+            No:
+              index + 1,
+
             "Student Number":
               getRecordStudentNumber(
                 record,
               ),
+
             "Student Name":
               getRecordStudentName(
                 record,
               ),
+
             Status:
               getRecordStatus(
                 record,
               ),
+
             "Recorded At":
               getRecordTime(
                 record,
@@ -831,7 +1795,9 @@ function AttendanceHistoryDetail() {
                 : "",
           }),
         ),
-      [records],
+      [
+        records,
+      ],
     );
 
   /* =======================================================
@@ -845,7 +1811,7 @@ function AttendanceHistoryDetail() {
   };
 
   /* =======================================================
-     PDF
+     EXPORT PDF
   ======================================================= */
 
   const handleExportPdf =
@@ -860,39 +1826,430 @@ function AttendanceHistoryDetail() {
 
       try {
         setExportError("");
-        setExportingPdf(true);
 
-        await new Promise(
-          (resolve) => {
-            window.requestAnimationFrame(
-              () => {
-                window.requestAnimationFrame(
-                  resolve,
-                );
-              },
-            );
+        setExportingPdf(
+          true,
+        );
+
+        /* ===============================================
+           LOAD LOGOS
+        =============================================== */
+
+        const [
+          depedImage,
+          schoolImage,
+        ] =
+          await Promise.all([
+            loadImageAsPngDataUrl(
+              depedLogo,
+            ).catch(
+              () => null,
+            ),
+
+            loadImageAsPngDataUrl(
+              seniorHighSchoolLogo,
+            ).catch(
+              () => null,
+            ),
+          ]);
+
+        /* ===============================================
+           CREATE PDF
+        =============================================== */
+
+        const document =
+          new jsPDF({
+            orientation:
+              "landscape",
+
+            unit:
+              "mm",
+
+            format:
+              "a4",
+
+            compress:
+              true,
+          });
+
+        document.setProperties(
+          {
+            title:
+              `${sectionName} Attendance ${attendanceDate || sessionId}`,
+
+            subject:
+              "Official Student Attendance Session Record",
+
+            author:
+              "Signal Village National High School",
+
+            creator:
+              "SVNHS Attendance Management System",
           },
         );
 
-        window.print();
+        /* ===============================================
+           FIRST PAGE HEADER
+        =============================================== */
+
+        drawPdfHeader({
+          document,
+
+          depedImage,
+
+          schoolImage,
+        });
+
+        drawPdfMeta({
+          document,
+
+          sectionName,
+
+          adviserName,
+
+          attendanceDate,
+
+          startedAt:
+            session?.startedAt,
+
+          endedAt:
+            session?.endedAt,
+        });
+
+        drawPdfSummary({
+          document,
+
+          totalStudents,
+
+          presentCount,
+
+          lateCount,
+
+          absentCount,
+
+          attendanceRate,
+        });
+
+        /* ===============================================
+           TABLE DATA
+        =============================================== */
+
+        const tableBody =
+          records.map(
+            (
+              record,
+              index,
+            ) => {
+              const time =
+                getRecordTime(
+                  record,
+                );
+
+              return [
+                index + 1,
+
+                getRecordStudentNumber(
+                  record,
+                ),
+
+                getRecordStudentName(
+                  record,
+                ),
+
+                getRecordStatus(
+                  record,
+                ),
+
+                time
+                  ? formatTime(
+                      time,
+                      true,
+                    )
+                  : "—",
+              ];
+            },
+          );
+
+        /* ===============================================
+           TABLE
+        =============================================== */
+
+        autoTable(
+          document,
+          {
+            startY: 58,
+
+            margin: {
+              top: 27,
+
+              right: 10,
+
+              bottom: 15,
+
+              left: 10,
+            },
+
+            head: [
+              [
+                "No.",
+
+                "Student No.",
+
+                "Student Name",
+
+                "Status",
+
+                "Recorded At",
+              ],
+            ],
+
+            body:
+              tableBody,
+
+            theme:
+              "grid",
+
+            showHead:
+              "everyPage",
+
+            rowPageBreak:
+              "avoid",
+
+            styles: {
+              font:
+                "helvetica",
+
+              fontSize:
+                6.7,
+
+              cellPadding:
+                2.4,
+
+              overflow:
+                "linebreak",
+
+              valign:
+                "middle",
+
+              halign:
+                "center",
+
+              textColor:
+                PDF_COLORS.text,
+
+              lineColor:
+                PDF_COLORS.border,
+
+              lineWidth:
+                0.12,
+            },
+
+            headStyles: {
+              fillColor:
+                PDF_COLORS.navyDark,
+
+              textColor:
+                PDF_COLORS.white,
+
+              fontStyle:
+                "bold",
+
+              fontSize:
+                6.2,
+
+              minCellHeight:
+                8,
+
+              halign:
+                "center",
+            },
+
+            alternateRowStyles: {
+              fillColor: [
+                249,
+                251,
+                253,
+              ],
+            },
+
+            columnStyles: {
+              0: {
+                cellWidth: 12,
+              },
+
+              1: {
+                cellWidth: 42,
+              },
+
+              2: {
+                cellWidth: 105,
+
+                halign:
+                  "left",
+              },
+
+              3: {
+                cellWidth: 45,
+              },
+
+              4: {
+                cellWidth: 50,
+              },
+            },
+
+            didParseCell: (
+              hookData,
+            ) => {
+              if (
+                hookData.section !==
+                "body"
+              ) {
+                return;
+              }
+
+              /* STUDENT NAME */
+
+              if (
+                hookData.column
+                  .index === 2
+              ) {
+                hookData.cell.styles.fontStyle =
+                  "bold";
+
+                hookData.cell.styles.textColor =
+                  PDF_COLORS.navyDark;
+              }
+
+              /* STATUS */
+
+              if (
+                hookData.column
+                  .index === 3
+              ) {
+                const status =
+                  String(
+                    hookData.cell
+                      .raw ?? "",
+                  ).toUpperCase();
+
+                hookData.cell.styles.fontStyle =
+                  "bold";
+
+                if (
+                  status ===
+                  "PRESENT"
+                ) {
+                  hookData.cell.styles.textColor =
+                    PDF_COLORS.green;
+
+                  hookData.cell.styles.fillColor =
+                    PDF_COLORS.softGreen;
+                } else if (
+                  status ===
+                  "LATE"
+                ) {
+                  hookData.cell.styles.textColor =
+                    PDF_COLORS.amber;
+
+                  hookData.cell.styles.fillColor =
+                    PDF_COLORS.softAmber;
+                } else if (
+                  status ===
+                  "ABSENT"
+                ) {
+                  hookData.cell.styles.textColor =
+                    PDF_COLORS.red;
+
+                  hookData.cell.styles.fillColor =
+                    PDF_COLORS.softRed;
+                }
+              }
+            },
+
+            didDrawPage: (
+              hookData,
+            ) => {
+              if (
+                hookData.pageNumber >
+                1
+              ) {
+                drawPdfHeader({
+                  document,
+
+                  depedImage,
+
+                  schoolImage,
+                });
+              }
+            },
+          },
+        );
+
+        /* ===============================================
+           CERTIFICATION / SIGNATURES
+        =============================================== */
+
+        drawPdfSignatures({
+          document,
+
+          adviserName,
+
+          depedImage,
+
+          schoolImage,
+        });
+
+        /* ===============================================
+           FOOTERS / PAGE NUMBERS
+        =============================================== */
+
+        drawPdfFooters({
+          document,
+
+          generatedAt:
+            formatGeneratedAt(),
+        });
+
+        /* ===============================================
+           FILE NAME
+        =============================================== */
+
+        const fileName =
+          sanitizeFileName(
+            `${sectionName}_Attendance_${attendanceDate || sessionId}`,
+          );
+
+        /* ===============================================
+           DIRECT PDF DOWNLOAD
+        =============================================== */
+
+        document.save(
+          `${fileName}.pdf`,
+        );
       } catch (
         exportRequestError
       ) {
         console.error(
-          "Unable to prepare PDF export:",
+          "Unable to export PDF attendance record:",
           exportRequestError,
         );
 
         setExportError(
-          "Unable to prepare the PDF attendance record.",
+          exportRequestError
+            ?.response
+            ?.data
+            ?.message ||
+            "Unable to export the PDF attendance record.",
         );
       } finally {
-        setExportingPdf(false);
+        setExportingPdf(
+          false,
+        );
       }
     };
 
   /* =======================================================
-     EXCEL
+     EXPORT EXCEL
   ======================================================= */
 
   const handleExportExcel =
@@ -907,64 +2264,103 @@ function AttendanceHistoryDetail() {
 
       try {
         setExportError("");
-        setExportingExcel(true);
+
+        setExportingExcel(
+          true,
+        );
+
+        /* ===============================================
+           RECORD ROWS
+        =============================================== */
 
         const recordRows =
           exportRows.map(
             (row) => [
               row.No,
-              row["Student Number"],
-              row["Student Name"],
+
+              row[
+                "Student Number"
+              ],
+
+              row[
+                "Student Name"
+              ],
+
               row.Status,
-              row["Recorded At"],
+
+              row[
+                "Recorded At"
+              ],
             ],
           );
+
+        /* ===============================================
+           RECORD WORKSHEET
+        =============================================== */
 
         const recordSheetData = [
           [
             "SIGNAL VILLAGE NATIONAL HIGH SCHOOL",
           ],
+
           [
             "ATTENDANCE MANAGEMENT SYSTEM",
           ],
+
           [
             "OFFICIAL STUDENT ATTENDANCE REGISTER",
           ],
+
           [],
+
           [
             "Section",
             sectionName,
           ],
+
           [
             "Adviser",
             adviserName,
           ],
+
           [
             "Attendance Date",
+
             formatDate(
               attendanceDate,
             ),
           ],
+
           [
             "Session Started",
+
             formatTime(
               session?.startedAt,
             ),
           ],
+
           [
             "Session Ended",
+
             formatTime(
               session?.endedAt,
             ),
           ],
+
           [],
+
           [
             "No.",
+
             "Student Number",
+
             "Student Name",
+
             "Status",
+
             "Recorded At",
           ],
+
           ...recordRows,
         ];
 
@@ -973,96 +2369,158 @@ function AttendanceHistoryDetail() {
             recordSheetData,
           );
 
-        recordWorksheet["!merges"] = [
+        recordWorksheet[
+          "!merges"
+        ] = [
           XLSX.utils.decode_range(
             "A1:E1",
           ),
+
           XLSX.utils.decode_range(
             "A2:E2",
           ),
+
           XLSX.utils.decode_range(
             "A3:E3",
           ),
         ];
 
-        recordWorksheet["!cols"] = [
-          { wch: 7 },
-          { wch: 19 },
-          { wch: 34 },
-          { wch: 15 },
-          { wch: 20 },
+        recordWorksheet[
+          "!cols"
+        ] = [
+          {
+            wch: 7,
+          },
+
+          {
+            wch: 19,
+          },
+
+          {
+            wch: 34,
+          },
+
+          {
+            wch: 15,
+          },
+
+          {
+            wch: 20,
+          },
         ];
+
+        recordWorksheet[
+          "!autofilter"
+        ] = {
+          ref:
+            recordRows.length >
+            0
+              ? `A11:E${
+                  11 +
+                  recordRows.length
+                }`
+              : "A11:E11",
+        };
+
+        /* ===============================================
+           SUMMARY WORKSHEET
+        =============================================== */
 
         const summarySheetData = [
           [
             "SIGNAL VILLAGE NATIONAL HIGH SCHOOL",
           ],
+
           [
             "ATTENDANCE SESSION SUMMARY",
           ],
+
           [],
+
           [
             "Section",
             sectionName,
           ],
+
           [
             "Adviser",
             adviserName,
           ],
+
           [
             "Attendance Date",
+
             formatDate(
               attendanceDate,
             ),
           ],
+
           [
             "Session Started",
+
             formatTime(
               session?.startedAt,
             ),
           ],
+
           [
             "Session Ended",
+
             formatTime(
               session?.endedAt,
             ),
           ],
+
           [],
+
           [
             "Metric",
             "Value",
           ],
+
           [
             "Students",
             totalStudents,
           ],
+
           [
             "Present",
             presentCount,
           ],
+
           [
             "Late",
             lateCount,
           ],
+
           [
             "Absent",
             absentCount,
           ],
+
           [
             "Present Rate",
+
             presentRate / 100,
           ],
+
           [
             "Late Rate",
+
             lateRate / 100,
           ],
+
           [
             "Absence Rate",
+
             absenceRate / 100,
           ],
+
           [
             "Overall Attendance",
-            attendanceRate / 100,
+
+            attendanceRate /
+              100,
           ],
         ];
 
@@ -1071,18 +2529,28 @@ function AttendanceHistoryDetail() {
             summarySheetData,
           );
 
-        summaryWorksheet["!merges"] = [
+        summaryWorksheet[
+          "!merges"
+        ] = [
           XLSX.utils.decode_range(
             "A1:B1",
           ),
+
           XLSX.utils.decode_range(
             "A2:B2",
           ),
         ];
 
-        summaryWorksheet["!cols"] = [
-          { wch: 25 },
-          { wch: 32 },
+        summaryWorksheet[
+          "!cols"
+        ] = [
+          {
+            wch: 25,
+          },
+
+          {
+            wch: 32,
+          },
         ];
 
         for (
@@ -1093,7 +2561,9 @@ function AttendanceHistoryDetail() {
           const address =
             XLSX.utils.encode_cell(
               {
-                r: rowIndex,
+                r:
+                  rowIndex,
+
                 c: 1,
               },
             );
@@ -1109,18 +2579,26 @@ function AttendanceHistoryDetail() {
           }
         }
 
+        /* ===============================================
+           WORKBOOK
+        =============================================== */
+
         const workbook =
           XLSX.utils.book_new();
 
         XLSX.utils.book_append_sheet(
           workbook,
+
           recordWorksheet,
+
           "Attendance Record",
         );
 
         XLSX.utils.book_append_sheet(
           workbook,
+
           summaryWorksheet,
+
           "Summary",
         );
 
@@ -1131,9 +2609,12 @@ function AttendanceHistoryDetail() {
 
         XLSX.writeFile(
           workbook,
+
           `${fileName}.xlsx`,
+
           {
-            compression: true,
+            compression:
+              true,
           },
         );
       } catch (
@@ -1148,7 +2629,9 @@ function AttendanceHistoryDetail() {
           "Unable to export the Excel attendance record.",
         );
       } finally {
-        setExportingExcel(false);
+        setExportingExcel(
+          false,
+        );
       }
     };
 
@@ -1164,7 +2647,7 @@ function AttendanceHistoryDetail() {
     >
       <section className="attendance-detail-page adviser-attendance-record-page">
         {/* =================================================
-            PAGE TOOLBAR
+            TOOLBAR
         ================================================== */}
 
         <div className="attendance-record-toolbar">
@@ -1185,12 +2668,15 @@ function AttendanceHistoryDetail() {
           </button>
 
           <div className="attendance-record-actions">
+            {/* PDF */}
+
             <button
               type="button"
               className="attendance-export-button attendance-export-pdf"
               disabled={
                 loading ||
-                records.length === 0 ||
+                records.length ===
+                  0 ||
                 exportingPdf ||
                 exportingExcel
               }
@@ -1208,22 +2694,25 @@ function AttendanceHistoryDetail() {
               <span>
                 <strong>
                   {exportingPdf
-                    ? "Preparing..."
+                    ? "Generating..."
                     : "Export PDF"}
                 </strong>
 
                 <small>
-                  Official printable sheet
+                  Direct PDF download
                 </small>
               </span>
             </button>
+
+            {/* EXCEL */}
 
             <button
               type="button"
               className="attendance-export-button attendance-export-excel"
               disabled={
                 loading ||
-                records.length === 0 ||
+                records.length ===
+                  0 ||
                 exportingPdf ||
                 exportingExcel
               }
@@ -1291,7 +2780,9 @@ function AttendanceHistoryDetail() {
               aria-hidden="true"
             >
               <img
-                src={depedLogo}
+                src={
+                  depedLogo
+                }
                 alt=""
               />
 
@@ -1350,6 +2841,7 @@ function AttendanceHistoryDetail() {
             <div className="attendance-record-section-meta">
               <span>
                 Adviser
+
                 <strong>
                   {adviserName}
                 </strong>
@@ -1357,6 +2849,7 @@ function AttendanceHistoryDetail() {
 
               <span>
                 Attendance Date
+
                 <strong>
                   {formatDate(
                     attendanceDate,
@@ -1366,6 +2859,7 @@ function AttendanceHistoryDetail() {
 
               <span>
                 Session Time
+
                 <strong>
                   {formatTime(
                     session?.startedAt,
@@ -1395,7 +2889,9 @@ function AttendanceHistoryDetail() {
 
             <div>
               <b>
-                {overallHealth.label}
+                {
+                  overallHealth.label
+                }
               </b>
 
               <small>
@@ -1415,6 +2911,8 @@ function AttendanceHistoryDetail() {
           className="attendance-record-summary"
           aria-label="Attendance session summary"
         >
+          {/* TOTAL */}
+
           <article className="attendance-record-stat attendance-record-stat-neutral">
             <div
               className="attendance-record-stat-icon"
@@ -1429,7 +2927,9 @@ function AttendanceHistoryDetail() {
               </span>
 
               <strong>
-                {totalStudents}
+                {
+                  totalStudents
+                }
               </strong>
 
               <small>
@@ -1437,6 +2937,8 @@ function AttendanceHistoryDetail() {
               </small>
             </div>
           </article>
+
+          {/* PRESENT */}
 
           <article className="attendance-record-stat attendance-record-stat-present">
             <div
@@ -1464,6 +2966,8 @@ function AttendanceHistoryDetail() {
             </div>
           </article>
 
+          {/* LATE */}
+
           <article className="attendance-record-stat attendance-record-stat-late">
             <div
               className="attendance-record-stat-icon"
@@ -1490,6 +2994,8 @@ function AttendanceHistoryDetail() {
             </div>
           </article>
 
+          {/* ABSENT */}
+
           <article className="attendance-record-stat attendance-record-stat-absent">
             <div
               className="attendance-record-stat-icon"
@@ -1515,6 +3021,8 @@ function AttendanceHistoryDetail() {
               </small>
             </div>
           </article>
+
+          {/* SESSION */}
 
           <article className="attendance-record-stat attendance-record-stat-sessions">
             <div
@@ -1545,6 +3053,10 @@ function AttendanceHistoryDetail() {
         ================================================== */}
 
         <section className="attendance-record-sheet">
+          {/* ===============================================
+              HEADER
+          ================================================ */}
+
           <header className="attendance-record-sheet-header">
             <div>
               <span className="attendance-record-kicker">
@@ -1556,9 +3068,7 @@ function AttendanceHistoryDetail() {
               </h2>
 
               <p>
-                Official student attendance
-                entries recorded during this
-                completed class session.
+                Official student attendance entries recorded during this completed class session.
               </p>
             </div>
 
@@ -1569,7 +3079,9 @@ function AttendanceHistoryDetail() {
                 </span>
 
                 <strong>
-                  {totalStudents}
+                  {
+                    totalStudents
+                  }
                 </strong>
               </div>
 
@@ -1579,7 +3091,9 @@ function AttendanceHistoryDetail() {
                 </span>
 
                 <strong>
-                  {presentCount}
+                  {
+                    presentCount
+                  }
                 </strong>
               </div>
 
@@ -1602,6 +3116,8 @@ function AttendanceHistoryDetail() {
           ================================================ */}
 
           <div className="attendance-record-filters adviser-attendance-record-filters">
+            {/* SEARCH */}
+
             <label className="attendance-record-search">
               <span
                 aria-hidden="true"
@@ -1631,6 +3147,8 @@ function AttendanceHistoryDetail() {
                 />
               </div>
             </label>
+
+            {/* STATUS */}
 
             <label className="attendance-record-filter adviser-attendance-status-filter">
               <span>
@@ -1668,6 +3186,8 @@ function AttendanceHistoryDetail() {
               </select>
             </label>
 
+            {/* SCOPE */}
+
             <div className="attendance-record-filter-context">
               <span>
                 SESSION SCOPE
@@ -1683,9 +3203,7 @@ function AttendanceHistoryDetail() {
               </strong>
 
               <small>
-                Exports always include the
-                complete official session
-                record.
+                PDF and Excel exports always include the complete official session record.
               </small>
             </div>
           </div>
@@ -1727,8 +3245,7 @@ function AttendanceHistoryDetail() {
               </strong>
 
               <p>
-                Loading student attendance
-                records...
+                Loading student attendance records...
               </p>
             </div>
           )}
@@ -1739,7 +3256,8 @@ function AttendanceHistoryDetail() {
 
           {!loading &&
             !error &&
-            records.length === 0 && (
+            records.length ===
+              0 && (
               <div className="attendance-record-empty">
                 <div
                   aria-hidden="true"
@@ -1752,9 +3270,7 @@ function AttendanceHistoryDetail() {
                 </strong>
 
                 <p>
-                  This completed session does
-                  not contain any attendance
-                  records.
+                  This completed session does not contain any attendance records.
                 </p>
               </div>
             )}
@@ -1765,7 +3281,8 @@ function AttendanceHistoryDetail() {
 
           {!loading &&
             !error &&
-            records.length > 0 && (
+            records.length >
+              0 && (
               <>
                 <div className="attendance-record-table-wrap">
                   <table className="attendance-record-table adviser-attendance-record-table">
@@ -1824,16 +3341,22 @@ function AttendanceHistoryDetail() {
                               }
                               className={`attendance-record-row adviser-attendance-record-row is-${status.toLowerCase()}`}
                             >
+                              {/* NO */}
+
                               <td className="attendance-record-row-number">
                                 {index +
                                   1}
                               </td>
+
+                              {/* STUDENT NUMBER */}
 
                               <td className="attendance-record-student-number">
                                 {
                                   studentNumber
                                 }
                               </td>
+
+                              {/* STUDENT */}
 
                               <td>
                                 <div className="attendance-record-student">
@@ -1863,6 +3386,8 @@ function AttendanceHistoryDetail() {
                                 </div>
                               </td>
 
+                              {/* STATUS */}
+
                               <td>
                                 <span
                                   className={`attendance-session-status-pill is-${status.toLowerCase()}`}
@@ -1874,6 +3399,8 @@ function AttendanceHistoryDetail() {
                                   }
                                 </span>
                               </td>
+
+                              {/* TIME */}
 
                               <td className="adviser-attendance-record-time">
                                 {getRecordTime(
@@ -1896,7 +3423,7 @@ function AttendanceHistoryDetail() {
                 </div>
 
                 {/* =========================================
-                    SHEET FOOTNOTE
+                    NOTE
                 ========================================== */}
 
                 <div className="attendance-record-note">
@@ -1911,20 +3438,21 @@ function AttendanceHistoryDetail() {
                       <strong>
                         Reading the register:
                       </strong>{" "}
-                      present and late records
-                      include their recorded
-                      attendance time when
-                      available. Absent students
-                      do not have a recorded
-                      check-in time.
+                      present and late records include their recorded attendance time when available. Absent students do not have a recorded check-in time.
                     </p>
                   </div>
 
                   <span>
                     Session ID:{" "}
-                    {sessionId}
+                    {
+                      sessionId
+                    }
                   </span>
                 </div>
+
+                {/* =========================================
+                    FOOTER
+                ========================================== */}
 
                 <footer className="attendance-record-pagination adviser-attendance-record-footer">
                   <p>
@@ -1936,7 +3464,9 @@ function AttendanceHistoryDetail() {
                     </strong>{" "}
                     of{" "}
                     <strong>
-                      {records.length}
+                      {
+                        records.length
+                      }
                     </strong>{" "}
                     attendance records
                   </p>
@@ -1966,7 +3496,9 @@ function AttendanceHistoryDetail() {
             <span />
 
             <strong>
-              {adviserName}
+              {
+                adviserName
+              }
             </strong>
 
             <small>
@@ -1985,260 +3517,6 @@ function AttendanceHistoryDetail() {
               School Official
             </small>
           </div>
-        </section>
-
-        {/* =================================================
-            PRINT-ONLY OFFICIAL FULL REPORT
-        ================================================== */}
-
-        <section
-          className="attendance-print-sheet"
-          aria-hidden="true"
-        >
-          <header className="attendance-print-header">
-            <div className="attendance-print-logos">
-              <img
-                src={depedLogo}
-                alt=""
-              />
-
-              <img
-                src={
-                  seniorHighSchoolLogo
-                }
-                alt=""
-              />
-            </div>
-
-            <div>
-              <span>
-                Republic of the Philippines
-              </span>
-
-              <strong>
-                Signal Village National High School
-              </strong>
-
-              <small>
-                Attendance Management System
-              </small>
-
-              <h1>
-                Official Student Attendance Record
-              </h1>
-            </div>
-          </header>
-
-          <section className="attendance-print-meta adviser-attendance-print-meta">
-            <div>
-              <span>
-                Section
-              </span>
-
-              <strong>
-                {sectionName}
-              </strong>
-            </div>
-
-            <div>
-              <span>
-                Adviser
-              </span>
-
-              <strong>
-                {adviserName}
-              </strong>
-            </div>
-
-            <div>
-              <span>
-                Attendance Date
-              </span>
-
-              <strong>
-                {formatDate(
-                  attendanceDate,
-                )}
-              </strong>
-            </div>
-
-            <div>
-              <span>
-                Session Time
-              </span>
-
-              <strong>
-                {formatTime(
-                  session?.startedAt,
-                )}{" "}
-                –{" "}
-                {formatTime(
-                  session?.endedAt,
-                )}
-              </strong>
-            </div>
-          </section>
-
-          <section className="attendance-print-summary adviser-attendance-print-summary">
-            <div>
-              <span>
-                Students
-              </span>
-
-              <strong>
-                {totalStudents}
-              </strong>
-            </div>
-
-            <div>
-              <span>
-                Present
-              </span>
-
-              <strong>
-                {presentCount}
-              </strong>
-            </div>
-
-            <div>
-              <span>
-                Late
-              </span>
-
-              <strong>
-                {lateCount}
-              </strong>
-            </div>
-
-            <div>
-              <span>
-                Absent
-              </span>
-
-              <strong>
-                {absentCount}
-              </strong>
-            </div>
-
-            <div>
-              <span>
-                Attendance
-              </span>
-
-              <strong>
-                {attendanceRate.toFixed(
-                  1,
-                )}
-                %
-              </strong>
-            </div>
-          </section>
-
-          <table className="attendance-print-table">
-            <thead>
-              <tr>
-                <th>
-                  No.
-                </th>
-
-                <th>
-                  Student No.
-                </th>
-
-                <th>
-                  Student Name
-                </th>
-
-                <th>
-                  Status
-                </th>
-
-                <th>
-                  Recorded At
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {exportRows.map(
-                (row) => (
-                  <tr
-                    key={`${row.No}-${row["Student Number"]}`}
-                  >
-                    <td>
-                      {row.No}
-                    </td>
-
-                    <td>
-                      {
-                        row[
-                          "Student Number"
-                        ]
-                      }
-                    </td>
-
-                    <td>
-                      {
-                        row[
-                          "Student Name"
-                        ]
-                      }
-                    </td>
-
-                    <td>
-                      {row.Status}
-                    </td>
-
-                    <td>
-                      {
-                        row[
-                          "Recorded At"
-                        ]
-                      }
-                    </td>
-                  </tr>
-                ),
-              )}
-            </tbody>
-          </table>
-
-          <section className="adviser-attendance-print-signatures">
-            <div>
-              <span />
-
-              <strong>
-                {adviserName}
-              </strong>
-
-              <small>
-                Class Adviser
-              </small>
-            </div>
-
-            <div>
-              <span />
-
-              <strong>
-                ______________________________
-              </strong>
-
-              <small>
-                School Official
-              </small>
-            </div>
-          </section>
-
-          <footer className="attendance-print-footer">
-            <span>
-              Generated by SVNHS Attendance
-              Management System ·{" "}
-              {formatGeneratedAt()}
-            </span>
-
-            <span>
-              Adviser Attendance History
-            </span>
-          </footer>
         </section>
       </section>
     </AdviserLayout>
