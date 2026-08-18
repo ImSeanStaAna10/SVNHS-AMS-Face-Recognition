@@ -8,6 +8,7 @@ public class StudentResponse {
     private String sectionId;
     private String sectionName;
     private boolean active;
+    private boolean faceRegistered;
 
     public StudentResponse(
             String id,
@@ -15,7 +16,8 @@ public class StudentResponse {
             String name,
             String sectionId,
             String sectionName,
-            boolean active
+            boolean active,
+            boolean faceRegistered
     ) {
         this.id = id;
         this.studentNumber = studentNumber;
@@ -23,6 +25,7 @@ public class StudentResponse {
         this.sectionId = sectionId;
         this.sectionName = sectionName;
         this.active = active;
+        this.faceRegistered = faceRegistered;
     }
 
     public String getId() {
@@ -47,5 +50,9 @@ public class StudentResponse {
 
     public boolean isActive() {
         return active;
+    }
+
+    public boolean isFaceRegistered() {
+        return faceRegistered;
     }
 }

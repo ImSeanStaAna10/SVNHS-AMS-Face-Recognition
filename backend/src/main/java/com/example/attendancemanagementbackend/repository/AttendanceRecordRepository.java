@@ -534,4 +534,131 @@ public interface AttendanceRecordRepository
             @Param("toDate")
             LocalDate toDate
     );
+
+    /* =========================================================
+   ADVISER ATTENDANCE HISTORY
+
+   Returns one historical row per ENDED attendance session.
+
+   Security:
+   - Adviser ID comes from authenticated user
+   - Adviser only sees sessions belonging to their section
+
+   Supports:
+   - Date range
+   - Pagination
+   - Newest sessions first
+========================================================= */
+
+    @Query(
+            value = """
+                SELECT
+                    ats.id AS "sessionId",
+
+                    s.id AS "sectionId",
+
+                    s.name AS "sectionName",
+
+                    ats.attendance_date
+                        AS "attendanceDate",
+
+                    ats.started_at
+                        AS "startedAt",
+
+                    ats.ended_at
+                        AS "endedAt",
+
+                    COUNT(
+                        ar.id
+                    ) AS "studentCount",
+
+                    COUNT(
+                        ar.id
+                    ) FILTER (
+                        WHERE ar.status = 'PRESENT'
+                    ) AS "presentCount",
+
+                    COUNT(
+                        ar.id
+                    ) FILTER (
+                        WHERE ar.status = 'LATE'
+                    ) AS "lateCount",
+
+                    COUNT(
+                        ar.id
+                    ) FILTER (
+                        WHERE ar.status = 'ABSENT'
+                    ) AS "absentCount"
+
+                FROM public.attendance_sessions ats
+
+                INNER JOIN public.sections s
+                    ON s.id = ats.section_id
+
+                LEFT JOIN public.users u
+                    ON u.id = s.adviser_id
+
+                LEFT JOIN public.attendance_records ar
+                    ON ar.session_id = ats.id
+
+                WHERE
+                    ats.status = 'ENDED'
+
+                    AND u.id = :adviserId
+
+                    AND ats.attendance_date
+                        BETWEEN :fromDate
+                        AND :toDate
+
+                GROUP BY
+                    ats.id,
+                    s.id,
+                    s.name,
+                    ats.attendance_date,
+                    ats.started_at,
+                    ats.ended_at
+
+                ORDER BY
+                    ats.attendance_date DESC,
+                    ats.ended_at DESC
+                """,
+
+            countQuery = """
+                SELECT
+                    COUNT(*)
+
+                FROM public.attendance_sessions ats
+
+                INNER JOIN public.sections s
+                    ON s.id = ats.section_id
+
+                LEFT JOIN public.users u
+                    ON u.id = s.adviser_id
+
+                WHERE
+                    ats.status = 'ENDED'
+
+                    AND u.id = :adviserId
+
+                    AND ats.attendance_date
+                        BETWEEN :fromDate
+                        AND :toDate
+                """,
+
+            nativeQuery = true
+    )
+    Page<AdviserAttendanceHistoryProjection>
+    findAdviserAttendanceHistory(
+
+            @Param("adviserId")
+            String adviserId,
+
+            @Param("fromDate")
+            LocalDate fromDate,
+
+            @Param("toDate")
+            LocalDate toDate,
+
+            Pageable pageable
+    );
 }

@@ -15,6 +15,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.attendancemanagementbackend.dto.AdviserAttendanceHistoryResponse;
+import com.example.attendancemanagementbackend.dto.attendance.PagedResponse;
+import com.example.attendancemanagementbackend.repository.AdviserAttendanceHistoryProjection;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -307,5 +314,189 @@ public class AttendanceSessionService {
                                 "No active attendance session found"
                         )
                 );
+
+
+    }
+
+/* =========================================================
+   GET ADVISER ATTENDANCE HISTORY
+========================================================= */
+
+    @Transactional(readOnly = true)
+    public PagedResponse<AdviserAttendanceHistoryResponse>
+    getAttendanceHistory(
+            String adviserId,
+            LocalDate fromDate,
+            LocalDate toDate,
+            int page,
+            int size
+    ) {
+
+    /* =====================================================
+       RESOLVE DATE RANGE
+
+       Default:
+       Current month until today
+    ===================================================== */
+
+        LocalDate today =
+                LocalDate.now();
+
+        LocalDate resolvedFromDate =
+                fromDate != null
+                        ? fromDate
+                        : today.withDayOfMonth(1);
+
+        LocalDate resolvedToDate =
+                toDate != null
+                        ? toDate
+                        : today;
+
+    /* =====================================================
+       VALIDATE DATE RANGE
+    ===================================================== */
+
+        if (resolvedFromDate.isAfter(
+                resolvedToDate
+        )) {
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "From date cannot be after to date"
+            );
+        }
+
+    /* =====================================================
+       VALIDATE PAGINATION
+    ===================================================== */
+
+        if (page < 0) {
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Page cannot be negative"
+            );
+        }
+
+        int resolvedSize =
+                size <= 0
+                        ? 10
+                        : Math.min(
+                        size,
+                        50
+                );
+
+        PageRequest pageable =
+                PageRequest.of(
+                        page,
+                        resolvedSize
+                );
+
+    /* =====================================================
+       QUERY HISTORY
+    ===================================================== */
+
+        Page<AdviserAttendanceHistoryProjection>
+                historyPage =
+                attendanceRecordRepository
+                        .findAdviserAttendanceHistory(
+                                adviserId,
+                                resolvedFromDate,
+                                resolvedToDate,
+                                pageable
+                        );
+
+    /* =====================================================
+       MAP RESPONSE
+    ===================================================== */
+
+        Page<AdviserAttendanceHistoryResponse>
+                responsePage =
+                historyPage.map(
+                        this::mapAttendanceHistory
+                );
+
+        return PagedResponse.from(
+                responsePage
+        );
+    }
+
+
+/* =========================================================
+   MAP ADVISER ATTENDANCE HISTORY
+========================================================= */
+
+    private AdviserAttendanceHistoryResponse
+    mapAttendanceHistory(
+            AdviserAttendanceHistoryProjection projection
+    ) {
+
+        long studentCount =
+                safeLong(
+                        projection.getStudentCount()
+                );
+
+        long presentCount =
+                safeLong(
+                        projection.getPresentCount()
+                );
+
+        long lateCount =
+                safeLong(
+                        projection.getLateCount()
+                );
+
+        long absentCount =
+                safeLong(
+                        projection.getAbsentCount()
+                );
+
+        /*
+         * Attendance rate considers PRESENT
+         * and LATE as attended.
+         */
+        long attendedCount =
+                presentCount +
+                        lateCount;
+
+        double attendanceRate =
+                studentCount == 0
+                        ? 0.0
+                        : ((double) attendedCount /
+                        studentCount) * 100.0;
+
+        /*
+         * Keep API values clean for the frontend.
+         */
+        attendanceRate =
+                Math.round(
+                        attendanceRate * 100.0
+                ) / 100.0;
+
+        return new AdviserAttendanceHistoryResponse(
+                projection.getSessionId(),
+                projection.getSectionId(),
+                projection.getSectionName(),
+                projection.getAttendanceDate(),
+                projection.getStartedAt(),
+                projection.getEndedAt(),
+                AttendanceSessionStatus.ENDED.name(),
+                studentCount,
+                presentCount,
+                lateCount,
+                absentCount,
+                attendanceRate
+        );
+    }
+
+
+/* =========================================================
+   SAFE LONG
+========================================================= */
+
+    private long safeLong(
+            Long value
+    ) {
+        return value != null
+                ? value
+                : 0L;
     }
 }

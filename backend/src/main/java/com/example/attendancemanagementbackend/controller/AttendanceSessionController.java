@@ -6,6 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.attendancemanagementbackend.dto.AdviserAttendanceHistoryResponse;
+import com.example.attendancemanagementbackend.dto.attendance.PagedResponse;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
+
 import java.util.Map;
 
 @RestController
@@ -93,6 +100,58 @@ public class AttendanceSessionController {
                         "endedAt", session.getEndedAt(),
                         "status", session.getStatus()
                 )
+        );
+    }
+
+    /* =========================================================
+   ADVISER ATTENDANCE HISTORY
+========================================================= */
+
+    @GetMapping("/history")
+    public ResponseEntity<
+            PagedResponse<AdviserAttendanceHistoryResponse>
+            >
+    getAttendanceHistory(
+
+            @RequestParam(required = false)
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate fromDate,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate toDate,
+
+            @RequestParam(
+                    defaultValue = "0"
+            )
+            int page,
+
+            @RequestParam(
+                    defaultValue = "10"
+            )
+            int size,
+
+            Authentication authentication
+    ) {
+
+        String adviserId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
+        return ResponseEntity.ok(
+                attendanceSessionService
+                        .getAttendanceHistory(
+                                adviserId,
+                                fromDate,
+                                toDate,
+                                page,
+                                size
+                        )
         );
     }
 }
