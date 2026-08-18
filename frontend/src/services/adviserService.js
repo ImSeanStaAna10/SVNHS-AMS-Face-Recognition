@@ -48,6 +48,10 @@ const createStudent = async ({ studentNumber, name, sectionId }) => {
  *
  * Backend expects multipart/form-data
  * with a file field named "image".
+ *
+ * IMPORTANT:
+ * Do not manually set Content-Type here.
+ * Axios/browser will generate the multipart boundary.
  */
 const registerStudentFace = async (studentId, imageFile) => {
   const formData = new FormData();
@@ -90,6 +94,11 @@ const getActiveSession = async (sectionId) => {
 
 /**
  * Starts an attendance session for a section.
+ *
+ * Backend:
+ *
+ * POST /api/attendance-sessions
+ * ?sectionId={sectionId}
  */
 const startAttendanceSession = async (sectionId) => {
   const response = await api.post("/attendance-sessions", null, {
@@ -107,9 +116,59 @@ const startAttendanceSession = async (sectionId) => {
 
 /**
  * Ends an active attendance session.
+ *
+ * Backend:
+ *
+ * PATCH /api/attendance-sessions/{sessionId}/end
  */
 const endAttendanceSession = async (sessionId) => {
   const response = await api.patch(`/attendance-sessions/${sessionId}/end`);
+
+  return response.data;
+};
+
+/* =========================================================
+   ATTENDANCE HISTORY
+========================================================= */
+
+/**
+ * Returns completed attendance sessions
+ * belonging to the logged-in adviser.
+ *
+ * Backend:
+ *
+ * GET /api/attendance-sessions/history
+ *
+ * Optional query params:
+ *
+ * fromDate=2026-08-01
+ * toDate=2026-08-31
+ * page=0
+ * size=10
+ *
+ * Example:
+ *
+ * adviserService.getAttendanceHistory({
+ *   fromDate: "2026-08-01",
+ *   toDate: "2026-08-31",
+ *   page: 0,
+ *   size: 10,
+ * });
+ */
+const getAttendanceHistory = async ({
+  fromDate,
+  toDate,
+  page = 0,
+  size = 10,
+} = {}) => {
+  const response = await api.get("/attendance-sessions/history", {
+    params: {
+      fromDate,
+      toDate,
+      page,
+      size,
+    },
+  });
 
   return response.data;
 };
@@ -184,6 +243,9 @@ const markManualAttendance = async ({ sessionId, studentId }) => {
  *
  * sessionId = attendance session id
  * image     = face image
+ *
+ * IMPORTANT:
+ * Do not manually set multipart Content-Type.
  */
 const markFaceAttendance = async ({ sessionId, imageFile }) => {
   const formData = new FormData();
@@ -203,7 +265,7 @@ const markFaceAttendance = async ({ sessionId, imageFile }) => {
 
 /**
  * Removes a student's attendance record
- * from a specific session.
+ * from a specific active session.
  *
  * Backend:
  *
@@ -235,12 +297,15 @@ const adviserService = {
   createStudent,
   registerStudentFace,
 
-  /* SESSION */
+  /* ATTENDANCE SESSION */
   getActiveSession,
   startAttendanceSession,
   endAttendanceSession,
 
-  /* ATTENDANCE */
+  /* ATTENDANCE HISTORY */
+  getAttendanceHistory,
+
+  /* ATTENDANCE RECORDS */
   getSessionRecords,
   markManualAttendance,
   markFaceAttendance,

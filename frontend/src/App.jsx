@@ -8,6 +8,8 @@ import Login from "./features/auth/Login";
 
 import AdviserAttendance from "./features/adviser/AdviserAttendance";
 import AdviserDashboard from "./features/adviser/AdviserDashboard";
+import AttendanceHistory from "./features/adviser/AttendanceHistory";
+import AttendanceHistoryDetail from "./features/adviser/AttendanceHistoryDetail";
 import AttendanceSession from "./features/adviser/AttendanceSession";
 import StudentManagement from "./features/adviser/StudentManagement";
 
@@ -63,10 +65,30 @@ function App() {
 
         <Route path="/adviser/students" element={<StudentManagement />} />
 
-        {/* ATTENDANCE LANDING PAGE */}
+        {/* =================================================
+            ATTENDANCE LANDING PAGE
+        ================================================= */}
+
         <Route path="/adviser/attendance" element={<AdviserAttendance />} />
 
-        {/* ACTIVE ATTENDANCE SESSION */}
+        {/* =================================================
+            ATTENDANCE HISTORY
+        ================================================= */}
+
+        <Route
+          path="/adviser/attendance/history"
+          element={<AttendanceHistory />}
+        />
+
+        <Route
+          path="/adviser/attendance/history/:sessionId"
+          element={<AttendanceHistoryDetail />}
+        />
+
+        {/* =================================================
+            ACTIVE ATTENDANCE SESSION
+        ================================================= */}
+
         <Route
           path="/adviser/attendance/:sessionId"
           element={<AttendanceSession />}

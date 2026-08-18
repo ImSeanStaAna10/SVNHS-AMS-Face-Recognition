@@ -52,11 +52,18 @@ const NAVIGATION_ITEMS = [
     label: "Students",
     icon: "♙",
     path: "/adviser/students",
+    exact: true,
   },
   {
     label: "Attendance",
     icon: "◷",
     path: "/adviser/attendance",
+    exact: true,
+  },
+  {
+    label: "Attendance History",
+    icon: "▤",
+    path: "/adviser/attendance/history",
   },
 ];
 
@@ -87,17 +94,22 @@ function AdviserLayout({
   eyebrow = "ADVISER PORTAL",
   description = "Attendance Management System",
 }) {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const location = useLocation();
+  const location =
+    useLocation();
 
-  const user = authService.getUser();
+  const user =
+    authService.getUser();
 
   /* =======================================================
      NAVIGATION
   ======================================================= */
 
-  const handleNavigate = (path) => {
+  const handleNavigate = (
+    path,
+  ) => {
     navigate(path);
   };
 
@@ -124,7 +136,8 @@ function AdviserLayout({
   const userInitial =
     userName
       .charAt(0)
-      .toUpperCase() || "A";
+      .toUpperCase() ||
+    "A";
 
   /* =======================================================
      RENDER
@@ -142,7 +155,9 @@ function AdviserLayout({
         <div className="councilor-brand">
           <div className="councilor-brand-logo">
             <img
-              src={seniorHighSchoolLogo}
+              src={
+                seniorHighSchoolLogo
+              }
               alt="Signal Village National High School"
             />
           </div>
@@ -180,7 +195,9 @@ function AdviserLayout({
 
               return (
                 <button
-                  key={item.path}
+                  key={
+                    item.path
+                  }
                   type="button"
                   className={`councilor-nav-item ${
                     active
@@ -233,7 +250,9 @@ function AdviserLayout({
           <button
             type="button"
             className="councilor-logout"
-            onClick={handleLogout}
+            onClick={
+              handleLogout
+            }
           >
             <span
               aria-hidden="true"
@@ -284,10 +303,18 @@ function AdviserLayout({
               {INSTITUTIONAL_LOGOS.map(
                 (logo) => (
                   <img
-                    key={logo.alt}
-                    src={logo.src}
-                    alt={logo.alt}
-                    title={logo.alt}
+                    key={
+                      logo.alt
+                    }
+                    src={
+                      logo.src
+                    }
+                    alt={
+                      logo.alt
+                    }
+                    title={
+                      logo.alt
+                    }
                   />
                 ),
               )}

@@ -1,0 +1,886 @@
+/* =========================================================
+   ATTENDANCE HISTORY DETAIL
+========================================================= */
+
+.attendance-history-detail-page {
+  width: 100%;
+  display: grid;
+  gap: 16px;
+  padding-bottom: 40px;
+}
+
+.attendance-history-detail-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.attendance-history-detail-nav > button {
+  border: 0;
+  background: transparent;
+  color: var(--c-blue-800);
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.attendance-history-detail-nav > div {
+  display: flex;
+  gap: 8px;
+}
+
+.attendance-history-detail-nav > div > button {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 8px;
+  background: var(--c-surface);
+  color: var(--c-text-primary);
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.attendance-history-detail-nav > div > button span {
+  color: var(--c-text-body);
+  font-weight: 700;
+}
+
+.attendance-history-detail-nav button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   OFFICIAL HEADER
+========================================================= */
+
+.attendance-history-detail-hero {
+  position: relative;
+  min-height: 128px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  overflow: hidden;
+  padding: 24px 27px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: linear-gradient(115deg, #071a3f, #123d7e 64%, #711d2d);
+  color: #ffffff;
+  box-shadow: 0 14px 31px rgba(7, 26, 63, 0.16);
+}
+
+.attendance-history-detail-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #b4233a 0 36%,
+    #ffffff 36% 38%,
+    #24579d 38% 100%
+  );
+}
+
+.attendance-history-detail-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.attendance-history-detail-logos {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.attendance-history-detail-logos img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.14));
+}
+
+.attendance-history-detail-identity > div:last-child > span {
+  color: #f4c85a;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.attendance-history-detail-identity h2 {
+  margin: 5px 0 0;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.attendance-history-detail-identity p {
+  margin: 5px 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 8px;
+}
+
+.attendance-history-detail-record-label {
+  min-width: 160px;
+  padding: 13px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  text-align: right;
+}
+
+.attendance-history-detail-record-label span {
+  display: block;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 6px;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+}
+
+.attendance-history-detail-record-label strong {
+  display: block;
+  margin-top: 5px;
+  color: #d1fae5;
+  font-size: 10px;
+}
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.attendance-history-detail-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 18px 20px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+  background: var(--c-surface);
+  box-shadow: var(--c-card-shadow);
+}
+
+.attendance-history-detail-title > div:first-child > span {
+  color: var(--c-blue-800);
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.attendance-history-detail-title h1 {
+  margin: 4px 0 0;
+  color: var(--c-text-primary);
+  font-size: 20px;
+  letter-spacing: -0.3px;
+}
+
+.attendance-history-detail-title p {
+  margin: 5px 0 0;
+  color: var(--c-text-body);
+  font-size: 8px;
+}
+
+.attendance-history-detail-session-id {
+  max-width: 280px;
+  padding: 9px 11px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 8px;
+  background: var(--c-surface-soft);
+}
+
+.attendance-history-detail-session-id span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 6px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.attendance-history-detail-session-id strong {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--c-text-secondary);
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   META
+========================================================= */
+
+.attendance-history-detail-meta {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+  overflow: hidden;
+  background: var(--c-surface);
+}
+
+.attendance-history-detail-meta article {
+  min-width: 0;
+  padding: 13px 14px;
+}
+
+.attendance-history-detail-meta article + article {
+  border-left: 1px solid var(--c-border-soft);
+}
+
+.attendance-history-detail-meta span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 6px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.attendance-history-detail-meta strong {
+  display: block;
+  margin-top: 5px;
+  overflow: hidden;
+  color: var(--c-text-primary);
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.attendance-history-detail-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.attendance-history-detail-summary article {
+  padding: 15px 16px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+  background: var(--c-surface);
+  box-shadow: var(--c-card-shadow);
+}
+
+.attendance-history-detail-summary span {
+  color: var(--c-text-muted);
+  font-size: 6px;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+}
+
+.attendance-history-detail-summary strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--c-text-primary);
+  font-size: 21px;
+}
+
+.attendance-history-detail-summary article.is-success strong {
+  color: var(--c-success-text);
+}
+
+.attendance-history-detail-summary article.is-danger strong {
+  color: var(--c-error-text);
+}
+
+.attendance-history-detail-summary article.is-late strong {
+  color: #a16207;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.attendance-history-detail-error {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 13px;
+  border: 1px solid var(--c-error-border);
+  border-radius: 9px;
+  background: var(--c-error-bg);
+  color: var(--c-error-text);
+  font-size: 8px;
+}
+
+.attendance-history-detail-error > span {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-error-text);
+  color: var(--c-surface);
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.attendance-history-detail-error p {
+  margin: 0;
+}
+
+/* =========================================================
+   REGISTER
+========================================================= */
+
+.attendance-history-detail-register {
+  overflow: hidden;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+  background: var(--c-surface);
+  box-shadow: var(--c-panel-shadow);
+}
+
+.attendance-history-detail-register > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 17px 19px;
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.attendance-history-detail-register > header > div:first-child > span {
+  color: var(--c-blue-800);
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.attendance-history-detail-register h3 {
+  margin: 4px 0 0;
+  color: var(--c-text-primary);
+  font-size: 14px;
+}
+
+.attendance-history-detail-register > header p {
+  margin: 4px 0 0;
+  color: var(--c-text-body);
+  font-size: 8px;
+}
+
+.attendance-history-detail-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.attendance-history-detail-filters label {
+  min-width: 230px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 9px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 8px;
+  background: var(--c-surface-soft);
+}
+
+.attendance-history-detail-filters label span {
+  color: var(--c-text-muted);
+  font-size: 12px;
+}
+
+.attendance-history-detail-filters input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--c-text-primary);
+  font-family: inherit;
+  font-size: 8px;
+}
+
+.attendance-history-detail-filters select {
+  min-height: 36px;
+  padding: 0 9px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 8px;
+  background: var(--c-surface-soft);
+  color: var(--c-text-primary);
+  font-family: inherit;
+  font-size: 8px;
+  outline: 0;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.attendance-history-detail-table-shell {
+  overflow-x: auto;
+}
+
+.attendance-history-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+}
+
+.attendance-history-detail-table th {
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: var(--c-surface-soft);
+  color: var(--c-text-muted);
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-align: left;
+}
+
+.attendance-history-detail-table td {
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--c-border-soft);
+  color: var(--c-text-body);
+  font-size: 8px;
+}
+
+.attendance-history-detail-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.attendance-history-detail-table tbody tr:hover {
+  background: var(--c-surface-soft);
+}
+
+.attendance-history-detail-number {
+  color: var(--c-text-secondary);
+  font-weight: 760;
+}
+
+.attendance-history-detail-student {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.attendance-history-detail-student > span {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.attendance-history-detail-student strong {
+  color: var(--c-text-primary);
+  font-size: 8px;
+}
+
+.attendance-history-detail-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 6px;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+}
+
+.attendance-history-detail-status i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.attendance-history-detail-status.is-present {
+  border: 1px solid var(--c-success-border);
+  background: var(--c-success-bg);
+  color: var(--c-success-text);
+}
+
+.attendance-history-detail-status.is-present i {
+  background: var(--c-success-dot);
+}
+
+.attendance-history-detail-status.is-absent {
+  border: 1px solid var(--c-error-border);
+  background: var(--c-error-bg);
+  color: var(--c-error-text);
+}
+
+.attendance-history-detail-status.is-absent i {
+  background: var(--c-error-text);
+}
+
+.attendance-history-detail-status.is-late {
+  border: 1px solid #e6c76e;
+  background: #fff8db;
+  color: #8a5d00;
+}
+
+.attendance-history-detail-status.is-late i {
+  background: #d69e00;
+}
+
+html[data-theme="dark"] .attendance-history-detail-status.is-late {
+  border-color: #5a491e;
+  background: #2e2817;
+  color: #f2cf69;
+}
+
+.attendance-history-detail-register > footer {
+  padding: 11px 15px;
+  border-top: 1px solid var(--c-border-soft);
+  background: var(--c-surface-soft);
+  color: var(--c-text-muted);
+  font-size: 7px;
+}
+
+.attendance-history-detail-loading,
+.attendance-history-detail-empty {
+  min-height: 230px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 30px;
+  color: var(--c-text-body);
+  font-size: 8px;
+  text-align: center;
+}
+
+.attendance-history-detail-loading > span {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--c-border-soft);
+  border-top-color: var(--c-blue-800);
+  border-radius: 50%;
+  animation: attendance-history-detail-spin 0.75s linear infinite;
+}
+
+/* =========================================================
+   SIGNATURES
+========================================================= */
+
+.attendance-history-detail-signatures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 80px;
+  max-width: 780px;
+  margin: 22px auto 0;
+  width: 100%;
+}
+
+.attendance-history-detail-signatures div {
+  text-align: center;
+}
+
+.attendance-history-detail-signatures span {
+  display: block;
+  height: 30px;
+  border-bottom: 1px solid var(--c-text-muted);
+}
+
+.attendance-history-detail-signatures strong,
+.attendance-history-detail-signatures small {
+  display: block;
+}
+
+.attendance-history-detail-signatures strong {
+  margin-top: 5px;
+  color: var(--c-text-primary);
+  font-size: 8px;
+}
+
+.attendance-history-detail-signatures small {
+  margin-top: 2px;
+  color: var(--c-text-muted);
+  font-size: 7px;
+}
+
+/* =========================================================
+   PRINT SHEET
+========================================================= */
+
+.attendance-history-print-sheet {
+  display: none;
+}
+
+@keyframes attendance-history-detail-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+  .attendance-history-detail-meta,
+  .attendance-history-detail-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-history-detail-meta article + article {
+    border-left: 0;
+    border-top: 1px solid var(--c-border-soft);
+  }
+
+  .attendance-history-detail-register > header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 700px) {
+  .attendance-history-detail-nav,
+  .attendance-history-detail-title,
+  .attendance-history-detail-hero {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .attendance-history-detail-nav > div {
+    width: 100%;
+  }
+
+  .attendance-history-detail-nav > div > button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .attendance-history-detail-record-label {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .attendance-history-detail-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .attendance-history-detail-filters label {
+    min-width: 0;
+  }
+
+  .attendance-history-detail-signatures {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+}
+
+@media (max-width: 520px) {
+  .attendance-history-detail-meta,
+  .attendance-history-detail-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-history-detail-identity {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* =========================================================
+   PRINT / PDF
+========================================================= */
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+
+  body {
+    background: #ffffff !important;
+  }
+
+  .councilor-sidebar,
+  .councilor-header,
+  .adviser-sidebar,
+  .adviser-header,
+  .attendance-history-detail-page {
+    display: none !important;
+  }
+
+  .councilor-page,
+  .councilor-main,
+  .councilor-content,
+  .adviser-layout,
+  .adviser-main,
+  .adviser-content {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .attendance-history-print-sheet {
+    display: block !important;
+    width: 100%;
+    color: #111827;
+    background: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .attendance-history-print-sheet > header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding-bottom: 9px;
+    border-bottom: 2px solid #173967;
+    text-align: center;
+  }
+
+  .attendance-history-print-sheet > header > div {
+    display: flex;
+    gap: 7px;
+  }
+
+  .attendance-history-print-sheet > header img {
+    width: 43px;
+    height: 43px;
+    object-fit: contain;
+  }
+
+  .attendance-history-print-sheet > header section span,
+  .attendance-history-print-sheet > header section strong,
+  .attendance-history-print-sheet > header section small {
+    display: block;
+  }
+
+  .attendance-history-print-sheet > header section span {
+    font-size: 7px;
+    letter-spacing: 0.09em;
+  }
+
+  .attendance-history-print-sheet > header section strong {
+    margin-top: 2px;
+    font-size: 15px;
+  }
+
+  .attendance-history-print-sheet > header section small {
+    margin-top: 2px;
+    font-size: 7px;
+  }
+
+  .attendance-history-print-title {
+    padding: 9px 0;
+    text-align: center;
+  }
+
+  .attendance-history-print-title span {
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+  }
+
+  .attendance-history-print-title h1 {
+    margin: 3px 0 0;
+    font-size: 15px;
+  }
+
+  .attendance-history-print-title p {
+    margin: 3px 0 0;
+    font-size: 8px;
+  }
+
+  .attendance-history-print-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-bottom: 8px;
+    border: 1px solid #cbd5e1;
+  }
+
+  .attendance-history-print-meta div {
+    padding: 6px 7px;
+  }
+
+  .attendance-history-print-meta div + div {
+    border-left: 1px solid #cbd5e1;
+  }
+
+  .attendance-history-print-meta span,
+  .attendance-history-print-meta strong {
+    display: block;
+  }
+
+  .attendance-history-print-meta span {
+    color: #64748b;
+    font-size: 6px;
+    font-weight: 700;
+  }
+
+  .attendance-history-print-meta strong {
+    margin-top: 3px;
+    font-size: 8px;
+  }
+
+  .attendance-history-print-sheet table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7px;
+  }
+
+  .attendance-history-print-sheet th,
+  .attendance-history-print-sheet td {
+    padding: 5px 6px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+  }
+
+  .attendance-history-print-sheet th {
+    background: #eef3f8 !important;
+    font-size: 6px;
+    font-weight: 700;
+  }
+
+  .attendance-history-print-sheet > footer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 90px;
+    max-width: 650px;
+    margin: 24px auto 0;
+  }
+
+  .attendance-history-print-sheet > footer div {
+    text-align: center;
+  }
+
+  .attendance-history-print-sheet > footer span {
+    display: block;
+    height: 25px;
+    border-bottom: 1px solid #111827;
+  }
+
+  .attendance-history-print-sheet > footer strong,
+  .attendance-history-print-sheet > footer small {
+    display: block;
+  }
+
+  .attendance-history-print-sheet > footer strong {
+    margin-top: 3px;
+    font-size: 8px;
+  }
+
+  .attendance-history-print-sheet > footer small {
+    margin-top: 2px;
+    font-size: 7px;
+  }
+}
