@@ -40,14 +40,14 @@
 
   inset: 0;
 
+  z-index: 1;
+
   background: linear-gradient(
     90deg,
     rgba(7, 27, 66, 0.9) 0%,
     rgba(7, 27, 66, 0.7) 42%,
     rgba(7, 27, 66, 0.42) 100%
   );
-
-  z-index: 1;
 }
 
 /* =========================================================
@@ -62,9 +62,9 @@
 
   width: 42%;
 
-  pointer-events: none;
-
   z-index: 2;
+
+  pointer-events: none;
 }
 
 .auth-decoration-left {
@@ -86,8 +86,6 @@
   height: 120%;
 
   border-radius: 45%;
-
-  transform: rotate(-12deg);
 }
 
 .auth-wave-red {
@@ -118,7 +116,9 @@
   width: min(1180px, calc(100% - 48px));
 
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(390px, 460px);
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(390px, 460px);
 
   align-items: center;
 
@@ -170,7 +170,9 @@
 
   object-fit: contain;
 
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(
+    0 4px 10px rgba(0, 0, 0, 0.25)
+  );
 }
 
 .auth-logos .auth-school-logo {
@@ -457,7 +459,8 @@
 
   background: #ffffff;
 
-  box-shadow: 0 0 0 3px rgba(36, 85, 154, 0.12);
+  box-shadow:
+    0 0 0 3px rgba(36, 85, 154, 0.12);
 }
 
 .auth-input-wrapper input:disabled {
@@ -477,7 +480,7 @@
 }
 
 /* =========================================================
-   PASSWORD SHOW / HIDE BUTTON
+   PASSWORD VISIBILITY TOGGLE
 ========================================================= */
 
 .auth-password-toggle {
@@ -542,24 +545,13 @@
   cursor: not-allowed;
 }
 
-.auth-password-input-wrapper:focus-within .auth-password-toggle {
+.auth-password-input-wrapper:focus-within
+  .auth-password-toggle {
   color: #24559a;
 }
 
 /* =========================================================
-   PASSWORD LABEL ROW
-========================================================= */
-
-.auth-password-label-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 12px;
-}
-
-/* =========================================================
-   FORGOT PASSWORD
+   FORGOT PASSWORD LINK
 ========================================================= */
 
 .auth-forgot-password {
@@ -606,149 +598,11 @@
 }
 
 /* =========================================================
-   PASSWORD RECOVERY HELP
-========================================================= */
-
-.auth-password-help {
-  overflow: hidden;
-
-  padding: 14px;
-
-  border: 1px solid #d5dfed;
-
-  border-radius: 10px;
-
-  background: #f7f9fc;
-
-  box-shadow: inset 3px 0 0 #123d7e;
-
-  animation: auth-password-help-enter 0.18s ease-out;
-}
-
-/* =========================================================
-   PASSWORD HELP HEADER
-========================================================= */
-
-.auth-password-help-header {
-  display: flex;
-  align-items: flex-start;
-
-  gap: 10px;
-}
-
-.auth-password-help-icon {
-  width: 23px;
-  height: 23px;
-
-  flex: 0 0 23px;
-
-  display: grid;
-  place-items: center;
-
-  border-radius: 50%;
-
-  background: #123d7e;
-
-  color: #ffffff;
-
-  font-size: 10px;
-
-  font-weight: 800;
-}
-
-.auth-password-help-header > div {
-  min-width: 0;
-}
-
-.auth-password-help-header strong {
-  display: block;
-
-  color: #172d53;
-
-  font-size: 11px;
-
-  font-weight: 800;
-}
-
-.auth-password-help-header p {
-  margin: 3px 0 0;
-
-  color: #6b7280;
-
-  font-size: 9.5px;
-
-  line-height: 1.5;
-}
-
-/* =========================================================
-   PASSWORD RECOVERY OPTIONS
-========================================================= */
-
-.auth-password-help-options {
-  display: grid;
-
-  gap: 8px;
-
-  margin-top: 12px;
-}
-
-.auth-password-help-option {
-  padding: 10px 11px;
-
-  border: 1px solid #e0e5ed;
-
-  border-radius: 8px;
-
-  background: #ffffff;
-}
-
-.auth-password-role {
-  display: inline-flex;
-
-  margin-bottom: 4px;
-
-  color: #123d7e;
-
-  font-size: 7.5px;
-
-  font-weight: 900;
-
-  letter-spacing: 0.12em;
-}
-
-/* Adviser slightly blue */
-.auth-password-help-option:first-child .auth-password-role {
-  color: #123d7e;
-}
-
-/* Councilor subtle red accent */
-.auth-password-help-option:last-child .auth-password-role {
-  color: #a91e2b;
-}
-
-.auth-password-help-option p {
-  margin: 0;
-
-  color: #697386;
-
-  font-size: 9.5px;
-
-  line-height: 1.55;
-}
-
-.auth-password-help-option p strong {
-  color: #23365b;
-
-  font-weight: 800;
-}
-
-/* =========================================================
    ERROR
 ========================================================= */
 
 .auth-error {
   display: flex;
-
   align-items: flex-start;
 
   gap: 10px;
@@ -768,11 +622,10 @@
   width: 20px;
   height: 20px;
 
-  flex-shrink: 0;
+  flex: 0 0 20px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
 
   border-radius: 50%;
 
@@ -815,7 +668,11 @@
 
   border-radius: 9px;
 
-  background: linear-gradient(135deg, #c51f2d, #a91522);
+  background: linear-gradient(
+    135deg,
+    #c51f2d,
+    #a91522
+  );
 
   color: #ffffff;
 
@@ -829,7 +686,8 @@
 
   cursor: pointer;
 
-  box-shadow: 0 8px 18px rgba(197, 31, 45, 0.25);
+  box-shadow:
+    0 8px 18px rgba(197, 31, 45, 0.25);
 
   transition:
     transform 0.18s ease,
@@ -840,7 +698,8 @@
 .auth-submit:hover:not(:disabled) {
   transform: translateY(-1px);
 
-  box-shadow: 0 12px 24px rgba(197, 31, 45, 0.3);
+  box-shadow:
+    0 12px 24px rgba(197, 31, 45, 0.3);
 }
 
 .auth-submit:active:not(:disabled) {
@@ -883,25 +742,7 @@
 }
 
 /* =========================================================
-   PASSWORD HELP ANIMATION
-========================================================= */
-
-@keyframes auth-password-help-enter {
-  from {
-    transform: translateY(-4px);
-
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-
-    opacity: 1;
-  }
-}
-
-/* =========================================================
-   CARD FOOTER
+   LOGIN CARD FOOTER
 ========================================================= */
 
 .auth-login-footer {
@@ -984,6 +825,563 @@
 }
 
 /* =========================================================
+   FLOATING MODAL BACKDROP
+========================================================= */
+
+.auth-modal-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(4, 15, 38, 0.66);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  animation:
+    auth-backdrop-enter
+    0.18s ease-out;
+}
+
+/* =========================================================
+   FLOATING RECOVERY MODAL
+========================================================= */
+
+.auth-recovery-modal {
+  position: relative;
+
+  width: min(100%, 455px);
+
+  max-height: calc(100dvh - 40px);
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  border: 1px solid rgba(255, 255, 255, 0.82);
+
+  border-radius: 16px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 34px 100px rgba(0, 0, 0, 0.4),
+    0 10px 28px rgba(0, 0, 0, 0.18);
+
+  animation:
+    auth-modal-enter
+    0.2s ease-out;
+}
+
+/* =========================================================
+   MODAL TOP ACCENT
+========================================================= */
+
+.auth-recovery-modal::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  right: 0;
+  left: 0;
+
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    #c51f2d 0%,
+    #c51f2d 50%,
+    #123d7e 50%,
+    #123d7e 100%
+  );
+}
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.auth-recovery-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 26px 24px 18px;
+
+  border-bottom: 1px solid #e6eaf0;
+}
+
+.auth-recovery-header-copy {
+  min-width: 0;
+}
+
+.auth-recovery-header-copy > span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #c51f2d;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: 0.15em;
+}
+
+.auth-recovery-header-copy h2 {
+  margin: 0;
+
+  color: #10244b;
+
+  font-size: 22px;
+
+  line-height: 1.2;
+
+  font-weight: 850;
+
+  letter-spacing: -0.45px;
+}
+
+.auth-recovery-header-copy p {
+  margin: 7px 0 0;
+
+  color: #6b7280;
+
+  font-size: 10.5px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   MODAL CLOSE BUTTON
+========================================================= */
+
+.auth-modal-close {
+  width: 33px;
+  height: 33px;
+
+  flex: 0 0 33px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 0;
+
+  border-radius: 8px;
+
+  background: #f3f5f8;
+
+  color: #667085;
+
+  font-family: inherit;
+
+  font-size: 21px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.auth-modal-close:hover {
+  background: #fff0f1;
+
+  color: #c51f2d;
+}
+
+.auth-modal-close:active {
+  transform: scale(0.96);
+}
+
+.auth-modal-close:focus-visible {
+  outline: 3px solid rgba(36, 85, 154, 0.18);
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   RECOVERY INTRO
+========================================================= */
+
+.auth-recovery-intro {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  margin: 17px 20px 0;
+
+  padding: 11px 12px;
+
+  border: 1px solid #d7e3f2;
+
+  border-radius: 9px;
+
+  background: #f6f9fd;
+}
+
+.auth-recovery-intro-icon {
+  width: 21px;
+  height: 21px;
+
+  flex: 0 0 21px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #123d7e;
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.auth-recovery-intro p {
+  margin: 1px 0 0;
+
+  color: #53657e;
+
+  font-size: 9.25px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   RECOVERY OPTIONS
+========================================================= */
+
+.auth-recovery-options {
+  display: grid;
+
+  gap: 10px;
+
+  padding: 15px 20px;
+}
+
+/* =========================================================
+   RECOVERY CARD
+========================================================= */
+
+.auth-recovery-card {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 12px;
+
+  padding: 13px;
+
+  border: 1px solid #e1e6ed;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.auth-recovery-card:hover {
+  transform: translateY(-1px);
+}
+
+.auth-recovery-adviser:hover {
+  border-color: rgba(18, 61, 126, 0.25);
+
+  background: #f8fbff;
+
+  box-shadow:
+    0 6px 16px rgba(18, 61, 126, 0.06);
+}
+
+.auth-recovery-councilor:hover {
+  border-color: rgba(197, 31, 45, 0.23);
+
+  background: #fffafb;
+
+  box-shadow:
+    0 6px 16px rgba(197, 31, 45, 0.05);
+}
+
+/* =========================================================
+   ROLE ICON
+========================================================= */
+
+.auth-recovery-role-icon {
+  width: 36px;
+  height: 36px;
+
+  flex: 0 0 36px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 9px;
+
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.auth-recovery-adviser
+  .auth-recovery-role-icon {
+  background: linear-gradient(
+    135deg,
+    #123d7e,
+    #24559a
+  );
+
+  box-shadow:
+    0 6px 14px rgba(18, 61, 126, 0.17);
+}
+
+.auth-recovery-councilor
+  .auth-recovery-role-icon {
+  background: linear-gradient(
+    135deg,
+    #c51f2d,
+    #a91522
+  );
+
+  box-shadow:
+    0 6px 14px rgba(197, 31, 45, 0.17);
+}
+
+/* =========================================================
+   ROLE COPY
+========================================================= */
+
+.auth-recovery-role-copy {
+  min-width: 0;
+}
+
+.auth-recovery-role-copy > span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-size: 7px;
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+}
+
+.auth-recovery-adviser
+  .auth-recovery-role-copy > span {
+  color: #123d7e;
+}
+
+.auth-recovery-councilor
+  .auth-recovery-role-copy > span {
+  color: #c51f2d;
+}
+
+.auth-recovery-role-copy h3 {
+  margin: 0;
+
+  color: #203657;
+
+  font-size: 11.5px;
+
+  font-weight: 800;
+
+  line-height: 1.4;
+}
+
+.auth-recovery-role-copy p {
+  margin: 4px 0 0;
+
+  color: #697386;
+
+  font-size: 9px;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   SECURITY NOTE
+========================================================= */
+
+.auth-recovery-security-note {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  margin: 0 20px;
+
+  padding: 11px 12px;
+
+  border: 1px solid #eee0b6;
+
+  border-radius: 9px;
+
+  background: #fffaf0;
+}
+
+.auth-recovery-security-icon {
+  width: 20px;
+  height: 20px;
+
+  flex: 0 0 20px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #d1a42a;
+
+  color: #ffffff;
+
+  font-size: 9px;
+
+  font-weight: 900;
+}
+
+.auth-recovery-security-note > div:last-child {
+  min-width: 0;
+}
+
+.auth-recovery-security-note strong {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #775b12;
+
+  font-size: 8.5px;
+
+  font-weight: 850;
+}
+
+.auth-recovery-security-note p {
+  margin: 0;
+
+  color: #7c6a3b;
+
+  font-size: 8.5px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   RECOVERY ACTIONS
+========================================================= */
+
+.auth-recovery-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  padding: 18px 20px 20px;
+}
+
+.auth-recovery-button {
+  min-width: 120px;
+  height: 39px;
+
+  padding: 0 18px;
+
+  border: 0;
+
+  border-radius: 8px;
+
+  background: linear-gradient(
+    135deg,
+    #123d7e,
+    #0d326d
+  );
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 7px 16px rgba(18, 61, 126, 0.2);
+
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    opacity 0.16s ease;
+}
+
+.auth-recovery-button:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 20px rgba(18, 61, 126, 0.25);
+}
+
+.auth-recovery-button:active {
+  transform: translateY(0);
+}
+
+.auth-recovery-button:focus-visible {
+  outline: 3px solid rgba(36, 85, 154, 0.2);
+
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   MODAL ANIMATION
+========================================================= */
+
+@keyframes auth-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes auth-modal-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(10px)
+      scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+/* =========================================================
    TABLET
 ========================================================= */
 
@@ -993,7 +1391,10 @@
   }
 
   .auth-container {
-    width: min(650px, calc(100% - 32px));
+    width: min(
+      650px,
+      calc(100% - 32px)
+    );
 
     grid-template-columns: 1fr;
 
@@ -1007,7 +1408,11 @@
   }
 
   .auth-school-title h1 {
-    font-size: clamp(30px, 7vw, 48px);
+    font-size: clamp(
+      30px,
+      7vw,
+      48px
+    );
   }
 
   .auth-login-card {
@@ -1053,7 +1458,8 @@
     height: 48px;
   }
 
-  .auth-logos .auth-school-logo {
+  .auth-logos
+    .auth-school-logo {
     width: 58px;
     height: 58px;
   }
@@ -1117,18 +1523,6 @@
     height: 34px;
   }
 
-  .auth-password-help {
-    padding: 12px;
-  }
-
-  .auth-password-help-option {
-    padding: 9px 10px;
-  }
-
-  .auth-password-help-option p {
-    font-size: 9px;
-  }
-
   .auth-login-footer {
     flex-wrap: wrap;
 
@@ -1139,6 +1533,52 @@
 
   .auth-bottom-label {
     display: none;
+  }
+
+  /* FLOATING MODAL */
+
+  .auth-modal-backdrop {
+    padding: 14px;
+  }
+
+  .auth-recovery-modal {
+    width: 100%;
+
+    max-height: calc(100dvh - 28px);
+
+    border-radius: 14px;
+  }
+
+  .auth-recovery-modal-header {
+    padding: 23px 18px 16px;
+  }
+
+  .auth-recovery-header-copy h2 {
+    font-size: 20px;
+  }
+
+  .auth-recovery-header-copy p {
+    font-size: 10px;
+  }
+
+  .auth-recovery-intro {
+    margin: 15px 16px 0;
+  }
+
+  .auth-recovery-options {
+    padding: 14px 16px;
+  }
+
+  .auth-recovery-security-note {
+    margin: 0 16px;
+  }
+
+  .auth-recovery-actions {
+    padding: 17px 16px 18px;
+  }
+
+  .auth-recovery-button {
+    width: 100%;
   }
 }
 
@@ -1156,7 +1596,8 @@
     height: 43px;
   }
 
-  .auth-logos .auth-school-logo {
+  .auth-logos
+    .auth-school-logo {
     width: 52px;
     height: 52px;
   }
@@ -1173,8 +1614,21 @@
     font-size: 23px;
   }
 
-  .auth-password-help {
-    padding: 11px;
+  .auth-recovery-card {
+    gap: 10px;
+
+    padding: 12px;
+  }
+
+  .auth-recovery-role-icon {
+    width: 34px;
+    height: 34px;
+
+    flex-basis: 34px;
+  }
+
+  .auth-recovery-role-copy p {
+    font-size: 8.7px;
   }
 }
 
@@ -1186,12 +1640,16 @@
   .auth-input-wrapper input,
   .auth-password-toggle,
   .auth-forgot-password,
-  .auth-submit {
+  .auth-submit,
+  .auth-modal-close,
+  .auth-recovery-card,
+  .auth-recovery-button {
     transition: none;
   }
 
   .auth-spinner,
-  .auth-password-help {
+  .auth-modal-backdrop,
+  .auth-recovery-modal {
     animation: none;
   }
 }

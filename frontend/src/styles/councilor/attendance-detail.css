@@ -1,5 +1,5 @@
 /* =========================================================
-   COUNCILOR — DETAILED ATTENDANCE REPORT
+   COUNCILOR — DAILY ATTENDANCE DETAIL
    PROFESSIONAL OFFICIAL RECORD SHEET
 ========================================================= */
 
@@ -12,6 +12,7 @@
   --record-blue-900: #0b2e67;
   --record-blue-800: #16477f;
   --record-blue-700: #245f9e;
+
   --record-blue-100: #eaf2fb;
   --record-blue-50: #f5f8fc;
 
@@ -62,6 +63,7 @@
 
   display: inline-flex;
   align-items: center;
+  justify-content: center;
 
   gap: 8px;
 
@@ -76,14 +78,17 @@
 
   font: inherit;
   font-size: 0.78rem;
-  font-weight: 720;
+  font-weight: 750;
 
   cursor: pointer;
+
+  box-shadow: 0 1px 2px rgba(7, 27, 66, 0.02);
 
   transition:
     transform 160ms ease,
     border-color 160ms ease,
-    background 160ms ease;
+    background 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .attendance-detail-back:hover {
@@ -92,6 +97,8 @@
   border-color: #9fb3cc;
 
   background: var(--record-blue-50);
+
+  box-shadow: 0 3px 10px rgba(7, 27, 66, 0.05);
 }
 
 /* =========================================================
@@ -106,14 +113,13 @@
 }
 
 .attendance-export-button {
-  min-height: 48px;
+  min-width: 164px;
+  min-height: 50px;
 
   display: inline-flex;
   align-items: center;
 
   gap: 10px;
-
-  min-width: 154px;
 
   padding: 7px 12px;
 
@@ -137,7 +143,8 @@
   transition:
     transform 160ms ease,
     border-color 160ms ease,
-    box-shadow 160ms ease;
+    box-shadow 160ms ease,
+    background 160ms ease;
 }
 
 .attendance-export-button:hover:not(:disabled) {
@@ -166,8 +173,8 @@
 }
 
 .attendance-export-button strong {
-  font-size: 0.75rem;
-  font-weight: 760;
+  font-size: 0.76rem;
+  font-weight: 800;
 }
 
 .attendance-export-button small {
@@ -175,14 +182,16 @@
 
   color: var(--record-text-muted);
 
-  font-size: 0.62rem;
+  font-size: 0.61rem;
+
+  line-height: 1.3;
 }
 
 .attendance-export-icon {
-  width: 34px;
-  height: 34px;
+  width: 35px;
+  height: 35px;
 
-  flex: 0 0 34px;
+  flex: 0 0 35px;
 
   display: grid;
   place-items: center;
@@ -195,16 +204,32 @@
   letter-spacing: 0.04em;
 }
 
+/* =========================================================
+   PDF EXPORT
+========================================================= */
+
 .attendance-export-pdf .attendance-export-icon {
   background: #fff0f2;
 
   color: #b52232;
 }
 
+.attendance-export-pdf:hover:not(:disabled) {
+  background: #fffafb;
+}
+
+/* =========================================================
+   EXCEL EXPORT
+========================================================= */
+
 .attendance-export-excel .attendance-export-icon {
   background: #eaf7f0;
 
   color: #1f764d;
+}
+
+.attendance-export-excel:hover:not(:disabled) {
+  background: #fbfefc;
 }
 
 /* =========================================================
@@ -257,7 +282,11 @@
 .attendance-export-error p {
   margin: 3px 0 0;
 
+  color: #8f1a27;
+
   font-size: 0.7rem;
+
+  line-height: 1.5;
 }
 
 /* =========================================================
@@ -267,6 +296,8 @@
 .attendance-record-header {
   position: relative;
 
+  min-height: 116px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -275,29 +306,15 @@
 
   overflow: hidden;
 
-  min-height: 116px;
-
   padding: 22px 26px;
 
-  border:
-    1px solid
-    var(--record-border-strong);
+  border: 1px solid var(--record-border-strong);
 
-  border-top:
-    5px solid
-    var(--record-blue-900);
+  border-top: 5px solid var(--record-blue-900);
 
-  background:
-    linear-gradient(
-      110deg,
-      #ffffff 0%,
-      #fbfdff 60%,
-      #edf4fb 100%
-    );
+  background: linear-gradient(110deg, #ffffff 0%, #fbfdff 60%, #edf4fb 100%);
 
-  box-shadow:
-    0 6px 20px
-    rgba(7, 27, 66, 0.055);
+  box-shadow: 0 6px 20px rgba(7, 27, 66, 0.055);
 }
 
 .attendance-record-header::after {
@@ -311,13 +328,12 @@
 
   height: 3px;
 
-  background:
-    linear-gradient(
-      90deg,
-      #bd2434 0 32%,
-      #e2b132 32% 36%,
-      #123d7e 36% 100%
-    );
+  background: linear-gradient(
+    90deg,
+    #bd2434 0 32%,
+    #e2b132 32% 36%,
+    #123d7e 36% 100%
+  );
 }
 
 /* =========================================================
@@ -363,7 +379,7 @@
   color: #66758b;
 
   font-size: 0.57rem;
-  font-weight: 800;
+  font-weight: 850;
 
   letter-spacing: 0.13em;
 }
@@ -373,8 +389,10 @@
 
   color: var(--record-blue-950);
 
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: 1.02rem;
+  font-weight: 850;
+
+  line-height: 1.25;
 }
 
 .attendance-record-school small {
@@ -394,9 +412,7 @@
 
   padding-left: 26px;
 
-  border-left:
-    1px solid
-    var(--record-border);
+  border-left: 1px solid var(--record-border);
 
   text-align: right;
 }
@@ -411,7 +427,7 @@
   color: #8a2330;
 
   font-size: 0.58rem;
-  font-weight: 850;
+  font-weight: 900;
 
   letter-spacing: 0.12em;
 }
@@ -421,12 +437,14 @@
 
   color: var(--record-blue-950);
 
-  font-size: 0.96rem;
-  font-weight: 800;
+  font-size: 0.98rem;
+  font-weight: 850;
+
+  line-height: 1.3;
 }
 
 .attendance-record-document small {
-  max-width: 270px;
+  max-width: 285px;
 
   margin-top: 4px;
 
@@ -448,9 +466,7 @@
     minmax(0, 1fr)
     285px;
 
-  border:
-    1px solid
-    var(--record-border);
+  border: 1px solid var(--record-border);
 
   border-top: 0;
 
@@ -469,7 +485,7 @@
   color: #7a8799;
 
   font-size: 0.6rem;
-  font-weight: 850;
+  font-weight: 900;
 
   letter-spacing: 0.12em;
 }
@@ -479,10 +495,9 @@
 
   color: var(--record-blue-950);
 
-  font-size:
-    clamp(1.55rem, 2.4vw, 2rem);
+  font-size: clamp(1.55rem, 2.4vw, 2rem);
 
-  font-weight: 820;
+  font-weight: 850;
 
   line-height: 1.15;
 
@@ -508,7 +523,7 @@
   color: var(--record-text-muted);
 
   font-size: 0.62rem;
-  font-weight: 700;
+  font-weight: 750;
 
   text-transform: uppercase;
 
@@ -519,15 +534,17 @@
   color: var(--record-text-soft);
 
   font-size: 0.76rem;
-  font-weight: 730;
+  font-weight: 780;
 
   text-transform: none;
 
   letter-spacing: 0;
+
+  line-height: 1.4;
 }
 
 /* =========================================================
-   HEALTH PANEL
+   ATTENDANCE HEALTH
 ========================================================= */
 
 .attendance-record-health {
@@ -539,17 +556,14 @@
 
   padding: 22px 24px;
 
-  border-left:
-    1px solid
-    var(--record-border);
+  border-left: 1px solid var(--record-border);
 
-  background:
-    #f7f9fc;
+  background: #f7f9fc;
 }
 
 .attendance-record-health > span {
   font-size: 0.58rem;
-  font-weight: 850;
+  font-weight: 900;
 
   letter-spacing: 0.12em;
 }
@@ -558,7 +572,7 @@
   margin-top: 7px;
 
   font-size: 1.75rem;
-  font-weight: 850;
+  font-weight: 900;
 
   line-height: 1;
 }
@@ -587,34 +601,19 @@
 }
 
 .attendance-record-health-strong {
-  background:
-    linear-gradient(
-      135deg,
-      #f5fbf8,
-      #eaf7f0
-    );
+  background: linear-gradient(135deg, #f5fbf8, #eaf7f0);
 
   color: var(--record-green);
 }
 
 .attendance-record-health-monitor {
-  background:
-    linear-gradient(
-      135deg,
-      #fffaf0,
-      #fff3d9
-    );
+  background: linear-gradient(135deg, #fffaf0, #fff3d9);
 
   color: var(--record-amber);
 }
 
 .attendance-record-health-review {
-  background:
-    linear-gradient(
-      135deg,
-      #fff7f8,
-      #ffeaed
-    );
+  background: linear-gradient(135deg, #fff7f8, #ffeaed);
 
   color: var(--record-red);
 }
@@ -626,8 +625,7 @@
 .attendance-record-summary {
   display: grid;
 
-  grid-template-columns:
-    repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 
   gap: 10px;
 
@@ -637,26 +635,33 @@
 
 .attendance-record-stat {
   min-width: 0;
+  min-height: 82px;
 
   display: flex;
   align-items: center;
 
   gap: 11px;
 
-  min-height: 82px;
-
   padding: 13px 14px;
 
-  border:
-    1px solid
-    var(--record-border);
+  border: 1px solid var(--record-border);
 
-  background:
-    #ffffff;
+  background: #ffffff;
 
-  box-shadow:
-    0 2px 8px
-    rgba(7, 27, 66, 0.035);
+  box-shadow: 0 2px 8px rgba(7, 27, 66, 0.035);
+
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.attendance-record-stat:hover {
+  transform: translateY(-1px);
+
+  border-color: #c4d0df;
+
+  box-shadow: 0 6px 16px rgba(7, 27, 66, 0.055);
 }
 
 .attendance-record-stat-icon {
@@ -671,7 +676,7 @@
   border-radius: 8px;
 
   font-size: 0.86rem;
-  font-weight: 850;
+  font-weight: 900;
 }
 
 .attendance-record-stat > div:last-child {
@@ -688,7 +693,7 @@
   color: var(--record-text-muted);
 
   font-size: 0.54rem;
-  font-weight: 850;
+  font-weight: 900;
 
   letter-spacing: 0.09em;
 }
@@ -699,7 +704,7 @@
   color: var(--record-text);
 
   font-size: 1.08rem;
-  font-weight: 820;
+  font-weight: 850;
 }
 
 .attendance-record-stat small {
@@ -715,36 +720,31 @@
   white-space: nowrap;
 }
 
-.attendance-record-stat-neutral
-  .attendance-record-stat-icon {
+.attendance-record-stat-neutral .attendance-record-stat-icon {
   background: #edf3fb;
 
   color: #123d7e;
 }
 
-.attendance-record-stat-present
-  .attendance-record-stat-icon {
+.attendance-record-stat-present .attendance-record-stat-icon {
   background: var(--record-green-soft);
 
   color: var(--record-green);
 }
 
-.attendance-record-stat-late
-  .attendance-record-stat-icon {
+.attendance-record-stat-late .attendance-record-stat-icon {
   background: var(--record-amber-soft);
 
   color: var(--record-amber);
 }
 
-.attendance-record-stat-absent
-  .attendance-record-stat-icon {
+.attendance-record-stat-absent .attendance-record-stat-icon {
   background: var(--record-red-soft);
 
   color: var(--record-red);
 }
 
-.attendance-record-stat-sessions
-  .attendance-record-stat-icon {
+.attendance-record-stat-sessions .attendance-record-stat-icon {
   background: #eef0fa;
 
   color: #515a9a;
@@ -757,19 +757,17 @@
 .attendance-record-sheet {
   overflow: hidden;
 
-  border:
-    1px solid
-    var(--record-border-strong);
+  border: 1px solid var(--record-border-strong);
+
+  border-radius: 2px;
 
   background: #ffffff;
 
-  box-shadow:
-    0 8px 28px
-    rgba(7, 27, 66, 0.055);
+  box-shadow: 0 8px 28px rgba(7, 27, 66, 0.055);
 }
 
 /* =========================================================
-   RECORD SHEET HEADER
+   SHEET HEADER
 ========================================================= */
 
 .attendance-record-sheet-header {
@@ -781,16 +779,9 @@
 
   padding: 21px 23px;
 
-  border-bottom:
-    1px solid
-    var(--record-border);
+  border-bottom: 1px solid var(--record-border);
 
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff,
-      #fafcff
-    );
+  background: linear-gradient(180deg, #ffffff, #fafcff);
 }
 
 .attendance-record-kicker {
@@ -799,7 +790,7 @@
   color: #315891;
 
   font-size: 0.58rem;
-  font-weight: 850;
+  font-weight: 900;
 
   letter-spacing: 0.13em;
 }
@@ -810,7 +801,7 @@
   color: var(--record-blue-950);
 
   font-size: 1.16rem;
-  font-weight: 810;
+  font-weight: 850;
 }
 
 .attendance-record-sheet-header p {
@@ -834,18 +825,19 @@
 
   display: grid;
 
-  grid-template-columns:
-    repeat(3, auto);
+  grid-template-columns: repeat(3, auto);
 
-  border:
-    1px solid
-    var(--record-border);
+  border: 1px solid var(--record-border);
+
+  border-radius: 8px;
+
+  overflow: hidden;
 
   background: #f8fafc;
 }
 
 .attendance-record-sheet-meta > div {
-  min-width: 85px;
+  min-width: 88px;
 
   padding: 9px 11px;
 
@@ -853,9 +845,7 @@
 }
 
 .attendance-record-sheet-meta > div + div {
-  border-left:
-    1px solid
-    var(--record-border);
+  border-left: 1px solid var(--record-border);
 }
 
 .attendance-record-sheet-meta span,
@@ -867,7 +857,7 @@
   color: var(--record-text-muted);
 
   font-size: 0.53rem;
-  font-weight: 800;
+  font-weight: 850;
 
   letter-spacing: 0.06em;
 
@@ -880,55 +870,77 @@
   color: var(--record-text);
 
   font-size: 0.69rem;
-  font-weight: 760;
+  font-weight: 800;
 }
 
 /* =========================================================
-   FILTERS
+   DAILY ATTENDANCE FILTERS
 ========================================================= */
 
-.attendance-record-filters {
+.attendance-record-filters,
+.attendance-record-filters-daily {
   display: grid;
 
   grid-template-columns:
-    minmax(250px, 1fr)
-    155px
-    155px
-    minmax(210px, 0.7fr);
+    minmax(280px, 1fr)
+    185px
+    185px
+    minmax(235px, 0.8fr);
 
   align-items: stretch;
 
   gap: 10px;
 
-  padding: 13px 18px;
+  padding: 14px 18px;
 
-  border-bottom:
-    1px solid
-    var(--record-border);
+  border-bottom: 1px solid var(--record-border);
 
-  background: #f4f7fb;
+  background: linear-gradient(180deg, #f7f9fc, #f3f6fa);
 }
 
+/* =========================================================
+   STUDENT SEARCH
+========================================================= */
+
 .attendance-record-search {
+  position: relative;
+
   min-width: 0;
+  min-height: 52px;
 
   display: flex;
   align-items: center;
 
   gap: 10px;
 
-  min-height: 48px;
+  padding: 0 11px;
 
-  padding: 0 12px;
-
-  border:
-    1px solid
-    #cbd6e4;
+  border: 1px solid #cbd6e4;
+  border-radius: 8px;
 
   background: #ffffff;
+
+  cursor: text;
+
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.attendance-record-search:hover {
+  border-color: #b6c5d7;
+}
+
+.attendance-record-search:focus-within {
+  border-color: #4c79b3;
+
+  box-shadow: 0 0 0 3px rgba(36, 85, 154, 0.08);
 }
 
 .attendance-record-search > span {
+  flex: 0 0 auto;
+
   color: #8d99aa;
 
   font-size: 1rem;
@@ -940,9 +952,7 @@
   flex: 1;
 }
 
-.attendance-record-search
-  > div
-  > span,
+.attendance-record-search > div > span,
 .attendance-record-filter > span,
 .attendance-record-filter-context > span {
   display: block;
@@ -952,9 +962,11 @@
   color: #7c8898;
 
   font-size: 0.52rem;
-  font-weight: 850;
+  font-weight: 900;
 
   letter-spacing: 0.08em;
+
+  line-height: 1.2;
 }
 
 .attendance-record-search input {
@@ -963,6 +975,7 @@
   padding: 0;
 
   border: 0;
+
   outline: 0;
 
   background: transparent;
@@ -970,58 +983,249 @@
   color: var(--record-text);
 
   font: inherit;
+
   font-size: 0.73rem;
+  font-weight: 550;
 }
 
 .attendance-record-search input::placeholder {
   color: #a7b0be;
+
+  font-weight: 450;
 }
 
+/* =========================================================
+   SEARCH CLEAR BUTTON
+========================================================= */
+
+.attendance-record-search-clear {
+  width: 26px;
+  height: 26px;
+
+  flex: 0 0 26px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: #f1f4f8;
+
+  color: #6f7d8f;
+
+  font: inherit;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.attendance-record-search-clear:hover {
+  background: #fff0f2;
+
+  color: #b52232;
+}
+
+.attendance-record-search-clear:active {
+  transform: scale(0.95);
+}
+
+/* =========================================================
+   SINGLE DATE PICKER
+========================================================= */
+
 .attendance-record-filter {
+  min-width: 0;
+
   display: flex;
   justify-content: center;
   flex-direction: column;
+
+  padding: 6px 10px;
+
+  border: 1px solid #cbd6e4;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.attendance-record-filter:hover {
+  border-color: #b6c5d7;
+}
+
+.attendance-record-filter:focus-within {
+  border-color: #4c79b3;
+
+  box-shadow: 0 0 0 3px rgba(36, 85, 154, 0.08);
 }
 
 .attendance-record-filter input {
   width: 100%;
-  height: 32px;
+  height: 31px;
 
-  padding: 0 8px;
+  padding: 0;
 
-  border:
-    1px solid
-    #cbd6e4;
+  border: 0;
 
   outline: 0;
+
+  background: transparent;
+
+  color: var(--record-text);
+
+  font: inherit;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  color-scheme: light;
+}
+
+.attendance-record-filter input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+
+  opacity: 0.68;
+
+  transition: opacity 150ms ease;
+}
+
+.attendance-record-filter input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* =========================================================
+   TODAY SHORTCUT
+========================================================= */
+
+.attendance-record-today-button {
+  min-width: 0;
+
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+  padding: 7px 11px;
+
+  border: 1px solid #cbd6e4;
+  border-radius: 8px;
 
   background: #ffffff;
 
   color: var(--record-text);
 
   font: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-shadow: 0 1px 2px rgba(7, 27, 66, 0.015);
+
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.attendance-record-today-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  border-color: #9ab0ca;
+
+  background: #f7faff;
+
+  box-shadow: 0 4px 12px rgba(7, 27, 66, 0.05);
+}
+
+.attendance-record-today-button > span,
+.attendance-record-today-button > strong,
+.attendance-record-today-button > small {
+  display: block;
+}
+
+.attendance-record-today-button > span {
+  color: #315891;
+
+  font-size: 0.51rem;
+  font-weight: 900;
+
+  letter-spacing: 0.09em;
+}
+
+.attendance-record-today-button > strong {
+  margin-top: 3px;
+
+  color: var(--record-text);
+
   font-size: 0.68rem;
+  font-weight: 800;
 }
 
-.attendance-record-search:focus-within,
-.attendance-record-filter input:focus {
-  border-color: #4c79b3;
+.attendance-record-today-button > small {
+  margin-top: 2px;
 
-  box-shadow:
-    0 0 0 3px
-    rgba(36, 85, 154, 0.08);
+  color: var(--record-text-muted);
+
+  font-size: 0.54rem;
+
+  line-height: 1.25;
 }
+
+/* SELECTED TODAY */
+
+.attendance-record-today-button.active,
+.attendance-record-today-button:disabled {
+  border-color: #aebfd3;
+
+  background: linear-gradient(135deg, #edf3fb, #f5f8fc);
+
+  cursor: default;
+
+  opacity: 1;
+}
+
+.attendance-record-today-button.active > span {
+  color: #123d7e;
+}
+
+.attendance-record-today-button.active > strong {
+  color: #123d7e;
+}
+
+/* =========================================================
+   CURRENT RECORD CONTEXT
+========================================================= */
 
 .attendance-record-filter-context {
+  min-width: 0;
+
   display: flex;
   justify-content: center;
   flex-direction: column;
 
   padding: 8px 11px;
 
-  border:
-    1px solid
-    #d4dce7;
+  border: 1px solid #d4dce7;
+  border-radius: 8px;
 
   background: #ffffff;
 }
@@ -1036,8 +1240,10 @@
 
   color: var(--record-text);
 
-  font-size: 0.68rem;
-  font-weight: 730;
+  font-size: 0.66rem;
+  font-weight: 800;
+
+  line-height: 1.35;
 
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1046,9 +1252,16 @@
 .attendance-record-filter-context small {
   margin-top: 3px;
 
+  overflow: hidden;
+
   color: var(--record-text-muted);
 
-  font-size: 0.56rem;
+  font-size: 0.55rem;
+
+  line-height: 1.4;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* =========================================================
@@ -1058,13 +1271,15 @@
 .attendance-record-table-wrap {
   width: 100%;
 
+  max-height: 670px;
+
   overflow: auto;
 
-  max-height: 670px;
+  scrollbar-gutter: stable;
 }
 
 /* =========================================================
-   PROFESSIONAL RECORD TABLE
+   RECORD TABLE
 ========================================================= */
 
 .attendance-record-table {
@@ -1088,25 +1303,16 @@
 .attendance-record-table thead th {
   padding: 11px 10px;
 
-  border-right:
-    1px solid
-    rgba(255, 255, 255, 0.12);
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
 
-  border-bottom:
-    1px solid
-    #071c40;
+  border-bottom: 1px solid #071c40;
 
-  background:
-    linear-gradient(
-      180deg,
-      #102f62,
-      #0b244e
-    );
+  background: linear-gradient(180deg, #102f62, #0b244e);
 
   color: #ffffff;
 
   font-size: 0.59rem;
-  font-weight: 850;
+  font-weight: 900;
 
   line-height: 1.25;
 
@@ -1126,16 +1332,10 @@
 
   padding: 10px;
 
-  border-right:
-    1px solid
-    #e3e8ef;
+  border-right: 1px solid #e3e8ef;
+  border-bottom: 1px solid #dce3ec;
 
-  border-bottom:
-    1px solid
-    #dce3ec;
-
-  color:
-    #354256;
+  color: #354256;
 
   font-size: 0.72rem;
 
@@ -1166,27 +1366,19 @@
 
   background: #f2f6fb;
 
-  box-shadow:
-    inset 3px 0
-    #315891;
+  box-shadow: inset 3px 0 #315891;
 }
 
 .attendance-record-row-review {
-  background:
-    linear-gradient(
-      90deg,
-      rgba(181, 34, 50, 0.045),
-      transparent 18%
-    );
+  background: linear-gradient(90deg, rgba(181, 34, 50, 0.045), transparent 18%);
 }
 
 .attendance-record-row-monitor {
-  background:
-    linear-gradient(
-      90deg,
-      rgba(167, 109, 11, 0.035),
-      transparent 18%
-    );
+  background: linear-gradient(
+    90deg,
+    rgba(167, 109, 11, 0.035),
+    transparent 18%
+  );
 }
 
 /* =========================================================
@@ -1225,7 +1417,7 @@
 .attendance-record-student-number {
   color: #657389 !important;
 
-  font-weight: 700;
+  font-weight: 750;
 
   white-space: nowrap;
 }
@@ -1254,18 +1446,16 @@
   display: grid;
   place-items: center;
 
-  border:
-    1px solid
-    #cfdae8;
+  border: 1px solid #cfdae8;
 
-  background:
-    #edf3fb;
+  border-radius: 6px;
 
-  color:
-    #123d7e;
+  background: #edf3fb;
+
+  color: #123d7e;
 
   font-size: 0.72rem;
-  font-weight: 850;
+  font-weight: 900;
 }
 
 .attendance-record-student > div:last-child {
@@ -1283,7 +1473,7 @@
   color: #152945;
 
   font-size: 0.75rem;
-  font-weight: 760;
+  font-weight: 800;
 
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1302,7 +1492,7 @@
 ========================================================= */
 
 .attendance-record-count {
-  font-weight: 720;
+  font-weight: 750;
 }
 
 /* =========================================================
@@ -1319,12 +1509,11 @@
 
   padding: 0 7px;
 
-  border:
-    1px solid
-    transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
 
   font-size: 0.68rem;
-  font-weight: 820;
+  font-weight: 850;
 }
 
 .attendance-record-pill.present {
@@ -1352,7 +1541,7 @@
 }
 
 /* =========================================================
-   RATE
+   ATTENDANCE RATE
 ========================================================= */
 
 .attendance-record-rate {
@@ -1382,7 +1571,7 @@
   color: #142b4c;
 
   font-size: 0.7rem;
-  font-weight: 820;
+  font-weight: 850;
 }
 
 .attendance-record-rate > div:first-child span {
@@ -1411,15 +1600,9 @@
 
   border-radius: inherit;
 
-  background:
-    linear-gradient(
-      90deg,
-      #123d7e,
-      #4386c5
-    );
+  background: linear-gradient(90deg, #123d7e, #4386c5);
 
-  transition:
-    width 320ms ease;
+  transition: width 320ms ease;
 }
 
 /* =========================================================
@@ -1434,12 +1617,11 @@
 
   padding: 0 8px;
 
-  border:
-    1px solid
-    transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
 
   font-size: 0.56rem;
-  font-weight: 850;
+  font-weight: 900;
 
   letter-spacing: 0.045em;
 
@@ -1483,9 +1665,7 @@
 
   padding: 11px 16px;
 
-  border-top:
-    1px solid
-    var(--record-border);
+  border-top: 1px solid var(--record-border);
 
   background: #f8fafc;
 
@@ -1512,9 +1692,8 @@
   display: grid;
   place-items: center;
 
-  border:
-    1px solid
-    #ccd7e4;
+  border: 1px solid #ccd7e4;
+  border-radius: 50%;
 
   background: #ffffff;
 
@@ -1529,11 +1708,17 @@
 
   margin: 0;
 
+  color: #68768a;
+
   line-height: 1.5;
 }
 
 .attendance-record-note > span {
   flex: 0 0 auto;
+
+  color: #718095;
+
+  font-weight: 700;
 
   white-space: nowrap;
 }
@@ -1551,9 +1736,7 @@
 
   padding: 13px 17px;
 
-  border-top:
-    1px solid
-    var(--record-border);
+  border-top: 1px solid var(--record-border);
 
   background: #f4f7fa;
 }
@@ -1586,26 +1769,29 @@
 
   padding: 0 10px;
 
-  border:
-    1px solid
-    #cbd6e3;
+  border: 1px solid #cbd6e3;
+  border-radius: 6px;
 
   background: #ffffff;
 
   color: #123d7e;
 
   font: inherit;
+
   font-size: 0.64rem;
-  font-weight: 730;
+  font-weight: 750;
 
   cursor: pointer;
 
   transition:
     border-color 150ms ease,
-    background 150ms ease;
+    background 150ms ease,
+    transform 150ms ease;
 }
 
 .attendance-record-pagination button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
   border-color: #8ea8c7;
 
   background: #edf3fb;
@@ -1650,6 +1836,7 @@
   color: var(--record-text);
 
   font-size: 0.83rem;
+  font-weight: 800;
 }
 
 .attendance-record-loading p,
@@ -1672,9 +1859,8 @@
   display: grid;
   place-items: center;
 
-  border:
-    1px solid
-    #d4dde9;
+  border: 1px solid #d4dde9;
+  border-radius: 10px;
 
   background: #f1f5fa;
 
@@ -1684,19 +1870,10 @@
 }
 
 /* =========================================================
-   PRINT-ONLY SHEET
+   DARK MODE — PAGE
 ========================================================= */
 
-.attendance-print-sheet {
-  display: none;
-}
-
-/* =========================================================
-   DARK MODE
-========================================================= */
-
-html[data-theme="dark"]
-  .attendance-detail-page {
+html[data-theme="dark"] .attendance-detail-page {
   --record-border: #263b59;
   --record-border-strong: #354a68;
 
@@ -1705,154 +1882,179 @@ html[data-theme="dark"]
   --record-text-muted: #94a2b5;
 }
 
-html[data-theme="dark"]
-  .attendance-detail-back,
-html[data-theme="dark"]
-  .attendance-export-button,
-html[data-theme="dark"]
-  .attendance-record-header,
-html[data-theme="dark"]
-  .attendance-record-identity,
-html[data-theme="dark"]
-  .attendance-record-stat,
-html[data-theme="dark"]
-  .attendance-record-sheet {
-  border-color:
-    var(--record-border);
+/* =========================================================
+   DARK MODE — SURFACES
+========================================================= */
+
+html[data-theme="dark"] .attendance-detail-back,
+html[data-theme="dark"] .attendance-export-button,
+html[data-theme="dark"] .attendance-record-header,
+html[data-theme="dark"] .attendance-record-identity,
+html[data-theme="dark"] .attendance-record-stat,
+html[data-theme="dark"] .attendance-record-sheet {
+  border-color: var(--record-border);
 
   background: #101f37;
 
   color: #edf3fb;
 }
 
-html[data-theme="dark"]
-  .attendance-record-header {
-  background:
-    linear-gradient(
-      110deg,
-      #101f37,
-      #0d1c33
-    );
+html[data-theme="dark"] .attendance-record-header {
+  background: linear-gradient(110deg, #101f37, #0d1c33);
 }
 
-html[data-theme="dark"]
-  .attendance-record-school strong,
-html[data-theme="dark"]
-  .attendance-record-document strong,
-html[data-theme="dark"]
-  .attendance-record-section-block h1,
-html[data-theme="dark"]
-  .attendance-record-stat strong,
-html[data-theme="dark"]
-  .attendance-record-sheet-header h2,
-html[data-theme="dark"]
-  .attendance-record-student strong,
-html[data-theme="dark"]
-  .attendance-record-rate strong {
+html[data-theme="dark"] .attendance-record-school strong,
+html[data-theme="dark"] .attendance-record-document strong,
+html[data-theme="dark"] .attendance-record-section-block h1,
+html[data-theme="dark"] .attendance-record-stat strong,
+html[data-theme="dark"] .attendance-record-sheet-header h2,
+html[data-theme="dark"] .attendance-record-student strong,
+html[data-theme="dark"] .attendance-record-rate strong {
   color: #f3f7fc;
 }
 
-html[data-theme="dark"]
-  .attendance-record-document {
-  border-left-color:
-    var(--record-border);
+html[data-theme="dark"] .attendance-record-document {
+  border-left-color: var(--record-border);
 }
 
-html[data-theme="dark"]
-  .attendance-record-health {
-  border-left-color:
-    var(--record-border);
+/* =========================================================
+   DARK MODE — HEALTH
+========================================================= */
+
+html[data-theme="dark"] .attendance-record-health {
+  border-left-color: var(--record-border);
 }
 
-html[data-theme="dark"]
-  .attendance-record-health-strong {
+html[data-theme="dark"] .attendance-record-health-strong {
   background: #15352f;
 }
 
-html[data-theme="dark"]
-  .attendance-record-health-monitor {
+html[data-theme="dark"] .attendance-record-health-monitor {
   background: #40341b;
 }
 
-html[data-theme="dark"]
-  .attendance-record-health-review {
+html[data-theme="dark"] .attendance-record-health-review {
   background: #3c2029;
 }
 
-html[data-theme="dark"]
-  .attendance-record-sheet-header,
-html[data-theme="dark"]
-  .attendance-record-filters,
-html[data-theme="dark"]
-  .attendance-record-note,
-html[data-theme="dark"]
-  .attendance-record-pagination {
-  border-color:
-    var(--record-border);
+/* =========================================================
+   DARK MODE — SHEET
+========================================================= */
+
+html[data-theme="dark"] .attendance-record-sheet-header,
+html[data-theme="dark"] .attendance-record-filters,
+html[data-theme="dark"] .attendance-record-filters-daily,
+html[data-theme="dark"] .attendance-record-note,
+html[data-theme="dark"] .attendance-record-pagination {
+  border-color: var(--record-border);
 
   background: #0d1b31;
 }
 
-html[data-theme="dark"]
-  .attendance-record-sheet-meta,
-html[data-theme="dark"]
-  .attendance-record-search,
-html[data-theme="dark"]
-  .attendance-record-filter input,
-html[data-theme="dark"]
-  .attendance-record-filter-context,
-html[data-theme="dark"]
-  .attendance-record-pagination button {
-  border-color:
-    #344b6b;
+html[data-theme="dark"] .attendance-record-sheet-meta {
+  border-color: #344b6b;
+
+  background: #132440;
+}
+
+html[data-theme="dark"] .attendance-record-sheet-meta > div + div {
+  border-color: #344b6b;
+}
+
+html[data-theme="dark"] .attendance-record-sheet-meta strong {
+  color: #ecf2fa;
+}
+
+/* =========================================================
+   DARK MODE — FILTERS
+========================================================= */
+
+html[data-theme="dark"] .attendance-record-search,
+html[data-theme="dark"] .attendance-record-filter,
+html[data-theme="dark"] .attendance-record-today-button,
+html[data-theme="dark"] .attendance-record-filter-context {
+  border-color: #344b6b;
 
   background: #132440;
 
   color: #ecf2fa;
 }
 
-html[data-theme="dark"]
-  .attendance-record-search input,
-html[data-theme="dark"]
-  .attendance-record-filter input,
-html[data-theme="dark"]
-  .attendance-record-filter-context strong {
+html[data-theme="dark"] .attendance-record-search:hover,
+html[data-theme="dark"] .attendance-record-filter:hover {
+  border-color: #4a678c;
+}
+
+html[data-theme="dark"] .attendance-record-search input,
+html[data-theme="dark"] .attendance-record-filter input,
+html[data-theme="dark"] .attendance-record-filter-context strong,
+html[data-theme="dark"] .attendance-record-today-button > strong {
   color: #ecf2fa;
 }
 
-html[data-theme="dark"]
-  .attendance-record-table,
-html[data-theme="dark"]
-  .attendance-record-table tbody tr {
+html[data-theme="dark"] .attendance-record-filter input {
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] .attendance-record-search-clear {
+  background: #1e3454;
+
+  color: #b7c5d8;
+}
+
+html[data-theme="dark"] .attendance-record-search-clear:hover {
+  background: #4a202a;
+
+  color: #ffb9c1;
+}
+
+html[data-theme="dark"] .attendance-record-today-button:hover:not(:disabled) {
+  border-color: #55769f;
+
+  background: #193052;
+}
+
+html[data-theme="dark"] .attendance-record-today-button.active,
+html[data-theme="dark"] .attendance-record-today-button:disabled {
+  border-color: #46688f;
+
+  background: linear-gradient(135deg, #183052, #142946);
+}
+
+html[data-theme="dark"] .attendance-record-today-button.active > span,
+html[data-theme="dark"] .attendance-record-today-button.active > strong {
+  color: #d9ebff;
+}
+
+/* =========================================================
+   DARK MODE — TABLE
+========================================================= */
+
+html[data-theme="dark"] .attendance-record-table,
+html[data-theme="dark"] .attendance-record-table tbody tr {
   background: #101f37;
 }
 
-html[data-theme="dark"]
-  .attendance-record-table tbody tr:nth-child(even) {
+html[data-theme="dark"] .attendance-record-table tbody tr:nth-child(even) {
   background: #0e1d33;
 }
 
-html[data-theme="dark"]
-  .attendance-record-table tbody tr:hover {
+html[data-theme="dark"] .attendance-record-table tbody tr:hover {
   background: #152945;
 }
 
-html[data-theme="dark"]
-  .attendance-record-table tbody td {
+html[data-theme="dark"] .attendance-record-table tbody td {
   border-color: #293d5b;
 
   color: #d4dce7;
 }
 
-html[data-theme="dark"]
-  .attendance-record-student-number,
-html[data-theme="dark"]
-  .attendance-record-row-number {
+html[data-theme="dark"] .attendance-record-student-number,
+html[data-theme="dark"] .attendance-record-row-number {
   color: #a4afbd !important;
 }
 
-html[data-theme="dark"]
-  .attendance-record-student > div:first-child {
+html[data-theme="dark"] .attendance-record-student > div:first-child {
   border-color: #344c6e;
 
   background: #183052;
@@ -1860,9 +2062,28 @@ html[data-theme="dark"]
   color: #acd5ff;
 }
 
-html[data-theme="dark"]
-  .attendance-record-rate-bar {
+html[data-theme="dark"] .attendance-record-rate-bar {
   background: #293d57;
+}
+
+html[data-theme="dark"] .attendance-record-note p {
+  color: #9baabc;
+}
+
+html[data-theme="dark"] .attendance-record-note > div > span {
+  border-color: #344b6b;
+
+  background: #132440;
+
+  color: #acd5ff;
+}
+
+html[data-theme="dark"] .attendance-record-pagination button {
+  border-color: #344b6b;
+
+  background: #132440;
+
+  color: #d8eaff;
 }
 
 /* =========================================================
@@ -1871,22 +2092,19 @@ html[data-theme="dark"]
 
 @media (max-width: 1180px) {
   .attendance-record-summary {
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .attendance-record-filters {
+  .attendance-record-filters,
+  .attendance-record-filters-daily {
     grid-template-columns:
-      minmax(230px, 1fr)
-      150px
-      150px;
-
-    align-items: end;
+      minmax(260px, 1fr)
+      180px
+      180px;
   }
 
   .attendance-record-filter-context {
-    grid-column:
-      1 / -1;
+    grid-column: 1 / -1;
   }
 }
 
@@ -1896,17 +2114,19 @@ html[data-theme="dark"]
 
 @media (max-width: 900px) {
   .attendance-detail-page {
-    padding:
-      22px
-      18px
-      40px;
+    padding: 22px 18px 40px;
   }
 
   .attendance-record-toolbar,
   .attendance-record-header,
   .attendance-record-sheet-header {
     align-items: flex-start;
+
     flex-direction: column;
+  }
+
+  .attendance-record-toolbar {
+    gap: 13px;
   }
 
   .attendance-record-actions {
@@ -1920,14 +2140,9 @@ html[data-theme="dark"]
   .attendance-record-document {
     width: 100%;
 
-    padding:
-      15px
-      0
-      0;
+    padding: 15px 0 0;
 
-    border-top:
-      1px solid
-      var(--record-border);
+    border-top: 1px solid var(--record-border);
 
     border-left: 0;
 
@@ -1943,39 +2158,39 @@ html[data-theme="dark"]
   }
 
   .attendance-record-health {
-    border-top:
-      1px solid
-      var(--record-border);
+    border-top: 1px solid var(--record-border);
 
     border-left: 0;
   }
 
   .attendance-record-summary {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .attendance-record-sheet-meta {
     width: 100%;
 
-    grid-template-columns:
-      repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  .attendance-record-filters {
+  .attendance-record-filters,
+  .attendance-record-filters-daily {
     grid-template-columns:
       1fr
       1fr;
   }
 
-  .attendance-record-search,
+  .attendance-record-search {
+    grid-column: 1 / -1;
+  }
+
   .attendance-record-filter-context {
-    grid-column:
-      1 / -1;
+    grid-column: 1 / -1;
   }
 
   .attendance-record-note {
     align-items: flex-start;
+
     flex-direction: column;
   }
 
@@ -1990,11 +2205,10 @@ html[data-theme="dark"]
 
 @media (max-width: 580px) {
   .attendance-detail-page {
-    padding:
-      18px
-      13px
-      34px;
+    padding: 18px 13px 34px;
   }
+
+  /* TOOLBAR */
 
   .attendance-record-actions {
     flex-direction: column;
@@ -2002,16 +2216,27 @@ html[data-theme="dark"]
 
   .attendance-export-button {
     width: 100%;
+    min-width: 0;
   }
 
+  .attendance-detail-back {
+    width: 100%;
+
+    justify-content: flex-start;
+  }
+
+  /* HEADER */
+
   .attendance-record-header {
-    padding:
-      20px
-      18px;
+    padding: 20px 18px;
   }
 
   .attendance-record-brand {
     align-items: flex-start;
+  }
+
+  .attendance-record-logos {
+    gap: 5px;
   }
 
   .attendance-record-logos img {
@@ -2019,18 +2244,29 @@ html[data-theme="dark"]
     height: 38px;
   }
 
+  .attendance-record-school strong {
+    font-size: 0.9rem;
+  }
+
+  /* SECTION */
+
   .attendance-record-section-block {
-    padding:
-      20px
-      18px;
+    padding: 20px 18px;
   }
 
   .attendance-record-section-meta {
     align-items: flex-start;
+
     flex-direction: column;
 
     gap: 10px;
   }
+
+  .attendance-record-health {
+    padding: 19px 18px;
+  }
+
+  /* SUMMARY */
 
   .attendance-record-summary {
     grid-template-columns: 1fr;
@@ -2040,10 +2276,10 @@ html[data-theme="dark"]
     min-height: 72px;
   }
 
+  /* SHEET */
+
   .attendance-record-sheet-header {
-    padding:
-      18px
-      16px;
+    padding: 18px 16px;
   }
 
   .attendance-record-sheet-meta {
@@ -2051,18 +2287,18 @@ html[data-theme="dark"]
   }
 
   .attendance-record-sheet-meta > div + div {
-    border-top:
-      1px solid
-      var(--record-border);
+    border-top: 1px solid var(--record-border);
 
     border-left: 0;
   }
 
-  .attendance-record-filters {
+  /* DAILY FILTERS */
+
+  .attendance-record-filters,
+  .attendance-record-filters-daily {
     grid-template-columns: 1fr;
 
-    padding:
-      13px;
+    padding: 13px;
   }
 
   .attendance-record-search,
@@ -2070,8 +2306,23 @@ html[data-theme="dark"]
     grid-column: auto;
   }
 
+  .attendance-record-search,
+  .attendance-record-filter,
+  .attendance-record-today-button,
+  .attendance-record-filter-context {
+    min-height: 52px;
+  }
+
+  .attendance-record-filter-context strong,
+  .attendance-record-filter-context small {
+    white-space: normal;
+  }
+
+  /* PAGINATION */
+
   .attendance-record-pagination {
     align-items: stretch;
+
     flex-direction: column;
   }
 
@@ -2081,300 +2332,54 @@ html[data-theme="dark"]
 }
 
 /* =========================================================
-   PRINT / PDF
+   VERY SMALL MOBILE
 ========================================================= */
 
-@page {
-  size: A4 landscape;
-
-  margin: 10mm;
-}
-
-@media print {
-  html,
-  body {
-    width: auto !important;
-    min-width: 0 !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    background: #ffffff !important;
-  }
-
-  * {
-    print-color-adjust: exact !important;
-
-    -webkit-print-color-adjust: exact !important;
-  }
-
-  .councilor-sidebar,
-  .councilor-topbar,
-  .councilor-header,
-  .attendance-record-toolbar,
-  .attendance-export-error,
-  .attendance-record-header,
-  .attendance-record-identity,
-  .attendance-record-summary,
-  .attendance-record-sheet {
-    display: none !important;
-  }
-
-  .councilor-layout,
-  .councilor-page,
-  .councilor-main,
-  .councilor-content,
+@media (max-width: 390px) {
   .attendance-detail-page {
-    display: block !important;
-
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    background: #ffffff !important;
+    padding: 14px 9px 30px;
   }
 
-  .attendance-print-sheet {
-    display: block !important;
-
-    width: 100%;
-
-    color: #111827;
-
-    font-family:
-      Arial,
-      Helvetica,
-      sans-serif;
+  .attendance-record-header {
+    padding: 18px 14px;
   }
 
-  .attendance-print-header {
-    display: grid;
-
-    grid-template-columns:
-      auto
-      minmax(0, 1fr);
-
-    align-items: center;
-
-    gap: 14px;
-
-    padding-bottom: 9px;
-
-    border-bottom:
-      2px solid
-      #123d7e;
-
-    text-align: center;
+  .attendance-record-brand {
+    gap: 10px;
   }
 
-  .attendance-print-logos {
-    display: flex;
-
-    gap: 5px;
+  .attendance-record-logos img {
+    width: 33px;
+    height: 33px;
   }
 
-  .attendance-print-logos img {
-    width: 38px;
-    height: 38px;
-
-    object-fit: contain;
+  .attendance-record-school span {
+    font-size: 0.5rem;
   }
 
-  .attendance-print-header span,
-  .attendance-print-header strong,
-  .attendance-print-header small {
-    display: block;
+  .attendance-record-school strong {
+    font-size: 0.82rem;
   }
 
-  .attendance-print-header span {
-    font-size: 7pt;
+  .attendance-record-sheet-header {
+    padding: 16px 13px;
   }
 
-  .attendance-print-header strong {
-    margin-top: 2px;
-
-    font-size: 10pt;
+  .attendance-record-filters,
+  .attendance-record-filters-daily {
+    padding: 10px;
   }
 
-  .attendance-print-header small {
-    margin-top: 1px;
+  .attendance-record-pagination > div > span {
+    padding: 0 2px;
 
-    font-size: 6.5pt;
+    font-size: 0.59rem;
   }
 
-  .attendance-print-header h1 {
-    margin:
-      5px
-      0
-      0;
+  .attendance-record-pagination button {
+    padding: 0 8px;
 
-    font-size: 12pt;
-
-    text-transform: uppercase;
-  }
-
-  .attendance-print-meta {
-    display: grid;
-
-    grid-template-columns:
-      repeat(4, 1fr);
-
-    margin-top: 8px;
-
-    border:
-      1px solid
-      #4b5563;
-  }
-
-  .attendance-print-meta > div {
-    padding:
-      5px
-      6px;
-  }
-
-  .attendance-print-meta > div + div {
-    border-left:
-      1px solid
-      #9ca3af;
-  }
-
-  .attendance-print-meta span,
-  .attendance-print-meta strong {
-    display: block;
-  }
-
-  .attendance-print-meta span {
-    font-size: 6pt;
-
-    text-transform: uppercase;
-  }
-
-  .attendance-print-meta strong {
-    margin-top: 2px;
-
-    font-size: 7.3pt;
-  }
-
-  .attendance-print-summary {
-    display: grid;
-
-    grid-template-columns:
-      repeat(6, 1fr);
-
-    margin-top: 6px;
-
-    border:
-      1px solid
-      #9ca3af;
-  }
-
-  .attendance-print-summary > div {
-    padding:
-      4px
-      5px;
-
-    text-align: center;
-  }
-
-  .attendance-print-summary > div + div {
-    border-left:
-      1px solid
-      #d1d5db;
-  }
-
-  .attendance-print-summary span,
-  .attendance-print-summary strong {
-    display: block;
-  }
-
-  .attendance-print-summary span {
-    font-size: 5.8pt;
-
-    text-transform: uppercase;
-  }
-
-  .attendance-print-summary strong {
-    margin-top: 2px;
-
-    font-size: 7.4pt;
-  }
-
-  .attendance-print-table {
-    width: 100%;
-
-    margin-top: 8px;
-
-    border-collapse: collapse;
-
-    font-size: 6.5pt;
-  }
-
-  .attendance-print-table thead {
-    display: table-header-group;
-  }
-
-  .attendance-print-table th {
-    padding:
-      4px
-      4px;
-
-    border:
-      1px solid
-      #374151;
-
-    background:
-      #123d7e !important;
-
-    color:
-      #ffffff !important;
-
-    font-size: 6pt;
-
-    text-transform: uppercase;
-  }
-
-  .attendance-print-table td {
-    padding:
-      3.5px
-      4px;
-
-    border:
-      1px solid
-      #9ca3af;
-
-    text-align: center;
-  }
-
-  .attendance-print-table td:nth-child(3) {
-    text-align: left;
-  }
-
-  .attendance-print-table tr {
-    break-inside: avoid;
-  }
-
-  .attendance-print-footer {
-    display: flex;
-    justify-content: space-between;
-
-    gap: 12px;
-
-    margin-top: 7px;
-
-    padding-top: 5px;
-
-    border-top:
-      1px solid
-      #9ca3af;
-
-    color:
-      #4b5563;
-
-    font-size: 5.8pt;
+    font-size: 0.6rem;
   }
 }
 
@@ -2384,14 +2389,17 @@ html[data-theme="dark"]
 
 .attendance-detail-back:focus-visible,
 .attendance-export-button:focus-visible,
-.attendance-record-pagination button:focus-visible,
-.attendance-record-search:focus-within,
-.attendance-record-filter input:focus-visible {
-  outline:
-    3px solid
-    rgba(36, 85, 154, 0.16);
+.attendance-record-search-clear:focus-visible,
+.attendance-record-today-button:focus-visible,
+.attendance-record-pagination button:focus-visible {
+  outline: 3px solid rgba(36, 85, 154, 0.16);
 
   outline-offset: 2px;
+}
+
+.attendance-record-search:focus-within,
+.attendance-record-filter:focus-within {
+  outline: none;
 }
 
 /* =========================================================
@@ -2401,6 +2409,11 @@ html[data-theme="dark"]
 @media (prefers-reduced-motion: reduce) {
   .attendance-detail-back,
   .attendance-export-button,
+  .attendance-record-stat,
+  .attendance-record-search,
+  .attendance-record-search-clear,
+  .attendance-record-filter,
+  .attendance-record-today-button,
   .attendance-record-table tbody tr,
   .attendance-record-rate-bar > span,
   .attendance-record-pagination button {
