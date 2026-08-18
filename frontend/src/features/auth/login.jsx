@@ -1,30 +1,175 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import authService from "../../services/authService";
 
-import schoolBackground from "../../assets/school-background.png";
 import bagongPilipinasLogo from "../../assets/bagong-pilipinas-logo.svg";
 import depedLogo from "../../assets/kagawaran-educ-logo.svg";
+import schoolBackground from "../../assets/school-background.png";
 import schoolDivisionLogo from "../../assets/school-division-logo.svg";
 import shsLogo from "../../assets/shs-logo.svg";
 
 import "./auth.css";
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
 
 const INITIAL_FORM = {
   email: "",
   password: "",
 };
 
+/* =========================================================
+   PASSWORD VISIBILITY ICON
+========================================================= */
+
+function PasswordVisibilityIcon({ visible }) {
+  if (visible) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        <circle
+          cx="12"
+          cy="12"
+          r="2.7"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M3 3l18 18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M10.6 6.1A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a14.8 14.8 0 0 1-2.4 3.1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M6.2 7.2C3.9 9 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M9.9 9.9a3 3 0 0 0 4.2 4.2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 function Login() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState(INITIAL_FORM);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  /* =======================================================
+     STATE
+  ======================================================= */
+
+  const [formData, setFormData] =
+    useState(INITIAL_FORM);
+
+  const [loading, setLoading] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+  const [
+    showForgotPasswordModal,
+    setShowForgotPasswordModal,
+  ] = useState(false);
+
+  /* =======================================================
+     FORGOT PASSWORD MODAL EFFECTS
+  ======================================================= */
+
+  useEffect(() => {
+    if (!showForgotPasswordModal) {
+      return undefined;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow =
+      "hidden";
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setShowForgotPasswordModal(false);
+      }
+    };
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown,
+    );
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown,
+      );
+    };
+  }, [showForgotPasswordModal]);
+
+  /* =======================================================
+     FORM CHANGE
+  ======================================================= */
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const {
+      name,
+      value,
+    } = event.target;
 
     setFormData((current) => ({
       ...current,
@@ -36,61 +181,121 @@ function Login() {
     }
   };
 
+  /* =======================================================
+     PASSWORD VISIBILITY
+  ======================================================= */
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(
+      (current) => !current,
+    );
+  };
+
+  /* =======================================================
+     FORGOT PASSWORD MODAL
+  ======================================================= */
+
+  const openForgotPasswordModal = () => {
+    setShowForgotPasswordModal(true);
+  };
+
+  const closeForgotPasswordModal = () => {
+    setShowForgotPasswordModal(false);
+  };
+
+  /* =======================================================
+     LOGIN
+  ======================================================= */
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const email = formData.email.trim();
-    const password = formData.password;
+    const email =
+      formData.email.trim();
+
+    const password =
+      formData.password;
 
     if (!email || !password) {
-      setError("Please enter your email address and password.");
+      setError(
+        "Please enter your email address and password.",
+      );
+
       return;
     }
 
     try {
       setLoading(true);
+
       setError("");
 
-      const data = await authService.login({
-        email,
-        password,
-      });
+      const data =
+        await authService.login({
+          email,
+          password,
+        });
 
-      const user = authService.saveSession(data);
+      const user =
+        authService.saveSession(data);
 
       switch (user.role) {
         case "COUNCILOR":
-          navigate("/councilor/dashboard", { replace: true });
+          navigate(
+            "/councilor/dashboard",
+            {
+              replace: true,
+            },
+          );
+
           break;
 
         case "ADVISER":
-          navigate("/adviser/dashboard", { replace: true });
+          navigate(
+            "/adviser/dashboard",
+            {
+              replace: true,
+            },
+          );
+
           break;
 
         default:
-          navigate("/dashboard", { replace: true });
+          navigate(
+            "/dashboard",
+            {
+              replace: true,
+            },
+          );
       }
     } catch (err) {
       if (!err.response) {
         setError(
-          "Unable to connect to the server. Please check if the backend is running."
+          "Unable to connect to the server. Please check if the backend is running.",
         );
+
         return;
       }
 
       setError(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          "Invalid email address or password."
+          "Invalid email address or password.",
       );
     } finally {
       setLoading(false);
     }
   };
 
+  /* =======================================================
+     RENDER
+  ======================================================= */
+
   return (
     <main className="auth-page">
-      {/* Background */}
+      {/* =================================================
+          BACKGROUND
+      ================================================== */}
+
       <img
         src={schoolBackground}
         alt=""
@@ -98,14 +303,21 @@ function Login() {
         aria-hidden="true"
       />
 
-      <div className="auth-background-overlay" aria-hidden="true" />
+      <div
+        className="auth-background-overlay"
+        aria-hidden="true"
+      />
 
-      {/* Decorative institutional waves */}
+      {/* =================================================
+          DECORATIVE WAVES
+      ================================================== */}
+
       <div
         className="auth-decoration auth-decoration-left"
         aria-hidden="true"
       >
         <span className="auth-wave auth-wave-red" />
+
         <span className="auth-wave auth-wave-blue" />
       </div>
 
@@ -114,12 +326,19 @@ function Login() {
         aria-hidden="true"
       >
         <span className="auth-wave auth-wave-red" />
+
         <span className="auth-wave auth-wave-blue" />
       </div>
 
-      {/* Main content */}
+      {/* =================================================
+          MAIN CONTENT
+      ================================================== */}
+
       <div className="auth-container">
-        {/* BRANDING */}
+        {/* ===============================================
+            BRANDING
+        ================================================ */}
+
         <section className="auth-brand">
           <div className="auth-institutional">
             <p className="auth-republic">
@@ -156,24 +375,40 @@ function Login() {
             </span>
 
             <h1>
-              <span>SIGNAL VILLAGE</span>
+              <span>
+                SIGNAL VILLAGE
+              </span>
+
               NATIONAL HIGH SCHOOL
             </h1>
 
             <div className="auth-title-divider">
               <span />
-              <strong>SVNHS</strong>
+
+              <strong>
+                SVNHS
+              </strong>
+
               <span />
             </div>
 
-            <p>ATTENDANCE MANAGEMENT SYSTEM</p>
+            <p>
+              ATTENDANCE MANAGEMENT SYSTEM
+            </p>
           </div>
         </section>
 
-        {/* LOGIN CARD */}
+        {/* ===============================================
+            LOGIN CARD
+        ================================================ */}
+
         <section className="auth-login-section">
           <div className="auth-login-card">
             <div className="auth-card-top-line" />
+
+            {/* ===========================================
+                HEADER
+            ============================================ */}
 
             <header className="auth-login-header">
               <span className="auth-welcome">
@@ -190,12 +425,19 @@ function Login() {
               </p>
             </header>
 
+            {/* ===========================================
+                LOGIN FORM
+            ============================================ */}
+
             <form
               className="auth-form"
               onSubmit={handleSubmit}
               noValidate
             >
-              {/* EMAIL */}
+              {/* =========================================
+                  EMAIL
+              ========================================== */}
+
               <div className="auth-field">
                 <label htmlFor="email">
                   Email Address
@@ -222,13 +464,16 @@ function Login() {
                 </div>
               </div>
 
-              {/* PASSWORD */}
+              {/* =========================================
+                  PASSWORD
+              ========================================== */}
+
               <div className="auth-field">
                 <label htmlFor="password">
                   Password
                 </label>
 
-                <div className="auth-input-wrapper">
+                <div className="auth-input-wrapper auth-password-input-wrapper">
                   <span
                     className="auth-input-icon"
                     aria-hidden="true"
@@ -239,35 +484,100 @@ function Login() {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
                     placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleChange}
+                    value={
+                      formData.password
+                    }
+                    onChange={
+                      handleChange
+                    }
                     autoComplete="current-password"
                     disabled={loading}
                   />
+
+                  <button
+                    type="button"
+                    className="auth-password-toggle"
+                    onClick={
+                      togglePasswordVisibility
+                    }
+                    disabled={loading}
+                    aria-label={
+                      showPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                    aria-pressed={
+                      showPassword
+                    }
+                    title={
+                      showPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                  >
+                    <PasswordVisibilityIcon
+                      visible={
+                        showPassword
+                      }
+                    />
+                  </button>
                 </div>
+
+                {/* =======================================
+                    FORGOT PASSWORD
+                ======================================== */}
+
+                <button
+                  type="button"
+                  className="auth-forgot-password"
+                  onClick={
+                    openForgotPasswordModal
+                  }
+                  aria-haspopup="dialog"
+                >
+                  Forgot your password?
+                </button>
               </div>
 
-              {/* ERROR */}
+              {/* =========================================
+                  ERROR
+              ========================================== */}
+
               {error && (
                 <div
                   className="auth-error"
                   role="alert"
                 >
-                  <span>!</span>
-                  <p>{error}</p>
+                  <span aria-hidden="true">
+                    !
+                  </span>
+
+                  <p>
+                    {error}
+                  </p>
                 </div>
               )}
 
-              {/* SUBMIT */}
+              {/* =========================================
+                  LOGIN BUTTON
+              ========================================== */}
+
               <button
                 type="submit"
                 className="auth-submit"
                 disabled={loading}
               >
                 {loading && (
-                  <span className="auth-spinner" />
+                  <span
+                    className="auth-spinner"
+                    aria-hidden="true"
+                  />
                 )}
 
                 {loading
@@ -276,8 +586,14 @@ function Login() {
               </button>
             </form>
 
+            {/* ===========================================
+                FOOTER
+            ============================================ */}
+
             <footer className="auth-login-footer">
-              <span>SVNHS</span>
+              <span>
+                SVNHS
+              </span>
 
               <span className="auth-footer-divider" />
 
@@ -289,16 +605,209 @@ function Login() {
         </section>
       </div>
 
-      {/* Bottom institutional label */}
-      <div className="auth-bottom-label">
-        <span>Department of Education</span>
+      {/* =================================================
+          BOTTOM LABEL
+      ================================================== */}
 
-        <strong>•</strong>
+      <div className="auth-bottom-label">
+        <span>
+          Department of Education
+        </span>
+
+        <strong>
+          •
+        </strong>
 
         <span>
           Schools Division of Taguig City and Pateros
         </span>
       </div>
+
+      {/* =================================================
+          FLOATING FORGOT PASSWORD MODAL
+      ================================================== */}
+
+      {showForgotPasswordModal && (
+        <div
+          className="auth-modal-backdrop"
+          onMouseDown={(event) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              closeForgotPasswordModal();
+            }
+          }}
+        >
+          <section
+            className="auth-recovery-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-recovery-title"
+            aria-describedby="auth-recovery-description"
+          >
+            {/* ===========================================
+                MODAL HEADER
+            ============================================ */}
+
+            <header className="auth-recovery-modal-header">
+              <div className="auth-recovery-header-copy">
+                <span>
+                  ACCOUNT RECOVERY
+                </span>
+
+                <h2 id="auth-recovery-title">
+                  Forgot your password?
+                </h2>
+
+                <p id="auth-recovery-description">
+                  Follow the instructions below based
+                  on your account role.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="auth-modal-close"
+                onClick={
+                  closeForgotPasswordModal
+                }
+                aria-label="Close password recovery modal"
+              >
+                ×
+              </button>
+            </header>
+
+            {/* ===========================================
+                INTRODUCTION
+            ============================================ */}
+
+            <div className="auth-recovery-intro">
+              <span
+                className="auth-recovery-intro-icon"
+                aria-hidden="true"
+              >
+                i
+              </span>
+
+              <p>
+                Password recovery is handled by an
+                authorized person to protect school
+                accounts from unauthorized access.
+              </p>
+            </div>
+
+            {/* ===========================================
+                RECOVERY OPTIONS
+            ============================================ */}
+
+            <div className="auth-recovery-options">
+              {/* =========================================
+                  ADVISER
+              ========================================== */}
+
+              <article className="auth-recovery-card auth-recovery-adviser">
+                <div
+                  className="auth-recovery-role-icon"
+                  aria-hidden="true"
+                >
+                  A
+                </div>
+
+                <div className="auth-recovery-role-copy">
+                  <span>
+                    ADVISER ACCOUNT
+                  </span>
+
+                  <h3>
+                    Contact your Councilor
+                  </h3>
+
+                  <p>
+                    If you forgot your Adviser account
+                    password, contact your school
+                    Councilor to request a password
+                    reset. The Councilor can provide
+                    you with a new temporary password.
+                  </p>
+                </div>
+              </article>
+
+              {/* =========================================
+                  COUNCILOR
+              ========================================== */}
+
+              <article className="auth-recovery-card auth-recovery-councilor">
+                <div
+                  className="auth-recovery-role-icon"
+                  aria-hidden="true"
+                >
+                  C
+                </div>
+
+                <div className="auth-recovery-role-copy">
+                  <span>
+                    COUNCILOR ACCOUNT
+                  </span>
+
+                  <h3>
+                    Contact the system administrator
+                  </h3>
+
+                  <p>
+                    If you forgot your Councilor account
+                    password, contact the system
+                    developer or authorized administrator
+                    for secure account recovery.
+                  </p>
+                </div>
+              </article>
+            </div>
+
+            {/* ===========================================
+                SECURITY REMINDER
+            ============================================ */}
+
+            <div className="auth-recovery-security-note">
+              <div
+                className="auth-recovery-security-icon"
+                aria-hidden="true"
+              >
+                !
+              </div>
+
+              <div>
+                <strong>
+                  Security Reminder
+                </strong>
+
+                <p>
+                  Never share your existing password
+                  with anyone. Only use temporary
+                  credentials provided through the
+                  authorized recovery process.
+                </p>
+              </div>
+            </div>
+
+            {/* ===========================================
+                ACTION
+            ============================================ */}
+
+            <footer className="auth-recovery-actions">
+              <button
+                type="button"
+                className="auth-recovery-button"
+                onClick={
+                  closeForgotPasswordModal
+                }
+              >
+                Back to Login
+              </button>
+            </footer>
+          </section>
+        </div>
+      )}
     </main>
   );
 }

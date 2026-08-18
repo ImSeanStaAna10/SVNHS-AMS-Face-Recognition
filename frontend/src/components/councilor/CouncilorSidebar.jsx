@@ -4,11 +4,15 @@ import shsLogo from "../../assets/shs-logo.svg";
 
 import authService from "../../services/authService";
 
-function CouncilorSidebar() {
+function CouncilorSidebar({ onChangePassword }) {
   const navigate = useNavigate();
 
   const getNavClassName = ({ isActive }) =>
     `councilor-nav-item ${isActive ? "active" : ""}`;
+
+  /* =======================================================
+     LOGOUT
+  ======================================================= */
 
   const handleLogout = () => {
     authService.logout();
@@ -17,6 +21,10 @@ function CouncilorSidebar() {
       replace: true,
     });
   };
+
+  /* =======================================================
+     RENDER
+  ======================================================= */
 
   return (
     <aside className="councilor-sidebar">
@@ -43,7 +51,9 @@ function CouncilorSidebar() {
       <span className="councilor-nav-label">MAIN MENU</span>
 
       <nav className="councilor-nav" aria-label="Councilor navigation">
-        {/* DASHBOARD */}
+        {/* =============================================
+            DASHBOARD
+        ============================================== */}
 
         <NavLink to="/councilor/dashboard" className={getNavClassName} end>
           <span className="councilor-nav-icon" aria-hidden="true">
@@ -53,7 +63,9 @@ function CouncilorSidebar() {
           <span>Dashboard</span>
         </NavLink>
 
-        {/* ADVISERS */}
+        {/* =============================================
+            ADVISERS
+        ============================================== */}
 
         <NavLink to="/councilor/advisers" className={getNavClassName}>
           <span className="councilor-nav-icon" aria-hidden="true">
@@ -63,7 +75,9 @@ function CouncilorSidebar() {
           <span>Advisers</span>
         </NavLink>
 
-        {/* SECTIONS */}
+        {/* =============================================
+            SECTIONS
+        ============================================== */}
 
         <NavLink to="/councilor/sections" className={getNavClassName}>
           <span className="councilor-nav-icon" aria-hidden="true">
@@ -73,7 +87,9 @@ function CouncilorSidebar() {
           <span>Sections</span>
         </NavLink>
 
-        {/* ATTENDANCE */}
+        {/* =============================================
+            ATTENDANCE
+        ============================================== */}
 
         <NavLink to="/councilor/attendance" className={getNavClassName}>
           <span className="councilor-nav-icon" aria-hidden="true">
@@ -82,6 +98,26 @@ function CouncilorSidebar() {
 
           <span>Attendance</span>
         </NavLink>
+
+        {/* =============================================
+            CHANGE PASSWORD
+        ============================================== */}
+
+        <button
+          type="button"
+          className="councilor-nav-item councilor-password-nav-item"
+          onClick={onChangePassword}
+          aria-haspopup="dialog"
+        >
+          <span
+            className="councilor-nav-icon councilor-password-nav-icon"
+            aria-hidden="true"
+          >
+            ⚿
+          </span>
+
+          <span>Change Password</span>
+        </button>
       </nav>
 
       {/* ===============================================

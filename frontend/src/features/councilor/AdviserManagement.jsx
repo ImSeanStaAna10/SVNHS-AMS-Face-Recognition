@@ -1,14 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-import ThemeToggle from "../../common/themeToggle";
+import CouncilorLayout from "../../layouts/CouncilorLayout";
 
-import authService from "../../services/authService";
 import councilorService from "../../services/councilorService";
 
-import bagongPilipinasLogo from "../../assets/bagong-pilipinas-logo.svg";
-import depedLogo from "../../assets/kagawaran-educ-logo.svg";
-import schoolDivisionLogo from "../../assets/school-division-logo.svg";
 import seniorHighSchoolLogo from "../../assets/shs-logo.svg";
 
 import "../../styles/councilor.css";
@@ -28,26 +23,12 @@ const INITIAL_RESET_FORM = {
   confirmPassword: "",
 };
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const INITIAL_RESET_PASSWORD_VISIBILITY = {
+  newPassword: false,
+  confirmPassword: false,
+};
 
-const INSTITUTIONAL_LOGOS = [
-  {
-    src: bagongPilipinasLogo,
-    alt: "Bagong Pilipinas",
-  },
-  {
-    src: depedLogo,
-    alt: "Department of Education",
-  },
-  {
-    src: schoolDivisionLogo,
-    alt: "Schools Division Office",
-  },
-  {
-    src: seniorHighSchoolLogo,
-    alt: "Signal Village National High School",
-  },
-];
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /* =========================================================
    HELPERS
@@ -67,19 +48,84 @@ const normalizeAdvisers = (data) => {
 };
 
 /* =========================================================
+   PASSWORD VISIBILITY ICON
+========================================================= */
+
+function PasswordVisibilityIcon({ visible }) {
+  if (visible) {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+          d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        <circle
+          cx="12"
+          cy="12"
+          r="2.7"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M3 3l18 18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M10.6 6.1A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a14.8 14.8 0 0 1-2.4 3.1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M6.2 7.2C3.9 9 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M9.9 9.9a3 3 0 0 0 4.2 4.2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/* =========================================================
    COMPONENT
 ========================================================= */
 
 function Advisers() {
-  const navigate = useNavigate();
-
-  const user = authService.getUser();
-
   /* =======================================================
      DATA STATE
   ======================================================= */
 
   const [advisers, setAdvisers] = useState([]);
+
   const [search, setSearch] = useState("");
 
   /* =======================================================
@@ -87,7 +133,9 @@ function Advisers() {
   ======================================================= */
 
   const [loading, setLoading] = useState(true);
+
   const [creating, setCreating] = useState(false);
+
   const [resettingPassword, setResettingPassword] = useState(false);
 
   /* =======================================================
@@ -95,6 +143,7 @@ function Advisers() {
   ======================================================= */
 
   const [error, setError] = useState("");
+
   const [success, setSuccess] = useState("");
 
   /* =======================================================
@@ -102,20 +151,28 @@ function Advisers() {
   ======================================================= */
 
   const [showModal, setShowModal] = useState(false);
+
   const [formData, setFormData] = useState(INITIAL_FORM);
+
   const [formError, setFormError] = useState("");
+
+  const [showCreatePassword, setShowCreatePassword] = useState(false);
 
   /* =======================================================
      RESET PASSWORD MODAL STATE
   ======================================================= */
 
   const [showResetModal, setShowResetModal] = useState(false);
+
   const [selectedAdviser, setSelectedAdviser] = useState(null);
 
-  const [resetFormData, setResetFormData] =
-    useState(INITIAL_RESET_FORM);
+  const [resetFormData, setResetFormData] = useState(INITIAL_RESET_FORM);
 
   const [resetFormError, setResetFormError] = useState("");
+
+  const [resetPasswordVisibility, setResetPasswordVisibility] = useState(
+    INITIAL_RESET_PASSWORD_VISIBILITY,
+  );
 
   /* =======================================================
      INITIAL LOAD
@@ -133,6 +190,7 @@ function Advisers() {
         }
 
         setAdvisers(normalizeAdvisers(data));
+
         setError("");
       } catch (err) {
         console.error("Unable to load advisers:", err);
@@ -141,12 +199,7 @@ function Advisers() {
           return;
         }
 
-        setError(
-          getErrorMessage(
-            err,
-            "Unable to load advisers.",
-          ),
-        );
+        setError(getErrorMessage(err, "Unable to load advisers."));
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -166,15 +219,13 @@ function Advisers() {
   ======================================================= */
 
   useEffect(() => {
-    const hasOpenModal =
-      showModal || showResetModal;
+    const hasOpenModal = showModal || showResetModal;
 
     if (!hasOpenModal) {
       return undefined;
     }
 
-    const previousOverflow =
-      document.body.style.overflow;
+    const previousOverflow = document.body.style.overflow;
 
     document.body.style.overflow = "hidden";
 
@@ -183,112 +234,68 @@ function Advisers() {
         return;
       }
 
-      if (
-        showModal &&
-        !creating
-      ) {
+      /* ADD ADVISER */
+
+      if (showModal && !creating) {
         setShowModal(false);
+
         setFormData(INITIAL_FORM);
+
         setFormError("");
+
+        setShowCreatePassword(false);
       }
 
-      if (
-        showResetModal &&
-        !resettingPassword
-      ) {
+      /* RESET PASSWORD */
+
+      if (showResetModal && !resettingPassword) {
         setShowResetModal(false);
+
         setSelectedAdviser(null);
+
         setResetFormData(INITIAL_RESET_FORM);
+
         setResetFormError("");
+
+        setResetPasswordVisibility(INITIAL_RESET_PASSWORD_VISIBILITY);
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
+      document.body.style.overflow = previousOverflow;
 
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    showModal,
-    showResetModal,
-    creating,
-    resettingPassword,
-  ]);
+  }, [showModal, showResetModal, creating, resettingPassword]);
 
   /* =======================================================
      DERIVED DATA
   ======================================================= */
 
   const filteredAdvisers = useMemo(() => {
-    const keyword =
-      search.trim().toLowerCase();
+    const keyword = search.trim().toLowerCase();
 
     if (!keyword) {
       return advisers;
     }
 
     return advisers.filter((adviser) => {
-      const name =
-        adviser.name?.toLowerCase() ?? "";
+      const name = adviser.name?.toLowerCase() ?? "";
 
-      const email =
-        adviser.email?.toLowerCase() ?? "";
+      const email = adviser.email?.toLowerCase() ?? "";
 
-      return (
-        name.includes(keyword) ||
-        email.includes(keyword)
-      );
+      return name.includes(keyword) || email.includes(keyword);
     });
   }, [advisers, search]);
 
   const activeAdvisers = useMemo(
-    () =>
-      advisers.filter(
-        (adviser) =>
-          adviser.active !== false,
-      ).length,
+    () => advisers.filter((adviser) => adviser.active !== false).length,
     [advisers],
   );
 
-  const inactiveAdvisers =
-    advisers.length - activeAdvisers;
-
-  /* =======================================================
-     NAVIGATION
-  ======================================================= */
-
-  const goToDashboard = () => {
-    navigate("/councilor/dashboard");
-  };
-
-  const goToSections = () => {
-    navigate("/councilor/sections");
-  };
-
-  const goToAttendance = () => {
-    navigate("/councilor/attendance");
-  };
-
-  /* =======================================================
-     LOGOUT
-  ======================================================= */
-
-  const handleLogout = () => {
-    authService.logout();
-
-    navigate("/login", {
-      replace: true,
-    });
-  };
+  const inactiveAdvisers = advisers.length - activeAdvisers;
 
   /* =======================================================
      ADD ADVISER FORM HELPERS
@@ -296,12 +303,14 @@ function Advisers() {
 
   const resetForm = () => {
     setFormData(INITIAL_FORM);
+
     setFormError("");
+
+    setShowCreatePassword(false);
   };
 
   const handleFormChange = (event) => {
-    const { name, value } =
-      event.target;
+    const { name, value } = event.target;
 
     setFormData((current) => ({
       ...current,
@@ -332,6 +341,7 @@ function Advisers() {
     }
 
     setShowModal(false);
+
     resetForm();
   };
 
@@ -340,38 +350,33 @@ function Advisers() {
   ======================================================= */
 
   const validateForm = () => {
-    const name =
-      formData.name.trim();
+    const name = formData.name.trim();
 
-    const email =
-      formData.email
-        .trim()
-        .toLowerCase();
+    const email = formData.email.trim().toLowerCase();
 
-    const password =
-      formData.password;
+    const password = formData.password;
 
     if (!name || !email || !password) {
       return {
         valid: false,
-        message:
-          "Please complete all fields.",
+
+        message: "Please complete all fields.",
       };
     }
 
     if (!EMAIL_PATTERN.test(email)) {
       return {
         valid: false,
-        message:
-          "Please enter a valid email address.",
+
+        message: "Please enter a valid email address.",
       };
     }
 
     if (password.length < 6) {
       return {
         valid: false,
-        message:
-          "Password must be at least 6 characters.",
+
+        message: "Password must be at least 6 characters.",
       };
     }
 
@@ -391,30 +396,22 @@ function Advisers() {
   ======================================================= */
 
   const refreshAdvisers = async () => {
-    const data =
-      await councilorService.getAdvisers();
+    const data = await councilorService.getAdvisers();
 
-    setAdvisers(
-      normalizeAdvisers(data),
-    );
+    setAdvisers(normalizeAdvisers(data));
   };
 
   /* =======================================================
      CREATE ADVISER
   ======================================================= */
 
-  const handleCreateAdviser = async (
-    event,
-  ) => {
+  const handleCreateAdviser = async (event) => {
     event.preventDefault();
 
-    const validation =
-      validateForm();
+    const validation = validateForm();
 
     if (!validation.valid) {
-      setFormError(
-        validation.message,
-      );
+      setFormError(validation.message);
 
       return;
     }
@@ -426,9 +423,7 @@ function Advisers() {
       setError("");
       setSuccess("");
 
-      await councilorService.createAdviser(
-        validation.data,
-      );
+      await councilorService.createAdviser(validation.data);
 
       await refreshAdvisers();
 
@@ -436,21 +431,11 @@ function Advisers() {
 
       resetForm();
 
-      setSuccess(
-        "Adviser account created successfully.",
-      );
+      setSuccess("Adviser account created successfully.");
     } catch (err) {
-      console.error(
-        "Unable to create adviser:",
-        err,
-      );
+      console.error("Unable to create adviser:", err);
 
-      setFormError(
-        getErrorMessage(
-          err,
-          "Unable to create adviser account.",
-        ),
-      );
+      setFormError(getErrorMessage(err, "Unable to create adviser account."));
     } finally {
       setCreating(false);
     }
@@ -461,18 +446,15 @@ function Advisers() {
   ======================================================= */
 
   const resetPasswordForm = () => {
-    setResetFormData(
-      INITIAL_RESET_FORM,
-    );
+    setResetFormData(INITIAL_RESET_FORM);
 
     setResetFormError("");
+
+    setResetPasswordVisibility(INITIAL_RESET_PASSWORD_VISIBILITY);
   };
 
-  const handleResetFormChange = (
-    event,
-  ) => {
-    const { name, value } =
-      event.target;
+  const handleResetFormChange = (event) => {
+    const { name, value } = event.target;
 
     setResetFormData((current) => ({
       ...current,
@@ -484,19 +466,26 @@ function Advisers() {
     }
   };
 
+  const toggleResetPasswordVisibility = (fieldName) => {
+    setResetPasswordVisibility((current) => ({
+      ...current,
+
+      [fieldName]: !current[fieldName],
+    }));
+  };
+
   /* =======================================================
      RESET PASSWORD MODAL CONTROLS
   ======================================================= */
 
-  const openResetModal = (
-    adviser,
-  ) => {
+  const openResetModal = (adviser) => {
     resetPasswordForm();
 
     setError("");
     setSuccess("");
 
     setSelectedAdviser(adviser);
+
     setShowResetModal(true);
   };
 
@@ -506,6 +495,7 @@ function Advisers() {
     }
 
     setShowResetModal(false);
+
     setSelectedAdviser(null);
 
     resetPasswordForm();
@@ -516,39 +506,31 @@ function Advisers() {
   ======================================================= */
 
   const validateResetPassword = () => {
-    const newPassword =
-      resetFormData.newPassword;
+    const newPassword = resetFormData.newPassword;
 
-    const confirmPassword =
-      resetFormData.confirmPassword;
+    const confirmPassword = resetFormData.confirmPassword;
 
-    if (
-      !newPassword ||
-      !confirmPassword
-    ) {
+    if (!newPassword || !confirmPassword) {
       return {
         valid: false,
-        message:
-          "Please complete all password fields.",
+
+        message: "Please complete all password fields.",
       };
     }
 
     if (newPassword.length < 8) {
       return {
         valid: false,
-        message:
-          "Password must be at least 8 characters.",
+
+        message: "Password must be at least 8 characters.",
       };
     }
 
-    if (
-      newPassword !==
-      confirmPassword
-    ) {
+    if (newPassword !== confirmPassword) {
       return {
         valid: false,
-        message:
-          "Passwords do not match.",
+
+        message: "Passwords do not match.",
       };
     }
 
@@ -565,888 +547,584 @@ function Advisers() {
      RESET ADVISER PASSWORD
   ======================================================= */
 
-  const handleResetAdviserPassword =
-    async (event) => {
-      event.preventDefault();
+  const handleResetAdviserPassword = async (event) => {
+    event.preventDefault();
 
-      if (!selectedAdviser?.id) {
-        setResetFormError(
-          "Unable to identify the selected adviser.",
-        );
+    if (!selectedAdviser?.id) {
+      setResetFormError("Unable to identify the selected adviser.");
 
-        return;
-      }
+      return;
+    }
 
-      const validation =
-        validateResetPassword();
+    const validation = validateResetPassword();
 
-      if (!validation.valid) {
-        setResetFormError(
-          validation.message,
-        );
+    if (!validation.valid) {
+      setResetFormError(validation.message);
 
-        return;
-      }
+      return;
+    }
 
-      try {
-        setResettingPassword(true);
+    try {
+      setResettingPassword(true);
 
-        setResetFormError("");
-        setError("");
-        setSuccess("");
+      setResetFormError("");
+      setError("");
+      setSuccess("");
 
-        await councilorService.resetAdviserPassword(
-          selectedAdviser.id,
-          validation.data,
-        );
+      await councilorService.resetAdviserPassword(
+        selectedAdviser.id,
+        validation.data,
+      );
 
-        const adviserName =
-          selectedAdviser.name ||
-          "Adviser";
+      const adviserName = selectedAdviser.name || "Adviser";
 
-        setShowResetModal(false);
-        setSelectedAdviser(null);
+      setShowResetModal(false);
 
-        resetPasswordForm();
+      setSelectedAdviser(null);
 
-        setSuccess(
-          `${adviserName}'s password was reset successfully.`,
-        );
-      } catch (err) {
-        console.error(
-          "Unable to reset adviser password:",
-          err,
-        );
+      resetPasswordForm();
 
-        setResetFormError(
-          getErrorMessage(
-            err,
-            "Unable to reset adviser password.",
-          ),
-        );
-      } finally {
-        setResettingPassword(false);
-      }
-    };
+      setSuccess(`${adviserName}'s password was reset successfully.`);
+    } catch (err) {
+      console.error("Unable to reset adviser password:", err);
+
+      setResetFormError(
+        getErrorMessage(err, "Unable to reset adviser password."),
+      );
+    } finally {
+      setResettingPassword(false);
+    }
+  };
 
   /* =======================================================
      RENDER
   ======================================================= */
 
   return (
-    <main className="councilor-page">
-      {/* ===================================================
-          SIDEBAR
-      ==================================================== */}
-
-      <aside className="councilor-sidebar">
-        <div className="councilor-brand">
-          <div className="councilor-brand-logo">
-            <img
-              src={seniorHighSchoolLogo}
-              alt="Signal Village National High School"
-            />
-          </div>
-
-          <div className="councilor-brand-copy">
-            <strong>SVNHS</strong>
-
-            <span>
-              Attendance Management System
-            </span>
-          </div>
-        </div>
-
-        <span className="councilor-nav-label">
-          MAIN MENU
-        </span>
-
-        <nav
-          className="councilor-nav"
-          aria-label="Councilor navigation"
-        >
-          <button
-            type="button"
-            className="councilor-nav-item"
-            onClick={goToDashboard}
-          >
-            <span
-              className="councilor-nav-icon"
-              aria-hidden="true"
-            >
-              ▦
-            </span>
-
-            <span>Dashboard</span>
-          </button>
-
-          <button
-            type="button"
-            className="councilor-nav-item active"
-            aria-current="page"
-          >
-            <span
-              className="councilor-nav-icon"
-              aria-hidden="true"
-            >
-              ♙
-            </span>
-
-            <span>Advisers</span>
-          </button>
-
-          <button
-            type="button"
-            className="councilor-nav-item"
-            onClick={goToSections}
-          >
-            <span
-              className="councilor-nav-icon"
-              aria-hidden="true"
-            >
-              ▤
-            </span>
-
-            <span>Sections</span>
-          </button>
-
-          <button
-            type="button"
-            className="councilor-nav-item"
-            onClick={goToAttendance}
-          >
-            <span
-              className="councilor-nav-icon"
-              aria-hidden="true"
-            >
-              ◷
-            </span>
-
-            <span>Attendance</span>
-          </button>
-        </nav>
-
-        <div className="councilor-sidebar-footer">
-          <div className="councilor-sidebar-school">
-            <span>SCHOOL SYSTEM</span>
-
-            <strong>
-              Signal Village National High
-              School
-            </strong>
-          </div>
-
-          <button
-            type="button"
-            className="councilor-logout"
-            onClick={handleLogout}
-          >
-            <span aria-hidden="true">
-              ↪
-            </span>
-
-            <span>Logout</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* ===================================================
-          MAIN
-      ==================================================== */}
-
-      <section className="councilor-main">
-        <header className="councilor-header">
-          <div className="councilor-header-copy">
-            <span className="councilor-eyebrow">
-              ACCOUNT MANAGEMENT
-            </span>
-
-            <h1>Advisers</h1>
-
-            <p>
-              Manage adviser accounts for
-              your school.
-            </p>
-          </div>
-
-          <div className="councilor-header-actions">
-            <div
-              className="councilor-header-logos"
-              aria-label="Institutional logos"
-            >
-              {INSTITUTIONAL_LOGOS.map(
-                (logo) => (
-                  <img
-                    key={logo.alt}
-                    src={logo.src}
-                    alt={logo.alt}
-                    title={logo.alt}
-                  />
-                ),
-              )}
-            </div>
-
-            <div
-              className="councilor-header-divider"
-              aria-hidden="true"
-            />
-
-            <ThemeToggle />
-
-            <div
-              className="councilor-header-divider"
-              aria-hidden="true"
-            />
-
-            <div className="councilor-user">
-              <div className="councilor-avatar">
-                {user?.name
-                  ?.trim()
-                  ?.charAt(0)
-                  ?.toUpperCase() || "U"}
-              </div>
-
-              <div className="councilor-user-copy">
-                <strong>
-                  {user?.name ||
-                    "Councilor"}
-                </strong>
-
-                <span>
-                  School Councilor
-                </span>
-              </div>
-            </div>
-          </div>
-        </header>
-
+    <CouncilorLayout
+      eyebrow="ACCOUNT MANAGEMENT"
+      title="Advisers"
+      description="Manage adviser accounts for your school."
+    >
+      <section className="councilor-advisers-page">
         {/* =================================================
-            CONTENT
+            ADVISER OVERVIEW
         ================================================== */}
 
-        <div className="councilor-content councilor-advisers-page">
-          <section className="councilor-adviser-overview">
-            <section className="councilor-welcome-card">
-              <div className="councilor-welcome-copy">
-                <span>
-                  ADVISER MANAGEMENT
-                </span>
+        <section className="councilor-adviser-overview">
+          {/* ===============================================
+              WELCOME CARD
+          ================================================ */}
 
-                <h2>
-                  Manage adviser accounts
-                </h2>
+          <section className="councilor-welcome-card">
+            <div className="councilor-welcome-copy">
+              <span>ADVISER MANAGEMENT</span>
 
-                <p>
-                  Create, organize, and
-                  manage registered adviser
-                  accounts for Signal Village
-                  National High School.
-                </p>
+              <h2>Manage adviser accounts</h2>
 
-                <div className="councilor-welcome-meta">
-                  <span>SVNHS</span>
+              <p>
+                Create, organize, and manage registered adviser accounts for
+                Signal Village National High School.
+              </p>
 
-                  <span
-                    className="councilor-welcome-meta-dot"
-                    aria-hidden="true"
-                  />
+              <div className="councilor-welcome-meta">
+                <span>SVNHS</span>
 
-                  <span>
-                    Account Administration
-                  </span>
-                </div>
-              </div>
-
-              <div
-                className="councilor-welcome-badge"
-                aria-hidden="true"
-              >
-                <img
-                  src={seniorHighSchoolLogo}
-                  alt=""
+                <span
+                  className="councilor-welcome-meta-dot"
+                  aria-hidden="true"
                 />
+
+                <span>Account Administration</span>
               </div>
-            </section>
+            </div>
 
-            {/* SUMMARY METRICS */}
-
-            <section
-              className="councilor-adviser-metrics"
-              aria-label="Adviser statistics"
-            >
-              <article className="councilor-adviser-metric">
-                <div
-                  className="councilor-adviser-metric-icon"
-                  aria-hidden="true"
-                >
-                  ♙
-                </div>
-
-                <div className="councilor-adviser-metric-copy">
-                  <span>REGISTERED</span>
-
-                  <p>
-                    Total Advisers
-                  </p>
-
-                  <small>
-                    All adviser accounts
-                  </small>
-                </div>
-
-                <strong className="councilor-adviser-metric-value">
-                  {loading
-                    ? "—"
-                    : advisers.length}
-                </strong>
-              </article>
-
-              <article className="councilor-adviser-metric is-active">
-                <div
-                  className="councilor-adviser-metric-icon"
-                  aria-hidden="true"
-                >
-                  ✓
-                </div>
-
-                <div className="councilor-adviser-metric-copy">
-                  <span>ACTIVE</span>
-
-                  <p>
-                    Active Advisers
-                  </p>
-
-                  <small>
-                    Currently enabled
-                  </small>
-                </div>
-
-                <strong className="councilor-adviser-metric-value">
-                  {loading
-                    ? "—"
-                    : activeAdvisers}
-                </strong>
-              </article>
-
-              <article className="councilor-adviser-metric is-inactive">
-                <div
-                  className="councilor-adviser-metric-icon"
-                  aria-hidden="true"
-                >
-                  —
-                </div>
-
-                <div className="councilor-adviser-metric-copy">
-                  <span>INACTIVE</span>
-
-                  <p>
-                    Inactive Advisers
-                  </p>
-
-                  <small>
-                    Disabled accounts
-                  </small>
-                </div>
-
-                <strong className="councilor-adviser-metric-value">
-                  {loading
-                    ? "—"
-                    : inactiveAdvisers}
-                </strong>
-              </article>
-            </section>
+            <div className="councilor-welcome-badge" aria-hidden="true">
+              <img src={seniorHighSchoolLogo} alt="" />
+            </div>
           </section>
 
-          {/* SUCCESS */}
+          {/* ===============================================
+              SUMMARY METRICS
+          ================================================ */}
 
-          {success && (
-            <div
-              className="councilor-success"
-              role="status"
-              aria-live="polite"
-            >
-              <span aria-hidden="true">
+          <section
+            className="councilor-adviser-metrics"
+            aria-label="Adviser statistics"
+          >
+            {/* REGISTERED */}
+
+            <article className="councilor-adviser-metric">
+              <div className="councilor-adviser-metric-icon" aria-hidden="true">
+                ♙
+              </div>
+
+              <div className="councilor-adviser-metric-copy">
+                <span>REGISTERED</span>
+
+                <p>Total Advisers</p>
+
+                <small>All adviser accounts</small>
+              </div>
+
+              <strong className="councilor-adviser-metric-value">
+                {loading ? "—" : advisers.length}
+              </strong>
+            </article>
+
+            {/* ACTIVE */}
+
+            <article className="councilor-adviser-metric is-active">
+              <div className="councilor-adviser-metric-icon" aria-hidden="true">
                 ✓
-              </span>
+              </div>
 
-              <p>{success}</p>
+              <div className="councilor-adviser-metric-copy">
+                <span>ACTIVE</span>
 
+                <p>Active Advisers</p>
+
+                <small>Currently enabled</small>
+              </div>
+
+              <strong className="councilor-adviser-metric-value">
+                {loading ? "—" : activeAdvisers}
+              </strong>
+            </article>
+
+            {/* INACTIVE */}
+
+            <article className="councilor-adviser-metric is-inactive">
+              <div className="councilor-adviser-metric-icon" aria-hidden="true">
+                —
+              </div>
+
+              <div className="councilor-adviser-metric-copy">
+                <span>INACTIVE</span>
+
+                <p>Inactive Advisers</p>
+
+                <small>Disabled accounts</small>
+              </div>
+
+              <strong className="councilor-adviser-metric-value">
+                {loading ? "—" : inactiveAdvisers}
+              </strong>
+            </article>
+          </section>
+        </section>
+
+        {/* =================================================
+            SUCCESS MESSAGE
+        ================================================== */}
+
+        {success && (
+          <div className="councilor-success" role="status" aria-live="polite">
+            <span aria-hidden="true">✓</span>
+
+            <p>{success}</p>
+
+            <button
+              type="button"
+              onClick={() => setSuccess("")}
+              aria-label="Dismiss success message"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {/* =================================================
+            ADVISER DIRECTORY
+        ================================================== */}
+
+        <section className="councilor-panel councilor-adviser-directory">
+          {/* ===============================================
+              PANEL HEADER
+          ================================================ */}
+
+          <div className="councilor-panel-header">
+            <div>
+              <span>ACCOUNT MANAGEMENT</span>
+
+              <h2>
+                Adviser Directory
+                {!loading && <small>{advisers.length}</small>}
+              </h2>
+
+              <p>Search and manage registered school adviser accounts.</p>
+            </div>
+
+            <div className="councilor-panel-actions">
               <button
                 type="button"
-                onClick={() =>
-                  setSuccess("")
-                }
-                aria-label="Dismiss success message"
+                className="councilor-primary-button"
+                onClick={openModal}
               >
-                ×
+                <span aria-hidden="true">+</span>
+                Add Adviser
               </button>
+            </div>
+          </div>
+
+          {/* ===============================================
+              TOOLBAR
+          ================================================ */}
+
+          <div className="councilor-toolbar">
+            <div className="councilor-search">
+              <span aria-hidden="true">⌕</span>
+
+              <input
+                type="search"
+                aria-label="Search advisers"
+                placeholder="Search by name or email..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </div>
+
+            <span className="councilor-result-count">
+              {loading
+                ? "Loading..."
+                : `${filteredAdvisers.length} ${
+                    filteredAdvisers.length === 1 ? "adviser" : "advisers"
+                  }`}
+            </span>
+          </div>
+
+          {/* ===============================================
+              ERROR
+          ================================================ */}
+
+          {error && (
+            <div className="councilor-error" role="alert">
+              <span aria-hidden="true">!</span>
+
+              <p>{error}</p>
             </div>
           )}
 
-          {/* ADVISER DIRECTORY */}
+          {/* ===============================================
+              LOADING / EMPTY / TABLE
+          ================================================ */}
 
-          <section className="councilor-panel councilor-adviser-directory">
-            <div className="councilor-panel-header">
-              <div>
-                <span>
-                  ACCOUNT MANAGEMENT
-                </span>
+          {loading ? (
+            <div className="councilor-empty">
+              <div className="councilor-loading-spinner" aria-hidden="true" />
 
-                <h2>
-                  Adviser Directory
-                  {!loading && (
-                    <small>
-                      {advisers.length}
-                    </small>
-                  )}
-                </h2>
+              <strong>Loading advisers</strong>
 
-                <p>
-                  Search and manage
-                  registered school adviser
-                  accounts.
-                </p>
+              <p>Fetching registered adviser accounts...</p>
+            </div>
+          ) : filteredAdvisers.length === 0 ? (
+            <div className="councilor-empty">
+              <div className="councilor-empty-icon" aria-hidden="true">
+                ♙
               </div>
 
-              <div className="councilor-panel-actions">
+              <strong>
+                {search ? "No advisers found" : "No advisers yet"}
+              </strong>
+
+              <p>
+                {search
+                  ? "Try searching with a different name or email address."
+                  : "Create your first adviser account to get started."}
+              </p>
+
+              {!search && (
                 <button
                   type="button"
                   className="councilor-primary-button"
                   onClick={openModal}
                 >
-                  <span aria-hidden="true">
-                    +
-                  </span>
-
-                  Add Adviser
+                  + Add Adviser
                 </button>
-              </div>
+              )}
             </div>
+          ) : (
+            <div className="councilor-table-wrapper">
+              <table className="councilor-table">
+                <thead>
+                  <tr>
+                    <th scope="col">ADVISER</th>
 
-            {/* TOOLBAR */}
+                    <th scope="col">EMAIL ADDRESS</th>
 
-            <div className="councilor-toolbar">
-              <div className="councilor-search">
-                <span aria-hidden="true">
-                  ⌕
-                </span>
+                    <th scope="col">ROLE</th>
 
-                <input
-                  type="search"
-                  aria-label="Search advisers"
-                  placeholder="Search by name or email..."
-                  value={search}
-                  onChange={(event) =>
-                    setSearch(
-                      event.target.value,
-                    )
-                  }
-                />
-              </div>
+                    <th scope="col">STATUS</th>
 
-              <span className="councilor-result-count">
-                {loading
-                  ? "Loading..."
-                  : `${
-                      filteredAdvisers.length
-                    } ${
-                      filteredAdvisers.length ===
-                      1
-                        ? "adviser"
-                        : "advisers"
-                    }`}
+                    <th scope="col">ACTIONS</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredAdvisers.map((adviser) => {
+                    const adviserInitial =
+                      adviser.name?.trim()?.charAt(0)?.toUpperCase() || "A";
+
+                    const adviserRole = adviser.role || "ADVISER";
+
+                    const isActive = adviser.active !== false;
+
+                    return (
+                      <tr key={adviser.id}>
+                        {/* ADVISER */}
+
+                        <td>
+                          <div className="councilor-person">
+                            <div className="councilor-person-avatar">
+                              {adviserInitial}
+                            </div>
+
+                            <div>
+                              <strong>{adviser.name}</strong>
+
+                              <span>School Adviser</span>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* EMAIL */}
+
+                        <td>{adviser.email}</td>
+
+                        {/* ROLE */}
+
+                        <td>
+                          <span className="councilor-role">{adviserRole}</span>
+                        </td>
+
+                        {/* STATUS */}
+
+                        <td>
+                          <span
+                            className={`councilor-status ${
+                              isActive ? "" : "inactive"
+                            }`}
+                          >
+                            <span aria-hidden="true" />
+
+                            {isActive ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+
+                        {/* ACTION */}
+
+                        <td>
+                          <button
+                            type="button"
+                            className="councilor-table-action"
+                            onClick={() => openResetModal(adviser)}
+                          >
+                            Reset Password
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* ===============================================
+              PANEL FOOTER
+          ================================================ */}
+
+          {!loading && filteredAdvisers.length > 0 && (
+            <div className="councilor-panel-footer">
+              <span>
+                Showing {filteredAdvisers.length} of {advisers.length}{" "}
+                {advisers.length === 1 ? "adviser" : "advisers"}
               </span>
             </div>
+          )}
+        </section>
 
-            {/* ERROR */}
+        {/* =================================================
+            ADD ADVISER MODAL
+        ================================================== */}
 
-            {error && (
-              <div
-                className="councilor-error"
-                role="alert"
-              >
-                <span aria-hidden="true">
-                  !
-                </span>
-
-                <p>{error}</p>
-              </div>
-            )}
-
-            {/* CONTENT */}
-
-            {loading ? (
-              <div className="councilor-empty">
-                <div
-                  className="councilor-loading-spinner"
-                  aria-hidden="true"
-                />
-
-                <strong>
-                  Loading advisers
-                </strong>
-
-                <p>
-                  Fetching registered
-                  adviser accounts...
-                </p>
-              </div>
-            ) : filteredAdvisers.length ===
-              0 ? (
-              <div className="councilor-empty">
-                <div
-                  className="councilor-empty-icon"
-                  aria-hidden="true"
-                >
-                  ♙
-                </div>
-
-                <strong>
-                  {search
-                    ? "No advisers found"
-                    : "No advisers yet"}
-                </strong>
-
-                <p>
-                  {search
-                    ? "Try searching with a different name or email address."
-                    : "Create your first adviser account to get started."}
-                </p>
-
-                {!search && (
-                  <button
-                    type="button"
-                    className="councilor-primary-button"
-                    onClick={openModal}
-                  >
-                    + Add Adviser
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="councilor-table-wrapper">
-                <table className="councilor-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">
-                        ADVISER
-                      </th>
-
-                      <th scope="col">
-                        EMAIL ADDRESS
-                      </th>
-
-                      <th scope="col">
-                        ROLE
-                      </th>
-
-                      <th scope="col">
-                        STATUS
-                      </th>
-
-                      <th scope="col">
-                        ACTIONS
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {filteredAdvisers.map(
-                      (adviser) => {
-                        const adviserInitial =
-                          adviser.name
-                            ?.trim()
-                            ?.charAt(0)
-                            ?.toUpperCase() ||
-                          "A";
-
-                        const adviserRole =
-                          adviser.role ||
-                          "ADVISER";
-
-                        const isActive =
-                          adviser.active !==
-                          false;
-
-                        return (
-                          <tr key={adviser.id}>
-                            <td>
-                              <div className="councilor-person">
-                                <div className="councilor-person-avatar">
-                                  {
-                                    adviserInitial
-                                  }
-                                </div>
-
-                                <div>
-                                  <strong>
-                                    {
-                                      adviser.name
-                                    }
-                                  </strong>
-
-                                  <span>
-                                    School
-                                    Adviser
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-
-                            <td>
-                              {
-                                adviser.email
-                              }
-                            </td>
-
-                            <td>
-                              <span className="councilor-role">
-                                {
-                                  adviserRole
-                                }
-                              </span>
-                            </td>
-
-                            <td>
-                              <span
-                                className={`councilor-status ${
-                                  isActive
-                                    ? ""
-                                    : "inactive"
-                                }`}
-                              >
-                                <span
-                                  aria-hidden="true"
-                                />
-
-                                {isActive
-                                  ? "Active"
-                                  : "Inactive"}
-                              </span>
-                            </td>
-
-                            {/* ACTIONS */}
-
-                            <td>
-                              <button
-                                type="button"
-                                className="councilor-table-action"
-                                onClick={() =>
-                                  openResetModal(
-                                    adviser,
-                                  )
-                                }
-                              >
-                                Reset Password
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      },
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {!loading &&
-              filteredAdvisers.length >
-                0 && (
-                <div className="councilor-panel-footer">
-                  <span>
-                    Showing{" "}
-                    {
-                      filteredAdvisers.length
-                    }{" "}
-                    of {advisers.length}{" "}
-                    {advisers.length === 1
-                      ? "adviser"
-                      : "advisers"}
-                  </span>
-                </div>
-              )}
-          </section>
-        </div>
-      </section>
-
-      {/* ===================================================
-          ADD ADVISER MODAL
-      ==================================================== */}
-
-      {showModal && (
-        <div
-          className="councilor-modal-backdrop"
-          onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
-              closeModal();
-            }
-          }}
-        >
-          <div
-            className="councilor-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="add-adviser-title"
-          >
-            <div className="councilor-modal-header">
-              <div>
-                <span>
-                  ACCOUNT MANAGEMENT
-                </span>
-
-                <h2 id="add-adviser-title">
-                  Add Adviser
-                </h2>
-
-                <p>
-                  Create a new school
-                  adviser account.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                className="councilor-modal-close"
-                onClick={closeModal}
-                disabled={creating}
-                aria-label="Close modal"
-              >
-                ×
-              </button>
-            </div>
-
-            <form
-              className="councilor-modal-form"
-              onSubmit={
-                handleCreateAdviser
-              }
-              noValidate
-            >
-              <div className="councilor-modal-field">
-                <label htmlFor="adviser-name">
-                  Full Name
-                </label>
-
-                <input
-                  id="adviser-name"
-                  name="name"
-                  type="text"
-                  placeholder="Enter adviser name"
-                  value={formData.name}
-                  onChange={
-                    handleFormChange
-                  }
-                  autoComplete="name"
-                  disabled={creating}
-                  autoFocus
-                />
-              </div>
-
-              <div className="councilor-modal-field">
-                <label htmlFor="adviser-email">
-                  Email Address
-                </label>
-
-                <input
-                  id="adviser-email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter school email"
-                  value={formData.email}
-                  onChange={
-                    handleFormChange
-                  }
-                  autoComplete="email"
-                  disabled={creating}
-                />
-              </div>
-
-              <div className="councilor-modal-field">
-                <label htmlFor="adviser-password">
-                  Temporary Password
-                </label>
-
-                <input
-                  id="adviser-password"
-                  name="password"
-                  type="password"
-                  placeholder="Enter temporary password"
-                  value={
-                    formData.password
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                  autoComplete="new-password"
-                  disabled={creating}
-                />
-
-                <span className="councilor-field-hint">
-                  Minimum 6 characters.
-                </span>
-              </div>
-
-              {formError && (
-                <div
-                  className="councilor-modal-error"
-                  role="alert"
-                >
-                  <span aria-hidden="true">
-                    !
-                  </span>
-
-                  <p>{formError}</p>
-                </div>
-              )}
-
-              <div className="councilor-modal-actions">
-                <button
-                  type="button"
-                  className="councilor-secondary-button"
-                  onClick={closeModal}
-                  disabled={creating}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className="councilor-primary-button"
-                  disabled={creating}
-                >
-                  {creating && (
-                    <span
-                      className="councilor-button-spinner"
-                      aria-hidden="true"
-                    />
-                  )}
-
-                  {creating
-                    ? "Creating..."
-                    : "Create Adviser"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ===================================================
-          RESET PASSWORD MODAL
-      ==================================================== */}
-
-      {showResetModal &&
-        selectedAdviser && (
+        {showModal && (
           <div
             className="councilor-modal-backdrop"
             onMouseDown={(event) => {
-              if (
-                event.target ===
-                event.currentTarget
-              ) {
+              if (event.target === event.currentTarget) {
+                closeModal();
+              }
+            }}
+          >
+            <div
+              className="councilor-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="add-adviser-title"
+            >
+              {/* ===========================================
+                  HEADER
+              ============================================ */}
+
+              <div className="councilor-modal-header">
+                <div>
+                  <span>ACCOUNT MANAGEMENT</span>
+
+                  <h2 id="add-adviser-title">Add Adviser</h2>
+
+                  <p>Create a new school adviser account.</p>
+                </div>
+
+                <button
+                  type="button"
+                  className="councilor-modal-close"
+                  onClick={closeModal}
+                  disabled={creating}
+                  aria-label="Close modal"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* ===========================================
+                  FORM
+              ============================================ */}
+
+              <form
+                className="councilor-modal-form"
+                onSubmit={handleCreateAdviser}
+                noValidate
+              >
+                {/* NAME */}
+
+                <div className="councilor-modal-field">
+                  <label htmlFor="adviser-name">Full Name</label>
+
+                  <input
+                    id="adviser-name"
+                    name="name"
+                    type="text"
+                    placeholder="Enter adviser name"
+                    value={formData.name}
+                    onChange={handleFormChange}
+                    autoComplete="name"
+                    disabled={creating}
+                    autoFocus
+                  />
+                </div>
+
+                {/* EMAIL */}
+
+                <div className="councilor-modal-field">
+                  <label htmlFor="adviser-email">Email Address</label>
+
+                  <input
+                    id="adviser-email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter school email"
+                    value={formData.email}
+                    onChange={handleFormChange}
+                    autoComplete="email"
+                    disabled={creating}
+                  />
+                </div>
+
+                {/* TEMPORARY PASSWORD */}
+
+                <div className="councilor-modal-field">
+                  <label htmlFor="adviser-password">Temporary Password</label>
+
+                  <div className="councilor-password-input">
+                    <input
+                      id="adviser-password"
+                      name="password"
+                      type={showCreatePassword ? "text" : "password"}
+                      placeholder="Enter temporary password"
+                      value={formData.password}
+                      onChange={handleFormChange}
+                      autoComplete="new-password"
+                      disabled={creating}
+                    />
+
+                    <button
+                      type="button"
+                      className="councilor-password-toggle"
+                      onClick={() =>
+                        setShowCreatePassword((current) => !current)
+                      }
+                      disabled={creating}
+                      aria-label={
+                        showCreatePassword
+                          ? "Hide temporary password"
+                          : "Show temporary password"
+                      }
+                      aria-pressed={showCreatePassword}
+                      title={
+                        showCreatePassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      <PasswordVisibilityIcon visible={showCreatePassword} />
+                    </button>
+                  </div>
+
+                  <span className="councilor-field-hint">
+                    Minimum 6 characters.
+                  </span>
+                </div>
+
+                {/* ERROR */}
+
+                {formError && (
+                  <div className="councilor-modal-error" role="alert">
+                    <span aria-hidden="true">!</span>
+
+                    <p>{formError}</p>
+                  </div>
+                )}
+
+                {/* ACTIONS */}
+
+                <div className="councilor-modal-actions">
+                  <button
+                    type="button"
+                    className="councilor-secondary-button"
+                    onClick={closeModal}
+                    disabled={creating}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="councilor-primary-button"
+                    disabled={creating}
+                  >
+                    {creating && (
+                      <span
+                        className="councilor-button-spinner"
+                        aria-hidden="true"
+                      />
+                    )}
+
+                    {creating ? "Creating..." : "Create Adviser"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* =================================================
+            RESET PASSWORD MODAL
+        ================================================== */}
+
+        {showResetModal && selectedAdviser && (
+          <div
+            className="councilor-modal-backdrop"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
                 closeResetModal();
               }
             }}
@@ -1457,165 +1135,187 @@ function Advisers() {
               aria-modal="true"
               aria-labelledby="reset-password-title"
             >
-              {/* HEADER */}
+              {/* =========================================
+                    HEADER
+                ========================================== */}
 
               <div className="councilor-modal-header">
                 <div>
-                  <span>
-                    ACCOUNT SECURITY
-                  </span>
+                  <span>ACCOUNT SECURITY</span>
 
-                  <h2 id="reset-password-title">
-                    Reset Password
-                  </h2>
+                  <h2 id="reset-password-title">Reset Password</h2>
 
-                  <p>
-                    Set a new temporary
-                    password for this
-                    adviser account.
-                  </p>
+                  <p>Set a new temporary password for this adviser account.</p>
                 </div>
 
                 <button
                   type="button"
                   className="councilor-modal-close"
-                  onClick={
-                    closeResetModal
-                  }
-                  disabled={
-                    resettingPassword
-                  }
+                  onClick={closeResetModal}
+                  disabled={resettingPassword}
                   aria-label="Close reset password modal"
                 >
                   ×
                 </button>
               </div>
 
-              {/* FORM */}
+              {/* =========================================
+                    FORM
+                ========================================== */}
 
               <form
                 className="councilor-modal-form"
-                onSubmit={
-                  handleResetAdviserPassword
-                }
+                onSubmit={handleResetAdviserPassword}
                 noValidate
               >
-                {/* SELECTED ADVISER */}
+                {/* =======================================
+                      SELECTED ADVISER
+                  ======================================== */}
 
                 <div className="councilor-reset-account">
                   <div className="councilor-person-avatar">
-                    {selectedAdviser.name
-                      ?.trim()
-                      ?.charAt(0)
-                      ?.toUpperCase() ||
+                    {selectedAdviser.name?.trim()?.charAt(0)?.toUpperCase() ||
                       "A"}
                   </div>
 
                   <div>
-                    <span>
-                      Resetting password
-                      for
-                    </span>
+                    <span>Resetting password for</span>
 
-                    <strong>
-                      {
-                        selectedAdviser.name
-                      }
-                    </strong>
+                    <strong>{selectedAdviser.name}</strong>
 
-                    <small>
-                      {
-                        selectedAdviser.email
-                      }
-                    </small>
+                    <small>{selectedAdviser.email}</small>
                   </div>
                 </div>
 
-                {/* NEW PASSWORD */}
+                {/* =======================================
+                      NEW TEMPORARY PASSWORD
+                  ======================================== */}
 
                 <div className="councilor-modal-field">
                   <label htmlFor="reset-new-password">
                     New Temporary Password
                   </label>
 
-                  <input
-                    id="reset-new-password"
-                    name="newPassword"
-                    type="password"
-                    placeholder="Enter new temporary password"
-                    value={
-                      resetFormData.newPassword
-                    }
-                    onChange={
-                      handleResetFormChange
-                    }
-                    autoComplete="new-password"
-                    disabled={
-                      resettingPassword
-                    }
-                    autoFocus
-                  />
+                  <div className="councilor-password-input">
+                    <input
+                      id="reset-new-password"
+                      name="newPassword"
+                      type={
+                        resetPasswordVisibility.newPassword
+                          ? "text"
+                          : "password"
+                      }
+                      placeholder="Enter new temporary password"
+                      value={resetFormData.newPassword}
+                      onChange={handleResetFormChange}
+                      autoComplete="new-password"
+                      disabled={resettingPassword}
+                      autoFocus
+                    />
+
+                    <button
+                      type="button"
+                      className="councilor-password-toggle"
+                      onClick={() =>
+                        toggleResetPasswordVisibility("newPassword")
+                      }
+                      disabled={resettingPassword}
+                      aria-label={
+                        resetPasswordVisibility.newPassword
+                          ? "Hide new temporary password"
+                          : "Show new temporary password"
+                      }
+                      aria-pressed={resetPasswordVisibility.newPassword}
+                      title={
+                        resetPasswordVisibility.newPassword
+                          ? "Hide password"
+                          : "Show password"
+                      }
+                    >
+                      <PasswordVisibilityIcon
+                        visible={resetPasswordVisibility.newPassword}
+                      />
+                    </button>
+                  </div>
 
                   <span className="councilor-field-hint">
-                    Minimum 8
-                    characters.
+                    Minimum 8 characters.
                   </span>
                 </div>
 
-                {/* CONFIRM PASSWORD */}
+                {/* =======================================
+                      CONFIRM PASSWORD
+                  ======================================== */}
 
                 <div className="councilor-modal-field">
                   <label htmlFor="reset-confirm-password">
                     Confirm Password
                   </label>
 
-                  <input
-                    id="reset-confirm-password"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="Re-enter new password"
-                    value={
-                      resetFormData.confirmPassword
-                    }
-                    onChange={
-                      handleResetFormChange
-                    }
-                    autoComplete="new-password"
-                    disabled={
-                      resettingPassword
-                    }
-                  />
+                  <div className="councilor-password-input">
+                    <input
+                      id="reset-confirm-password"
+                      name="confirmPassword"
+                      type={
+                        resetPasswordVisibility.confirmPassword
+                          ? "text"
+                          : "password"
+                      }
+                      placeholder="Re-enter new password"
+                      value={resetFormData.confirmPassword}
+                      onChange={handleResetFormChange}
+                      autoComplete="new-password"
+                      disabled={resettingPassword}
+                    />
+
+                    <button
+                      type="button"
+                      className="councilor-password-toggle"
+                      onClick={() =>
+                        toggleResetPasswordVisibility("confirmPassword")
+                      }
+                      disabled={resettingPassword}
+                      aria-label={
+                        resetPasswordVisibility.confirmPassword
+                          ? "Hide confirmed password"
+                          : "Show confirmed password"
+                      }
+                      aria-pressed={resetPasswordVisibility.confirmPassword}
+                      title={
+                        resetPasswordVisibility.confirmPassword
+                          ? "Hide password"
+                          : "Show password"
+                      }
+                    >
+                      <PasswordVisibilityIcon
+                        visible={resetPasswordVisibility.confirmPassword}
+                      />
+                    </button>
+                  </div>
                 </div>
 
-                {/* ERROR */}
+                {/* =======================================
+                      ERROR
+                  ======================================== */}
 
                 {resetFormError && (
-                  <div
-                    className="councilor-modal-error"
-                    role="alert"
-                  >
-                    <span aria-hidden="true">
-                      !
-                    </span>
+                  <div className="councilor-modal-error" role="alert">
+                    <span aria-hidden="true">!</span>
 
-                    <p>
-                      {resetFormError}
-                    </p>
+                    <p>{resetFormError}</p>
                   </div>
                 )}
 
-                {/* ACTIONS */}
+                {/* =======================================
+                      ACTIONS
+                  ======================================== */}
 
                 <div className="councilor-modal-actions">
                   <button
                     type="button"
                     className="councilor-secondary-button"
-                    onClick={
-                      closeResetModal
-                    }
-                    disabled={
-                      resettingPassword
-                    }
+                    onClick={closeResetModal}
+                    disabled={resettingPassword}
                   >
                     Cancel
                   </button>
@@ -1623,9 +1323,7 @@ function Advisers() {
                   <button
                     type="submit"
                     className="councilor-primary-button"
-                    disabled={
-                      resettingPassword
-                    }
+                    disabled={resettingPassword}
                   >
                     {resettingPassword && (
                       <span
@@ -1634,16 +1332,15 @@ function Advisers() {
                       />
                     )}
 
-                    {resettingPassword
-                      ? "Resetting..."
-                      : "Reset Password"}
+                    {resettingPassword ? "Resetting..." : "Reset Password"}
                   </button>
                 </div>
               </form>
             </div>
           </div>
         )}
-    </main>
+      </section>
+    </CouncilorLayout>
   );
 }
 

@@ -360,3 +360,103 @@ html[data-theme="dark"] .adviser-password-help {
     transition: none;
   }
 }
+
+/* =========================================================
+   PASSWORD INPUT WITH VISIBILITY TOGGLE
+========================================================= */
+
+.adviser-password-input {
+  position: relative;
+
+  width: 100%;
+}
+
+.adviser-password-input input {
+  width: 100%;
+
+  padding-right: 46px !important;
+}
+
+/* =========================================================
+   SHOW / HIDE PASSWORD BUTTON
+========================================================= */
+
+.adviser-password-toggle {
+  position: absolute;
+
+  top: 50%;
+  right: 8px;
+
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: var(--c-text-muted);
+
+  cursor: pointer;
+
+  transform: translateY(-50%);
+
+  transition:
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.adviser-password-toggle svg {
+  width: 17px;
+  height: 17px;
+
+  display: block;
+}
+
+.adviser-password-toggle:hover:not(:disabled) {
+  background: var(--c-nav-hover-bg);
+
+  color: var(--c-blue-800);
+}
+
+.adviser-password-toggle:active:not(:disabled) {
+  background: var(--c-icon-bg);
+}
+
+.adviser-password-toggle:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
+  outline-offset: 1px;
+}
+
+.adviser-password-toggle:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+}
+
+.adviser-password-input:focus-within .adviser-password-toggle {
+  color: var(--c-blue-800);
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .adviser-password-toggle:hover:not(:disabled) {
+  background: var(--c-nav-hover-bg);
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .adviser-password-toggle {
+    transition: none;
+  }
+}

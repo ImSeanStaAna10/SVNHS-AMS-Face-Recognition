@@ -1,0 +1,451 @@
+/* =========================================================
+   SVNHS ATTENDANCE MANAGEMENT SYSTEM
+   COUNCILOR — ACCOUNT SECURITY
+========================================================= */
+
+/* =========================================================
+   CHANGE PASSWORD NAVIGATION
+========================================================= */
+
+.councilor-password-nav-item {
+  position: relative;
+
+  margin-top: 6px;
+}
+
+.councilor-password-nav-item::before {
+  content: "";
+
+  position: absolute;
+
+  top: -4px;
+  right: 13px;
+  left: 13px;
+
+  height: 1px;
+
+  background: var(--c-border-soft);
+
+  opacity: 0.75;
+}
+
+.councilor-password-nav-icon {
+  color: var(--c-blue-800);
+}
+
+.councilor-password-nav-item:hover .councilor-password-nav-icon {
+  color: currentColor;
+}
+
+/* =========================================================
+   PASSWORD MODAL
+========================================================= */
+
+.councilor-password-modal {
+  width: min(100%, 520px);
+}
+
+.councilor-password-form {
+  gap: 15px;
+}
+
+/* =========================================================
+   ACCOUNT SUMMARY
+========================================================= */
+
+.councilor-password-account {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 14px 15px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+
+  background: linear-gradient(
+    135deg,
+    var(--c-surface-soft),
+    var(--c-nav-hover-bg)
+  );
+}
+
+.councilor-password-avatar {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: grid;
+  place-items: center;
+
+  border: 3px solid rgba(197, 31, 45, 0.11);
+
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, var(--c-red-600), var(--c-red-700));
+
+  color: #ffffff;
+
+  box-shadow: 0 4px 11px rgba(197, 31, 45, 0.14);
+
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.councilor-password-account-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.councilor-password-account-copy > span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--c-text-muted);
+
+  font-size: 7px;
+  font-weight: 850;
+
+  letter-spacing: 0.13em;
+}
+
+.councilor-password-account-copy strong {
+  overflow: hidden;
+
+  color: var(--c-text-primary);
+
+  font-size: 12px;
+  font-weight: 780;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.councilor-password-account-copy small {
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: var(--c-text-muted);
+
+  font-size: 9px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   SECURITY NOTICE
+========================================================= */
+
+.councilor-password-notice {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 12px 13px;
+
+  border: 1px solid var(--c-brand-border);
+  border-radius: 10px;
+
+  background: var(--c-icon-bg);
+
+  color: var(--c-text-body);
+}
+
+.councilor-password-notice-icon {
+  width: 21px;
+  height: 21px;
+
+  flex: 0 0 21px;
+
+  display: grid;
+  place-items: center;
+
+  margin-top: 1px;
+
+  border-radius: 50%;
+
+  background: var(--c-blue-900);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.councilor-password-notice > div {
+  min-width: 0;
+}
+
+.councilor-password-notice strong {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--c-text-secondary);
+
+  font-size: 10px;
+  font-weight: 780;
+}
+
+.councilor-password-notice p {
+  margin: 0;
+
+  color: var(--c-text-body);
+
+  font-size: 8.5px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   SUCCESS MESSAGE
+========================================================= */
+
+.councilor-password-success {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 12px 14px;
+
+  border: 1px solid var(--c-success-border);
+  border-radius: 10px;
+
+  background: var(--c-success-bg);
+
+  color: var(--c-success-text);
+}
+
+.councilor-password-success > span {
+  width: 23px;
+  height: 23px;
+
+  flex: 0 0 23px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--c-success-text);
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.councilor-password-success > div {
+  min-width: 0;
+}
+
+.councilor-password-success strong {
+  display: block;
+
+  color: var(--c-success-text);
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.councilor-password-success p {
+  margin: 3px 0 0;
+
+  color: var(--c-success-text);
+
+  font-size: 8.5px;
+  font-weight: 550;
+
+  line-height: 1.5;
+
+  opacity: 0.9;
+}
+
+/* =========================================================
+   FORM POLISH
+========================================================= */
+
+.councilor-password-form .councilor-modal-field input {
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.councilor-password-form .councilor-modal-field input:focus {
+  border-color: var(--c-blue-800);
+
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.09);
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .councilor-password-account {
+  background: var(--c-surface-soft);
+}
+
+html[data-theme="dark"] .councilor-password-notice {
+  background: var(--c-icon-bg);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 720px) {
+  .councilor-password-nav-item {
+    margin-top: 0;
+  }
+
+  .councilor-password-nav-item::before {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .councilor-password-modal {
+    width: 100%;
+  }
+
+  .councilor-password-account {
+    padding: 13px;
+  }
+
+  .councilor-password-notice {
+    padding: 11px 12px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.councilor-password-nav-item:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .councilor-password-form .councilor-modal-field input {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   PASSWORD INPUT WITH VISIBILITY TOGGLE
+========================================================= */
+
+.councilor-password-input {
+  position: relative;
+
+  width: 100%;
+}
+
+.councilor-password-input input {
+  width: 100%;
+
+  padding-right: 46px !important;
+}
+
+/* =========================================================
+   SHOW / HIDE PASSWORD BUTTON
+========================================================= */
+
+.councilor-password-toggle {
+  position: absolute;
+
+  top: 50%;
+  right: 8px;
+
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: var(--c-text-muted);
+
+  cursor: pointer;
+
+  transform: translateY(-50%);
+
+  transition:
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.councilor-password-toggle svg {
+  width: 17px;
+  height: 17px;
+
+  display: block;
+}
+
+.councilor-password-toggle:hover:not(:disabled) {
+  background: var(--c-nav-hover-bg);
+
+  color: var(--c-blue-800);
+}
+
+.councilor-password-toggle:active:not(:disabled) {
+  background: var(--c-icon-bg);
+}
+
+.councilor-password-toggle:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
+  outline-offset: 1px;
+}
+
+.councilor-password-toggle:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   INPUT FOCUS
+========================================================= */
+
+.councilor-password-input:focus-within .councilor-password-toggle {
+  color: var(--c-blue-800);
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .councilor-password-toggle:hover:not(:disabled) {
+  background: var(--c-nav-hover-bg);
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .councilor-password-toggle {
+    transition: none;
+  }
+}

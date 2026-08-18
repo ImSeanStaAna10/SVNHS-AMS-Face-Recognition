@@ -1,6 +1,6 @@
 /* =========================================================
    AUTH PAGE
-   ========================================================= */
+========================================================= */
 
 .auth-page {
   position: relative;
@@ -20,7 +20,7 @@
 
 /* =========================================================
    BACKGROUND
-   ========================================================= */
+========================================================= */
 
 .auth-background {
   position: absolute;
@@ -52,7 +52,7 @@
 
 /* =========================================================
    DECORATIVE WAVES
-   ========================================================= */
+========================================================= */
 
 .auth-decoration {
   position: absolute;
@@ -108,7 +108,7 @@
 
 /* =========================================================
    MAIN CONTAINER
-   ========================================================= */
+========================================================= */
 
 .auth-container {
   position: relative;
@@ -129,14 +129,14 @@
 
 /* =========================================================
    SCHOOL BRANDING
-   ========================================================= */
+========================================================= */
 
 .auth-brand {
+  padding: 20px;
+
   color: #ffffff;
 
   text-align: center;
-
-  padding: 20px;
 }
 
 .auth-institutional {
@@ -156,9 +156,8 @@
 
 .auth-logos {
   display: flex;
-
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
   gap: 18px;
 
@@ -181,7 +180,7 @@
 
 /* =========================================================
    SCHOOL TITLE
-   ========================================================= */
+========================================================= */
 
 .auth-school-title {
   text-align: center;
@@ -194,16 +193,18 @@
 
   margin-bottom: 10px;
 
+  color: #f7c945;
+
   font-size: 12px;
   font-weight: 800;
 
   letter-spacing: 3px;
-
-  color: #f7c945;
 }
 
 .auth-school-title h1 {
   margin: 0;
+
+  color: #f1f4fa;
 
   font-size: clamp(34px, 4vw, 58px);
 
@@ -222,21 +223,16 @@
   color: #ffffff;
 }
 
-.auth-school-title h1 {
-  color: #f1f4fa;
-}
-
 .auth-title-divider {
-  display: flex;
+  width: min(420px, 90%);
 
+  display: flex;
   align-items: center;
   justify-content: center;
 
   gap: 14px;
 
   margin: 22px auto 16px;
-
-  width: min(420px, 90%);
 }
 
 .auth-title-divider span {
@@ -248,27 +244,27 @@
 }
 
 .auth-title-divider strong {
+  color: #f7c945;
+
   font-size: 12px;
 
   letter-spacing: 3px;
-
-  color: #f7c945;
 }
 
 .auth-school-title > p {
   margin: 0;
 
+  color: rgba(255, 255, 255, 0.9);
+
   font-size: 14px;
   font-weight: 700;
 
   letter-spacing: 3px;
-
-  color: rgba(255, 255, 255, 0.9);
 }
 
 /* =========================================================
    LOGIN SECTION
-   ========================================================= */
+========================================================= */
 
 .auth-login-section {
   display: flex;
@@ -283,25 +279,25 @@
 
   padding: 42px 42px 28px;
 
-  background: rgba(255, 255, 255, 0.97);
+  overflow: hidden;
 
   border: 1px solid rgba(255, 255, 255, 0.7);
 
   border-radius: 18px;
 
+  background: rgba(255, 255, 255, 0.97);
+
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.32),
     0 8px 25px rgba(0, 0, 0, 0.15);
-
-  overflow: hidden;
 }
 
 .auth-card-top-line {
   position: absolute;
 
   top: 0;
-  left: 0;
   right: 0;
+  left: 0;
 
   height: 5px;
 
@@ -316,7 +312,7 @@
 
 /* =========================================================
    LOGIN HEADER
-   ========================================================= */
+========================================================= */
 
 .auth-login-header {
   margin-bottom: 28px;
@@ -327,12 +323,12 @@
 
   margin-bottom: 8px;
 
+  color: #c51f2d;
+
   font-size: 11px;
   font-weight: 800;
 
   letter-spacing: 2px;
-
-  color: #c51f2d;
 }
 
 .auth-login-header h2 {
@@ -361,7 +357,7 @@
 
 /* =========================================================
    FORM
-   ========================================================= */
+========================================================= */
 
 .auth-form {
   display: flex;
@@ -387,11 +383,14 @@
   font-weight: 700;
 }
 
+/* =========================================================
+   INPUT WRAPPER
+========================================================= */
+
 .auth-input-wrapper {
   position: relative;
 
   display: flex;
-
   align-items: center;
 }
 
@@ -403,7 +402,6 @@
   width: 22px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -416,9 +414,12 @@
   pointer-events: none;
 }
 
+/* =========================================================
+   INPUT
+========================================================= */
+
 .auth-input-wrapper input {
   width: 100%;
-
   height: 49px;
 
   padding: 0 15px 0 45px;
@@ -433,6 +434,8 @@
 
   color: #182b4e;
 
+  font-family: inherit;
+
   font-size: 14px;
 
   transition:
@@ -445,7 +448,7 @@
   color: #9aa3b2;
 }
 
-.auth-input-wrapper input:hover {
+.auth-input-wrapper input:hover:not(:disabled) {
   border-color: #b8c1d0;
 }
 
@@ -461,11 +464,287 @@
   cursor: not-allowed;
 
   background: #f3f4f6;
+
+  color: #7b8494;
+}
+
+/* =========================================================
+   PASSWORD INPUT
+========================================================= */
+
+.auth-password-input-wrapper input {
+  padding-right: 52px;
+}
+
+/* =========================================================
+   PASSWORD SHOW / HIDE BUTTON
+========================================================= */
+
+.auth-password-toggle {
+  position: absolute;
+
+  top: 50%;
+  right: 8px;
+
+  width: 35px;
+  height: 35px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #738096;
+
+  cursor: pointer;
+
+  transform: translateY(-50%);
+
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    opacity 0.16s ease;
+}
+
+.auth-password-toggle svg {
+  width: 18px;
+  height: 18px;
+
+  display: block;
+
+  pointer-events: none;
+}
+
+.auth-password-toggle:hover:not(:disabled) {
+  background: #eef3f9;
+
+  color: #24559a;
+}
+
+.auth-password-toggle:active:not(:disabled) {
+  background: #e5edf7;
+}
+
+.auth-password-toggle:focus-visible {
+  outline: 3px solid rgba(36, 85, 154, 0.18);
+
+  outline-offset: 1px;
+}
+
+.auth-password-toggle:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+}
+
+.auth-password-input-wrapper:focus-within .auth-password-toggle {
+  color: #24559a;
+}
+
+/* =========================================================
+   PASSWORD LABEL ROW
+========================================================= */
+
+.auth-password-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+/* =========================================================
+   FORGOT PASSWORD
+========================================================= */
+
+.auth-forgot-password {
+  align-self: flex-end;
+
+  margin-top: -1px;
+
+  padding: 1px 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #24559a;
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  line-height: 1.4;
+
+  cursor: pointer;
+
+  transition:
+    color 0.16s ease,
+    opacity 0.16s ease;
+}
+
+.auth-forgot-password:hover {
+  color: #c51f2d;
+
+  text-decoration: underline;
+
+  text-underline-offset: 2px;
+}
+
+.auth-forgot-password:focus-visible {
+  outline: 3px solid rgba(36, 85, 154, 0.15);
+
+  outline-offset: 3px;
+
+  border-radius: 3px;
+}
+
+/* =========================================================
+   PASSWORD RECOVERY HELP
+========================================================= */
+
+.auth-password-help {
+  overflow: hidden;
+
+  padding: 14px;
+
+  border: 1px solid #d5dfed;
+
+  border-radius: 10px;
+
+  background: #f7f9fc;
+
+  box-shadow: inset 3px 0 0 #123d7e;
+
+  animation: auth-password-help-enter 0.18s ease-out;
+}
+
+/* =========================================================
+   PASSWORD HELP HEADER
+========================================================= */
+
+.auth-password-help-header {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+}
+
+.auth-password-help-icon {
+  width: 23px;
+  height: 23px;
+
+  flex: 0 0 23px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #123d7e;
+
+  color: #ffffff;
+
+  font-size: 10px;
+
+  font-weight: 800;
+}
+
+.auth-password-help-header > div {
+  min-width: 0;
+}
+
+.auth-password-help-header strong {
+  display: block;
+
+  color: #172d53;
+
+  font-size: 11px;
+
+  font-weight: 800;
+}
+
+.auth-password-help-header p {
+  margin: 3px 0 0;
+
+  color: #6b7280;
+
+  font-size: 9.5px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   PASSWORD RECOVERY OPTIONS
+========================================================= */
+
+.auth-password-help-options {
+  display: grid;
+
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.auth-password-help-option {
+  padding: 10px 11px;
+
+  border: 1px solid #e0e5ed;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+}
+
+.auth-password-role {
+  display: inline-flex;
+
+  margin-bottom: 4px;
+
+  color: #123d7e;
+
+  font-size: 7.5px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+}
+
+/* Adviser slightly blue */
+.auth-password-help-option:first-child .auth-password-role {
+  color: #123d7e;
+}
+
+/* Councilor subtle red accent */
+.auth-password-help-option:last-child .auth-password-role {
+  color: #a91e2b;
+}
+
+.auth-password-help-option p {
+  margin: 0;
+
+  color: #697386;
+
+  font-size: 9.5px;
+
+  line-height: 1.55;
+}
+
+.auth-password-help-option p strong {
+  color: #23365b;
+
+  font-weight: 800;
 }
 
 /* =========================================================
    ERROR
-   ========================================================= */
+========================================================= */
 
 .auth-error {
   display: flex;
@@ -492,7 +771,6 @@
   flex-shrink: 0;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -517,7 +795,7 @@
 
 /* =========================================================
    LOGIN BUTTON
-   ========================================================= */
+========================================================= */
 
 .auth-submit {
   position: relative;
@@ -528,7 +806,6 @@
   margin-top: 4px;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -541,6 +818,8 @@
   background: linear-gradient(135deg, #c51f2d, #a91522);
 
   color: #ffffff;
+
+  font-family: inherit;
 
   font-size: 14px;
 
@@ -568,6 +847,12 @@
   transform: translateY(0);
 }
 
+.auth-submit:focus-visible {
+  outline: 3px solid rgba(197, 31, 45, 0.24);
+
+  outline-offset: 3px;
+}
+
 .auth-submit:disabled {
   cursor: not-allowed;
 
@@ -576,7 +861,7 @@
 
 /* =========================================================
    LOADING SPINNER
-   ========================================================= */
+========================================================= */
 
 .auth-spinner {
   width: 16px;
@@ -598,18 +883,36 @@
 }
 
 /* =========================================================
+   PASSWORD HELP ANIMATION
+========================================================= */
+
+@keyframes auth-password-help-enter {
+  from {
+    transform: translateY(-4px);
+
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+
+    opacity: 1;
+  }
+}
+
+/* =========================================================
    CARD FOOTER
-   ========================================================= */
+========================================================= */
 
 .auth-login-footer {
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   gap: 10px;
 
   margin-top: 25px;
+
   padding-top: 20px;
 
   border-top: 1px solid #e7e9ee;
@@ -621,6 +924,8 @@
   font-weight: 600;
 
   letter-spacing: 0.8px;
+
+  text-align: center;
 
   text-transform: uppercase;
 }
@@ -635,6 +940,8 @@
   width: 4px;
   height: 4px;
 
+  flex: 0 0 4px;
+
   border-radius: 50%;
 
   background: #b9bec7;
@@ -642,21 +949,20 @@
 
 /* =========================================================
    BOTTOM LABEL
-   ========================================================= */
+========================================================= */
 
 .auth-bottom-label {
   position: absolute;
 
-  left: 0;
   right: 0;
   bottom: 18px;
+  left: 0;
 
   z-index: 6;
 
   display: flex;
-
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
   gap: 10px;
 
@@ -678,16 +984,20 @@
 }
 
 /* =========================================================
-   RESPONSIVE
-   ========================================================= */
+   TABLET
+========================================================= */
 
 @media (max-width: 950px) {
+  .auth-page {
+    overflow-y: auto;
+  }
+
   .auth-container {
+    width: min(650px, calc(100% - 32px));
+
     grid-template-columns: 1fr;
 
     gap: 30px;
-
-    width: min(650px, calc(100% - 32px));
 
     padding: 45px 0 80px;
   }
@@ -702,14 +1012,36 @@
 
   .auth-login-card {
     max-width: 500px;
+
+    margin: 0 auto;
   }
 }
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 600px) {
   .auth-container {
     width: calc(100% - 24px);
 
-    padding: 30px 0 75px;
+    padding: 30px 0 55px;
+  }
+
+  .auth-brand {
+    padding-top: 10px;
+  }
+
+  .auth-institutional {
+    margin-bottom: 20px;
+  }
+
+  .auth-republic {
+    margin-bottom: 13px;
+
+    font-size: 9px;
+
+    letter-spacing: 1.8px;
   }
 
   .auth-logos {
@@ -726,14 +1058,28 @@
     height: 58px;
   }
 
+  .auth-location {
+    font-size: 10px;
+
+    letter-spacing: 2.2px;
+  }
+
   .auth-school-title h1 {
     font-size: 30px;
+
+    line-height: 1;
+  }
+
+  .auth-title-divider {
+    margin: 17px auto 12px;
   }
 
   .auth-school-title > p {
     font-size: 10px;
 
     letter-spacing: 2px;
+
+    line-height: 1.5;
   }
 
   .auth-login-card {
@@ -742,8 +1088,53 @@
     border-radius: 14px;
   }
 
+  .auth-login-header {
+    margin-bottom: 24px;
+  }
+
   .auth-login-header h2 {
     font-size: 25px;
+  }
+
+  .auth-login-header p {
+    font-size: 12px;
+  }
+
+  .auth-form {
+    gap: 17px;
+  }
+
+  .auth-input-wrapper input {
+    height: 48px;
+
+    font-size: 13px;
+  }
+
+  .auth-password-toggle {
+    right: 7px;
+
+    width: 34px;
+    height: 34px;
+  }
+
+  .auth-password-help {
+    padding: 12px;
+  }
+
+  .auth-password-help-option {
+    padding: 9px 10px;
+  }
+
+  .auth-password-help-option p {
+    font-size: 9px;
+  }
+
+  .auth-login-footer {
+    flex-wrap: wrap;
+
+    row-gap: 5px;
+
+    font-size: 9px;
   }
 
   .auth-bottom-label {
@@ -751,13 +1142,56 @@
   }
 }
 
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 400px) {
+  .auth-container {
+    width: calc(100% - 18px);
+  }
+
+  .auth-logos img {
+    width: 43px;
+    height: 43px;
+  }
+
+  .auth-logos .auth-school-logo {
+    width: 52px;
+    height: 52px;
+  }
+
+  .auth-school-title h1 {
+    font-size: 27px;
+  }
+
+  .auth-login-card {
+    padding: 32px 19px 22px;
+  }
+
+  .auth-login-header h2 {
+    font-size: 23px;
+  }
+
+  .auth-password-help {
+    padding: 11px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
 @media (prefers-reduced-motion: reduce) {
-  .auth-submit,
-  .auth-input-wrapper input {
+  .auth-input-wrapper input,
+  .auth-password-toggle,
+  .auth-forgot-password,
+  .auth-submit {
     transition: none;
   }
 
-  .auth-spinner {
+  .auth-spinner,
+  .auth-password-help {
     animation: none;
   }
 }

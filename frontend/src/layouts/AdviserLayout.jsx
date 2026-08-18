@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import ThemeToggle from "../common/themeToggle";
 
-import adviserService from "../services/adviserService";
+import accountService from "../services/accountService";
 import authService from "../services/authService";
 
 import bagongPilipinasLogo from "../assets/bagong-pilipinas-logo.svg";
@@ -26,6 +26,12 @@ const INITIAL_PASSWORD_FORM = {
   currentPassword: "",
   newPassword: "",
   confirmPassword: "",
+};
+
+const INITIAL_PASSWORD_VISIBILITY = {
+  currentPassword: false,
+  newPassword: false,
+  confirmPassword: false,
 };
 
 const INSTITUTIONAL_LOGOS = [
@@ -91,6 +97,82 @@ const getErrorMessage = (error, fallbackMessage) =>
   fallbackMessage;
 
 /* =========================================================
+   PASSWORD VISIBILITY ICON
+========================================================= */
+
+function PasswordVisibilityIcon({ visible }) {
+  if (visible) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        <circle
+          cx="12"
+          cy="12"
+          r="2.7"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M3 3l18 18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M10.6 6.1A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a14.8 14.8 0 0 1-2.4 3.1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M6.2 7.2C3.9 9 2.5 12 2.5 12s3.5 6 9.5 6c1.2 0 2.3-.2 3.3-.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <path
+        d="M9.9 9.9a3 3 0 0 0 4.2 4.2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/* =========================================================
    COMPONENT
 ========================================================= */
 
@@ -109,16 +191,23 @@ function AdviserLayout({
      CHANGE PASSWORD STATE
   ======================================================= */
 
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] =
+    useState(false);
 
-  const [passwordForm, setPasswordForm] = useState(
-    INITIAL_PASSWORD_FORM,
-  );
+  const [passwordForm, setPasswordForm] =
+    useState(INITIAL_PASSWORD_FORM);
 
-  const [passwordError, setPasswordError] = useState("");
-  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [passwordVisibility, setPasswordVisibility] =
+    useState(INITIAL_PASSWORD_VISIBILITY);
 
-  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] =
+    useState("");
+
+  const [passwordSuccess, setPasswordSuccess] =
+    useState("");
+
+  const [changingPassword, setChangingPassword] =
+    useState(false);
 
   /* =======================================================
      PASSWORD MODAL SIDE EFFECTS
@@ -129,9 +218,11 @@ function AdviserLayout({
       return undefined;
     }
 
-    const previousOverflow = document.body.style.overflow;
+    const previousOverflow =
+      document.body.style.overflow;
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow =
+      "hidden";
 
     const handleKeyDown = (event) => {
       if (
@@ -140,17 +231,27 @@ function AdviserLayout({
       ) {
         setShowPasswordModal(false);
 
-        setPasswordForm(INITIAL_PASSWORD_FORM);
+        setPasswordForm(
+          INITIAL_PASSWORD_FORM,
+        );
+
+        setPasswordVisibility(
+          INITIAL_PASSWORD_VISIBILITY,
+        );
 
         setPasswordError("");
         setPasswordSuccess("");
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "keydown",
+      handleKeyDown,
+    );
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow =
+        previousOverflow;
 
       window.removeEventListener(
         "keydown",
@@ -201,16 +302,28 @@ function AdviserLayout({
     "Adviser account";
 
   /* =======================================================
-     PASSWORD MODAL CONTROLS
+     RESET PASSWORD MODAL STATE
   ======================================================= */
 
-  const openPasswordModal = () => {
+  const resetPasswordModalState = () => {
     setPasswordForm(
       INITIAL_PASSWORD_FORM,
     );
 
+    setPasswordVisibility(
+      INITIAL_PASSWORD_VISIBILITY,
+    );
+
     setPasswordError("");
     setPasswordSuccess("");
+  };
+
+  /* =======================================================
+     PASSWORD MODAL CONTROLS
+  ======================================================= */
+
+  const openPasswordModal = () => {
+    resetPasswordModalState();
 
     setShowPasswordModal(true);
   };
@@ -222,20 +335,20 @@ function AdviserLayout({
 
     setShowPasswordModal(false);
 
-    setPasswordForm(
-      INITIAL_PASSWORD_FORM,
-    );
-
-    setPasswordError("");
-    setPasswordSuccess("");
+    resetPasswordModalState();
   };
 
   /* =======================================================
      PASSWORD FORM
   ======================================================= */
 
-  const handlePasswordFormChange = (event) => {
-    const { name, value } = event.target;
+  const handlePasswordFormChange = (
+    event,
+  ) => {
+    const {
+      name,
+      value,
+    } = event.target;
 
     setPasswordForm((current) => ({
       ...current,
@@ -249,6 +362,23 @@ function AdviserLayout({
     if (passwordSuccess) {
       setPasswordSuccess("");
     }
+  };
+
+  /* =======================================================
+     PASSWORD VISIBILITY
+  ======================================================= */
+
+  const togglePasswordVisibility = (
+    fieldName,
+  ) => {
+    setPasswordVisibility(
+      (current) => ({
+        ...current,
+
+        [fieldName]:
+          !current[fieldName],
+      }),
+    );
   };
 
   /* =======================================================
@@ -318,7 +448,9 @@ function AdviserLayout({
      CHANGE PASSWORD
   ======================================================= */
 
-  const handleChangePassword = async (event) => {
+  const handleChangePassword = async (
+    event,
+  ) => {
     event.preventDefault();
 
     const validation =
@@ -338,12 +470,16 @@ function AdviserLayout({
       setPasswordError("");
       setPasswordSuccess("");
 
-      await adviserService.changePassword(
+      await accountService.changePassword(
         validation.data,
       );
 
       setPasswordForm(
         INITIAL_PASSWORD_FORM,
+      );
+
+      setPasswordVisibility(
+        INITIAL_PASSWORD_VISIBILITY,
       );
 
       setPasswordSuccess(
@@ -377,8 +513,6 @@ function AdviserLayout({
       ==================================================== */}
 
       <aside className="councilor-sidebar adviser-sidebar">
-        {/* BRAND */}
-
         <div className="councilor-brand">
           <div className="councilor-brand-logo">
             <img
@@ -388,7 +522,9 @@ function AdviserLayout({
           </div>
 
           <div className="councilor-brand-copy">
-            <strong>SVNHS</strong>
+            <strong>
+              SVNHS
+            </strong>
 
             <span>
               Attendance Management System
@@ -396,15 +532,9 @@ function AdviserLayout({
           </div>
         </div>
 
-        {/* NAVIGATION LABEL */}
-
         <span className="councilor-nav-label">
           MAIN MENU
         </span>
-
-        {/* =================================================
-            NAVIGATION
-        ================================================== */}
 
         <nav
           className="councilor-nav"
@@ -451,9 +581,7 @@ function AdviserLayout({
             );
           })}
 
-          {/* ===============================================
-              CHANGE PASSWORD
-          ================================================ */}
+          {/* CHANGE PASSWORD */}
 
           <button
             type="button"
@@ -474,9 +602,7 @@ function AdviserLayout({
           </button>
         </nav>
 
-        {/* =================================================
-            SIDEBAR FOOTER
-        ================================================== */}
+        {/* SIDEBAR FOOTER */}
 
         <div className="councilor-sidebar-footer">
           <div className="councilor-sidebar-school">
@@ -510,13 +636,7 @@ function AdviserLayout({
       ==================================================== */}
 
       <section className="councilor-main adviser-main">
-        {/* =================================================
-            HEADER
-        ================================================== */}
-
         <header className="councilor-header adviser-header">
-          {/* HEADER COPY */}
-
           <div className="councilor-header-copy">
             <span className="councilor-eyebrow">
               {eyebrow}
@@ -531,11 +651,7 @@ function AdviserLayout({
             </p>
           </div>
 
-          {/* HEADER ACTIONS */}
-
           <div className="councilor-header-actions">
-            {/* INSTITUTIONAL LOGOS */}
-
             <div
               className="councilor-header-logos"
               aria-label="Institutional logos"
@@ -552,25 +668,17 @@ function AdviserLayout({
               )}
             </div>
 
-            {/* DIVIDER */}
-
             <div
               className="councilor-header-divider"
               aria-hidden="true"
             />
-
-            {/* THEME TOGGLE */}
 
             <ThemeToggle />
 
-            {/* DIVIDER */}
-
             <div
               className="councilor-header-divider"
               aria-hidden="true"
             />
-
-            {/* USER */}
 
             <div className="councilor-user">
               <div className="councilor-avatar">
@@ -589,10 +697,6 @@ function AdviserLayout({
             </div>
           </div>
         </header>
-
-        {/* =================================================
-            PAGE CONTENT
-        ================================================== */}
 
         <div className="councilor-content adviser-content">
           {children}
@@ -621,9 +725,7 @@ function AdviserLayout({
             aria-modal="true"
             aria-labelledby="change-password-title"
           >
-            {/* =============================================
-                MODAL HEADER
-            ============================================== */}
+            {/* MODAL HEADER */}
 
             <div className="councilor-modal-header">
               <div>
@@ -656,9 +758,7 @@ function AdviserLayout({
               </button>
             </div>
 
-            {/* =============================================
-                FORM
-            ============================================== */}
+            {/* FORM */}
 
             <form
               className="councilor-modal-form adviser-password-form"
@@ -667,9 +767,7 @@ function AdviserLayout({
               }
               noValidate
             >
-              {/* ===========================================
-                  ACCOUNT INFORMATION
-              ============================================ */}
+              {/* ACCOUNT INFORMATION */}
 
               <div className="adviser-password-account">
                 <div className="adviser-password-avatar">
@@ -691,9 +789,7 @@ function AdviserLayout({
                 </div>
               </div>
 
-              {/* ===========================================
-                  PASSWORD RECOVERY INFORMATION
-              ============================================ */}
+              {/* PASSWORD RECOVERY INFORMATION */}
 
               <div className="adviser-password-help">
                 <span
@@ -717,95 +813,201 @@ function AdviserLayout({
                 </div>
               </div>
 
-              {/* ===========================================
-                  CURRENT PASSWORD
-              ============================================ */}
+              {/* CURRENT PASSWORD */}
 
               <div className="councilor-modal-field">
                 <label htmlFor="current-password">
                   Current Password
                 </label>
 
-                <input
-                  id="current-password"
-                  name="currentPassword"
-                  type="password"
-                  placeholder="Enter current password"
-                  value={
-                    passwordForm.currentPassword
-                  }
-                  onChange={
-                    handlePasswordFormChange
-                  }
-                  autoComplete="current-password"
-                  disabled={
-                    changingPassword
-                  }
-                  autoFocus
-                />
+                <div className="adviser-password-input">
+                  <input
+                    id="current-password"
+                    name="currentPassword"
+                    type={
+                      passwordVisibility.currentPassword
+                        ? "text"
+                        : "password"
+                    }
+                    placeholder="Enter current password"
+                    value={
+                      passwordForm.currentPassword
+                    }
+                    onChange={
+                      handlePasswordFormChange
+                    }
+                    autoComplete="current-password"
+                    disabled={
+                      changingPassword
+                    }
+                    autoFocus
+                  />
+
+                  <button
+                    type="button"
+                    className="adviser-password-toggle"
+                    onClick={() =>
+                      togglePasswordVisibility(
+                        "currentPassword",
+                      )
+                    }
+                    disabled={
+                      changingPassword
+                    }
+                    aria-label={
+                      passwordVisibility.currentPassword
+                        ? "Hide current password"
+                        : "Show current password"
+                    }
+                    aria-pressed={
+                      passwordVisibility.currentPassword
+                    }
+                    title={
+                      passwordVisibility.currentPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                  >
+                    <PasswordVisibilityIcon
+                      visible={
+                        passwordVisibility.currentPassword
+                      }
+                    />
+                  </button>
+                </div>
               </div>
 
-              {/* ===========================================
-                  NEW PASSWORD
-              ============================================ */}
+              {/* NEW PASSWORD */}
 
               <div className="councilor-modal-field">
                 <label htmlFor="new-password">
                   New Password
                 </label>
 
-                <input
-                  id="new-password"
-                  name="newPassword"
-                  type="password"
-                  placeholder="Enter new password"
-                  value={
-                    passwordForm.newPassword
-                  }
-                  onChange={
-                    handlePasswordFormChange
-                  }
-                  autoComplete="new-password"
-                  disabled={
-                    changingPassword
-                  }
-                />
+                <div className="adviser-password-input">
+                  <input
+                    id="new-password"
+                    name="newPassword"
+                    type={
+                      passwordVisibility.newPassword
+                        ? "text"
+                        : "password"
+                    }
+                    placeholder="Enter new password"
+                    value={
+                      passwordForm.newPassword
+                    }
+                    onChange={
+                      handlePasswordFormChange
+                    }
+                    autoComplete="new-password"
+                    disabled={
+                      changingPassword
+                    }
+                  />
+
+                  <button
+                    type="button"
+                    className="adviser-password-toggle"
+                    onClick={() =>
+                      togglePasswordVisibility(
+                        "newPassword",
+                      )
+                    }
+                    disabled={
+                      changingPassword
+                    }
+                    aria-label={
+                      passwordVisibility.newPassword
+                        ? "Hide new password"
+                        : "Show new password"
+                    }
+                    aria-pressed={
+                      passwordVisibility.newPassword
+                    }
+                    title={
+                      passwordVisibility.newPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                  >
+                    <PasswordVisibilityIcon
+                      visible={
+                        passwordVisibility.newPassword
+                      }
+                    />
+                  </button>
+                </div>
 
                 <span className="councilor-field-hint">
                   Use at least 8 characters.
                 </span>
               </div>
 
-              {/* ===========================================
-                  CONFIRM NEW PASSWORD
-              ============================================ */}
+              {/* CONFIRM NEW PASSWORD */}
 
               <div className="councilor-modal-field">
                 <label htmlFor="confirm-new-password">
                   Confirm New Password
                 </label>
 
-                <input
-                  id="confirm-new-password"
-                  name="confirmPassword"
-                  type="password"
-                  placeholder="Re-enter new password"
-                  value={
-                    passwordForm.confirmPassword
-                  }
-                  onChange={
-                    handlePasswordFormChange
-                  }
-                  autoComplete="new-password"
-                  disabled={
-                    changingPassword
-                  }
-                />
+                <div className="adviser-password-input">
+                  <input
+                    id="confirm-new-password"
+                    name="confirmPassword"
+                    type={
+                      passwordVisibility.confirmPassword
+                        ? "text"
+                        : "password"
+                    }
+                    placeholder="Re-enter new password"
+                    value={
+                      passwordForm.confirmPassword
+                    }
+                    onChange={
+                      handlePasswordFormChange
+                    }
+                    autoComplete="new-password"
+                    disabled={
+                      changingPassword
+                    }
+                  />
+
+                  <button
+                    type="button"
+                    className="adviser-password-toggle"
+                    onClick={() =>
+                      togglePasswordVisibility(
+                        "confirmPassword",
+                      )
+                    }
+                    disabled={
+                      changingPassword
+                    }
+                    aria-label={
+                      passwordVisibility.confirmPassword
+                        ? "Hide confirmed password"
+                        : "Show confirmed password"
+                    }
+                    aria-pressed={
+                      passwordVisibility.confirmPassword
+                    }
+                    title={
+                      passwordVisibility.confirmPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                  >
+                    <PasswordVisibilityIcon
+                      visible={
+                        passwordVisibility.confirmPassword
+                      }
+                    />
+                  </button>
+                </div>
               </div>
 
-              {/* ===========================================
-                  ERROR
-              ============================================ */}
+              {/* ERROR */}
 
               {passwordError && (
                 <div
@@ -822,9 +1024,7 @@ function AdviserLayout({
                 </div>
               )}
 
-              {/* ===========================================
-                  SUCCESS
-              ============================================ */}
+              {/* SUCCESS */}
 
               {passwordSuccess && (
                 <div
@@ -849,9 +1049,7 @@ function AdviserLayout({
                 </div>
               )}
 
-              {/* ===========================================
-                  ACTIONS
-              ============================================ */}
+              {/* ACTIONS */}
 
               <div className="councilor-modal-actions">
                 <button
