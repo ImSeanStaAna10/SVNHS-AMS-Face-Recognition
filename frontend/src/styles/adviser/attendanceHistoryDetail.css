@@ -883,4 +883,369 @@ html[data-theme="dark"] .attendance-history-detail-status.is-late {
     margin-top: 2px;
     font-size: 7px;
   }
+} /* =========================================================
+   ADVISER ATTENDANCE HISTORY DETAIL
+
+   The main visual language intentionally reuses the existing
+   Councilor attendance-record-* classes loaded by AdviserLayout.
+   This file only adds single-session-specific controls/states.
+========================================================= */
+
+.adviser-attendance-record-page {
+  width: 100%;
+}
+
+/* =========================================================
+   SECTION IDENTITY
+========================================================= */
+
+.adviser-attendance-record-page .attendance-record-section-meta {
+  flex-wrap: wrap;
+}
+
+.adviser-attendance-record-page .attendance-record-section-meta > span {
+  min-width: 150px;
+}
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+.adviser-attendance-record-filters {
+  grid-template-columns:
+    minmax(250px, 1.25fr)
+    minmax(170px, 0.55fr)
+    minmax(250px, 0.9fr);
+}
+
+.adviser-attendance-status-filter select {
+  width: 100%;
+  min-height: 39px;
+  padding: 0 11px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 8px;
+  outline: none;
+  background: var(--c-surface);
+  color: var(--c-text-primary);
+  font-family: inherit;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+.adviser-attendance-status-filter select:focus {
+  border-color: var(--c-blue-800);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-blue-800) 10%, transparent);
+}
+
+/* =========================================================
+   SINGLE SESSION TABLE
+========================================================= */
+
+.adviser-attendance-record-table {
+  min-width: 860px;
+}
+
+.adviser-attendance-record-row.is-present {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--c-success-bg) 45%, transparent),
+    transparent 30%
+  );
+}
+
+.adviser-attendance-record-row.is-absent {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--c-error-bg) 45%, transparent),
+    transparent 30%
+  );
+}
+
+.adviser-attendance-record-row.is-late {
+  background: linear-gradient(90deg, rgba(250, 204, 21, 0.07), transparent 30%);
+}
+
+.adviser-attendance-record-time {
+  color: var(--c-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   STATUS PILL
+========================================================= */
+
+.attendance-session-status-pill {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 6px;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.attendance-session-status-pill > i {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 5px;
+  border-radius: 50%;
+}
+
+.attendance-session-status-pill.is-present {
+  border: 1px solid var(--c-success-border);
+  background: var(--c-success-bg);
+  color: var(--c-success-text);
+}
+
+.attendance-session-status-pill.is-present > i {
+  background: var(--c-success-dot);
+}
+
+.attendance-session-status-pill.is-absent {
+  border: 1px solid var(--c-error-border);
+  background: var(--c-error-bg);
+  color: var(--c-error-text);
+}
+
+.attendance-session-status-pill.is-absent > i {
+  background: var(--c-error-text);
+}
+
+.attendance-session-status-pill.is-late {
+  border: 1px solid #e9c86d;
+  background: #fff8d9;
+  color: #885e00;
+}
+
+.attendance-session-status-pill.is-late > i {
+  background: #d69e00;
+}
+
+html[data-theme="dark"] .attendance-session-status-pill.is-late {
+  border-color: #5f4d1d;
+  background: #302816;
+  color: #f3cf69;
+}
+
+/* =========================================================
+   METHOD PILL
+========================================================= */
+
+.attendance-session-method-pill {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 999px;
+  background: var(--c-surface-soft);
+  color: var(--c-text-secondary);
+  font-size: 6px;
+  font-weight: 760;
+  white-space: nowrap;
+}
+
+.attendance-session-method-pill.is-face {
+  border-color: var(--c-brand-border);
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+}
+
+.attendance-session-method-pill.is-manual {
+  border-color: var(--c-border-soft);
+  background: var(--c-surface-soft);
+  color: var(--c-text-secondary);
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.adviser-attendance-record-footer {
+  align-items: center;
+}
+
+.adviser-attendance-session-footer-meta {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+}
+
+.adviser-attendance-session-footer-meta span {
+  color: var(--c-text-muted);
+  font-size: 6px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.adviser-attendance-session-footer-meta strong {
+  color: var(--c-text-secondary);
+  font-size: 8px;
+}
+
+/* =========================================================
+   SIGNATURES
+========================================================= */
+
+.adviser-attendance-record-signatures {
+  width: min(760px, 100%);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 90px;
+  margin: 26px auto 5px;
+}
+
+.adviser-attendance-record-signatures > div {
+  text-align: center;
+}
+
+.adviser-attendance-record-signatures > div > span {
+  display: block;
+  height: 30px;
+  border-bottom: 1px solid var(--c-text-muted);
+}
+
+.adviser-attendance-record-signatures strong,
+.adviser-attendance-record-signatures small {
+  display: block;
+}
+
+.adviser-attendance-record-signatures strong {
+  margin-top: 6px;
+  color: var(--c-text-primary);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.adviser-attendance-record-signatures small {
+  margin-top: 2px;
+  color: var(--c-text-muted);
+  font-size: 7px;
+}
+
+/* =========================================================
+   PRINT-SPECIFIC EXTENSIONS
+========================================================= */
+
+.adviser-attendance-print-meta {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.adviser-attendance-print-summary {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.adviser-attendance-print-signatures {
+  width: 650px;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 90px;
+  margin: 25px auto 0;
+}
+
+.adviser-attendance-print-signatures > div {
+  text-align: center;
+}
+
+.adviser-attendance-print-signatures > div > span {
+  display: block;
+  height: 24px;
+  border-bottom: 1px solid #111827;
+}
+
+.adviser-attendance-print-signatures strong,
+.adviser-attendance-print-signatures small {
+  display: block;
+}
+
+.adviser-attendance-print-signatures strong {
+  margin-top: 4px;
+  font-size: 8px;
+}
+
+.adviser-attendance-print-signatures small {
+  margin-top: 2px;
+  font-size: 7px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 980px) {
+  .adviser-attendance-record-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adviser-attendance-record-filters .attendance-record-filter-context {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .adviser-attendance-record-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .adviser-attendance-record-filters .attendance-record-filter-context {
+    grid-column: auto;
+  }
+
+  .adviser-attendance-record-signatures {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .adviser-attendance-session-footer-meta {
+    text-align: left;
+  }
+}
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+  .adviser-attendance-record-signatures {
+    display: none !important;
+  }
+
+  .adviser-attendance-print-signatures {
+    display: grid !important;
+  }
+
+  /*
+   * AdviserLayout reuses councilor shell classes.
+   * Hide the shell so only the official print sheet remains.
+   */
+  .councilor-sidebar,
+  .councilor-header,
+  .adviser-sidebar,
+  .adviser-header,
+  .adviser-attendance-record-page {
+    display: none !important;
+  }
+
+  .councilor-page,
+  .councilor-main,
+  .councilor-content,
+  .adviser-layout,
+  .adviser-main,
+  .adviser-content {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .attendance-print-sheet {
+    display: block !important;
+  }
 }
