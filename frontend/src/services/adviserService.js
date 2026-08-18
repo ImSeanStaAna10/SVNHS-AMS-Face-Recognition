@@ -29,7 +29,11 @@ const getStudents = async () => {
 /**
  * Creates a student inside the Adviser's assigned section.
  */
-const createStudent = async ({ studentNumber, name, sectionId }) => {
+const createStudent = async ({
+  studentNumber,
+  name,
+  sectionId,
+}) => {
   const response = await api.post("/students", {
     studentNumber,
     name,
@@ -53,12 +57,18 @@ const createStudent = async ({ studentNumber, name, sectionId }) => {
  * Do not manually set Content-Type here.
  * Axios/browser will generate the multipart boundary.
  */
-const registerStudentFace = async (studentId, imageFile) => {
+const registerStudentFace = async (
+  studentId,
+  imageFile,
+) => {
   const formData = new FormData();
 
   formData.append("image", imageFile);
 
-  const response = await api.post(`/students/${studentId}/face`, formData);
+  const response = await api.post(
+    `/students/${studentId}/face`,
+    formData,
+  );
 
   return response.data;
 };
@@ -100,12 +110,18 @@ const getActiveSession = async (sectionId) => {
  * POST /api/attendance-sessions
  * ?sectionId={sectionId}
  */
-const startAttendanceSession = async (sectionId) => {
-  const response = await api.post("/attendance-sessions", null, {
-    params: {
-      sectionId,
+const startAttendanceSession = async (
+  sectionId,
+) => {
+  const response = await api.post(
+    "/attendance-sessions",
+    null,
+    {
+      params: {
+        sectionId,
+      },
     },
-  });
+  );
 
   return response.data;
 };
@@ -121,8 +137,12 @@ const startAttendanceSession = async (sectionId) => {
  *
  * PATCH /api/attendance-sessions/{sessionId}/end
  */
-const endAttendanceSession = async (sessionId) => {
-  const response = await api.patch(`/attendance-sessions/${sessionId}/end`);
+const endAttendanceSession = async (
+  sessionId,
+) => {
+  const response = await api.patch(
+    `/attendance-sessions/${sessionId}/end`,
+  );
 
   return response.data;
 };
@@ -145,15 +165,6 @@ const endAttendanceSession = async (sessionId) => {
  * toDate=2026-08-31
  * page=0
  * size=10
- *
- * Example:
- *
- * adviserService.getAttendanceHistory({
- *   fromDate: "2026-08-01",
- *   toDate: "2026-08-31",
- *   page: 0,
- *   size: 10,
- * });
  */
 const getAttendanceHistory = async ({
   fromDate,
@@ -161,14 +172,17 @@ const getAttendanceHistory = async ({
   page = 0,
   size = 10,
 } = {}) => {
-  const response = await api.get("/attendance-sessions/history", {
-    params: {
-      fromDate,
-      toDate,
-      page,
-      size,
+  const response = await api.get(
+    "/attendance-sessions/history",
+    {
+      params: {
+        fromDate,
+        toDate,
+        page,
+        size,
+      },
     },
-  });
+  );
 
   return response.data;
 };
@@ -192,8 +206,12 @@ const getAttendanceHistory = async ({
  *   records: [...]
  * }
  */
-const getSessionRecords = async (sessionId) => {
-  const response = await api.get(`/attendance-records/session/${sessionId}`);
+const getSessionRecords = async (
+  sessionId,
+) => {
+  const response = await api.get(
+    `/attendance-records/session/${sessionId}`,
+  );
 
   const data = response.data;
 
@@ -221,13 +239,20 @@ const getSessionRecords = async (sessionId) => {
  * ?sessionId={sessionId}
  * &studentId={studentId}
  */
-const markManualAttendance = async ({ sessionId, studentId }) => {
-  const response = await api.post("/attendance-records", null, {
-    params: {
-      sessionId,
-      studentId,
+const markManualAttendance = async ({
+  sessionId,
+  studentId,
+}) => {
+  const response = await api.post(
+    "/attendance-records",
+    null,
+    {
+      params: {
+        sessionId,
+        studentId,
+      },
     },
-  });
+  );
 
   return response.data;
 };
@@ -247,14 +272,26 @@ const markManualAttendance = async ({ sessionId, studentId }) => {
  * IMPORTANT:
  * Do not manually set multipart Content-Type.
  */
-const markFaceAttendance = async ({ sessionId, imageFile }) => {
+const markFaceAttendance = async ({
+  sessionId,
+  imageFile,
+}) => {
   const formData = new FormData();
 
-  formData.append("sessionId", sessionId);
+  formData.append(
+    "sessionId",
+    sessionId,
+  );
 
-  formData.append("image", imageFile);
+  formData.append(
+    "image",
+    imageFile,
+  );
 
-  const response = await api.post("/attendance-records/face", formData);
+  const response = await api.post(
+    "/attendance-records/face",
+    formData,
+  );
 
   return response.data;
 };
@@ -273,13 +310,48 @@ const markFaceAttendance = async ({ sessionId, imageFile }) => {
  * ?sessionId={sessionId}
  * &studentId={studentId}
  */
-const removeAttendance = async ({ sessionId, studentId }) => {
-  const response = await api.delete("/attendance-records", {
-    params: {
-      sessionId,
-      studentId,
+const removeAttendance = async ({
+  sessionId,
+  studentId,
+}) => {
+  const response = await api.delete(
+    "/attendance-records",
+    {
+      params: {
+        sessionId,
+        studentId,
+      },
     },
-  });
+  );
+
+  return response.data;
+};
+
+/* =========================================================
+   ACCOUNT SECURITY
+========================================================= */
+
+/**
+ * Changes the password of the currently authenticated user.
+ *
+ * Backend:
+ *
+ * PATCH /api/users/me/password
+ *
+ * The backend identifies the adviser through
+ * the authenticated JWT principal.
+ */
+const changePassword = async ({
+  currentPassword,
+  newPassword,
+}) => {
+  const response = await api.patch(
+    "/users/me/password",
+    {
+      currentPassword,
+      newPassword,
+    },
+  );
 
   return response.data;
 };
@@ -289,7 +361,7 @@ const removeAttendance = async ({ sessionId, studentId }) => {
 ========================================================= */
 
 const adviserService = {
-  /* SECTION */
+  /* SECTIONS */
   getSections,
 
   /* STUDENTS */
@@ -310,6 +382,9 @@ const adviserService = {
   markManualAttendance,
   markFaceAttendance,
   removeAttendance,
+
+  /* ACCOUNT SECURITY */
+  changePassword,
 };
 
 export default adviserService;

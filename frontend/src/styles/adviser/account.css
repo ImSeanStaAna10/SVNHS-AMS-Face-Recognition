@@ -1,0 +1,362 @@
+/* =========================================================
+   SVNHS ATTENDANCE MANAGEMENT SYSTEM
+   ADVISER — ACCOUNT SECURITY
+========================================================= */
+
+/* =========================================================
+   CHANGE PASSWORD NAVIGATION ITEM
+========================================================= */
+
+.adviser-password-nav-item {
+  margin-top: 5px;
+}
+
+.adviser-password-nav-item::after {
+  content: "";
+
+  position: absolute;
+
+  top: -3px;
+  right: 13px;
+  left: 13px;
+
+  height: 1px;
+
+  background: var(--c-border-soft);
+
+  opacity: 0.7;
+}
+
+.adviser-password-nav-item:hover {
+  background: var(--c-nav-hover-bg);
+
+  color: var(--c-nav-hover-text);
+}
+
+.adviser-password-nav-icon {
+  color: var(--c-blue-800);
+}
+
+.adviser-password-nav-item:hover .adviser-password-nav-icon {
+  color: currentColor;
+}
+
+/* =========================================================
+   PASSWORD MODAL
+========================================================= */
+
+.adviser-password-modal {
+  width: min(100%, 520px);
+}
+
+.adviser-password-form {
+  gap: 15px;
+}
+
+/* =========================================================
+   ACCOUNT SUMMARY
+========================================================= */
+
+.adviser-password-account {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 14px 15px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+
+  background: linear-gradient(
+    135deg,
+    var(--c-surface-soft),
+    var(--c-nav-hover-bg)
+  );
+}
+
+.adviser-password-avatar {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: grid;
+  place-items: center;
+
+  border: 3px solid rgba(197, 31, 45, 0.11);
+
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, var(--c-red-600), var(--c-red-700));
+
+  color: #ffffff;
+
+  box-shadow: 0 4px 11px rgba(197, 31, 45, 0.14);
+
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.adviser-password-account-copy {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.adviser-password-account-copy > span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--c-text-muted);
+
+  font-size: 7px;
+  font-weight: 850;
+
+  letter-spacing: 0.13em;
+}
+
+.adviser-password-account-copy strong {
+  overflow: hidden;
+
+  color: var(--c-text-primary);
+
+  font-size: 12px;
+  font-weight: 780;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adviser-password-account-copy small {
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: var(--c-text-muted);
+
+  font-size: 9px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   PASSWORD RECOVERY HELP
+========================================================= */
+
+.adviser-password-help {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 12px 13px;
+
+  border: 1px solid var(--c-brand-border);
+  border-radius: 10px;
+
+  background: var(--c-icon-bg);
+
+  color: var(--c-text-body);
+}
+
+.adviser-password-help-icon {
+  width: 21px;
+  height: 21px;
+
+  flex: 0 0 21px;
+
+  display: grid;
+  place-items: center;
+
+  margin-top: 1px;
+
+  border-radius: 50%;
+
+  background: var(--c-blue-900);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.adviser-password-help > div {
+  min-width: 0;
+}
+
+.adviser-password-help strong {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--c-text-secondary);
+
+  font-size: 10px;
+  font-weight: 780;
+}
+
+.adviser-password-help p {
+  margin: 0;
+
+  color: var(--c-text-body);
+
+  font-size: 8.5px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   PASSWORD SUCCESS
+========================================================= */
+
+.adviser-password-success {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 12px 14px;
+
+  border: 1px solid var(--c-success-border);
+  border-radius: 10px;
+
+  background: var(--c-success-bg);
+
+  color: var(--c-success-text);
+}
+
+.adviser-password-success > span {
+  width: 23px;
+  height: 23px;
+
+  flex: 0 0 23px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--c-success-text);
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.adviser-password-success > div {
+  min-width: 0;
+}
+
+.adviser-password-success strong {
+  display: block;
+
+  color: var(--c-success-text);
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.adviser-password-success p {
+  margin: 3px 0 0;
+
+  color: var(--c-success-text);
+
+  font-size: 8.5px;
+  font-weight: 550;
+
+  line-height: 1.5;
+
+  opacity: 0.88;
+}
+
+/* =========================================================
+   FORM POLISH
+========================================================= */
+
+.adviser-password-form .councilor-modal-field input {
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.adviser-password-form .councilor-modal-field input:focus {
+  border-color: var(--c-blue-800);
+
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.09);
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .adviser-password-account {
+  background: var(--c-surface-soft);
+}
+
+html[data-theme="dark"] .adviser-password-help {
+  background: var(--c-icon-bg);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 720px) {
+  /*
+   * Change Password now lives inside .councilor-nav,
+   * so it remains available even though the sidebar
+   * footer is hidden on smaller screens.
+   */
+
+  .adviser-password-nav-item {
+    margin-top: 0;
+  }
+
+  .adviser-password-nav-item::after {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .adviser-password-modal {
+    width: 100%;
+  }
+
+  .adviser-password-account {
+    padding: 13px;
+  }
+
+  .adviser-password-help {
+    padding: 11px 12px;
+  }
+
+  .adviser-password-account-copy strong {
+    max-width: 230px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.adviser-password-nav-item:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .adviser-password-form .councilor-modal-field input {
+    transition: none;
+  }
+}
