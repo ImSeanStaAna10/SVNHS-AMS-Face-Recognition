@@ -1,14 +1,22 @@
 package com.example.attendancemanagementbackend.config;
 
 import com.example.attendancemanagementbackend.security.JwtAuthenticationFilter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.http.HttpMethod;
+
 import org.springframework.security.config.Customizer;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.web.SecurityFilterChain;
+
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -19,6 +27,7 @@ public class SecurityConfig {
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
+
         this.jwtAuthenticationFilter =
                 jwtAuthenticationFilter;
     }
@@ -126,7 +135,9 @@ public class SecurityConfig {
                                         HttpMethod.PATCH,
                                         "/api/users/advisers/*/reset-password"
                                 )
-                                .hasRole("COUNCILOR")
+                                .hasRole(
+                                        "COUNCILOR"
+                                )
 
                                 /* =================================
                                    COUNCILOR
@@ -137,13 +148,17 @@ public class SecurityConfig {
                                         HttpMethod.POST,
                                         "/api/users/advisers"
                                 )
-                                .hasRole("COUNCILOR")
+                                .hasRole(
+                                        "COUNCILOR"
+                                )
 
                                 .requestMatchers(
                                         HttpMethod.GET,
                                         "/api/users"
                                 )
-                                .hasRole("COUNCILOR")
+                                .hasRole(
+                                        "COUNCILOR"
+                                )
 
                                 /* =================================
                                    COUNCILOR
@@ -154,18 +169,57 @@ public class SecurityConfig {
                                         HttpMethod.POST,
                                         "/api/sections"
                                 )
-                                .hasRole("COUNCILOR")
+                                .hasRole(
+                                        "COUNCILOR"
+                                )
 
                                 /* =================================
+                                   ATTENDANCE REPORT ARCHIVE
+
+                                   Both roles can access the
+                                   reporting API.
+
+                                   IMPORTANT:
+                                   Route-level security only checks
+                                   the role.
+
+                                   Section ownership is enforced
+                                   inside AttendanceReportAccessService:
+
                                    COUNCILOR
-                                   ATTENDANCE REPORTING
+                                   → any section
+
+                                   ADVISER
+                                   → assigned section only
                                 ================================= */
 
                                 .requestMatchers(
                                         HttpMethod.GET,
                                         "/api/attendance-reports/**"
                                 )
-                                .hasRole("COUNCILOR")
+                                .hasAnyRole(
+                                        "COUNCILOR",
+                                        "ADVISER"
+                                )
+
+                                /* =================================
+                                   FUTURE REPORT ACTIONS
+
+                                   We will likely use POST later for:
+                                   - manual generation
+                                   - regeneration
+
+                                   Only Councilor should be able
+                                   to manually regenerate archives.
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.POST,
+                                        "/api/attendance-reports/**"
+                                )
+                                .hasRole(
+                                        "COUNCILOR"
+                                )
 
                                 /* =================================
                                    ADVISER
@@ -176,19 +230,25 @@ public class SecurityConfig {
                                         HttpMethod.POST,
                                         "/api/students"
                                 )
-                                .hasRole("ADVISER")
+                                .hasRole(
+                                        "ADVISER"
+                                )
 
                                 .requestMatchers(
                                         HttpMethod.GET,
                                         "/api/students"
                                 )
-                                .hasRole("ADVISER")
+                                .hasRole(
+                                        "ADVISER"
+                                )
 
                                 .requestMatchers(
                                         HttpMethod.POST,
                                         "/api/students/*/face"
                                 )
-                                .hasRole("ADVISER")
+                                .hasRole(
+                                        "ADVISER"
+                                )
 
                                 /* =================================
                                    ADVISER
@@ -198,21 +258,27 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/api/attendance-sessions/**"
                                 )
-                                .hasRole("ADVISER")
+                                .hasRole(
+                                        "ADVISER"
+                                )
 
                                 /* =================================
                                    ADVISER
                                    ATTENDANCE RECORD OPERATIONS
 
                                    Councilor reporting does NOT use
-                                   this route. Reporting has its own
-                                   /attendance-reports/** endpoint.
+                                   this route.
+
+                                   Reporting uses:
+                                   /api/attendance-reports/**
                                 ================================= */
 
                                 .requestMatchers(
                                         "/api/attendance-records/**"
                                 )
-                                .hasRole("ADVISER")
+                                .hasRole(
+                                        "ADVISER"
+                                )
 
                                 /* =================================
                                    EVERYTHING ELSE

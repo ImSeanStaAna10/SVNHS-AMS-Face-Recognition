@@ -1,13 +1,17 @@
 package com.example.attendancemanagementbackend.repository;
 
 import com.example.attendancemanagementbackend.entity.AttendanceRecord;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -38,15 +42,28 @@ public interface AttendanceRecordRepository
 
     /* =========================================================
        COUNCILOR SECTION ATTENDANCE REPORT
+
+       Returns one aggregated row per section.
+
+       Supports:
+       - Date range
+       - Section filter
+       - Adviser filter
+       - Search
+       - Server-side pagination
+
+       Only ENDED attendance sessions are included.
     ========================================================= */
 
     @Query(
             value = """
                     SELECT
                         s.id AS "sectionId",
+
                         s.name AS "sectionName",
 
                         u.id AS "adviserId",
+
                         u.name AS "adviserName",
 
                         COUNT(
@@ -221,6 +238,10 @@ public interface AttendanceRecordRepository
 
     /* =========================================================
        SCHOOL-WIDE ATTENDANCE SUMMARY
+
+       Used by the Councilor Attendance dashboard.
+
+       Aggregates all matching completed attendance records.
     ========================================================= */
 
     @Query(
@@ -307,6 +328,7 @@ public interface AttendanceRecordRepository
                                 )
                         )
                     """,
+
             nativeQuery = true
     )
     AttendanceSummaryProjection
@@ -332,6 +354,10 @@ public interface AttendanceRecordRepository
        DETAILED STUDENT ATTENDANCE REPORT
 
        Returns one aggregated row per student.
+
+       Used by:
+       - Councilor attendance detail
+       - Date-specific section attendance review
 
        Supports:
        - Section
@@ -409,7 +435,8 @@ public interface AttendanceRecordRepository
                         st.name
 
                     ORDER BY
-                        st.name ASC
+                        LOWER(st.name) ASC,
+                        st.student_number ASC
                     """,
 
             countQuery = """
@@ -475,6 +502,11 @@ public interface AttendanceRecordRepository
 
     /* =========================================================
        SECTION DETAIL SUMMARY
+
+       Existing summary used by the detailed attendance page.
+
+       This projection is also reusable by the automated
+       Weekly / Monthly report aggregation service.
     ========================================================= */
 
     @Query(
@@ -520,6 +552,7 @@ public interface AttendanceRecordRepository
                         AND ats.attendance_date
                             BETWEEN :fromDate AND :toDate
                     """,
+
             nativeQuery = true
     )
     AttendanceSectionDetailSummaryProjection
@@ -536,114 +569,207 @@ public interface AttendanceRecordRepository
     );
 
     /* =========================================================
-   ADVISER ATTENDANCE HISTORY
+       AUTOMATED REPORT ARCHIVE
+       COMPLETE STUDENT PERIOD SUMMARY
 
-   Returns one historical row per ENDED attendance session.
+       IMPORTANT:
+       Unlike findStudentAttendanceReport(), this query has
+       no pagination and no search filter.
 
-   Security:
-   - Adviser ID comes from authenticated user
-   - Adviser only sees sessions belonging to their section
+       Reason:
+       Weekly / Monthly PDF and Excel files must contain the
+       COMPLETE official section record, not just one UI page
+       or a filtered search result.
 
-   Supports:
-   - Date range
-   - Pagination
-   - Newest sessions first
-========================================================= */
+       Used by:
+       - Weekly report generator
+       - Monthly report generator
+       - Automatic report archive
+       - Server-side PDF generation
+       - Server-side Excel generation
+
+       Only ENDED sessions are included.
+    ========================================================= */
 
     @Query(
             value = """
-                SELECT
-                    ats.id AS "sessionId",
+                    SELECT
+                        st.id AS "studentId",
 
-                    s.id AS "sectionId",
+                        st.student_number AS "studentNumber",
 
-                    s.name AS "sectionName",
+                        st.name AS "studentName",
 
-                    ats.attendance_date
-                        AS "attendanceDate",
+                        COUNT(
+                            DISTINCT ats.id
+                        ) AS "sessionCount",
 
-                    ats.started_at
-                        AS "startedAt",
+                        COUNT(*) FILTER (
+                            WHERE ar.status = 'PRESENT'
+                        ) AS "presentCount",
 
-                    ats.ended_at
-                        AS "endedAt",
+                        COUNT(*) FILTER (
+                            WHERE ar.status = 'LATE'
+                        ) AS "lateCount",
 
-                    COUNT(
-                        ar.id
-                    ) AS "studentCount",
+                        COUNT(*) FILTER (
+                            WHERE ar.status = 'ABSENT'
+                        ) AS "absentCount",
 
-                    COUNT(
-                        ar.id
-                    ) FILTER (
-                        WHERE ar.status = 'PRESENT'
-                    ) AS "presentCount",
+                        COUNT(
+                            ar.id
+                        ) AS "totalRecords"
 
-                    COUNT(
-                        ar.id
-                    ) FILTER (
-                        WHERE ar.status = 'LATE'
-                    ) AS "lateCount",
+                    FROM public.attendance_records ar
 
-                    COUNT(
-                        ar.id
-                    ) FILTER (
-                        WHERE ar.status = 'ABSENT'
-                    ) AS "absentCount"
+                    INNER JOIN public.attendance_sessions ats
+                        ON ats.id = ar.session_id
 
-                FROM public.attendance_sessions ats
+                    INNER JOIN public.students st
+                        ON st.id = ar.student_id
 
-                INNER JOIN public.sections s
-                    ON s.id = ats.section_id
+                    WHERE
+                        ats.status = 'ENDED'
 
-                LEFT JOIN public.users u
-                    ON u.id = s.adviser_id
+                        AND ats.section_id = :sectionId
 
-                LEFT JOIN public.attendance_records ar
-                    ON ar.session_id = ats.id
+                        AND ats.attendance_date
+                            BETWEEN :fromDate AND :toDate
 
-                WHERE
-                    ats.status = 'ENDED'
+                    GROUP BY
+                        st.id,
+                        st.student_number,
+                        st.name
 
-                    AND u.id = :adviserId
+                    ORDER BY
+                        LOWER(st.name) ASC,
+                        st.student_number ASC
+                    """,
 
-                    AND ats.attendance_date
-                        BETWEEN :fromDate
-                        AND :toDate
+            nativeQuery = true
+    )
+    List<AttendanceStudentReportProjection>
+    findStudentPeriodSummary(
 
-                GROUP BY
-                    ats.id,
-                    s.id,
-                    s.name,
-                    ats.attendance_date,
-                    ats.started_at,
-                    ats.ended_at
+            @Param("sectionId")
+            String sectionId,
 
-                ORDER BY
-                    ats.attendance_date DESC,
-                    ats.ended_at DESC
-                """,
+            @Param("fromDate")
+            LocalDate fromDate,
+
+            @Param("toDate")
+            LocalDate toDate
+    );
+
+    /* =========================================================
+       ADVISER ATTENDANCE HISTORY
+
+       Returns one historical row per ENDED attendance session.
+
+       Security:
+       - Adviser ID comes from authenticated user
+       - Adviser only sees sessions belonging to their section
+
+       Supports:
+       - Date range
+       - Pagination
+       - Newest sessions first
+    ========================================================= */
+
+    @Query(
+            value = """
+                    SELECT
+                        ats.id AS "sessionId",
+
+                        s.id AS "sectionId",
+
+                        s.name AS "sectionName",
+
+                        ats.attendance_date
+                            AS "attendanceDate",
+
+                        ats.started_at
+                            AS "startedAt",
+
+                        ats.ended_at
+                            AS "endedAt",
+
+                        COUNT(
+                            ar.id
+                        ) AS "studentCount",
+
+                        COUNT(
+                            ar.id
+                        ) FILTER (
+                            WHERE ar.status = 'PRESENT'
+                        ) AS "presentCount",
+
+                        COUNT(
+                            ar.id
+                        ) FILTER (
+                            WHERE ar.status = 'LATE'
+                        ) AS "lateCount",
+
+                        COUNT(
+                            ar.id
+                        ) FILTER (
+                            WHERE ar.status = 'ABSENT'
+                        ) AS "absentCount"
+
+                    FROM public.attendance_sessions ats
+
+                    INNER JOIN public.sections s
+                        ON s.id = ats.section_id
+
+                    LEFT JOIN public.users u
+                        ON u.id = s.adviser_id
+
+                    LEFT JOIN public.attendance_records ar
+                        ON ar.session_id = ats.id
+
+                    WHERE
+                        ats.status = 'ENDED'
+
+                        AND u.id = :adviserId
+
+                        AND ats.attendance_date
+                            BETWEEN :fromDate
+                            AND :toDate
+
+                    GROUP BY
+                        ats.id,
+                        s.id,
+                        s.name,
+                        ats.attendance_date,
+                        ats.started_at,
+                        ats.ended_at
+
+                    ORDER BY
+                        ats.attendance_date DESC,
+                        ats.ended_at DESC
+                    """,
 
             countQuery = """
-                SELECT
-                    COUNT(*)
+                    SELECT
+                        COUNT(*)
 
-                FROM public.attendance_sessions ats
+                    FROM public.attendance_sessions ats
 
-                INNER JOIN public.sections s
-                    ON s.id = ats.section_id
+                    INNER JOIN public.sections s
+                        ON s.id = ats.section_id
 
-                LEFT JOIN public.users u
-                    ON u.id = s.adviser_id
+                    LEFT JOIN public.users u
+                        ON u.id = s.adviser_id
 
-                WHERE
-                    ats.status = 'ENDED'
+                    WHERE
+                        ats.status = 'ENDED'
 
-                    AND u.id = :adviserId
+                        AND u.id = :adviserId
 
-                    AND ats.attendance_date
-                        BETWEEN :fromDate
-                        AND :toDate
-                """,
+                        AND ats.attendance_date
+                            BETWEEN :fromDate
+                            AND :toDate
+                    """,
 
             nativeQuery = true
     )
