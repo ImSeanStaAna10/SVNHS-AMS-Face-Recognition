@@ -20,6 +20,17 @@ const createAdviser = async ({ name, email, password }) => {
   return response.data;
 };
 
+const resetAdviserPassword = async (adviserId, { newPassword }) => {
+  const response = await api.patch(
+    `/users/advisers/${adviserId}/reset-password`,
+    {
+      newPassword,
+    },
+  );
+
+  return response.data;
+};
+
 /* =========================================================
    SECTIONS
 ========================================================= */
@@ -104,6 +115,7 @@ const councilorService = {
   /* Advisers */
   getAdvisers,
   createAdviser,
+  resetAdviserPassword,
 
   /* Sections */
   getSections,

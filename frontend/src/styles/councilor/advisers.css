@@ -979,3 +979,74 @@
     transform: none;
   }
 }
+.councilor-table-action {
+  border: 1px solid var(--councilor-border, #d9e1ec);
+  border-radius: 8px;
+  padding: 8px 12px;
+
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+
+  color: #173b70;
+  background: transparent;
+
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.councilor-table-action:hover {
+  background: rgba(30, 91, 168, 0.08);
+  border-color: rgba(30, 91, 168, 0.3);
+}
+
+.councilor-table-action:active {
+  transform: translateY(1px);
+}
+
+.councilor-reset-account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 16px;
+  border: 1px solid rgba(30, 91, 168, 0.12);
+  border-radius: 12px;
+
+  background: rgba(30, 91, 168, 0.05);
+}
+
+.councilor-reset-account > div:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.councilor-reset-account span {
+  margin-bottom: 2px;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.councilor-reset-account strong {
+  color: #173b70;
+}
+
+.councilor-reset-account small {
+  margin-top: 2px;
+
+  color: #718096;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
