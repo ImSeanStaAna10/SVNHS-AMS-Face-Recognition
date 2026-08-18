@@ -11,14 +11,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-import java.util.List;
-
 @Configuration
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter
-            jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
@@ -94,6 +90,9 @@ public class SecurityConfig {
 
                                 /* =================================
                                    DISABLED REGISTRATION
+
+                                   Councilor account is seeded
+                                   during system initialization.
                                 ================================= */
 
                                 .requestMatchers(
@@ -101,6 +100,33 @@ public class SecurityConfig {
                                         "/api/auth/register"
                                 )
                                 .denyAll()
+
+                                /* =================================
+                                   PASSWORD MANAGEMENT
+
+                                   Councilor and Adviser can change
+                                   their own password.
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.PATCH,
+                                        "/api/users/me/password"
+                                )
+                                .hasAnyRole(
+                                        "COUNCILOR",
+                                        "ADVISER"
+                                )
+
+                                /* =================================
+                                   COUNCILOR
+                                   RESET ADVISER PASSWORD
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.PATCH,
+                                        "/api/users/advisers/*/reset-password"
+                                )
+                                .hasRole("COUNCILOR")
 
                                 /* =================================
                                    COUNCILOR
@@ -190,6 +216,9 @@ public class SecurityConfig {
 
                                 /* =================================
                                    EVERYTHING ELSE
+
+                                   Any route not explicitly listed
+                                   above still requires authentication.
                                 ================================= */
 
                                 .anyRequest()
@@ -207,6 +236,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 }
