@@ -2,22 +2,22 @@ package com.example.attendancemanagementbackend.service;
 
 import com.example.attendancemanagementbackend.dto.AttendanceReportAggregationResponse;
 import com.example.attendancemanagementbackend.dto.AttendanceReportArchiveResponse;
+
 import com.example.attendancemanagementbackend.entity.AttendanceReportArchive;
 import com.example.attendancemanagementbackend.entity.AttendanceReportType;
+
 import com.example.attendancemanagementbackend.exception.ApiException;
+
 import com.example.attendancemanagementbackend.repository.AttendanceReportArchiveRepository;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,6 +28,16 @@ import java.util.Locale;
 
 @Service
 public class AttendanceReportFileService {
+
+    /* =========================================================
+       CONTENT TYPES
+    ========================================================= */
+
+    private static final String PDF_CONTENT_TYPE =
+            "application/pdf";
+
+    private static final String EXCEL_CONTENT_TYPE =
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     /* =========================================================
        DEPENDENCIES
@@ -45,7 +55,8 @@ public class AttendanceReportFileService {
     private final AttendanceReportArchiveRepository
             attendanceReportArchiveRepository;
 
-    private final Path storageRoot;
+    private final SupabaseStorageService
+            supabaseStorageService;
 
     /* =========================================================
        CONSTRUCTOR
@@ -65,10 +76,8 @@ public class AttendanceReportFileService {
             AttendanceReportArchiveRepository
                     attendanceReportArchiveRepository,
 
-            @Value(
-                    "${attendance.reports.storage-path:storage/attendance-reports}"
-            )
-            String storagePath
+            SupabaseStorageService
+                    supabaseStorageService
     ) {
 
         this.attendanceReportAggregationService =
@@ -83,15 +92,26 @@ public class AttendanceReportFileService {
         this.attendanceReportArchiveRepository =
                 attendanceReportArchiveRepository;
 
-        this.storageRoot =
-                Paths
-                        .get(storagePath)
-                        .toAbsolutePath()
-                        .normalize();
+        this.supabaseStorageService =
+                supabaseStorageService;
     }
 
     /* =========================================================
        GENERATE / REGENERATE REPORT
+
+       Flow:
+
+       Database attendance records
+                ↓
+       Aggregation
+                ↓
+       Temporary PDF / Excel
+                ↓
+       Supabase Storage
+                ↓
+       Archive metadata saved to PostgreSQL
+                ↓
+       Temporary local files deleted
     ========================================================= */
 
     public AttendanceReportArchiveResponse generate(
@@ -119,7 +139,7 @@ public class AttendanceReportFileService {
                         );
 
         /* =====================================================
-           2. BUILD STORAGE DIRECTORY
+           2. BUILD SAFE SECTION NAME
         ===================================================== */
 
         String safeSectionName =
@@ -127,47 +147,17 @@ public class AttendanceReportFileService {
                         report.sectionName()
                 );
 
+        /* =====================================================
+           3. BUILD STORAGE PERIOD DIRECTORY
+        ===================================================== */
+
         String directoryPeriod =
                 buildDirectoryPeriod(
                         report
                 );
 
-        Path targetDirectory =
-                storageRoot
-
-                        .resolve(
-                                String.valueOf(
-                                        report
-                                                .periodStart()
-                                                .getYear()
-                                )
-                        )
-
-                        .resolve(
-                                report
-                                        .reportType()
-                                        .name()
-                                        .toLowerCase(
-                                                Locale.ROOT
-                                        )
-                        )
-
-                        .resolve(
-                                directoryPeriod
-                        )
-
-                        .resolve(
-                                safeSectionName
-                        )
-
-                        .normalize();
-
-        ensureInsideStorage(
-                targetDirectory
-        );
-
         /* =====================================================
-           3. BUILD FILE NAMES
+           4. BUILD FILE NAMES
         ===================================================== */
 
         String baseFileName =
@@ -176,67 +166,89 @@ public class AttendanceReportFileService {
                 );
 
         String pdfFileName =
-                baseFileName +
+                baseFileName
+                        +
                         ".pdf";
 
         String excelFileName =
-                baseFileName +
+                baseFileName
+                        +
                         ".xlsx";
 
-        Path pdfPath =
-                targetDirectory
-                        .resolve(
-                                pdfFileName
-                        )
-                        .normalize();
+        /* =====================================================
+           5. BUILD SUPABASE OBJECT DIRECTORY
 
-        Path excelPath =
-                targetDirectory
-                        .resolve(
-                                excelFileName
-                        )
-                        .normalize();
+           Example:
 
-        ensureInsideStorage(
-                pdfPath
-        );
+           2026/
+           weekly/
+           2026-08-17_to_2026-08-21/
+           BSCS_3-B/
+        ===================================================== */
 
-        ensureInsideStorage(
-                excelPath
-        );
+        String objectDirectory =
+                buildObjectDirectory(
+                        report,
+                        directoryPeriod,
+                        safeSectionName
+                );
 
         /* =====================================================
-           4. TEMPORARY FILES
+           6. FINAL SUPABASE OBJECT KEYS
 
-           Generate to temp first so we don't expose
-           partially-written reports.
+           These values are stored in the DB fields:
+
+           pdfRelativePath
+           excelRelativePath
+
+           They are now Supabase object keys rather
+           than local filesystem paths.
+        ===================================================== */
+
+        String pdfObjectKey =
+                objectDirectory
+                        +
+                        "/"
+                        +
+                        pdfFileName;
+
+        String excelObjectKey =
+                objectDirectory
+                        +
+                        "/"
+                        +
+                        excelFileName;
+
+        /* =====================================================
+           7. TEMPORARY LOCAL FILES
+
+           The generators currently write to Path objects.
+
+           We therefore generate into OS temporary files,
+           upload them to Supabase, then delete them.
+
+           These are NOT permanent report storage.
         ===================================================== */
 
         Path temporaryPdf =
-                targetDirectory
-                        .resolve(
-                                pdfFileName +
-                                        ".tmp"
-                        )
-                        .normalize();
+                null;
 
         Path temporaryExcel =
-                targetDirectory
-                        .resolve(
-                                excelFileName +
-                                        ".tmp"
-                        )
-                        .normalize();
+                null;
 
         try {
 
-            /* =================================================
-               CREATE DIRECTORY
-            ================================================= */
+            temporaryPdf =
+                    Files.createTempFile(
+                            "attendance-report-",
+                            ".pdf"
+                    );
 
-            Files.createDirectories(
-                    targetDirectory
-            );
+            temporaryExcel =
+                    Files.createTempFile(
+                            "attendance-report-",
+                            ".xlsx"
+                    );
 
             /* =================================================
                GENERATE PDF
@@ -259,20 +271,43 @@ public class AttendanceReportFileService {
                     );
 
             /* =================================================
-               MOVE TEMP FILES TO FINAL LOCATION
+               UPLOAD PDF TO SUPABASE STORAGE
+
+               putObject on the same key replaces the
+               previous object, making regeneration
+               idempotent.
             ================================================= */
 
-            moveReplacing(
-                    temporaryPdf,
-                    pdfPath
-            );
+            supabaseStorageService
+                    .upload(
+                            pdfObjectKey,
+                            temporaryPdf,
+                            PDF_CONTENT_TYPE
+                    );
 
-            moveReplacing(
-                    temporaryExcel,
-                    excelPath
-            );
+            /* =================================================
+               UPLOAD EXCEL TO SUPABASE STORAGE
+            ================================================= */
+
+            supabaseStorageService
+                    .upload(
+                            excelObjectKey,
+                            temporaryExcel,
+                            EXCEL_CONTENT_TYPE
+                    );
 
         } catch (IOException exception) {
+
+            throw new ApiException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Unable to generate temporary attendance report files"
+            );
+
+        } finally {
+
+            /* =================================================
+               ALWAYS REMOVE TEMPORARY FILES
+            ================================================= */
 
             deleteQuietly(
                     temporaryPdf
@@ -281,23 +316,18 @@ public class AttendanceReportFileService {
             deleteQuietly(
                     temporaryExcel
             );
-
-            throw new ApiException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Unable to generate attendance report files"
-            );
         }
 
         /* =====================================================
-           5. FIND EXISTING ARCHIVE
+           8. FIND EXISTING ARCHIVE
 
            Same:
-           - section
-           - report type
-           - period start
-           - period end
+           section
+           + type
+           + start
+           + end
 
-           means regenerate/update instead of duplicate.
+           → update existing record instead of duplicate.
         ===================================================== */
 
         AttendanceReportArchive archive =
@@ -319,7 +349,7 @@ public class AttendanceReportFileService {
                         );
 
         /* =====================================================
-           6. SNAPSHOT INFORMATION
+           9. SECTION / ADVISER SNAPSHOT
         ===================================================== */
 
         archive.setSectionId(
@@ -351,7 +381,7 @@ public class AttendanceReportFileService {
         );
 
         /* =====================================================
-           7. SUMMARY VALUES
+           10. SUMMARY COUNTS
         ===================================================== */
 
         archive.setStudentCount(
@@ -389,7 +419,7 @@ public class AttendanceReportFileService {
         );
 
         /* =====================================================
-           8. PDF INFORMATION
+           11. PDF STORAGE INFORMATION
         ===================================================== */
 
         archive.setPdfFileName(
@@ -397,13 +427,11 @@ public class AttendanceReportFileService {
         );
 
         archive.setPdfRelativePath(
-                relativePath(
-                        pdfPath
-                )
+                pdfObjectKey
         );
 
         /* =====================================================
-           9. EXCEL INFORMATION
+           12. EXCEL STORAGE INFORMATION
         ===================================================== */
 
         archive.setExcelFileName(
@@ -411,13 +439,11 @@ public class AttendanceReportFileService {
         );
 
         archive.setExcelRelativePath(
-                relativePath(
-                        excelPath
-                )
+                excelObjectKey
         );
 
         /* =====================================================
-           10. GENERATION TIME
+           13. GENERATION TIME
         ===================================================== */
 
         archive.setGeneratedAt(
@@ -425,7 +451,7 @@ public class AttendanceReportFileService {
         );
 
         /* =====================================================
-           11. SAVE ARCHIVE
+           14. SAVE DATABASE ARCHIVE
         ===================================================== */
 
         AttendanceReportArchive savedArchive =
@@ -438,6 +464,47 @@ public class AttendanceReportFileService {
                 .from(
                         savedArchive
                 );
+    }
+
+    /* =========================================================
+       BUILD SUPABASE OBJECT DIRECTORY
+    ========================================================= */
+
+    private String buildObjectDirectory(
+
+            AttendanceReportAggregationResponse report,
+
+            String directoryPeriod,
+
+            String safeSectionName
+    ) {
+
+        return report
+                .periodStart()
+                .getYear()
+
+                +
+                "/"
+
+                +
+                report
+                        .reportType()
+                        .name()
+                        .toLowerCase(
+                                Locale.ROOT
+                        )
+
+                +
+                "/"
+
+                +
+                directoryPeriod
+
+                +
+                "/"
+
+                +
+                safeSectionName;
     }
 
     /* =========================================================
@@ -457,11 +524,13 @@ public class AttendanceReportFileService {
            MONTHLY
 
            Example:
+
            BSCS_3-B_Monthly_August_2026
         ===================================================== */
 
         if (
-                report.reportType() ==
+                report.reportType()
+                        ==
                         AttendanceReportType.MONTHLY
         ) {
 
@@ -476,8 +545,10 @@ public class AttendanceReportFileService {
                                             )
                             );
 
-            return sectionName +
-                    "_Monthly_" +
+            return sectionName
+                    +
+                    "_Monthly_"
+                    +
                     month;
         }
 
@@ -485,13 +556,18 @@ public class AttendanceReportFileService {
            WEEKLY
 
            Example:
+
            BSCS_3-B_Weekly_2026-08-17_to_2026-08-21
         ===================================================== */
 
-        return sectionName +
-                "_Weekly_" +
-                report.periodStart() +
-                "_to_" +
+        return sectionName
+                +
+                "_Weekly_"
+                +
+                report.periodStart()
+                +
+                "_to_"
+                +
                 report.periodEnd();
     }
 
@@ -506,15 +582,14 @@ public class AttendanceReportFileService {
         /* =====================================================
            MONTHLY
 
-           storage/
-           attendance-reports/
            2026/
            monthly/
            08/
         ===================================================== */
 
         if (
-                report.reportType() ==
+                report.reportType()
+                        ==
                         AttendanceReportType.MONTHLY
         ) {
 
@@ -531,110 +606,16 @@ public class AttendanceReportFileService {
         /* =====================================================
            WEEKLY
 
-           storage/
-           attendance-reports/
            2026/
            weekly/
            2026-08-17_to_2026-08-21/
         ===================================================== */
 
-        return report.periodStart() +
-                "_to_" +
+        return report.periodStart()
+                +
+                "_to_"
+                +
                 report.periodEnd();
-    }
-
-    /* =========================================================
-       DATABASE RELATIVE PATH
-
-       We store relative paths instead of machine-specific
-       absolute paths.
-    ========================================================= */
-
-    private String relativePath(
-            Path file
-    ) {
-
-        return storageRoot
-
-                .relativize(
-                        file
-                )
-
-                .toString()
-
-                .replace(
-                        '\\',
-                        '/'
-                );
-    }
-
-    /* =========================================================
-       PATH SECURITY
-
-       Prevent generated paths from escaping the configured
-       report storage directory.
-    ========================================================= */
-
-    private void ensureInsideStorage(
-            Path path
-    ) {
-
-        Path normalizedPath =
-                path
-                        .toAbsolutePath()
-                        .normalize();
-
-        if (
-                !normalizedPath.startsWith(
-                        storageRoot
-                )
-        ) {
-
-            throw new ApiException(
-                    HttpStatus.BAD_REQUEST,
-                    "Invalid attendance report storage path"
-            );
-        }
-    }
-
-    /* =========================================================
-       SAFE FILE MOVE
-    ========================================================= */
-
-    private void moveReplacing(
-
-            Path source,
-
-            Path target
-
-    ) throws IOException {
-
-        try {
-
-            Files.move(
-
-                    source,
-
-                    target,
-
-                    StandardCopyOption.REPLACE_EXISTING,
-
-                    StandardCopyOption.ATOMIC_MOVE
-            );
-
-        } catch (
-                AtomicMoveNotSupportedException exception
-        ) {
-
-            Files.move(
-
-                    source,
-
-                    target,
-
-                    StandardCopyOption.REPLACE_EXISTING
-            );
-        }
     }
 
     /* =========================================================
@@ -645,6 +626,13 @@ public class AttendanceReportFileService {
             Path path
     ) {
 
+        if (
+                path == null
+        ) {
+
+            return;
+        }
+
         try {
 
             Files.deleteIfExists(
@@ -654,7 +642,11 @@ public class AttendanceReportFileService {
         } catch (IOException ignored) {
 
             /*
-             * Best-effort cleanup only.
+             * Best-effort cleanup.
+             *
+             * The operating system temporary directory
+             * must never prevent report generation from
+             * completing.
              */
         }
     }
@@ -668,7 +660,8 @@ public class AttendanceReportFileService {
     ) {
 
         if (
-                value == null ||
+                value == null
+                        ||
                         value.isBlank()
         ) {
 
@@ -692,7 +685,8 @@ public class AttendanceReportFileService {
         };
 
         for (
-                String character :
+                String character
+                :
                 invalidCharacters
         ) {
 

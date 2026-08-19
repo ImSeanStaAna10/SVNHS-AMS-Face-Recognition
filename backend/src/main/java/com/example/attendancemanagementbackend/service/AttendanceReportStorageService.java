@@ -1,22 +1,22 @@
 package com.example.attendancemanagementbackend.service;
 
 import com.example.attendancemanagementbackend.entity.AttendanceReportArchive;
-import com.example.attendancemanagementbackend.exception.ApiException;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.example.attendancemanagementbackend.exception.ApiException;
 
 import org.springframework.http.HttpStatus;
 
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 @Service
 public class AttendanceReportStorageService {
 
-    private final Path storageRoot;
+    /* =========================================================
+       DEPENDENCIES
+    ========================================================= */
+
+    private final SupabaseStorageService
+            supabaseStorageService;
 
     /* =========================================================
        CONSTRUCTOR
@@ -24,64 +24,118 @@ public class AttendanceReportStorageService {
 
     public AttendanceReportStorageService(
 
-            @Value(
-                    "${attendance.reports.storage-path:storage/attendance-reports}"
-            )
-            String storagePath
+            SupabaseStorageService
+                    supabaseStorageService
     ) {
 
-        this.storageRoot =
-                Paths
-                        .get(
-                                storagePath
-                        )
-                        .toAbsolutePath()
-                        .normalize();
+        this.supabaseStorageService =
+                supabaseStorageService;
     }
 
     /* =========================================================
-       PDF
+       PDF CONTENT
     ========================================================= */
 
-    public Path getPdfFile(
+    public byte[] getPdfContent(
             AttendanceReportArchive archive
     ) {
 
-        return resolveStoredFile(
+        if (
+                archive == null
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.NOT_FOUND,
+                    "Attendance report archive was not found"
+            );
+        }
+
+        return downloadStoredFile(
+
                 archive.getPdfRelativePath(),
+
                 "PDF"
         );
     }
 
     /* =========================================================
-       EXCEL
+       EXCEL CONTENT
     ========================================================= */
 
-    public Path getExcelFile(
+    public byte[] getExcelContent(
             AttendanceReportArchive archive
     ) {
 
-        return resolveStoredFile(
+        if (
+                archive == null
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.NOT_FOUND,
+                    "Attendance report archive was not found"
+            );
+        }
+
+        return downloadStoredFile(
+
                 archive.getExcelRelativePath(),
+
                 "Excel"
         );
     }
 
     /* =========================================================
-       RESOLVE STORED FILE
+       DOWNLOAD STORED FILE
+
+       relativePath now represents a Supabase Storage
+       object key.
+
+       Example:
+
+       2026/weekly/
+       2026-08-17_to_2026-08-21/
+       BSCS_3-B/
+       report.pdf
     ========================================================= */
 
-    private Path resolveStoredFile(
+    private byte[] downloadStoredFile(
 
-            String relativePath,
+            String objectKey,
+
+            String fileType
+    ) {
+
+        String normalizedObjectKey =
+                validateObjectKey(
+                        objectKey,
+                        fileType
+                );
+
+        return supabaseStorageService
+                .download(
+                        normalizedObjectKey
+                );
+    }
+
+    /* =========================================================
+       OBJECT KEY VALIDATION
+
+       Database paths are internal values, but we still
+       validate them defensively before sending them to
+       Supabase Storage.
+    ========================================================= */
+
+    private String validateObjectKey(
+
+            String objectKey,
 
             String fileType
     ) {
 
         if (
-                relativePath == null
+                objectKey == null
                         ||
-                        relativePath.isBlank()
+                        objectKey.isBlank()
         ) {
 
             throw new ApiException(
@@ -92,52 +146,70 @@ public class AttendanceReportStorageService {
             );
         }
 
-        Path resolved =
-                storageRoot
-                        .resolve(
-                                relativePath
-                        )
-                        .toAbsolutePath()
-                        .normalize();
+        String normalized =
+                objectKey
+                        .trim()
+                        .replace(
+                                '\\',
+                                '/'
+                        );
 
         /* =====================================================
-           PATH TRAVERSAL PROTECTION
+           OBJECT KEYS MUST BE RELATIVE
         ===================================================== */
 
-        if (
-                !resolved.startsWith(
-                        storageRoot
+        while (
+                normalized.startsWith(
+                        "/"
                 )
         ) {
 
-            throw new ApiException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Invalid stored attendance report path"
-            );
+            normalized =
+                    normalized.substring(
+                            1
+                    );
         }
 
         /* =====================================================
-           PHYSICAL FILE CHECK
+           DEFENSIVE PATH VALIDATION
         ===================================================== */
 
+        String[] segments =
+                normalized.split(
+                        "/"
+                );
+
+        for (
+                String segment
+                :
+                segments
+        ) {
+
+            if (
+                    "..".equals(
+                            segment
+                    )
+            ) {
+
+                throw new ApiException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Invalid stored attendance report object key"
+                );
+            }
+        }
+
         if (
-                !Files.exists(
-                        resolved
-                )
-                        ||
-                        !Files.isRegularFile(
-                                resolved
-                        )
+                normalized.isBlank()
         ) {
 
             throw new ApiException(
                     HttpStatus.NOT_FOUND,
                     fileType
                             +
-                            " attendance report file was not found"
+                            " report file is not available"
             );
         }
 
-        return resolved;
+        return normalized;
     }
 }

@@ -5,6 +5,7 @@ import com.example.attendancemanagementbackend.dto.AttendanceReportArchiveRespon
 import com.example.attendancemanagementbackend.dto.AttendanceReportBatchGenerationResponse;
 import com.example.attendancemanagementbackend.dto.AttendanceReportDownloadFormat;
 import com.example.attendancemanagementbackend.dto.AttendanceReportZipFile;
+import com.example.attendancemanagementbackend.dto.SupabaseStorageTestResponse;
 
 import com.example.attendancemanagementbackend.dto.attendance.PagedResponse;
 
@@ -17,9 +18,7 @@ import com.example.attendancemanagementbackend.service.AttendanceReportFileServi
 import com.example.attendancemanagementbackend.service.AttendanceReportScheduler;
 import com.example.attendancemanagementbackend.service.AttendanceReportStorageService;
 import com.example.attendancemanagementbackend.service.AttendanceReportZipService;
-
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
+import com.example.attendancemanagementbackend.service.SupabaseStorageService;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -36,8 +35,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.nio.file.Path;
 
 import java.time.LocalDate;
 
@@ -84,6 +81,9 @@ public class AttendanceReportController {
     private final AttendanceReportScheduler
             attendanceReportScheduler;
 
+    private final SupabaseStorageService
+            supabaseStorageService;
+
     /* =========================================================
        CONSTRUCTOR
     ========================================================= */
@@ -106,7 +106,10 @@ public class AttendanceReportController {
                     attendanceReportZipService,
 
             AttendanceReportScheduler
-                    attendanceReportScheduler
+                    attendanceReportScheduler,
+
+            SupabaseStorageService
+                    supabaseStorageService
     ) {
 
         this.attendanceReportAccessService =
@@ -126,18 +129,13 @@ public class AttendanceReportController {
 
         this.attendanceReportScheduler =
                 attendanceReportScheduler;
+
+        this.supabaseStorageService =
+                supabaseStorageService;
     }
 
     /* =========================================================
        PREVIEW REPORT
-
-       COUNCILOR:
-       - Any section
-
-       ADVISER:
-       - Assigned section only
-
-       Does NOT create files.
     ========================================================= */
 
     @GetMapping("/preview")
@@ -181,18 +179,12 @@ public class AttendanceReportController {
     }
 
     /* =========================================================
-       MANUAL GENERATE / REGENERATE SINGLE REPORT
+       GENERATE / REGENERATE SINGLE REPORT
 
-       COUNCILOR ONLY via SecurityConfig.
+       COUNCILOR ONLY.
 
-       Creates:
-       - PDF
-       - Excel
-       - Archive row
-
-       Same section/type/period:
-       - Existing archive is updated
-       - No duplicate archive row
+       Actual PDF / XLSX files are uploaded to the
+       private Supabase Storage bucket.
     ========================================================= */
 
     @PostMapping("/generate")
@@ -235,18 +227,11 @@ public class AttendanceReportController {
     /* =========================================================
        MANUAL BATCH GENERATION
 
-       COUNCILOR ONLY via SecurityConfig.
+       COUNCILOR ONLY.
 
-       Generates reports for ALL sections for the
-       selected period.
-
-       Used for:
-       - Testing scheduler logic
-       - Catch-up generation
-       - Manual batch regeneration
-
-       Automatic weekly/monthly schedulers reuse the
-       same generateForPeriod(...) logic internally.
+       Scheduler uses the same generation pipeline,
+       therefore scheduled reports are also uploaded
+       to Supabase Storage.
     ========================================================= */
 
     @PostMapping("/generate-batch")
@@ -283,23 +268,29 @@ public class AttendanceReportController {
     }
 
     /* =========================================================
+       SUPABASE STORAGE SMOKE TEST
+
+       TEMPORARY.
+
+       Remove after full production storage migration
+       has been verified.
+    ========================================================= */
+
+    @PostMapping("/storage-test")
+    public ResponseEntity<SupabaseStorageTestResponse>
+    testSupabaseStorage() {
+
+        SupabaseStorageTestResponse response =
+                supabaseStorageService
+                        .smokeTest();
+
+        return ResponseEntity.ok(
+                response
+        );
+    }
+
+    /* =========================================================
        ARCHIVE LIST
-
-       COUNCILOR:
-       - Can see all accessible reports
-
-       ADVISER:
-       - Can only see assigned section reports
-
-       Example:
-
-       GET /api/attendance-reports/archive
-           ?type=WEEKLY
-           &sectionId=...
-           &from=2026-08-01
-           &to=2026-08-31
-           &page=0
-           &size=12
     ========================================================= */
 
     @GetMapping("/archive")
@@ -355,15 +346,27 @@ public class AttendanceReportController {
     /* =========================================================
        VIEW / DOWNLOAD PDF
 
+       Security:
+       getAuthorizedReport(...) checks that:
+
+       COUNCILOR
+       → may access allowed reports
+
+       ADVISER
+       → may access assigned section only
+
+       Storage:
+       actual PDF bytes come from Supabase Storage.
+
        download=false
-       → Browser inline preview
+       → inline browser preview
 
        download=true
-       → Attachment download
+       → attachment
     ========================================================= */
 
     @GetMapping("/{reportId}/pdf")
-    public ResponseEntity<Resource>
+    public ResponseEntity<byte[]>
     getPdf(
 
             @PathVariable
@@ -382,27 +385,26 @@ public class AttendanceReportController {
                                 authentication
                         );
 
-        Path file =
+        byte[] content =
                 attendanceReportStorageService
-                        .getPdfFile(
+                        .getPdfContent(
                                 archive
                         );
 
-        Resource resource =
-                new FileSystemResource(
-                        file
-                );
-
         ContentDisposition disposition;
 
-        if (download) {
+        if (
+                download
+        ) {
 
             disposition =
                     ContentDisposition
                             .attachment()
+
                             .filename(
                                     archive.getPdfFileName()
                             )
+
                             .build();
 
         } else {
@@ -410,9 +412,11 @@ public class AttendanceReportController {
             disposition =
                     ContentDisposition
                             .inline()
+
                             .filename(
                                     archive.getPdfFileName()
                             )
+
                             .build();
         }
 
@@ -424,9 +428,7 @@ public class AttendanceReportController {
                 )
 
                 .contentLength(
-                        file
-                                .toFile()
-                                .length()
+                        content.length
                 )
 
                 .header(
@@ -435,18 +437,18 @@ public class AttendanceReportController {
                 )
 
                 .body(
-                        resource
+                        content
                 );
     }
 
     /* =========================================================
        DOWNLOAD EXCEL
 
-       Always returned as attachment.
+       Actual XLSX bytes come from Supabase Storage.
     ========================================================= */
 
     @GetMapping("/{reportId}/excel")
-    public ResponseEntity<Resource>
+    public ResponseEntity<byte[]>
     getExcel(
 
             @PathVariable
@@ -462,23 +464,20 @@ public class AttendanceReportController {
                                 authentication
                         );
 
-        Path file =
+        byte[] content =
                 attendanceReportStorageService
-                        .getExcelFile(
+                        .getExcelContent(
                                 archive
                         );
-
-        Resource resource =
-                new FileSystemResource(
-                        file
-                );
 
         ContentDisposition disposition =
                 ContentDisposition
                         .attachment()
+
                         .filename(
                                 archive.getExcelFileName()
                         )
+
                         .build();
 
         return ResponseEntity
@@ -489,9 +488,7 @@ public class AttendanceReportController {
                 )
 
                 .contentLength(
-                        file
-                                .toFile()
-                                .length()
+                        content.length
                 )
 
                 .header(
@@ -500,24 +497,20 @@ public class AttendanceReportController {
                 )
 
                 .body(
-                        resource
+                        content
                 );
     }
 
     /* =========================================================
        DOWNLOAD ALL ZIP
 
-       Supports:
+       Individual PDF/XLSX files are fetched from
+       Supabase Storage and assembled into ZIP bytes.
 
-       format=PDF
-       format=EXCEL
-       format=BOTH
-
-       COUNCILOR:
-       - All matching authorized reports
-
-       ADVISER:
-       - Assigned section reports only
+       format:
+       PDF
+       EXCEL
+       BOTH
     ========================================================= */
 
     @GetMapping("/archive/download-all")
@@ -568,9 +561,11 @@ public class AttendanceReportController {
         ContentDisposition disposition =
                 ContentDisposition
                         .attachment()
+
                         .filename(
                                 zipFile.fileName()
                         )
+
                         .build();
 
         return ResponseEntity

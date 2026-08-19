@@ -14,9 +14,6 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import java.time.LocalDateTime;
 
 import java.time.format.DateTimeFormatter;
@@ -30,6 +27,10 @@ import java.util.zip.ZipOutputStream;
 @Service
 public class AttendanceReportZipService {
 
+    /* =========================================================
+       DEPENDENCIES
+    ========================================================= */
+
     private final AttendanceReportStorageService
             attendanceReportStorageService;
 
@@ -38,7 +39,9 @@ public class AttendanceReportZipService {
     ========================================================= */
 
     public AttendanceReportZipService(
-            AttendanceReportStorageService attendanceReportStorageService
+
+            AttendanceReportStorageService
+                    attendanceReportStorageService
     ) {
 
         this.attendanceReportStorageService =
@@ -47,6 +50,11 @@ public class AttendanceReportZipService {
 
     /* =========================================================
        CREATE ZIP
+
+       Files are retrieved from Supabase Storage and
+       written directly into the ZIP in memory.
+
+       No permanent local files are required.
     ========================================================= */
 
     public AttendanceReportZipFile createZip(
@@ -70,7 +78,9 @@ public class AttendanceReportZipService {
 
         AttendanceReportDownloadFormat resolvedFormat =
                 format != null
+
                         ? format
+
                         : AttendanceReportDownloadFormat.BOTH;
 
         try (
@@ -85,55 +95,76 @@ public class AttendanceReportZipService {
 
             for (
                     AttendanceReportArchive archive
-                    : reports
+                    :
+                    reports
             ) {
 
+                /* =================================================
+                   PDF
+                ================================================= */
+
                 if (
-                        resolvedFormat ==
+                        resolvedFormat
+                                ==
                                 AttendanceReportDownloadFormat.PDF
+
                                 ||
-                                resolvedFormat ==
+
+                                resolvedFormat
+                                        ==
                                         AttendanceReportDownloadFormat.BOTH
                 ) {
 
-                    Path pdf =
+                    byte[] pdfContent =
                             attendanceReportStorageService
-                                    .getPdfFile(
+                                    .getPdfContent(
                                             archive
                                     );
 
                     addFile(
                             zip,
                             archive,
-                            pdf,
+                            pdfContent,
                             archive.getPdfFileName()
                     );
                 }
 
+                /* =================================================
+                   EXCEL
+                ================================================= */
+
                 if (
-                        resolvedFormat ==
+                        resolvedFormat
+                                ==
                                 AttendanceReportDownloadFormat.EXCEL
+
                                 ||
-                                resolvedFormat ==
+
+                                resolvedFormat
+                                        ==
                                         AttendanceReportDownloadFormat.BOTH
                 ) {
 
-                    Path excel =
+                    byte[] excelContent =
                             attendanceReportStorageService
-                                    .getExcelFile(
+                                    .getExcelContent(
                                             archive
                                     );
 
                     addFile(
                             zip,
                             archive,
-                            excel,
+                            excelContent,
                             archive.getExcelFileName()
                     );
                 }
             }
 
             zip.finish();
+
+            /* =====================================================
+               ZIP FILE NAME
+            ===================================================== */
 
             String timestamp =
                     LocalDateTime
@@ -147,16 +178,20 @@ public class AttendanceReportZipService {
 
             String fileName =
                     "attendance_reports_"
+
                             +
                             resolvedFormat
                                     .name()
                                     .toLowerCase(
                                             Locale.ROOT
                                     )
+
                             +
                             "_"
+
                             +
                             timestamp
+
                             +
                             ".zip";
 
@@ -175,7 +210,7 @@ public class AttendanceReportZipService {
     }
 
     /* =========================================================
-       ADD FILE
+       ADD FILE TO ZIP
     ========================================================= */
 
     private void addFile(
@@ -184,11 +219,26 @@ public class AttendanceReportZipService {
 
             AttendanceReportArchive archive,
 
-            Path file,
+            byte[] content,
 
             String fileName
 
     ) throws IOException {
+
+        if (
+                content == null
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.NOT_FOUND,
+                    "Attendance report file content is not available"
+            );
+        }
+
+        String safeFileName =
+                sanitizeFileName(
+                        fileName
+                );
 
         String folder =
                 archive
@@ -197,20 +247,27 @@ public class AttendanceReportZipService {
                         .toLowerCase(
                                 Locale.ROOT
                         )
+
                         +
                         "/"
+
                         +
                         archive.getPeriodStart()
+
                         +
                         "_to_"
+
                         +
                         archive.getPeriodEnd()
+
                         +
                         "/"
+
                         +
                         sanitize(
                                 archive.getSectionName()
                         )
+
                         +
                         "/";
 
@@ -218,16 +275,15 @@ public class AttendanceReportZipService {
                 new ZipEntry(
                         folder
                                 +
-                                fileName
+                                safeFileName
                 );
 
         zip.putNextEntry(
                 entry
         );
 
-        Files.copy(
-                file,
-                zip
+        zip.write(
+                content
         );
 
         zip.closeEntry();
@@ -252,13 +308,49 @@ public class AttendanceReportZipService {
 
         return value
                 .trim()
+
                 .replaceAll(
                         "[\\\\/:*?\"<>|]",
                         "-"
                 )
+
                 .replaceAll(
                         "\\s+",
                         "_"
+                );
+    }
+
+    /* =========================================================
+       SANITIZE FILE NAME
+
+       Additional ZIP safety in case archive metadata
+       has unexpected characters.
+    ========================================================= */
+
+    private String sanitizeFileName(
+            String value
+    ) {
+
+        if (
+                value == null
+                        ||
+                        value.isBlank()
+        ) {
+
+            return "attendance-report";
+        }
+
+        return value
+                .trim()
+
+                .replaceAll(
+                        "[\\\\/:*?\"<>|]",
+                        "-"
+                )
+
+                .replace(
+                        "..",
+                        "-"
                 );
     }
 }
