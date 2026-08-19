@@ -6,6 +6,7 @@ import com.example.attendancemanagementbackend.dto.FaceMatchResult;
 import com.example.attendancemanagementbackend.entity.AttendanceRecord;
 import com.example.attendancemanagementbackend.entity.AttendanceSession;
 import com.example.attendancemanagementbackend.entity.AttendanceSessionStatus;
+import com.example.attendancemanagementbackend.entity.AttendanceStatus;
 import com.example.attendancemanagementbackend.entity.Section;
 import com.example.attendancemanagementbackend.entity.Student;
 import com.example.attendancemanagementbackend.exception.ApiException;
@@ -13,6 +14,7 @@ import com.example.attendancemanagementbackend.repository.AttendanceRecordReposi
 import com.example.attendancemanagementbackend.repository.AttendanceSessionRepository;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
 import com.example.attendancemanagementbackend.repository.StudentRepository;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +27,26 @@ import java.util.List;
 @Service
 public class AttendanceRecordService {
 
-    private static final double FACE_MATCH_THRESHOLD = 0.50;
+    private static final double FACE_MATCH_THRESHOLD =
+            0.50;
 
-    private final AttendanceRecordRepository attendanceRecordRepository;
-    private final AttendanceSessionRepository attendanceSessionRepository;
-    private final StudentRepository studentRepository;
-    private final SectionRepository sectionRepository;
-    private final StudentFaceService studentFaceService;
-    private final FaceRecognitionClient faceRecognitionClient;
+    private final AttendanceRecordRepository
+            attendanceRecordRepository;
+
+    private final AttendanceSessionRepository
+            attendanceSessionRepository;
+
+    private final StudentRepository
+            studentRepository;
+
+    private final SectionRepository
+            sectionRepository;
+
+    private final StudentFaceService
+            studentFaceService;
+
+    private final FaceRecognitionClient
+            faceRecognitionClient;
 
     public AttendanceRecordService(
             AttendanceRecordRepository attendanceRecordRepository,
@@ -42,18 +56,32 @@ public class AttendanceRecordService {
             StudentFaceService studentFaceService,
             FaceRecognitionClient faceRecognitionClient
     ) {
-        this.attendanceRecordRepository = attendanceRecordRepository;
-        this.attendanceSessionRepository = attendanceSessionRepository;
-        this.studentRepository = studentRepository;
-        this.sectionRepository = sectionRepository;
-        this.studentFaceService = studentFaceService;
-        this.faceRecognitionClient = faceRecognitionClient;
+        this.attendanceRecordRepository =
+                attendanceRecordRepository;
+
+        this.attendanceSessionRepository =
+                attendanceSessionRepository;
+
+        this.studentRepository =
+                studentRepository;
+
+        this.sectionRepository =
+                sectionRepository;
+
+        this.studentFaceService =
+                studentFaceService;
+
+        this.faceRecognitionClient =
+                faceRecognitionClient;
     }
 
+    /* =========================================================
+       MANUAL ATTENDANCE
+    ========================================================= */
+
     /**
-     * MANUAL ATTENDANCE
-     *
-     * Marks a student as present for an active attendance session.
+     * Marks a student as PRESENT
+     * for an active attendance session.
      */
     @Transactional
     public AttendanceRecord markPresent(
@@ -62,10 +90,15 @@ public class AttendanceRecordService {
     ) {
 
         AttendanceSession session =
-                getActiveSession(sessionId);
+                getActiveSession(
+                        sessionId
+                );
 
         Student student =
-                studentRepository.findById(studentId)
+                studentRepository
+                        .findById(
+                                studentId
+                        )
                         .orElseThrow(() ->
                                 new ApiException(
                                         HttpStatus.NOT_FOUND,
@@ -79,11 +112,13 @@ public class AttendanceRecordService {
         );
     }
 
+    /* =========================================================
+       FACE RECOGNITION ATTENDANCE
+    ========================================================= */
+
     /**
-     * FACE RECOGNITION ATTENDANCE
-     *
-     * Recognizes a student's face and marks the
-     * matched student as present.
+     * Recognizes a student's face and
+     * marks the matched student as PRESENT.
      */
     @Transactional
     public AttendanceRecord markPresentByFace(
@@ -92,20 +127,33 @@ public class AttendanceRecordService {
     ) throws IOException {
 
         AttendanceSession session =
-                getActiveSession(sessionId);
+                getActiveSession(
+                        sessionId
+                );
 
-        if (image == null || image.isEmpty()) {
+        /* =====================================================
+           VALIDATE IMAGE
+        ===================================================== */
+
+        if (image == null ||
+                image.isEmpty()) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Image is required"
             );
         }
 
+        /* =====================================================
+           FACE RECOGNITION
+        ===================================================== */
+
         FaceRecognitionClient.FaceRecognitionResult result =
-                faceRecognitionClient.recognizeFace(
-                        image.getBytes(),
-                        image.getOriginalFilename()
-                );
+                faceRecognitionClient
+                        .recognizeFace(
+                                image.getBytes(),
+                                image.getOriginalFilename()
+                        );
 
         if (result == null ||
                 !result.success() ||
@@ -117,20 +165,39 @@ public class AttendanceRecordService {
             );
         }
 
-        FaceMatchResult match =
-                studentFaceService.findMostSimilarFace(
-                        result.embedding()
-                );
+        /* =====================================================
+           FIND CLOSEST REGISTERED FACE
+        ===================================================== */
 
-        if (match.distance() > FACE_MATCH_THRESHOLD) {
+        FaceMatchResult match =
+                studentFaceService
+                        .findMostSimilarFace(
+                                result.embedding()
+                        );
+
+        if (match == null) {
             throw new ApiException(
                     HttpStatus.UNAUTHORIZED,
                     "Face not recognized"
             );
         }
 
+        if (match.distance() >
+                FACE_MATCH_THRESHOLD) {
+
+            throw new ApiException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Face not recognized"
+            );
+        }
+
+        /* =====================================================
+           LOAD MATCHED STUDENT
+        ===================================================== */
+
         Student student =
-                studentRepository.findById(
+                studentRepository
+                        .findById(
                                 match.studentId()
                         )
                         .orElseThrow(() ->
@@ -146,15 +213,23 @@ public class AttendanceRecordService {
         );
     }
 
+    /* =========================================================
+       GET ACTIVE SESSION
+    ========================================================= */
+
     /**
-     * Gets an active attendance session.
+     * Gets and validates an active
+     * attendance session.
      */
     private AttendanceSession getActiveSession(
             String sessionId
     ) {
 
         AttendanceSession session =
-                attendanceSessionRepository.findById(sessionId)
+                attendanceSessionRepository
+                        .findById(
+                                sessionId
+                        )
                         .orElseThrow(() ->
                                 new ApiException(
                                         HttpStatus.NOT_FOUND,
@@ -174,29 +249,57 @@ public class AttendanceRecordService {
         return session;
     }
 
+    /* =========================================================
+       CREATE ATTENDANCE RECORD
+    ========================================================= */
+
     /**
-     * Creates an attendance record after validating:
+     * Creates a PRESENT attendance record
+     * after validating:
      *
      * 1. Student belongs to the session's section.
-     * 2. Student does not already have an attendance
-     *    record for this session.
+     * 2. Student is active.
+     * 3. Student does not already have an
+     *    attendance record for this session.
      */
     private AttendanceRecord createAttendanceRecord(
             AttendanceSession session,
             Student student
     ) {
 
+        /* =====================================================
+           VERIFY STUDENT SECTION
+        ===================================================== */
+
         if (student.getSection() == null ||
                 session.getSection() == null ||
                 !student.getSection()
                         .getId()
-                        .equals(session.getSection().getId())) {
+                        .equals(
+                                session.getSection()
+                                        .getId()
+                        )) {
 
             throw new ApiException(
                     HttpStatus.FORBIDDEN,
                     "Student does not belong to this section"
             );
         }
+
+        /* =====================================================
+           VERIFY STUDENT STATUS
+        ===================================================== */
+
+        if (!student.isActive()) {
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "Student is inactive"
+            );
+        }
+
+        /* =====================================================
+           PREVENT DUPLICATE ATTENDANCE
+        ===================================================== */
 
         if (attendanceRecordRepository
                 .existsBySessionIdAndStudentId(
@@ -210,26 +313,43 @@ public class AttendanceRecordService {
             );
         }
 
+        /* =====================================================
+           CREATE PRESENT RECORD
+
+           recordedAt is generated inside
+           AttendanceRecord using AppTime.now().
+        ===================================================== */
+
         AttendanceRecord record =
                 new AttendanceRecord(
                         session,
                         student
                 );
 
-        return attendanceRecordRepository.save(record);
+        return attendanceRecordRepository
+                .save(
+                        record
+                );
     }
 
+    /* =========================================================
+       GET SESSION ATTENDANCE
+    ========================================================= */
+
     /**
-     * GET SESSION ATTENDANCE
-     *
-     * Returns all attendance records for a specific session.
+     * Returns all attendance records
+     * for a specific session.
      */
     @Transactional(readOnly = true)
     public List<AttendanceRecordResponse> getSessionRecords(
             String sessionId
     ) {
 
-        if (!attendanceSessionRepository.existsById(sessionId)) {
+        if (!attendanceSessionRepository
+                .existsById(
+                        sessionId
+                )) {
+
             throw new ApiException(
                     HttpStatus.NOT_FOUND,
                     "Attendance session not found"
@@ -237,29 +357,38 @@ public class AttendanceRecordService {
         }
 
         return attendanceRecordRepository
-                .findBySessionId(sessionId)
+                .findBySessionId(
+                        sessionId
+                )
                 .stream()
                 .map(record ->
                         new AttendanceRecordResponse(
                                 record.getId(),
-                                record.getSession().getId(),
-                                record.getStudent().getId(),
-                                record.getStudent().getStudentNumber(),
-                                record.getStudent().getName(),
+                                record.getSession()
+                                        .getId(),
+                                record.getStudent()
+                                        .getId(),
+                                record.getStudent()
+                                        .getStudentNumber(),
+                                record.getStudent()
+                                        .getName(),
                                 record.getRecordedAt(),
-                                record.getStatus().name()
+                                record.getStatus()
+                                        .name()
                         )
                 )
                 .toList();
     }
 
+    /* =========================================================
+       COUNCILOR ATTENDANCE OVERVIEW
+    ========================================================= */
+
     /**
-     * COUNCILOR ATTENDANCE OVERVIEW
+     * Returns attendance summaries
+     * for all sections and their sessions.
      *
-     * Returns attendance summaries for all sections
-     * and their attendance sessions.
-     *
-     * Councilor can use this for:
+     * Includes:
      *
      * - Total students
      * - Present
@@ -270,25 +399,38 @@ public class AttendanceRecordService {
      * - Attendance date
      */
     @Transactional(readOnly = true)
-    public List<AttendanceOverviewResponse> getAttendanceOverview() {
+    public List<AttendanceOverviewResponse>
+    getAttendanceOverview() {
 
         List<AttendanceOverviewResponse> overview =
                 new ArrayList<>();
 
         List<Section> sections =
-                sectionRepository.findAll();
+                sectionRepository
+                        .findAll();
 
         for (Section section : sections) {
 
+            /* =================================================
+               ACTIVE STUDENTS
+            ================================================= */
+
             List<Student> students =
-                    studentRepository.findBySectionId(
-                            section.getId()
-                    );
+                    studentRepository
+                            .findBySectionId(
+                                    section.getId()
+                            );
 
             int totalStudents =
                     (int) students.stream()
-                            .filter(Student::isActive)
+                            .filter(
+                                    Student::isActive
+                            )
                             .count();
+
+            /* =================================================
+               SECTION SESSIONS
+            ================================================= */
 
             List<AttendanceSession> sessions =
                     attendanceSessionRepository
@@ -304,19 +446,40 @@ public class AttendanceRecordService {
                                         session.getId()
                                 );
 
+                /* =============================================
+                   PRESENT
+
+                   IMPORTANT:
+                   Only PRESENT records are counted as present.
+
+                   ABSENT records created when ending a session
+                   must NOT be counted here.
+                ============================================= */
+
                 int present =
                         (int) records.stream()
                                 .filter(record ->
                                         record.getStudent() != null &&
-                                                record.getStudent().isActive()
+                                                record.getStudent().isActive() &&
+                                                record.getStatus() ==
+                                                        AttendanceStatus.PRESENT
                                 )
                                 .count();
 
+                /* =============================================
+                   ABSENT
+                ============================================= */
+
                 int absent =
                         Math.max(
-                                totalStudents - present,
+                                totalStudents -
+                                        present,
                                 0
                         );
+
+                /* =============================================
+                   ATTENDANCE RATE
+                ============================================= */
 
                 double attendanceRate =
                         totalStudents == 0
@@ -324,16 +487,30 @@ public class AttendanceRecordService {
                                 : ((double) present /
                                 totalStudents) * 100.0;
 
-                String adviserId = null;
-                String adviserName = null;
+                /* =============================================
+                   ADVISER INFORMATION
+                ============================================= */
+
+                String adviserId =
+                        null;
+
+                String adviserName =
+                        null;
 
                 if (section.getAdviser() != null) {
+
                     adviserId =
-                            section.getAdviser().getId();
+                            section.getAdviser()
+                                    .getId();
 
                     adviserName =
-                            section.getAdviser().getName();
+                            section.getAdviser()
+                                    .getName();
                 }
+
+                /* =============================================
+                   BUILD RESPONSE
+                ============================================= */
 
                 overview.add(
                         new AttendanceOverviewResponse(
@@ -356,11 +533,13 @@ public class AttendanceRecordService {
         return overview;
     }
 
+    /* =========================================================
+       DELETE ATTENDANCE RECORD
+    ========================================================= */
+
     /**
-     * DELETE ATTENDANCE
-     *
-     * Deletes an attendance record for a specific
-     * session and student.
+     * Deletes an attendance record
+     * for a specific session and student.
      */
     @Transactional
     public void deleteAttendanceRecord(
@@ -381,6 +560,9 @@ public class AttendanceRecordService {
                                 )
                         );
 
-        attendanceRecordRepository.delete(record);
+        attendanceRecordRepository
+                .delete(
+                        record
+                );
     }
 }

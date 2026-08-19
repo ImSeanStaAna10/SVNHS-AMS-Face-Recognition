@@ -1,5 +1,7 @@
 package com.example.attendancemanagementbackend.service;
 
+import com.example.attendancemanagementbackend.dto.AdviserAttendanceHistoryResponse;
+import com.example.attendancemanagementbackend.dto.attendance.PagedResponse;
 import com.example.attendancemanagementbackend.entity.AttendanceRecord;
 import com.example.attendancemanagementbackend.entity.AttendanceSession;
 import com.example.attendancemanagementbackend.entity.AttendanceSessionStatus;
@@ -7,23 +9,20 @@ import com.example.attendancemanagementbackend.entity.AttendanceStatus;
 import com.example.attendancemanagementbackend.entity.Section;
 import com.example.attendancemanagementbackend.entity.Student;
 import com.example.attendancemanagementbackend.exception.ApiException;
+import com.example.attendancemanagementbackend.repository.AdviserAttendanceHistoryProjection;
 import com.example.attendancemanagementbackend.repository.AttendanceRecordRepository;
 import com.example.attendancemanagementbackend.repository.AttendanceSessionRepository;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
 import com.example.attendancemanagementbackend.repository.StudentRepository;
+import com.example.attendancemanagementbackend.util.AppTime;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.attendancemanagementbackend.dto.AdviserAttendanceHistoryResponse;
-import com.example.attendancemanagementbackend.dto.attendance.PagedResponse;
-import com.example.attendancemanagementbackend.repository.AdviserAttendanceHistoryProjection;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,7 +127,7 @@ public class AttendanceSessionService {
         ===================================================== */
 
         LocalDate attendanceDate =
-                LocalDate.now();
+                AppTime.today();
 
         if (attendanceSessionRepository
                 .existsBySectionIdAndAttendanceDate(
@@ -224,7 +223,7 @@ public class AttendanceSessionService {
         );
 
         session.setEndedAt(
-                LocalDateTime.now()
+                AppTime.now()
         );
 
         return attendanceSessionRepository
@@ -240,7 +239,8 @@ public class AttendanceSessionService {
     ) {
 
         String sectionId =
-                session.getSection().getId();
+                session.getSection()
+                        .getId();
 
         String sessionId =
                 session.getId();
@@ -314,13 +314,11 @@ public class AttendanceSessionService {
                                 "No active attendance session found"
                         )
                 );
-
-
     }
 
-/* =========================================================
-   GET ADVISER ATTENDANCE HISTORY
-========================================================= */
+    /* =========================================================
+       GET ADVISER ATTENDANCE HISTORY
+    ========================================================= */
 
     @Transactional(readOnly = true)
     public PagedResponse<AdviserAttendanceHistoryResponse>
@@ -332,15 +330,15 @@ public class AttendanceSessionService {
             int size
     ) {
 
-    /* =====================================================
-       RESOLVE DATE RANGE
+        /* =====================================================
+           RESOLVE DATE RANGE
 
-       Default:
-       Current month until today
-    ===================================================== */
+           Default:
+           Current month until today
+        ===================================================== */
 
         LocalDate today =
-                LocalDate.now();
+                AppTime.today();
 
         LocalDate resolvedFromDate =
                 fromDate != null
@@ -352,22 +350,23 @@ public class AttendanceSessionService {
                         ? toDate
                         : today;
 
-    /* =====================================================
-       VALIDATE DATE RANGE
-    ===================================================== */
+        /* =====================================================
+           VALIDATE DATE RANGE
+        ===================================================== */
 
         if (resolvedFromDate.isAfter(
                 resolvedToDate
         )) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "From date cannot be after to date"
             );
         }
 
-    /* =====================================================
-       VALIDATE PAGINATION
-    ===================================================== */
+        /* =====================================================
+           VALIDATE PAGINATION
+        ===================================================== */
 
         if (page < 0) {
             throw new ApiException(
@@ -390,9 +389,9 @@ public class AttendanceSessionService {
                         resolvedSize
                 );
 
-    /* =====================================================
-       QUERY HISTORY
-    ===================================================== */
+        /* =====================================================
+           QUERY HISTORY
+        ===================================================== */
 
         Page<AdviserAttendanceHistoryProjection>
                 historyPage =
@@ -404,9 +403,9 @@ public class AttendanceSessionService {
                                 pageable
                         );
 
-    /* =====================================================
-       MAP RESPONSE
-    ===================================================== */
+        /* =====================================================
+           MAP RESPONSE
+        ===================================================== */
 
         Page<AdviserAttendanceHistoryResponse>
                 responsePage =
@@ -419,10 +418,9 @@ public class AttendanceSessionService {
         );
     }
 
-
-/* =========================================================
-   MAP ADVISER ATTENDANCE HISTORY
-========================================================= */
+    /* =========================================================
+       MAP ADVISER ATTENDANCE HISTORY
+    ========================================================= */
 
     private AdviserAttendanceHistoryResponse
     mapAttendanceHistory(
@@ -487,10 +485,9 @@ public class AttendanceSessionService {
         );
     }
 
-
-/* =========================================================
-   SAFE LONG
-========================================================= */
+    /* =========================================================
+       SAFE LONG
+    ========================================================= */
 
     private long safeLong(
             Long value

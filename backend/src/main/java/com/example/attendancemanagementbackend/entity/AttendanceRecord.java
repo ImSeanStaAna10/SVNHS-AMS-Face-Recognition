@@ -1,5 +1,6 @@
 package com.example.attendancemanagementbackend.entity;
 
+import com.example.attendancemanagementbackend.util.AppTime;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -44,6 +45,10 @@ public class AttendanceRecord {
     @Column(nullable = false)
     private AttendanceStatus status;
 
+    /* =========================================================
+       CONSTRUCTORS
+    ========================================================= */
+
     public AttendanceRecord() {
     }
 
@@ -73,11 +78,22 @@ public class AttendanceRecord {
             Student student,
             AttendanceStatus status
     ) {
-        this.session = session;
-        this.student = student;
-        this.status = status;
-        this.recordedAt = LocalDateTime.now();
+        this.session =
+                session;
+
+        this.student =
+                student;
+
+        this.status =
+                status;
+
+        this.recordedAt =
+                AppTime.now();
     }
+
+    /* =========================================================
+       GETTERS / SETTERS
+    ========================================================= */
 
     public String getId() {
         return id;
@@ -90,7 +106,8 @@ public class AttendanceRecord {
     public void setSession(
             AttendanceSession session
     ) {
-        this.session = session;
+        this.session =
+                session;
     }
 
     public Student getStudent() {
@@ -100,7 +117,8 @@ public class AttendanceRecord {
     public void setStudent(
             Student student
     ) {
-        this.student = student;
+        this.student =
+                student;
     }
 
     public LocalDateTime getRecordedAt() {
@@ -114,6 +132,7 @@ public class AttendanceRecord {
     public void setStatus(
             AttendanceStatus status
     ) {
-        this.status = status;
+        this.status =
+                status;
     }
 }
