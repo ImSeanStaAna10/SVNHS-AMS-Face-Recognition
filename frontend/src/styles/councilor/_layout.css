@@ -1406,3 +1406,573 @@
     animation: none;
   }
 }
+
+
+
+
+/* =========================================================
+   ADVISER MOBILE DRAWER
+   Mobile only.
+   Desktop Adviser layout remains unchanged.
+========================================================= */
+
+/* =========================================================
+   HEADER LEADING
+========================================================= */
+
+.adviser-header-leading {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.adviser-header-leading
+  .councilor-header-copy {
+  min-width: 0;
+}
+
+/* =========================================================
+   MOBILE-ONLY ELEMENTS
+========================================================= */
+
+.adviser-mobile-menu-button,
+.adviser-mobile-sidebar-close,
+.adviser-mobile-sidebar-backdrop {
+  display: none;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 720px) {
+  /* =======================================================
+     MAIN LAYOUT
+  ======================================================= */
+
+  .adviser-layout {
+    display: block;
+  }
+
+  .adviser-layout
+    .adviser-main {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* =======================================================
+     SIDEBAR DRAWER
+  ======================================================= */
+
+  .adviser-layout
+    .adviser-sidebar {
+    position: fixed;
+
+    z-index: 110;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: min(300px, 86vw);
+
+    height: 100vh;
+    height: 100dvh;
+
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    transform:
+      translateX(-105%);
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    border-right:
+      1px solid
+      var(--c-border-soft);
+
+    border-bottom: 0;
+
+    box-shadow:
+      16px 0 45px
+      rgba(5, 20, 50, 0.22);
+
+    transition:
+      transform
+        0.26s
+        cubic-bezier(
+          0.22,
+          1,
+          0.36,
+          1
+        ),
+      visibility
+        0s
+        linear
+        0.26s;
+  }
+
+  .adviser-layout
+    .adviser-sidebar.is-mobile-open {
+    transform:
+      translateX(0);
+
+    visibility: visible;
+
+    pointer-events: auto;
+
+    transition:
+      transform
+        0.26s
+        cubic-bezier(
+          0.22,
+          1,
+          0.36,
+          1
+        );
+  }
+
+  /* =======================================================
+     SIDEBAR BRAND
+  ======================================================= */
+
+  .adviser-layout
+    .adviser-sidebar
+    .councilor-brand {
+    min-height: 82px;
+
+    flex: 0 0 auto;
+
+    padding:
+      15px
+      14px
+      15px
+      18px;
+  }
+
+  .adviser-layout
+    .adviser-sidebar
+    .councilor-brand-logo {
+    width: 44px;
+    height: 44px;
+
+    flex-basis: 44px;
+  }
+
+  .adviser-layout
+    .adviser-sidebar
+    .councilor-brand-copy {
+    flex: 1;
+
+    min-width: 0;
+  }
+
+  .adviser-layout
+    .adviser-sidebar
+    .councilor-brand-copy
+    span {
+    max-width: 165px;
+  }
+
+  /* =======================================================
+     MOBILE SIDEBAR CLOSE
+  ======================================================= */
+
+  .adviser-layout
+    .adviser-mobile-sidebar-close {
+    width: 36px;
+    height: 36px;
+
+    flex: 0 0 36px;
+
+    display: grid;
+    place-items: center;
+
+    margin-left: auto;
+
+    padding: 0;
+
+    border:
+      1px solid
+      var(--c-border-soft);
+
+    border-radius: 9px;
+
+    background:
+      var(--c-surface-soft);
+
+    color:
+      var(--c-text-muted);
+
+    font-family: inherit;
+
+    cursor: pointer;
+
+    transition:
+      background 0.18s ease,
+      color 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  .adviser-layout
+    .adviser-mobile-sidebar-close:hover {
+    background:
+      var(--c-nav-hover-bg);
+
+    color:
+      var(--c-text-primary);
+  }
+
+  .adviser-layout
+    .adviser-mobile-sidebar-close
+    span {
+    display: block;
+
+    margin-top: -2px;
+
+    font-size: 24px;
+    font-weight: 300;
+
+    line-height: 1;
+  }
+
+  /* =======================================================
+     NAVIGATION
+  ======================================================= */
+
+  .adviser-layout
+    .adviser-sidebar
+    .councilor-nav-label {
+    display: block;
+
+    padding:
+      20px
+      22px
+      8px;
+  }
+
+  .adviser-layout
+    .adviser-sidebar
+    .councilor-nav {
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    overflow: visible;
+
+    padding:
+      4px
+      14px
+      22px;
+  }
+
+  .adviser-layout
+    .adviser-sidebar
+    .councilor-nav-item {
+    width: 100%;
+
+    min-width: 0;
+    min-height: 44px;
+
+    flex: 0 0 auto;
+
+    padding:
+      10px
+      13px;
+
+    white-space: normal;
+  }
+
+  .adviser-layout
+    .adviser-sidebar
+    .councilor-nav-item.active::before {
+    display: block;
+  }
+
+  /* =======================================================
+     SIDEBAR FOOTER
+  ======================================================= */
+
+  .adviser-layout
+    .adviser-sidebar
+    .councilor-sidebar-footer {
+    display: block;
+
+    margin-top: auto;
+  }
+
+  /* =======================================================
+     BACKDROP
+  ======================================================= */
+
+  .adviser-layout
+    .adviser-mobile-sidebar-backdrop {
+    position: fixed;
+
+    z-index: 100;
+
+    inset: 0;
+
+    display: block;
+
+    background:
+      rgba(3, 12, 29, 0.48);
+
+    backdrop-filter:
+      blur(2px);
+
+    -webkit-backdrop-filter:
+      blur(2px);
+
+    animation:
+      adviser-mobile-backdrop-in
+      0.2s ease both;
+  }
+
+  /* =======================================================
+     HEADER
+  ======================================================= */
+
+  .adviser-layout
+    .adviser-header {
+    position: relative;
+
+    z-index: 30;
+
+    min-height: 74px;
+
+    gap: 12px;
+
+    padding:
+      13px
+      17px;
+  }
+
+  .adviser-layout
+    .adviser-header-leading {
+    min-width: 0;
+
+    flex: 1;
+
+    gap: 11px;
+  }
+
+  /* =======================================================
+     HAMBURGER BUTTON
+  ======================================================= */
+
+  .adviser-layout
+    .adviser-mobile-menu-button {
+    width: 40px;
+    height: 40px;
+
+    flex: 0 0 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding: 0;
+
+    border:
+      1px solid
+      var(--c-border-soft);
+
+    border-radius: 10px;
+
+    background:
+      var(--c-surface-soft);
+
+    color:
+      var(--c-text-primary);
+
+    box-shadow:
+      0 3px 10px
+      rgba(7, 27, 66, 0.05);
+
+    cursor: pointer;
+
+    transition:
+      background 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .adviser-layout
+    .adviser-mobile-menu-button
+    > span {
+    width: 17px;
+    height: 2px;
+
+    display: block;
+
+    border-radius: 999px;
+
+    background:
+      currentColor;
+  }
+
+  .adviser-layout
+    .adviser-mobile-menu-button:active {
+    transform:
+      scale(0.96);
+  }
+
+  /* =======================================================
+     HEADER COPY
+  ======================================================= */
+
+  .adviser-layout
+    .councilor-header-copy {
+    min-width: 0;
+  }
+
+  .adviser-layout
+    .councilor-header-copy
+    h1 {
+    overflow: hidden;
+
+    font-size: 20px;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+  }
+
+  .adviser-layout
+    .councilor-header-copy
+    p {
+    display: none;
+  }
+
+  .adviser-layout
+    .councilor-eyebrow {
+    font-size: 7px;
+  }
+
+  /* =======================================================
+     HEADER ACTIONS
+  ======================================================= */
+
+  .adviser-layout
+    .councilor-header-actions {
+    gap: 10px;
+  }
+}
+
+/* =========================================================
+   BACKDROP ANIMATION
+========================================================= */
+
+@keyframes adviser-mobile-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 520px) {
+  .adviser-layout
+    .adviser-header {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .adviser-layout
+    .adviser-mobile-menu-button {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+
+  .adviser-layout
+    .councilor-avatar {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+
+  .adviser-layout
+    .councilor-user-copy {
+    display: none;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .adviser-layout
+    .councilor-header-copy
+    h1 {
+    max-width: 125px;
+
+    font-size: 18px;
+  }
+
+  .adviser-layout
+    .adviser-mobile-menu-button {
+    width: 36px;
+    height: 36px;
+
+    flex-basis: 36px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.adviser-mobile-menu-button:focus-visible,
+.adviser-mobile-sidebar-close:focus-visible {
+  outline:
+    3px solid
+    var(--c-focus-ring);
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .adviser-layout
+    .adviser-sidebar,
+  .adviser-layout
+    .adviser-mobile-menu-button {
+    transition: none;
+  }
+
+  .adviser-layout
+    .adviser-mobile-sidebar-backdrop {
+    animation: none;
+  }
+}
