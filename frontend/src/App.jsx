@@ -1,4 +1,9 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 
 import Login from "./features/auth/Login";
 
@@ -7,6 +12,7 @@ import Login from "./features/auth/Login";
 ========================================================= */
 
 import AdviserAttendance from "./features/adviser/AdviserAttendance";
+import AdviserAttendanceRecords from "./features/adviser/AdviserAttendanceRecords";
 import AdviserDashboard from "./features/adviser/AdviserDashboard";
 import AttendanceHistory from "./features/adviser/AttendanceHistory";
 import AttendanceHistoryDetail from "./features/adviser/AttendanceHistoryDetail";
@@ -20,6 +26,7 @@ import StudentManagement from "./features/adviser/StudentManagement";
 import Advisers from "./features/councilor/AdviserManagement";
 import AttendanceDetails from "./features/councilor/AttendanceDetail";
 import AttendanceManagement from "./features/councilor/AttendanceManagement";
+import CouncilorAttendanceRecords from "./features/councilor/CouncilorAttendanceRecords";
 import CouncilorDashboard from "./features/councilor/CouncilorDashboard";
 import SectionManagement from "./features/councilor/SectionManagement";
 
@@ -35,70 +42,152 @@ function App() {
             AUTH
         ================================================= */}
 
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={
+            <Login />
+          }
+        />
 
         {/* =================================================
             COUNCILOR
         ================================================= */}
 
-        <Route path="/councilor/dashboard" element={<CouncilorDashboard />} />
+        <Route
+          path="/councilor/dashboard"
+          element={
+            <CouncilorDashboard />
+          }
+        />
 
-        <Route path="/councilor/advisers" element={<Advisers />} />
+        <Route
+          path="/councilor/advisers"
+          element={
+            <Advisers />
+          }
+        />
 
-        <Route path="/councilor/sections" element={<SectionManagement />} />
+        <Route
+          path="/councilor/sections"
+          element={
+            <SectionManagement />
+          }
+        />
+
+        {/* =================================================
+            COUNCILOR ATTENDANCE
+        ================================================= */}
 
         <Route
           path="/councilor/attendance"
-          element={<AttendanceManagement />}
+          element={
+            <AttendanceManagement />
+          }
         />
 
         <Route
           path="/councilor/attendance/:sectionId"
-          element={<AttendanceDetails />}
+          element={
+            <AttendanceDetails />
+          }
+        />
+
+        {/* =================================================
+            COUNCILOR ATTENDANCE RECORDS / ARCHIVE
+        ================================================= */}
+
+        <Route
+          path="/councilor/attendance-records"
+          element={
+            <CouncilorAttendanceRecords />
+          }
         />
 
         {/* =================================================
             ADVISER
         ================================================= */}
 
-        <Route path="/adviser/dashboard" element={<AdviserDashboard />} />
+        <Route
+          path="/adviser/dashboard"
+          element={
+            <AdviserDashboard />
+          }
+        />
 
-        <Route path="/adviser/students" element={<StudentManagement />} />
+        <Route
+          path="/adviser/students"
+          element={
+            <StudentManagement />
+          }
+        />
 
         {/* =================================================
-            ATTENDANCE LANDING PAGE
+            ADVISER ATTENDANCE LANDING
         ================================================= */}
 
-        <Route path="/adviser/attendance" element={<AdviserAttendance />} />
+        <Route
+          path="/adviser/attendance"
+          element={
+            <AdviserAttendance />
+          }
+        />
 
         {/* =================================================
-            ATTENDANCE HISTORY
+            ADVISER ATTENDANCE HISTORY
         ================================================= */}
 
         <Route
           path="/adviser/attendance/history"
-          element={<AttendanceHistory />}
+          element={
+            <AttendanceHistory />
+          }
         />
 
         <Route
           path="/adviser/attendance/history/:sessionId"
-          element={<AttendanceHistoryDetail />}
+          element={
+            <AttendanceHistoryDetail />
+          }
+        />
+
+        {/* =================================================
+            ADVISER ATTENDANCE RECORDS / ARCHIVE
+        ================================================= */}
+
+        <Route
+          path="/adviser/attendance-records"
+          element={
+            <AdviserAttendanceRecords />
+          }
         />
 
         {/* =================================================
             ACTIVE ATTENDANCE SESSION
+
+            Keep dynamic session route after the static
+            attendance routes for readability.
         ================================================= */}
 
         <Route
           path="/adviser/attendance/:sessionId"
-          element={<AttendanceSession />}
+          element={
+            <AttendanceSession />
+          }
         />
 
         {/* =================================================
             FALLBACK
         ================================================= */}
 
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to="/login"
+              replace
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

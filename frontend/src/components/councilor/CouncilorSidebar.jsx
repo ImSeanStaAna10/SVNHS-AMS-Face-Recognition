@@ -7,6 +7,10 @@ import authService from "../../services/authService";
 function CouncilorSidebar({ onChangePassword }) {
   const navigate = useNavigate();
 
+  /* =======================================================
+     NAV LINK CLASS
+  ======================================================= */
+
   const getNavClassName = ({ isActive }) =>
     `councilor-nav-item ${isActive ? "active" : ""}`;
 
@@ -67,7 +71,7 @@ function CouncilorSidebar({ onChangePassword }) {
             ADVISERS
         ============================================== */}
 
-        <NavLink to="/councilor/advisers" className={getNavClassName}>
+        <NavLink to="/councilor/advisers" className={getNavClassName} end>
           <span className="councilor-nav-icon" aria-hidden="true">
             ♙
           </span>
@@ -79,7 +83,7 @@ function CouncilorSidebar({ onChangePassword }) {
             SECTIONS
         ============================================== */}
 
-        <NavLink to="/councilor/sections" className={getNavClassName}>
+        <NavLink to="/councilor/sections" className={getNavClassName} end>
           <span className="councilor-nav-icon" aria-hidden="true">
             ▤
           </span>
@@ -91,12 +95,28 @@ function CouncilorSidebar({ onChangePassword }) {
             ATTENDANCE
         ============================================== */}
 
-        <NavLink to="/councilor/attendance" className={getNavClassName}>
+        <NavLink to="/councilor/attendance" className={getNavClassName} end>
           <span className="councilor-nav-icon" aria-hidden="true">
             ◷
           </span>
 
           <span>Attendance</span>
+        </NavLink>
+
+        {/* =============================================
+            ATTENDANCE RECORDS
+        ============================================== */}
+
+        <NavLink
+          to="/councilor/attendance-records"
+          className={getNavClassName}
+          end
+        >
+          <span className="councilor-nav-icon" aria-hidden="true">
+            ▥
+          </span>
+
+          <span>Attendance Records</span>
         </NavLink>
 
         {/* =============================================

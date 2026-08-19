@@ -77,6 +77,12 @@ const NAVIGATION_ITEMS = [
     icon: "▤",
     path: "/adviser/attendance/history",
   },
+  {
+    label: "Attendance Records",
+    icon: "▥",
+    path: "/adviser/attendance-records",
+    exact: true,
+  },
 ];
 
 /* =========================================================
@@ -581,7 +587,9 @@ function AdviserLayout({
             );
           })}
 
-          {/* CHANGE PASSWORD */}
+          {/* =================================================
+              CHANGE PASSWORD
+          ================================================= */}
 
           <button
             type="button"
@@ -602,7 +610,9 @@ function AdviserLayout({
           </button>
         </nav>
 
-        {/* SIDEBAR FOOTER */}
+        {/* =================================================
+            SIDEBAR FOOTER
+        ================================================= */}
 
         <div className="councilor-sidebar-footer">
           <div className="councilor-sidebar-school">
@@ -725,7 +735,9 @@ function AdviserLayout({
             aria-modal="true"
             aria-labelledby="change-password-title"
           >
-            {/* MODAL HEADER */}
+            {/* =================================================
+                MODAL HEADER
+            ================================================= */}
 
             <div className="councilor-modal-header">
               <div>
@@ -758,7 +770,9 @@ function AdviserLayout({
               </button>
             </div>
 
-            {/* FORM */}
+            {/* =================================================
+                FORM
+            ================================================= */}
 
             <form
               className="councilor-modal-form adviser-password-form"
@@ -767,7 +781,9 @@ function AdviserLayout({
               }
               noValidate
             >
-              {/* ACCOUNT INFORMATION */}
+              {/* ===============================================
+                  ACCOUNT INFORMATION
+              =============================================== */}
 
               <div className="adviser-password-account">
                 <div className="adviser-password-avatar">
@@ -789,7 +805,9 @@ function AdviserLayout({
                 </div>
               </div>
 
-              {/* PASSWORD RECOVERY INFORMATION */}
+              {/* ===============================================
+                  PASSWORD RECOVERY INFORMATION
+              =============================================== */}
 
               <div className="adviser-password-help">
                 <span
@@ -813,7 +831,9 @@ function AdviserLayout({
                 </div>
               </div>
 
-              {/* CURRENT PASSWORD */}
+              {/* ===============================================
+                  CURRENT PASSWORD
+              =============================================== */}
 
               <div className="councilor-modal-field">
                 <label htmlFor="current-password">
@@ -877,7 +897,9 @@ function AdviserLayout({
                 </div>
               </div>
 
-              {/* NEW PASSWORD */}
+              {/* ===============================================
+                  NEW PASSWORD
+              =============================================== */}
 
               <div className="councilor-modal-field">
                 <label htmlFor="new-password">
@@ -944,7 +966,9 @@ function AdviserLayout({
                 </span>
               </div>
 
-              {/* CONFIRM NEW PASSWORD */}
+              {/* ===============================================
+                  CONFIRM NEW PASSWORD
+              =============================================== */}
 
               <div className="councilor-modal-field">
                 <label htmlFor="confirm-new-password">
@@ -1007,7 +1031,9 @@ function AdviserLayout({
                 </div>
               </div>
 
-              {/* ERROR */}
+              {/* ===============================================
+                  ERROR
+              =============================================== */}
 
               {passwordError && (
                 <div
@@ -1024,7 +1050,9 @@ function AdviserLayout({
                 </div>
               )}
 
-              {/* SUCCESS */}
+              {/* ===============================================
+                  SUCCESS
+              =============================================== */}
 
               {passwordSuccess && (
                 <div
@@ -1049,7 +1077,9 @@ function AdviserLayout({
                 </div>
               )}
 
-              {/* ACTIONS */}
+              {/* ===============================================
+                  ACTIONS
+              =============================================== */}
 
               <div className="councilor-modal-actions">
                 <button
