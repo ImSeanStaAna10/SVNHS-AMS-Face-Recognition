@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+
 from fastapi import UploadFile
 from insightface.app import FaceAnalysis
 
@@ -10,7 +11,12 @@ class FaceService:
 
         self.face_app = FaceAnalysis(
             name="buffalo_l",
-            providers=["CPUExecutionProvider"]
+            root="/opt/insightface",
+            providers=["CPUExecutionProvider"],
+            allowed_modules=[
+                "detection",
+                "recognition"
+            ]
         )
 
         self.face_app.prepare(
@@ -37,7 +43,6 @@ class FaceService:
         image: UploadFile
     ):
 
-        # Read uploaded image
         image_bytes = await image.read()
 
         image_array = np.frombuffer(
@@ -53,7 +58,6 @@ class FaceService:
         if frame is None:
             raise ValueError("Invalid image file")
 
-        # Detect faces
         faces = self.face_app.get(frame)
 
         if len(faces) == 0:
@@ -65,10 +69,8 @@ class FaceService:
                 "Please provide an image with one face."
             )
 
-        # Get detected face
         face = faces[0]
 
-        # Generate embedding
         embedding = face.embedding
 
         if embedding is None or len(embedding) != 512:
