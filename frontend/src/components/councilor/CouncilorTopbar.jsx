@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 
-import ThemeToggle from "../../common/ThemeToggle";
+import ThemeToggle from "../../common/themeToggle";
 
 import authService from "../../services/authService";
 
