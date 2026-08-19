@@ -403,7 +403,7 @@
 
 .student-table {
   width: 100%;
-  min-width: 860px;
+  min-width: 1040px;
   border-collapse: collapse;
 }
 
@@ -428,7 +428,7 @@
 }
 
 .student-table th:last-child {
-  width: 130px;
+  width: 300px;
 }
 
 .student-table td {
@@ -2301,5 +2301,158 @@ html[data-theme="dark"] .student-face-privacy-note {
   .student-face-countdown,
   .student-face-camera-flash.is-active {
     animation: none;
+  }
+}
+
+/* =========================================================
+   STUDENT MANAGEMENT CRUD ACTIONS
+   Edit / Face / Deactivate
+========================================================= */
+
+.student-table td:last-child {
+  min-width: 300px;
+}
+
+.student-table td:last-child > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.student-face-action:disabled {
+  transform: none;
+  border-color: var(--c-border-soft);
+  background: var(--c-surface-soft);
+  color: var(--c-text-muted);
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.student-face-action:disabled:hover {
+  transform: none;
+  border-color: var(--c-border-soft);
+  background: var(--c-surface-soft);
+}
+
+.student-table td:last-child > div > .student-face-action:first-child {
+  border-color: var(--c-brand-border);
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+}
+
+.student-table td:last-child > div > .student-face-action:first-child:hover:not(:disabled) {
+  border-color: var(--c-blue-800);
+  background: var(--c-nav-hover-bg);
+}
+
+.student-table td:last-child > div > .student-face-action:last-child:not(:disabled) {
+  border-color: rgba(220, 38, 38, 0.22);
+  background: rgba(220, 38, 38, 0.055);
+  color: #b42318;
+}
+
+.student-table td:last-child > div > .student-face-action:last-child:hover:not(:disabled) {
+  border-color: rgba(220, 38, 38, 0.4);
+  background: rgba(220, 38, 38, 0.1);
+}
+
+/* =========================================================
+   EDIT / DEACTIVATE MODAL CONTENT
+========================================================= */
+
+.student-management + .adviser-modal-backdrop .adviser-modal {
+  max-width: min(94vw, 560px);
+}
+
+.student-management + .adviser-modal-backdrop .student-form {
+  padding: 20px 23px;
+}
+
+.student-management + .adviser-modal-backdrop .student-form .student-face-student {
+  margin: 0;
+}
+
+.student-management + .adviser-modal-backdrop .student-form .student-face-privacy-note {
+  margin-top: 2px;
+}
+
+/* =========================================================
+   DEACTIVATE CONFIRMATION
+========================================================= */
+
+.student-management + .adviser-modal-backdrop .student-face-privacy-note > span {
+  font-weight: 900;
+}
+
+.student-management + .adviser-modal-backdrop .student-face-privacy-note p {
+  color: var(--c-text-body);
+}
+
+.student-management + .adviser-modal-backdrop .student-face-privacy-note strong {
+  color: var(--c-text-primary);
+}
+
+/* =========================================================
+   DARK MODE — CRUD ACTIONS
+========================================================= */
+
+html[data-theme="dark"]
+  .student-table
+  td:last-child
+  > div
+  > .student-face-action:last-child:not(:disabled) {
+  border-color: rgba(248, 113, 113, 0.24);
+  background: rgba(127, 29, 29, 0.18);
+  color: #fca5a5;
+}
+
+html[data-theme="dark"]
+  .student-table
+  td:last-child
+  > div
+  > .student-face-action:last-child:hover:not(:disabled) {
+  border-color: rgba(248, 113, 113, 0.42);
+  background: rgba(127, 29, 29, 0.3);
+}
+
+/* =========================================================
+   RESPONSIVE — CRUD ACTIONS
+========================================================= */
+
+@media (max-width: 820px) {
+  .student-table {
+    min-width: 1000px;
+  }
+
+  .student-table th:last-child,
+  .student-table td:last-child {
+    width: 285px;
+    min-width: 285px;
+  }
+}
+
+@media (max-width: 650px) {
+  .student-management + .adviser-modal-backdrop .adviser-modal {
+    width: calc(100vw - 22px);
+  }
+
+  .student-management + .adviser-modal-backdrop .student-form {
+    padding: 17px;
+  }
+}
+
+@media (max-width: 440px) {
+  .student-management + .adviser-modal-backdrop .student-form {
+    padding: 15px;
+  }
+
+  .student-table td:last-child > div {
+    gap: 6px;
+  }
+
+  .student-face-action {
+    min-height: 30px;
+    padding: 0 9px;
   }
 }

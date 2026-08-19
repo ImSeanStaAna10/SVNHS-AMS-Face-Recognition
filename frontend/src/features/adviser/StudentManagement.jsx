@@ -120,7 +120,8 @@ function FaceCameraStatus({
 }) {
   const statusClass = capturedFacePreview
     ? "is-captured"
-    : scanPhase === "countdown" || scanPhase === "holding"
+    : scanPhase === "countdown" ||
+        scanPhase === "holding"
       ? "is-scanning"
       : cameraActive
         ? "is-live"
@@ -170,7 +171,8 @@ function FaceCapturePanel({
   onManualCapture,
 }) {
   const scannerActive =
-    cameraActive && !capturedFacePreview;
+    cameraActive &&
+    !capturedFacePreview;
 
   const readyForHold =
     scanPhase === "holding" ||
@@ -186,7 +188,9 @@ function FaceCapturePanel({
         {capturedFacePreview ? (
           <>
             <img
-              src={capturedFacePreview}
+              src={
+                capturedFacePreview
+              }
               alt={`Captured face of ${subjectName}`}
               className="student-face-captured-image"
             />
@@ -194,19 +198,32 @@ function FaceCapturePanel({
             <div className="student-face-captured-shade" />
 
             <div className="student-face-captured-label">
-              <span aria-hidden="true">✓</span>
+              <span
+                aria-hidden="true"
+              >
+                ✓
+              </span>
+
               Enrollment photo ready
             </div>
 
             <div className="student-face-captured-summary">
-              <span className="student-face-captured-check" aria-hidden="true">
+              <span
+                className="student-face-captured-check"
+                aria-hidden="true"
+              >
                 ✓
               </span>
 
               <div>
-                <strong>Capture complete</strong>
+                <strong>
+                  Capture complete
+                </strong>
+
                 <p>
-                  Review the photo, then complete the student enrollment.
+                  Review the photo,
+                  then complete the
+                  student enrollment.
                 </p>
               </div>
             </div>
@@ -218,30 +235,47 @@ function FaceCapturePanel({
               autoPlay
               muted
               playsInline
-              className={cameraActive ? "is-active" : ""}
-              onCanPlay={onCameraReady}
+              className={
+                cameraActive
+                  ? "is-active"
+                  : ""
+              }
+              onCanPlay={
+                onCameraReady
+              }
             />
 
             {!cameraActive && (
               <div className="student-face-camera-placeholder">
-                <div className="student-face-placeholder-icon" aria-hidden="true">
+                <div
+                  className="student-face-placeholder-icon"
+                  aria-hidden="true"
+                >
                   <span />
                   <span />
                   <span />
                   <span />
                 </div>
 
-                <strong>Camera access required</strong>
+                <strong>
+                  Camera access required
+                </strong>
 
                 <p>
-                  Allow camera access to start the guided face enrollment.
+                  Allow camera access
+                  to start the guided
+                  face enrollment.
                 </p>
 
                 <button
                   type="button"
                   className="adviser-primary-button"
-                  disabled={registeringFace}
-                  onClick={onEnableCamera}
+                  disabled={
+                    registeringFace
+                  }
+                  onClick={
+                    onEnableCamera
+                  }
                 >
                   Enable Camera
                 </button>
@@ -250,11 +284,16 @@ function FaceCapturePanel({
 
             {scannerActive && (
               <>
-                <div className="student-face-camera-vignette" aria-hidden="true" />
+                <div
+                  className="student-face-camera-vignette"
+                  aria-hidden="true"
+                />
 
                 <div
                   className={`student-face-biometric-guide ${
-                    readyForHold ? "is-ready" : ""
+                    readyForHold
+                      ? "is-ready"
+                      : ""
                   }`}
                   aria-hidden="true"
                 >
@@ -276,29 +315,51 @@ function FaceCapturePanel({
                 </div>
 
                 <div className="student-face-auto-badge">
-                  <span aria-hidden="true">◎</span>
+                  <span
+                    aria-hidden="true"
+                  >
+                    ◎
+                  </span>
+
                   AUTO CAPTURE
                 </div>
 
-                {countdown !== null && (
+                {countdown !==
+                  null && (
                   <div
                     className="student-face-countdown"
                     aria-live="polite"
                   >
-                    <span>{countdown}</span>
-                    <small>Hold still</small>
+                    <span>
+                      {countdown}
+                    </span>
+
+                    <small>
+                      Hold still
+                    </small>
                   </div>
                 )}
 
                 <div className="student-face-instruction">
-                  <div className="student-face-instruction-icon" aria-hidden="true">
-                    {scanPhase === "holding" || scanPhase === "countdown"
+                  <div
+                    className="student-face-instruction-icon"
+                    aria-hidden="true"
+                  >
+                    {scanPhase ===
+                      "holding" ||
+                    scanPhase ===
+                      "countdown"
                       ? "✓"
                       : "◎"}
                   </div>
 
                   <div>
-                    <strong>{scanMessage}</strong>
+                    <strong>
+                      {
+                        scanMessage
+                      }
+                    </strong>
+
                     <span>
                       {cameraReady
                         ? "Keep one face inside the oval and look straight ahead."
@@ -308,66 +369,128 @@ function FaceCapturePanel({
                 </div>
 
                 <div className="student-face-camera-meta">
-                  <span className={cameraReady ? "is-complete" : ""}>
-                    <i aria-hidden="true">{cameraReady ? "✓" : "1"}</i>
+                  <span
+                    className={
+                      cameraReady
+                        ? "is-complete"
+                        : ""
+                    }
+                  >
+                    <i
+                      aria-hidden="true"
+                    >
+                      {cameraReady
+                        ? "✓"
+                        : "1"}
+                    </i>
+
                     Camera ready
                   </span>
 
-                  <span className={readyForHold ? "is-complete" : ""}>
-                    <i aria-hidden="true">{readyForHold ? "✓" : "2"}</i>
+                  <span
+                    className={
+                      readyForHold
+                        ? "is-complete"
+                        : ""
+                    }
+                  >
+                    <i
+                      aria-hidden="true"
+                    >
+                      {readyForHold
+                        ? "✓"
+                        : "2"}
+                    </i>
+
                     Hold position
                   </span>
 
-                  <span className={capturingFace ? "is-complete" : ""}>
-                    <i aria-hidden="true">{capturingFace ? "✓" : "3"}</i>
+                  <span
+                    className={
+                      capturingFace
+                        ? "is-complete"
+                        : ""
+                    }
+                  >
+                    <i
+                      aria-hidden="true"
+                    >
+                      {capturingFace
+                        ? "✓"
+                        : "3"}
+                    </i>
+
                     Auto capture
                   </span>
                 </div>
 
-                {cameraReady && scanPhase !== "countdown" && (
-                  <button
-                    type="button"
-                    className="student-face-manual-capture"
-                    disabled={
-                      registeringFace ||
-                      capturingFace ||
-                      !cameraReady
-                    }
-                    onClick={onManualCapture}
-                  >
-                    Capture now
-                  </button>
-                )}
+                {cameraReady &&
+                  scanPhase !==
+                    "countdown" && (
+                    <button
+                      type="button"
+                      className="student-face-manual-capture"
+                      disabled={
+                        registeringFace ||
+                        capturingFace ||
+                        !cameraReady
+                      }
+                      onClick={
+                        onManualCapture
+                      }
+                    >
+                      Capture now
+                    </button>
+                  )}
               </>
             )}
 
             <div
-              className={`student-face-camera-flash ${flashActive ? "is-active" : ""}`}
+              className={`student-face-camera-flash ${
+                flashActive
+                  ? "is-active"
+                  : ""
+              }`}
               aria-hidden="true"
             />
           </>
         )}
       </div>
 
-      <canvas ref={canvasRef} hidden />
+      <canvas
+        ref={canvasRef}
+        hidden
+      />
 
-      {!capturedFacePreview && cameraActive && !cameraReady && (
-        <div className="student-face-camera-loading">
-          <span className="student-face-loading-dot" />
-          Preparing secure camera preview...
-        </div>
-      )}
+      {!capturedFacePreview &&
+        cameraActive &&
+        !cameraReady && (
+          <div className="student-face-camera-loading">
+            <span className="student-face-loading-dot" />
+            Preparing secure camera
+            preview...
+          </div>
+        )}
 
       {cameraError && (
         <div
           className="student-face-feedback is-error"
           role="alert"
         >
-          <span aria-hidden="true">!</span>
+          <span
+            aria-hidden="true"
+          >
+            !
+          </span>
 
           <div>
-            <strong>Camera unavailable</strong>
-            <p>{cameraError}</p>
+            <strong>
+              Camera unavailable
+            </strong>
+
+            <p>
+              {cameraError}
+            </p>
           </div>
         </div>
       )}
@@ -377,20 +500,39 @@ function FaceCapturePanel({
           className="student-face-feedback is-error"
           role="alert"
         >
-          <span aria-hidden="true">!</span>
+          <span
+            aria-hidden="true"
+          >
+            !
+          </span>
 
           <div>
-            <strong>Face registration</strong>
-            <p>{faceError}</p>
+            <strong>
+              Face registration
+            </strong>
+
+            <p>
+              {faceError}
+            </p>
           </div>
         </div>
       )}
 
       <div className="student-face-privacy-note">
-        <span aria-hidden="true">▣</span>
+        <span
+          aria-hidden="true"
+        >
+          ▣
+        </span>
+
         <p>
-          <strong>Face enrollment photo</strong>
-          The captured image is submitted only when you complete enrollment.
+          <strong>
+            Face enrollment photo
+          </strong>
+
+          The captured image is
+          submitted only when you
+          complete enrollment.
         </p>
       </div>
     </div>
@@ -506,18 +648,58 @@ function StudentManagement() {
     setCreateError,
   ] = useState("");
 
-  /*
-   * Used when the student record was
-   * successfully created but face
-   * enrollment failed.
-   *
-   * Retrying will only call the face
-   * registration endpoint.
-   */
   const [
     createdStudentRecord,
     setCreatedStudentRecord,
   ] = useState(null);
+
+  /* =======================================================
+     EDIT STUDENT STATE
+  ======================================================= */
+
+  const [
+    editingStudent,
+    setEditingStudent,
+  ] = useState(null);
+
+  const [
+    editStudentNumber,
+    setEditStudentNumber,
+  ] = useState("");
+
+  const [
+    editStudentName,
+    setEditStudentName,
+  ] = useState("");
+
+  const [
+    updatingStudent,
+    setUpdatingStudent,
+  ] = useState(false);
+
+  const [
+    editError,
+    setEditError,
+  ] = useState("");
+
+  /* =======================================================
+     DEACTIVATE STUDENT STATE
+  ======================================================= */
+
+  const [
+    studentToDeactivate,
+    setStudentToDeactivate,
+  ] = useState(null);
+
+  const [
+    deactivatingStudent,
+    setDeactivatingStudent,
+  ] = useState(false);
+
+  const [
+    deactivateError,
+    setDeactivateError,
+  ] = useState("");
 
   /* =======================================================
      EXISTING STUDENT FACE STATE
@@ -580,7 +762,9 @@ function StudentManagement() {
   const [
     scanMessage,
     setScanMessage,
-  ] = useState("Camera is off");
+  ] = useState(
+    "Camera is off",
+  );
 
   const [
     countdown,
@@ -702,12 +886,18 @@ function StudentManagement() {
       }
 
       autoCaptureTimeoutsRef.current.forEach(
-        (timeoutId) => window.clearTimeout(timeoutId),
+        (timeoutId) =>
+          window.clearTimeout(
+            timeoutId,
+          ),
       );
 
-      autoCaptureTimeoutsRef.current = [];
+      autoCaptureTimeoutsRef.current =
+        [];
 
-      if (flashTimeoutRef.current) {
+      if (
+        flashTimeoutRef.current
+      ) {
         window.clearTimeout(
           flashTimeoutRef.current,
         );
@@ -717,7 +907,8 @@ function StudentManagement() {
         streamRef.current,
       );
 
-      streamRef.current = null;
+      streamRef.current =
+        null;
 
       if (
         previewUrlRef.current
@@ -740,6 +931,12 @@ function StudentManagement() {
     showAddModal ||
     Boolean(
       selectedStudent,
+    ) ||
+    Boolean(
+      editingStudent,
+    ) ||
+    Boolean(
+      studentToDeactivate,
     );
 
   useEffect(() => {
@@ -815,7 +1012,8 @@ function StudentManagement() {
         (student) => {
           const name =
             String(
-              student?.name || "",
+              student?.name ||
+                "",
             ).toLowerCase();
 
           const number =
@@ -825,8 +1023,12 @@ function StudentManagement() {
             ).toLowerCase();
 
           return (
-            name.includes(query) ||
-            number.includes(query)
+            name.includes(
+              query,
+            ) ||
+            number.includes(
+              query,
+            )
           );
         },
       );
@@ -910,7 +1112,11 @@ function StudentManagement() {
     };
 
   const scheduleAutoCaptureStep =
-    (callback, delay, sessionId) => {
+    (
+      callback,
+      delay,
+      sessionId,
+    ) => {
       const timeoutId =
         window.setTimeout(
           () => {
@@ -943,7 +1149,8 @@ function StudentManagement() {
         streamRef.current,
       );
 
-      streamRef.current = null;
+      streamRef.current =
+        null;
 
       if (videoRef.current) {
         videoRef.current.srcObject =
@@ -971,7 +1178,9 @@ function StudentManagement() {
         autoCaptureStartedRef.current =
           false;
 
-        setScanPhase("preparing");
+        setScanPhase(
+          "preparing",
+        );
 
         setScanMessage(
           "Preparing camera...",
@@ -1022,10 +1231,6 @@ function StudentManagement() {
         const video =
           videoRef.current;
 
-        /*
-         * Modal may have closed while
-         * permission dialog was open.
-         */
         if (!video) {
           stopMediaStream(
             stream,
@@ -1055,7 +1260,9 @@ function StudentManagement() {
 
         stopFaceCamera();
 
-        setScanPhase("error");
+        setScanPhase(
+          "error",
+        );
 
         setScanMessage(
           "Camera unavailable",
@@ -1170,7 +1377,9 @@ function StudentManagement() {
 
       setCountdown(null);
 
-      setFlashActive(false);
+      setFlashActive(
+        false,
+      );
     };
 
   /* =======================================================
@@ -1178,7 +1387,9 @@ function StudentManagement() {
   ======================================================= */
 
   const handleCaptureFace =
-    async ({ automatic = false } = {}) => {
+    async ({
+      automatic = false,
+    } = {}) => {
       if (
         capturingFace ||
         registeringFace ||
@@ -1216,7 +1427,9 @@ function StudentManagement() {
           "Unable to capture the camera image.",
         );
 
-        setScanPhase("error");
+        setScanPhase(
+          "error",
+        );
 
         setScanMessage(
           "Capture failed",
@@ -1228,9 +1441,13 @@ function StudentManagement() {
       try {
         clearAutoCaptureTimers();
 
-        setCapturingFace(true);
+        setCapturingFace(
+          true,
+        );
 
-        setScanPhase("capturing");
+        setScanPhase(
+          "capturing",
+        );
 
         setScanMessage(
           "Capturing enrollment photo...",
@@ -1245,7 +1462,9 @@ function StudentManagement() {
           video.videoHeight;
 
         const context =
-          canvas.getContext("2d");
+          canvas.getContext(
+            "2d",
+          );
 
         if (!context) {
           throw new Error(
@@ -1253,11 +1472,6 @@ function StudentManagement() {
           );
         }
 
-        /*
-         * Keep the live preview mirrored for a natural
-         * selfie experience, but save the ORIGINAL
-         * camera frame for consistent face recognition.
-         */
         context.drawImage(
           video,
           0,
@@ -1266,9 +1480,13 @@ function StudentManagement() {
           canvas.height,
         );
 
-        setFlashActive(true);
+        setFlashActive(
+          true,
+        );
 
-        if (flashTimeoutRef.current) {
+        if (
+          flashTimeoutRef.current
+        ) {
           window.clearTimeout(
             flashTimeoutRef.current,
           );
@@ -1277,7 +1495,10 @@ function StudentManagement() {
         flashTimeoutRef.current =
           window.setTimeout(
             () => {
-              setFlashActive(false);
+              setFlashActive(
+                false,
+              );
+
               flashTimeoutRef.current =
                 null;
             },
@@ -1307,20 +1528,26 @@ function StudentManagement() {
           previewUrl,
         );
 
-        setScanPhase("captured");
+        setScanPhase(
+          "captured",
+        );
 
         setScanMessage(
           "Enrollment photo ready",
         );
 
         stopFaceCamera();
-      } catch (captureError) {
+      } catch (
+        captureError
+      ) {
         console.error(
           "Unable to capture face:",
           captureError,
         );
 
-        setScanPhase("error");
+        setScanPhase(
+          "error",
+        );
 
         setScanMessage(
           "Capture failed",
@@ -1331,7 +1558,9 @@ function StudentManagement() {
             "Unable to capture the student's face.",
         );
       } finally {
-        setCapturingFace(false);
+        setCapturingFace(
+          false,
+        );
       }
     };
 
@@ -1357,7 +1586,9 @@ function StudentManagement() {
       const sessionId =
         autoCaptureSessionRef.current;
 
-      setScanPhase("positioning");
+      setScanPhase(
+        "positioning",
+      );
 
       setScanMessage(
         "Center your face inside the oval",
@@ -1365,11 +1596,15 @@ function StudentManagement() {
 
       scheduleAutoCaptureStep(
         () => {
-          if (!streamRef.current) {
+          if (
+            !streamRef.current
+          ) {
             return;
           }
 
-          setScanPhase("holding");
+          setScanPhase(
+            "holding",
+          );
 
           setScanMessage(
             "Great. Look straight ahead and hold still",
@@ -1381,8 +1616,14 @@ function StudentManagement() {
 
       scheduleAutoCaptureStep(
         () => {
-          setScanPhase("countdown");
-          setScanMessage("Hold still");
+          setScanPhase(
+            "countdown",
+          );
+
+          setScanMessage(
+            "Hold still",
+          );
+
           setCountdown(3);
         },
         2600,
@@ -1390,13 +1631,15 @@ function StudentManagement() {
       );
 
       scheduleAutoCaptureStep(
-        () => setCountdown(2),
+        () =>
+          setCountdown(2),
         3400,
         sessionId,
       );
 
       scheduleAutoCaptureStep(
-        () => setCountdown(1),
+        () =>
+          setCountdown(1),
         4200,
         sessionId,
       );
@@ -1404,6 +1647,7 @@ function StudentManagement() {
       scheduleAutoCaptureStep(
         () => {
           setCountdown(null);
+
           void handleCaptureFace({
             automatic: true,
           });
@@ -1422,9 +1666,13 @@ function StudentManagement() {
         return;
       }
 
-      setCameraReady(true);
+      setCameraReady(
+        true,
+      );
 
-      setScanPhase("positioning");
+      setScanPhase(
+        "positioning",
+      );
 
       setScanMessage(
         "Center your face inside the oval",
@@ -1455,7 +1703,9 @@ function StudentManagement() {
       autoCaptureStartedRef.current =
         false;
 
-      setScanPhase("preparing");
+      setScanPhase(
+        "preparing",
+      );
 
       setScanMessage(
         "Preparing camera...",
@@ -1491,6 +1741,14 @@ function StudentManagement() {
         null,
       );
 
+      setEditingStudent(
+        null,
+      );
+
+      setStudentToDeactivate(
+        null,
+      );
+
       setSuccessMessage("");
 
       setShowAddModal(
@@ -1513,7 +1771,9 @@ function StudentManagement() {
 
   const closeAddModal =
     () => {
-      if (creatingStudent) {
+      if (
+        creatingStudent
+      ) {
         return;
       }
 
@@ -1553,7 +1813,9 @@ function StudentManagement() {
         return;
       }
 
-      if (!capturedFaceFile) {
+      if (
+        !capturedFaceFile
+      ) {
         setFaceError(
           "Please capture the student's face before saving.",
         );
@@ -1580,11 +1842,9 @@ function StudentManagement() {
 
         setSuccessMessage("");
 
-        /* ===============================================
-           STEP 1 — CREATE STUDENT
-        =============================================== */
-
-        if (!studentRecord?.id) {
+        if (
+          !studentRecord?.id
+        ) {
           operationStage =
             "student";
 
@@ -1602,10 +1862,6 @@ function StudentManagement() {
               },
             );
 
-          /*
-           * Normally backend returns
-           * the newly created student.
-           */
           if (
             createdStudent?.id
           ) {
@@ -1622,12 +1878,16 @@ function StudentManagement() {
               ) => {
                 const alreadyExists =
                   currentStudents.some(
-                    (student) =>
+                    (
+                      student,
+                    ) =>
                       student.id ===
                       createdStudent.id,
                   );
 
-                if (alreadyExists) {
+                if (
+                  alreadyExists
+                ) {
                   return currentStudents;
                 }
 
@@ -1638,11 +1898,6 @@ function StudentManagement() {
               },
             );
           } else {
-            /*
-             * Defensive fallback:
-             * refetch and locate the
-             * record by student number.
-             */
             const refreshed =
               await refreshStudents();
 
@@ -1668,10 +1923,6 @@ function StudentManagement() {
             );
           }
         }
-
-        /* ===============================================
-           STEP 2 — REGISTER FACE
-        =============================================== */
 
         operationStage =
           "face";
@@ -1725,7 +1976,8 @@ function StudentManagement() {
           "student"
         ) {
           if (
-            requestError?.response
+            requestError
+              ?.response
               ?.status === 409
           ) {
             setCreateError(
@@ -1746,12 +1998,6 @@ function StudentManagement() {
           return;
         }
 
-        /*
-         * Student already exists at this
-         * point. Keep the modal open and
-         * allow face enrollment retry
-         * WITHOUT recreating the student.
-         */
         setFaceError(
           getErrorMessage(
             requestError,
@@ -1766,15 +2012,385 @@ function StudentManagement() {
     };
 
   /* =======================================================
+     EDIT STUDENT MODAL
+  ======================================================= */
+
+  const openEditStudent =
+    (student) => {
+      if (
+        !student?.id ||
+        student.active ===
+          false
+      ) {
+        return;
+      }
+
+      resetCamera();
+
+      setShowAddModal(
+        false,
+      );
+
+      setSelectedStudent(
+        null,
+      );
+
+      setStudentToDeactivate(
+        null,
+      );
+
+      setEditingStudent(
+        student,
+      );
+
+      setEditStudentNumber(
+        student.studentNumber ||
+          "",
+      );
+
+      setEditStudentName(
+        student.name ||
+          "",
+      );
+
+      setEditError("");
+
+      setSuccessMessage("");
+    };
+
+  const resetEditStudent =
+    () => {
+      setEditingStudent(
+        null,
+      );
+
+      setEditStudentNumber(
+        "",
+      );
+
+      setEditStudentName(
+        "",
+      );
+
+      setEditError("");
+    };
+
+  const closeEditStudent =
+    () => {
+      if (
+        updatingStudent
+      ) {
+        return;
+      }
+
+      resetEditStudent();
+    };
+
+  /* =======================================================
+     UPDATE STUDENT
+  ======================================================= */
+
+  const handleUpdateStudent =
+    async (event) => {
+      event.preventDefault();
+
+      if (
+        !editingStudent?.id
+      ) {
+        setEditError(
+          "Student information is unavailable.",
+        );
+
+        return;
+      }
+
+      const cleanStudentNumber =
+        editStudentNumber.trim();
+
+      const cleanName =
+        editStudentName.trim();
+
+      if (
+        !cleanStudentNumber ||
+        !cleanName
+      ) {
+        setEditError(
+          "Student number and student name are required.",
+        );
+
+        return;
+      }
+
+      try {
+        setUpdatingStudent(
+          true,
+        );
+
+        setEditError("");
+
+        setSuccessMessage("");
+
+        const updatedStudent =
+          await adviserService.updateStudent(
+            editingStudent.id,
+            {
+              studentNumber:
+                cleanStudentNumber,
+
+              name:
+                cleanName,
+            },
+          );
+
+        if (
+          updatedStudent?.id
+        ) {
+          setStudents(
+            (
+              currentStudents,
+            ) =>
+              currentStudents.map(
+                (student) =>
+                  student.id ===
+                  updatedStudent.id
+                    ? {
+                        ...student,
+                        ...updatedStudent,
+                      }
+                    : student,
+              ),
+          );
+        }
+
+        try {
+          await refreshStudents();
+        } catch (
+          refreshError
+        ) {
+          console.warn(
+            "Unable to refresh students after update:",
+            refreshError,
+          );
+        }
+
+        setSuccessMessage(
+          `${cleanName}'s student information was updated successfully.`,
+        );
+
+        resetEditStudent();
+      } catch (
+        requestError
+      ) {
+        console.error(
+          "Unable to update student:",
+          requestError,
+        );
+
+        if (
+          requestError
+            ?.response
+            ?.status === 409
+        ) {
+          setEditError(
+            "That student number already belongs to another student.",
+          );
+
+          return;
+        }
+
+        setEditError(
+          getErrorMessage(
+            requestError,
+            "Unable to update the student record.",
+          ),
+        );
+      } finally {
+        setUpdatingStudent(
+          false,
+        );
+      }
+    };
+
+  /* =======================================================
+     DEACTIVATE STUDENT MODAL
+  ======================================================= */
+
+  const openDeactivateStudent =
+    (student) => {
+      if (
+        !student?.id ||
+        student.active ===
+          false
+      ) {
+        return;
+      }
+
+      resetCamera();
+
+      setShowAddModal(
+        false,
+      );
+
+      setSelectedStudent(
+        null,
+      );
+
+      setEditingStudent(
+        null,
+      );
+
+      setStudentToDeactivate(
+        student,
+      );
+
+      setDeactivateError("");
+
+      setSuccessMessage("");
+    };
+
+  const resetDeactivateStudent =
+    () => {
+      setStudentToDeactivate(
+        null,
+      );
+
+      setDeactivateError("");
+    };
+
+  const closeDeactivateStudent =
+    () => {
+      if (
+        deactivatingStudent
+      ) {
+        return;
+      }
+
+      resetDeactivateStudent();
+    };
+
+  /* =======================================================
+     DEACTIVATE STUDENT
+  ======================================================= */
+
+  const handleDeactivateStudent =
+    async () => {
+      if (
+        !studentToDeactivate
+          ?.id
+      ) {
+        setDeactivateError(
+          "Student information is unavailable.",
+        );
+
+        return;
+      }
+
+      const studentId =
+        studentToDeactivate.id;
+
+      const studentName =
+        studentToDeactivate.name ||
+        "Student";
+
+      try {
+        setDeactivatingStudent(
+          true,
+        );
+
+        setDeactivateError("");
+
+        setSuccessMessage("");
+
+        await adviserService.deleteStudent(
+          studentId,
+        );
+
+        /*
+         * Update the local roster immediately.
+         *
+         * Backend performs a soft delete,
+         * therefore the student remains in
+         * the list but becomes inactive.
+         */
+        setStudents(
+          (
+            currentStudents,
+          ) =>
+            currentStudents.map(
+              (student) =>
+                student.id ===
+                studentId
+                  ? {
+                      ...student,
+                      active: false,
+                    }
+                  : student,
+            ),
+        );
+
+        try {
+          await refreshStudents();
+        } catch (
+          refreshError
+        ) {
+          console.warn(
+            "Unable to refresh students after deactivation:",
+            refreshError,
+          );
+        }
+
+        setSuccessMessage(
+          `${studentName} was deactivated successfully. Attendance history remains preserved.`,
+        );
+
+        resetDeactivateStudent();
+      } catch (
+        requestError
+      ) {
+        console.error(
+          "Unable to deactivate student:",
+          requestError,
+        );
+
+        setDeactivateError(
+          getErrorMessage(
+            requestError,
+            "Unable to deactivate the student.",
+          ),
+        );
+      } finally {
+        setDeactivatingStudent(
+          false,
+        );
+      }
+    };
+
+  /* =======================================================
      EXISTING STUDENT FACE MODAL
   ======================================================= */
 
   const openFaceRegistration =
     (student) => {
+      if (
+        !student?.id ||
+        student.active ===
+          false
+      ) {
+        return;
+      }
+
       resetCamera();
 
       setShowAddModal(
         false,
+      );
+
+      setEditingStudent(
+        null,
+      );
+
+      setStudentToDeactivate(
+        null,
       );
 
       setSelectedStudent(
@@ -1797,7 +2413,9 @@ function StudentManagement() {
 
   const closeFaceRegistration =
     () => {
-      if (registeringFace) {
+      if (
+        registeringFace
+      ) {
         return;
       }
 
@@ -1822,7 +2440,9 @@ function StudentManagement() {
         return;
       }
 
-      if (!capturedFaceFile) {
+      if (
+        !capturedFaceFile
+      ) {
         setFaceError(
           "Please capture the student's face first.",
         );
@@ -1930,7 +2550,8 @@ function StudentManagement() {
 
             <div>
               <strong>
-                Student records unavailable
+                Student records
+                unavailable
               </strong>
 
               <p>
@@ -1957,7 +2578,9 @@ function StudentManagement() {
               </strong>
 
               <p>
-                {successMessage}
+                {
+                  successMessage
+                }
               </p>
             </div>
 
@@ -1985,14 +2608,15 @@ function StudentManagement() {
 
             <div>
               <strong>
-                Student Face Enrollment
+                Student Face
+                Enrollment
               </strong>
 
               <p>
-                New students can now be
-                created together with
-                their ID-style face
-                photo.
+                New students can now
+                be created together
+                with their ID-style
+                face photo.
               </p>
             </div>
           </div>
@@ -2095,8 +2719,9 @@ function StudentManagement() {
               </h2>
 
               <p>
-                Manage student records
-                and face identities.
+                Manage student
+                records and face
+                identities.
               </p>
             </div>
 
@@ -2289,7 +2914,7 @@ function StudentManagement() {
                     </th>
 
                     <th>
-                      Action
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -2401,23 +3026,70 @@ function StudentManagement() {
                           </td>
 
                           <td>
-                            <button
-                              type="button"
-                              className={`student-face-action ${
-                                faceRegistered
-                                  ? "is-registered"
-                                  : ""
-                              }`}
-                              onClick={() =>
-                                openFaceRegistration(
-                                  student,
-                                )
-                              }
+                            <div
+                              style={{
+                                display:
+                                  "flex",
+                                alignItems:
+                                  "center",
+                                gap: "8px",
+                                flexWrap:
+                                  "wrap",
+                              }}
                             >
-                              {faceRegistered
-                                ? "Update Face"
-                                : "Register Face"}
-                            </button>
+                              <button
+                                type="button"
+                                className="student-face-action"
+                                disabled={
+                                  !active
+                                }
+                                onClick={() =>
+                                  openEditStudent(
+                                    student,
+                                  )
+                                }
+                              >
+                                Edit
+                              </button>
+
+                              <button
+                                type="button"
+                                className={`student-face-action ${
+                                  faceRegistered
+                                    ? "is-registered"
+                                    : ""
+                                }`}
+                                disabled={
+                                  !active
+                                }
+                                onClick={() =>
+                                  openFaceRegistration(
+                                    student,
+                                  )
+                                }
+                              >
+                                {faceRegistered
+                                  ? "Update Face"
+                                  : "Register Face"}
+                              </button>
+
+                              <button
+                                type="button"
+                                className="student-face-action"
+                                disabled={
+                                  !active
+                                }
+                                onClick={() =>
+                                  openDeactivateStudent(
+                                    student,
+                                  )
+                                }
+                              >
+                                {active
+                                  ? "Deactivate"
+                                  : "Inactive"}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -2455,8 +3127,6 @@ function StudentManagement() {
               handleCreateStudent
             }
           >
-            {/* HEADER */}
-
             <header className="adviser-modal-header">
               <div className="adviser-modal-icon">
                 +
@@ -2480,13 +3150,7 @@ function StudentManagement() {
               </div>
             </header>
 
-            {/* BODY */}
-
             <div className="student-enrollment-body">
-              {/* ===========================================
-                  STUDENT INFORMATION
-              ============================================ */}
-
               <section className="student-enrollment-details">
                 <div className="student-enrollment-section-heading">
                   <span>
@@ -2495,12 +3159,14 @@ function StudentManagement() {
 
                   <div>
                     <strong>
-                      Student Information
+                      Student
+                      Information
                     </strong>
 
                     <p>
-                      Enter the official
-                      student details.
+                      Enter the
+                      official student
+                      details.
                     </p>
                   </div>
                 </div>
@@ -2515,14 +3181,16 @@ function StudentManagement() {
 
                     <div>
                       <strong>
-                        Student record created
+                        Student record
+                        created
                       </strong>
 
                       <p>
-                        Complete the face
-                        registration below.
-                        Student information
-                        is now locked.
+                        Complete the
+                        face registration
+                        below. Student
+                        information is
+                        now locked.
                       </p>
                     </div>
                   </div>
@@ -2623,16 +3291,14 @@ function StudentManagement() {
                       </span>
 
                       <p>
-                        {createError}
+                        {
+                          createError
+                        }
                       </p>
                     </div>
                   )}
                 </div>
               </section>
-
-              {/* ===========================================
-                  FACE PHOTO
-              ============================================ */}
 
               <section className="student-enrollment-photo">
                 <div className="student-enrollment-photo-header">
@@ -2643,7 +3309,8 @@ function StudentManagement() {
 
                     <div>
                       <strong>
-                        Student Face Photo
+                        Student Face
+                        Photo
                       </strong>
 
                       <p>
@@ -2724,8 +3391,6 @@ function StudentManagement() {
               </section>
             </div>
 
-            {/* FOOTER */}
-
             <footer className="adviser-modal-actions student-enrollment-actions">
               <button
                 type="button"
@@ -2802,6 +3467,340 @@ function StudentManagement() {
       )}
 
       {/* ===================================================
+          EDIT STUDENT MODAL
+      ==================================================== */}
+
+      {editingStudent && (
+        <div
+          className="adviser-modal-backdrop"
+          role="presentation"
+          onMouseDown={(
+            event,
+          ) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              closeEditStudent();
+            }
+          }}
+        >
+          <form
+            className="adviser-modal"
+            onSubmit={
+              handleUpdateStudent
+            }
+          >
+            <header className="adviser-modal-header">
+              <div className="adviser-modal-icon">
+                ✎
+              </div>
+
+              <div>
+                <span>
+                  STUDENT RECORD
+                </span>
+
+                <h2>
+                  Edit Student
+                </h2>
+
+                <p>
+                  Update the student
+                  number or student
+                  name.
+                </p>
+              </div>
+            </header>
+
+            <div className="student-form">
+              <label className="student-form-field">
+                <span>
+                  Student Number
+                </span>
+
+                <input
+                  type="text"
+                  value={
+                    editStudentNumber
+                  }
+                  disabled={
+                    updatingStudent
+                  }
+                  autoFocus
+                  placeholder="Enter student number"
+                  onChange={(
+                    event,
+                  ) =>
+                    setEditStudentNumber(
+                      event.target
+                        .value,
+                    )
+                  }
+                />
+              </label>
+
+              <label className="student-form-field">
+                <span>
+                  Student Name
+                </span>
+
+                <input
+                  type="text"
+                  value={
+                    editStudentName
+                  }
+                  disabled={
+                    updatingStudent
+                  }
+                  placeholder="Enter complete student name"
+                  onChange={(
+                    event,
+                  ) =>
+                    setEditStudentName(
+                      event.target
+                        .value,
+                    )
+                  }
+                />
+              </label>
+
+              <div className="student-form-field">
+                <span>
+                  Assigned Section
+                </span>
+
+                <div className="student-locked-field">
+                  <strong>
+                    {sectionName}
+                  </strong>
+
+                  <span
+                    aria-hidden="true"
+                  >
+                    🔒
+                  </span>
+                </div>
+
+                <small>
+                  Section assignment
+                  cannot be changed
+                  from Student
+                  Management.
+                </small>
+              </div>
+
+              {editError && (
+                <div
+                  className="adviser-modal-error"
+                  role="alert"
+                >
+                  <span
+                    aria-hidden="true"
+                  >
+                    !
+                  </span>
+
+                  <p>
+                    {editError}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <footer className="adviser-modal-actions">
+              <button
+                type="button"
+                className="adviser-secondary-button"
+                disabled={
+                  updatingStudent
+                }
+                onClick={
+                  closeEditStudent
+                }
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="adviser-primary-button"
+                disabled={
+                  updatingStudent ||
+                  !editStudentNumber.trim() ||
+                  !editStudentName.trim()
+                }
+              >
+                {updatingStudent && (
+                  <span
+                    className="adviser-button-spinner"
+                    aria-hidden="true"
+                  />
+                )}
+
+                {updatingStudent
+                  ? "Saving..."
+                  : "Save Changes"}
+              </button>
+            </footer>
+          </form>
+        </div>
+      )}
+
+      {/* ===================================================
+          DEACTIVATE STUDENT MODAL
+      ==================================================== */}
+
+      {studentToDeactivate && (
+        <div
+          className="adviser-modal-backdrop"
+          role="presentation"
+          onMouseDown={(
+            event,
+          ) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              closeDeactivateStudent();
+            }
+          }}
+        >
+          <div className="adviser-modal">
+            <header className="adviser-modal-header">
+              <div className="adviser-modal-icon">
+                !
+              </div>
+
+              <div>
+                <span>
+                  STUDENT STATUS
+                </span>
+
+                <h2>
+                  Deactivate Student
+                </h2>
+
+                <p>
+                  Remove this student
+                  from the active
+                  class roster.
+                </p>
+              </div>
+            </header>
+
+            <div className="student-form">
+              <div className="student-face-student">
+                <span className="student-face-student-avatar">
+                  {studentToDeactivate
+                    .name
+                    ?.charAt(0)
+                    ?.toUpperCase() ||
+                    "S"}
+                </span>
+
+                <div>
+                  <span>
+                    STUDENT
+                  </span>
+
+                  <strong>
+                    {
+                      studentToDeactivate.name
+                    }
+                  </strong>
+
+                  <small>
+                    {studentToDeactivate.studentNumber ||
+                      "No student number"}
+                    {" • "}
+                    {sectionName}
+                  </small>
+                </div>
+              </div>
+
+              <div className="student-face-privacy-note">
+                <span
+                  aria-hidden="true"
+                >
+                  !
+                </span>
+
+                <p>
+                  <strong>
+                    Attendance history
+                    will be preserved
+                  </strong>
+
+                  Deactivation does
+                  not permanently
+                  erase the student,
+                  attendance records,
+                  or registered face.
+                </p>
+              </div>
+
+              {deactivateError && (
+                <div
+                  className="adviser-modal-error"
+                  role="alert"
+                >
+                  <span
+                    aria-hidden="true"
+                  >
+                    !
+                  </span>
+
+                  <p>
+                    {
+                      deactivateError
+                    }
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <footer className="adviser-modal-actions">
+              <button
+                type="button"
+                className="adviser-secondary-button"
+                disabled={
+                  deactivatingStudent
+                }
+                onClick={
+                  closeDeactivateStudent
+                }
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="adviser-primary-button"
+                disabled={
+                  deactivatingStudent
+                }
+                onClick={() =>
+                  void handleDeactivateStudent()
+                }
+              >
+                {deactivatingStudent && (
+                  <span
+                    className="adviser-button-spinner"
+                    aria-hidden="true"
+                  />
+                )}
+
+                {deactivatingStudent
+                  ? "Deactivating..."
+                  : "Deactivate Student"}
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
+
+      {/* ===================================================
           EXISTING STUDENT FACE MODAL
       ==================================================== */}
 
@@ -2837,7 +3836,12 @@ function StudentManagement() {
                 </span>
 
                 <h2>
-                  Register Student Face
+                  {hasFaceRegistered(
+                    selectedStudent,
+                    locallyRegisteredFaceIds,
+                  )
+                    ? "Update Student Face"
+                    : "Register Student Face"}
                 </h2>
 
                 <p>
@@ -2990,7 +3994,12 @@ function StudentManagement() {
 
                     {registeringFace
                       ? "Registering..."
-                      : "Register Face"}
+                      : hasFaceRegistered(
+                            selectedStudent,
+                            locallyRegisteredFaceIds,
+                          )
+                        ? "Update Face"
+                        : "Register Face"}
                   </button>
                 </>
               ) : (

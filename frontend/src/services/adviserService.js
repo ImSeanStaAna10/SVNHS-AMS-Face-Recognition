@@ -43,6 +43,59 @@ const createStudent = async ({
   return response.data;
 };
 
+/**
+ * Updates a student's basic information.
+ *
+ * Backend:
+ *
+ * PATCH /api/students/{studentId}
+ *
+ * Editable fields:
+ *
+ * studentNumber
+ * name
+ *
+ * Student ID, section, face registration,
+ * and attendance history are not changed.
+ */
+const updateStudent = async (
+  studentId,
+  {
+    studentNumber,
+    name,
+  },
+) => {
+  const response = await api.patch(
+    `/students/${studentId}`,
+    {
+      studentNumber,
+      name,
+    },
+  );
+
+  return response.data;
+};
+
+/**
+ * Deactivates a student.
+ *
+ * Backend:
+ *
+ * DELETE /api/students/{studentId}
+ *
+ * IMPORTANT:
+ * Backend performs a soft delete.
+ * The student record, face registration,
+ * and attendance history remain preserved.
+ */
+const deleteStudent = async (
+  studentId,
+) => {
+  await api.delete(
+    `/students/${studentId}`,
+  );
+};
+
 /* =========================================================
    STUDENT FACE REGISTRATION
 ========================================================= */
@@ -82,7 +135,9 @@ const registerStudentFace = async (
  *
  * A 404 means there is currently no active session.
  */
-const getActiveSession = async (sectionId) => {
+const getActiveSession = async (
+  sectionId,
+) => {
   try {
     const response = await api.get(
       `/attendance-sessions/section/${sectionId}/active`,
@@ -90,7 +145,9 @@ const getActiveSession = async (sectionId) => {
 
     return response.data;
   } catch (error) {
-    if (error?.response?.status === 404) {
+    if (
+      error?.response?.status === 404
+    ) {
       return null;
     }
 
@@ -219,7 +276,9 @@ const getSessionRecords = async (
     return data;
   }
 
-  if (Array.isArray(data?.records)) {
+  if (
+    Array.isArray(data?.records)
+  ) {
     return data.records;
   }
 
@@ -367,6 +426,8 @@ const adviserService = {
   /* STUDENTS */
   getStudents,
   createStudent,
+  updateStudent,
+  deleteStudent,
   registerStudentFace,
 
   /* ATTENDANCE SESSION */
