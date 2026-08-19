@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import CouncilorSidebar from "../components/councilor/CouncilorSidebar";
 import CouncilorTopbar from "../components/councilor/CouncilorTopbar";
@@ -28,7 +31,10 @@ const INITIAL_PASSWORD_VISIBILITY = {
    HELPERS
 ========================================================= */
 
-const getErrorMessage = (error, fallbackMessage) =>
+const getErrorMessage = (
+  error,
+  fallbackMessage,
+) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   fallbackMessage;
@@ -37,7 +43,9 @@ const getErrorMessage = (error, fallbackMessage) =>
    PASSWORD VISIBILITY ICON
 ========================================================= */
 
-function PasswordVisibilityIcon({ visible }) {
+function PasswordVisibilityIcon({
+  visible,
+}) {
   if (visible) {
     return (
       <svg
@@ -113,30 +121,58 @@ function PasswordVisibilityIcon({ visible }) {
    COMPONENT
 ========================================================= */
 
-function CouncilorLayout({ children }) {
-  const user = authService.getUser();
+function CouncilorLayout({
+  children,
+}) {
+  const user =
+    authService.getUser();
+
+  /* =======================================================
+     MOBILE SIDEBAR STATE
+  ======================================================= */
+
+  const [
+    mobileSidebarOpen,
+    setMobileSidebarOpen,
+  ] = useState(false);
 
   /* =======================================================
      PASSWORD STATE
   ======================================================= */
 
-  const [showPasswordModal, setShowPasswordModal] =
-    useState(false);
+  const [
+    showPasswordModal,
+    setShowPasswordModal,
+  ] = useState(false);
 
-  const [passwordForm, setPasswordForm] =
-    useState(INITIAL_PASSWORD_FORM);
+  const [
+    passwordForm,
+    setPasswordForm,
+  ] = useState(
+    INITIAL_PASSWORD_FORM,
+  );
 
-  const [passwordVisibility, setPasswordVisibility] =
-    useState(INITIAL_PASSWORD_VISIBILITY);
+  const [
+    passwordVisibility,
+    setPasswordVisibility,
+  ] = useState(
+    INITIAL_PASSWORD_VISIBILITY,
+  );
 
-  const [passwordError, setPasswordError] =
-    useState("");
+  const [
+    passwordError,
+    setPasswordError,
+  ] = useState("");
 
-  const [passwordSuccess, setPasswordSuccess] =
-    useState("");
+  const [
+    passwordSuccess,
+    setPasswordSuccess,
+  ] = useState("");
 
-  const [changingPassword, setChangingPassword] =
-    useState(false);
+  const [
+    changingPassword,
+    setChangingPassword,
+  ] = useState(false);
 
   /* =======================================================
      USER
@@ -151,31 +187,79 @@ function CouncilorLayout({ children }) {
     "Councilor account";
 
   const userInitial =
-    userName.charAt(0).toUpperCase() ||
+    userName
+      .charAt(0)
+      .toUpperCase() ||
     "C";
+
+  /* =======================================================
+     MOBILE SIDEBAR CONTROLS
+  ======================================================= */
+
+  const openMobileSidebar = () => {
+    setMobileSidebarOpen(true);
+  };
+
+  const closeMobileSidebar = () => {
+    setMobileSidebarOpen(false);
+  };
+
+  /* =======================================================
+     CLOSE SIDEBAR WHEN RETURNING TO DESKTOP
+  ======================================================= */
+
+  useEffect(() => {
+    const mediaQuery =
+      window.matchMedia(
+        "(max-width: 720px)",
+      );
+
+    const handleViewportChange = (
+      event,
+    ) => {
+      if (!event.matches) {
+        setMobileSidebarOpen(false);
+      }
+    };
+
+    mediaQuery.addEventListener(
+      "change",
+      handleViewportChange,
+    );
+
+    return () => {
+      mediaQuery.removeEventListener(
+        "change",
+        handleViewportChange,
+      );
+    };
+  }, []);
 
   /* =======================================================
      RESET PASSWORD MODAL STATE
   ======================================================= */
 
-  const resetPasswordModalState = () => {
-    setPasswordForm(
-      INITIAL_PASSWORD_FORM,
-    );
+  const resetPasswordModalState =
+    () => {
+      setPasswordForm(
+        INITIAL_PASSWORD_FORM,
+      );
 
-    setPasswordVisibility(
-      INITIAL_PASSWORD_VISIBILITY,
-    );
+      setPasswordVisibility(
+        INITIAL_PASSWORD_VISIBILITY,
+      );
 
-    setPasswordError("");
-    setPasswordSuccess("");
-  };
+      setPasswordError("");
+      setPasswordSuccess("");
+    };
 
   /* =======================================================
      PASSWORD MODAL CONTROLS
   ======================================================= */
 
   const openPasswordModal = () => {
+    closeMobileSidebar();
+
     resetPasswordModalState();
 
     setShowPasswordModal(true);
@@ -192,11 +276,18 @@ function CouncilorLayout({ children }) {
   };
 
   /* =======================================================
-     PASSWORD MODAL SIDE EFFECTS
+     PAGE SCROLL LOCK
+
+     Prevent page scrolling when:
+     - mobile sidebar is open
+     - password modal is open
   ======================================================= */
 
   useEffect(() => {
-    if (!showPasswordModal) {
+    if (
+      !mobileSidebarOpen &&
+      !showPasswordModal
+    ) {
       return undefined;
     }
 
@@ -206,11 +297,46 @@ function CouncilorLayout({ children }) {
     document.body.style.overflow =
       "hidden";
 
-    const handleKeyDown = (event) => {
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+    };
+  }, [
+    mobileSidebarOpen,
+    showPasswordModal,
+  ]);
+
+  /* =======================================================
+     ESCAPE KEY
+  ======================================================= */
+
+  useEffect(() => {
+    if (
+      !mobileSidebarOpen &&
+      !showPasswordModal
+    ) {
+      return undefined;
+    }
+
+    const handleKeyDown = (
+      event,
+    ) => {
       if (
-        event.key === "Escape" &&
-        !changingPassword
+        event.key !==
+        "Escape"
       ) {
+        return;
+      }
+
+      /* ===============================================
+         CLOSE PASSWORD MODAL FIRST
+      =============================================== */
+
+      if (showPasswordModal) {
+        if (changingPassword) {
+          return;
+        }
+
         setShowPasswordModal(false);
 
         setPasswordForm(
@@ -223,6 +349,16 @@ function CouncilorLayout({ children }) {
 
         setPasswordError("");
         setPasswordSuccess("");
+
+        return;
+      }
+
+      /* ===============================================
+         CLOSE MOBILE SIDEBAR
+      =============================================== */
+
+      if (mobileSidebarOpen) {
+        setMobileSidebarOpen(false);
       }
     };
 
@@ -232,15 +368,13 @@ function CouncilorLayout({ children }) {
     );
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
-
       window.removeEventListener(
         "keydown",
         handleKeyDown,
       );
     };
   }, [
+    mobileSidebarOpen,
     showPasswordModal,
     changingPassword,
   ]);
@@ -257,10 +391,12 @@ function CouncilorLayout({ children }) {
       value,
     } = event.target;
 
-    setPasswordForm((current) => ({
-      ...current,
-      [name]: value,
-    }));
+    setPasswordForm(
+      (current) => ({
+        ...current,
+        [name]: value,
+      }),
+    );
 
     if (passwordError) {
       setPasswordError("");
@@ -359,59 +495,58 @@ function CouncilorLayout({ children }) {
      CHANGE PASSWORD
   ======================================================= */
 
-  const handleChangePassword = async (
-    event,
-  ) => {
-    event.preventDefault();
+  const handleChangePassword =
+    async (event) => {
+      event.preventDefault();
 
-    const validation =
-      validatePasswordForm();
+      const validation =
+        validatePasswordForm();
 
-    if (!validation.valid) {
-      setPasswordError(
-        validation.message,
-      );
+      if (!validation.valid) {
+        setPasswordError(
+          validation.message,
+        );
 
-      return;
-    }
+        return;
+      }
 
-    try {
-      setChangingPassword(true);
+      try {
+        setChangingPassword(true);
 
-      setPasswordError("");
-      setPasswordSuccess("");
+        setPasswordError("");
+        setPasswordSuccess("");
 
-      await accountService.changePassword(
-        validation.data,
-      );
+        await accountService.changePassword(
+          validation.data,
+        );
 
-      setPasswordForm(
-        INITIAL_PASSWORD_FORM,
-      );
+        setPasswordForm(
+          INITIAL_PASSWORD_FORM,
+        );
 
-      setPasswordVisibility(
-        INITIAL_PASSWORD_VISIBILITY,
-      );
+        setPasswordVisibility(
+          INITIAL_PASSWORD_VISIBILITY,
+        );
 
-      setPasswordSuccess(
-        "Your password has been changed successfully.",
-      );
-    } catch (error) {
-      console.error(
-        "Unable to change Councilor password:",
-        error,
-      );
-
-      setPasswordError(
-        getErrorMessage(
+        setPasswordSuccess(
+          "Your password has been changed successfully.",
+        );
+      } catch (error) {
+        console.error(
+          "Unable to change Councilor password:",
           error,
-          "Unable to change password.",
-        ),
-      );
-    } finally {
-      setChangingPassword(false);
-    }
-  };
+        );
+
+        setPasswordError(
+          getErrorMessage(
+            error,
+            "Unable to change password.",
+          ),
+        );
+      } finally {
+        setChangingPassword(false);
+      }
+    };
 
   /* =======================================================
      RENDER
@@ -424,17 +559,44 @@ function CouncilorLayout({ children }) {
       ================================================== */}
 
       <CouncilorSidebar
+        isOpen={
+          mobileSidebarOpen
+        }
+        onClose={
+          closeMobileSidebar
+        }
         onChangePassword={
           openPasswordModal
         }
       />
 
       {/* =================================================
+          MOBILE BACKDROP
+      ================================================== */}
+
+      {mobileSidebarOpen && (
+        <div
+          className="councilor-mobile-backdrop"
+          role="presentation"
+          onMouseDown={
+            closeMobileSidebar
+          }
+        />
+      )}
+
+      {/* =================================================
           MAIN
       ================================================== */}
 
       <div className="councilor-main">
-        <CouncilorTopbar />
+        <CouncilorTopbar
+          menuOpen={
+            mobileSidebarOpen
+          }
+          onMenuOpen={
+            openMobileSidebar
+          }
+        />
 
         <main className="councilor-content">
           {children}
@@ -478,8 +640,9 @@ function CouncilorLayout({ children }) {
                 </h2>
 
                 <p>
-                  Update the password used to access
-                  your Councilor account.
+                  Update the password used
+                  to access your Councilor
+                  account.
                 </p>
               </div>
 
@@ -551,9 +714,10 @@ function CouncilorLayout({ children }) {
                   </strong>
 
                   <p>
-                    Use a secure password that is
-                    different from your current
-                    password. Keep your account
+                    Use a secure password
+                    that is different from
+                    your current password.
+                    Keep your account
                     credentials private.
                   </p>
                 </div>
@@ -690,7 +854,8 @@ function CouncilorLayout({ children }) {
                 </div>
 
                 <span className="councilor-field-hint">
-                  Use at least 8 characters.
+                  Use at least 8
+                  characters.
                 </span>
               </div>
 
@@ -768,7 +933,9 @@ function CouncilorLayout({ children }) {
                   className="councilor-modal-error"
                   role="alert"
                 >
-                  <span aria-hidden="true">
+                  <span
+                    aria-hidden="true"
+                  >
                     !
                   </span>
 
@@ -788,7 +955,9 @@ function CouncilorLayout({ children }) {
                   role="status"
                   aria-live="polite"
                 >
-                  <span aria-hidden="true">
+                  <span
+                    aria-hidden="true"
+                  >
                     ✓
                   </span>
 

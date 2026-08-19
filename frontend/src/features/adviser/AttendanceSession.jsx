@@ -826,6 +826,7 @@ function AttendanceSession() {
       refreshRecords,
       students,
       sectionName,
+      setCameraError,
     ],
   );
 

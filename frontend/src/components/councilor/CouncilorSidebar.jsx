@@ -1,24 +1,64 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import {
+  NavLink,
+  useNavigate,
+} from "react-router-dom";
 
 import shsLogo from "../../assets/shs-logo.svg";
 
 import authService from "../../services/authService";
 
-function CouncilorSidebar({ onChangePassword }) {
-  const navigate = useNavigate();
+/* =========================================================
+   COMPONENT
+========================================================= */
+
+function CouncilorSidebar({
+  onChangePassword,
+  isOpen = false,
+  onClose,
+}) {
+  const navigate =
+    useNavigate();
 
   /* =======================================================
      NAV LINK CLASS
   ======================================================= */
 
-  const getNavClassName = ({ isActive }) =>
-    `councilor-nav-item ${isActive ? "active" : ""}`;
+  const getNavClassName = ({
+    isActive,
+  }) =>
+    `councilor-nav-item ${
+      isActive ? "active" : ""
+    }`;
+
+  /* =======================================================
+     CLOSE MOBILE SIDEBAR
+  ======================================================= */
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
+  /* =======================================================
+     CHANGE PASSWORD
+  ======================================================= */
+
+  const handleChangePassword = () => {
+    handleClose();
+
+    if (onChangePassword) {
+      onChangePassword();
+    }
+  };
 
   /* =======================================================
      LOGOUT
   ======================================================= */
 
   const handleLogout = () => {
+    handleClose();
+
     authService.logout();
 
     navigate("/login", {
@@ -31,76 +71,168 @@ function CouncilorSidebar({ onChangePassword }) {
   ======================================================= */
 
   return (
-    <aside className="councilor-sidebar">
+    <aside
+      id="councilor-mobile-sidebar"
+      className={`councilor-sidebar ${
+        isOpen
+          ? "is-mobile-open"
+          : ""
+      }`}
+    >
       {/* ===============================================
           BRAND
       ================================================ */}
 
       <div className="councilor-brand">
         <div className="councilor-brand-logo">
-          <img src={shsLogo} alt="Signal Village National High School" />
+          <img
+            src={shsLogo}
+            alt="Signal Village National High School"
+          />
         </div>
 
         <div className="councilor-brand-copy">
-          <strong>SVNHS</strong>
+          <strong>
+            SVNHS
+          </strong>
 
-          <span>Attendance Management System</span>
+          <span>
+            Attendance Management System
+          </span>
         </div>
+
+        {/* =============================================
+            MOBILE CLOSE BUTTON
+        ============================================== */}
+
+        <button
+          type="button"
+          className="councilor-mobile-sidebar-close"
+          onClick={handleClose}
+          aria-label="Close navigation menu"
+        >
+          <span
+            aria-hidden="true"
+          >
+            ×
+          </span>
+        </button>
       </div>
 
       {/* ===============================================
           NAVIGATION
       ================================================ */}
 
-      <span className="councilor-nav-label">MAIN MENU</span>
+      <span className="councilor-nav-label">
+        MAIN MENU
+      </span>
 
-      <nav className="councilor-nav" aria-label="Councilor navigation">
+      <nav
+        className="councilor-nav"
+        aria-label="Councilor navigation"
+      >
         {/* =============================================
             DASHBOARD
         ============================================== */}
 
-        <NavLink to="/councilor/dashboard" className={getNavClassName} end>
-          <span className="councilor-nav-icon" aria-hidden="true">
+        <NavLink
+          to="/councilor/dashboard"
+          className={
+            getNavClassName
+          }
+          onClick={
+            handleClose
+          }
+          end
+        >
+          <span
+            className="councilor-nav-icon"
+            aria-hidden="true"
+          >
             ▦
           </span>
 
-          <span>Dashboard</span>
+          <span>
+            Dashboard
+          </span>
         </NavLink>
 
         {/* =============================================
             ADVISERS
         ============================================== */}
 
-        <NavLink to="/councilor/advisers" className={getNavClassName} end>
-          <span className="councilor-nav-icon" aria-hidden="true">
+        <NavLink
+          to="/councilor/advisers"
+          className={
+            getNavClassName
+          }
+          onClick={
+            handleClose
+          }
+          end
+        >
+          <span
+            className="councilor-nav-icon"
+            aria-hidden="true"
+          >
             ♙
           </span>
 
-          <span>Advisers</span>
+          <span>
+            Advisers
+          </span>
         </NavLink>
 
         {/* =============================================
             SECTIONS
         ============================================== */}
 
-        <NavLink to="/councilor/sections" className={getNavClassName} end>
-          <span className="councilor-nav-icon" aria-hidden="true">
+        <NavLink
+          to="/councilor/sections"
+          className={
+            getNavClassName
+          }
+          onClick={
+            handleClose
+          }
+          end
+        >
+          <span
+            className="councilor-nav-icon"
+            aria-hidden="true"
+          >
             ▤
           </span>
 
-          <span>Sections</span>
+          <span>
+            Sections
+          </span>
         </NavLink>
 
         {/* =============================================
             ATTENDANCE
         ============================================== */}
 
-        <NavLink to="/councilor/attendance" className={getNavClassName} end>
-          <span className="councilor-nav-icon" aria-hidden="true">
+        <NavLink
+          to="/councilor/attendance"
+          className={
+            getNavClassName
+          }
+          onClick={
+            handleClose
+          }
+          end
+        >
+          <span
+            className="councilor-nav-icon"
+            aria-hidden="true"
+          >
             ◷
           </span>
 
-          <span>Attendance</span>
+          <span>
+            Attendance
+          </span>
         </NavLink>
 
         {/* =============================================
@@ -109,14 +241,24 @@ function CouncilorSidebar({ onChangePassword }) {
 
         <NavLink
           to="/councilor/attendance-records"
-          className={getNavClassName}
+          className={
+            getNavClassName
+          }
+          onClick={
+            handleClose
+          }
           end
         >
-          <span className="councilor-nav-icon" aria-hidden="true">
+          <span
+            className="councilor-nav-icon"
+            aria-hidden="true"
+          >
             ▥
           </span>
 
-          <span>Attendance Records</span>
+          <span>
+            Attendance Records
+          </span>
         </NavLink>
 
         {/* =============================================
@@ -126,7 +268,9 @@ function CouncilorSidebar({ onChangePassword }) {
         <button
           type="button"
           className="councilor-nav-item councilor-password-nav-item"
-          onClick={onChangePassword}
+          onClick={
+            handleChangePassword
+          }
           aria-haspopup="dialog"
         >
           <span
@@ -136,7 +280,9 @@ function CouncilorSidebar({ onChangePassword }) {
             ⚿
           </span>
 
-          <span>Change Password</span>
+          <span>
+            Change Password
+          </span>
         </button>
       </nav>
 
@@ -146,19 +292,32 @@ function CouncilorSidebar({ onChangePassword }) {
 
       <div className="councilor-sidebar-footer">
         <div className="councilor-sidebar-school">
-          <span>SCHOOL SYSTEM</span>
+          <span>
+            SCHOOL SYSTEM
+          </span>
 
-          <strong>Signal Village National High School</strong>
+          <strong>
+            Signal Village National
+            High School
+          </strong>
         </div>
 
         <button
           type="button"
           className="councilor-logout"
-          onClick={handleLogout}
+          onClick={
+            handleLogout
+          }
         >
-          <span aria-hidden="true">↪</span>
+          <span
+            aria-hidden="true"
+          >
+            ↪
+          </span>
 
-          <span>Logout</span>
+          <span>
+            Logout
+          </span>
         </button>
       </div>
     </aside>

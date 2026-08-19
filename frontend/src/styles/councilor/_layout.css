@@ -857,3 +857,552 @@
   }
 }
 
+/* =========================================================
+   COUNCILOR MOBILE DRAWER
+   Councilor portal only.
+   Desktop behavior remains unchanged.
+========================================================= */
+
+/* =========================================================
+   TOPBAR LEADING AREA
+========================================================= */
+
+.councilor-topbar-leading {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.councilor-topbar-leading .councilor-topbar-copy {
+  min-width: 0;
+}
+
+/* =========================================================
+   MOBILE-ONLY CONTROLS
+========================================================= */
+
+.councilor-mobile-menu-button,
+.councilor-mobile-sidebar-close,
+.councilor-mobile-backdrop {
+  display: none;
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE DRAWER
+========================================================= */
+
+@media (max-width: 720px) {
+
+  /* =======================================================
+     LAYOUT
+  ======================================================= */
+
+  .councilor-layout {
+    display: block;
+  }
+
+  .councilor-layout .councilor-main {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* =======================================================
+     SIDEBAR DRAWER
+  ======================================================= */
+
+  .councilor-layout .councilor-sidebar {
+    position: fixed;
+
+    z-index: 100;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: min(300px, 86vw);
+    height: 100vh;
+    height: 100dvh;
+
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    transform:
+      translateX(-105%);
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    border-right:
+      1px solid var(--c-border-soft);
+
+    border-bottom: 0;
+
+    box-shadow:
+      16px 0 45px
+      rgba(5, 20, 50, 0.22);
+
+    transition:
+      transform 0.26s
+        cubic-bezier(
+          0.22,
+          1,
+          0.36,
+          1
+        ),
+      visibility 0s
+        linear 0.26s;
+  }
+
+  .councilor-layout
+    .councilor-sidebar.is-mobile-open {
+    transform:
+      translateX(0);
+
+    visibility: visible;
+
+    pointer-events: auto;
+
+    transition:
+      transform 0.26s
+        cubic-bezier(
+          0.22,
+          1,
+          0.36,
+          1
+        );
+  }
+
+  /* =======================================================
+     SIDEBAR BRAND
+  ======================================================= */
+
+  .councilor-layout
+    .councilor-brand {
+    min-height: 82px;
+
+    flex: 0 0 auto;
+
+    padding:
+      15px
+      14px
+      15px
+      18px;
+  }
+
+  .councilor-layout
+    .councilor-brand-logo {
+    width: 44px;
+    height: 44px;
+
+    flex-basis: 44px;
+  }
+
+  .councilor-layout
+    .councilor-brand-copy {
+    flex: 1;
+
+    min-width: 0;
+  }
+
+  .councilor-layout
+    .councilor-brand-copy span {
+    max-width: 165px;
+  }
+
+  /* =======================================================
+     CLOSE BUTTON
+  ======================================================= */
+
+  .councilor-layout
+    .councilor-mobile-sidebar-close {
+    width: 36px;
+    height: 36px;
+
+    flex: 0 0 36px;
+
+    display: grid;
+    place-items: center;
+
+    margin-left: auto;
+
+    padding: 0;
+
+    border:
+      1px solid
+      var(--c-border-soft);
+
+    border-radius: 9px;
+
+    background:
+      var(--c-surface-soft);
+
+    color:
+      var(--c-text-muted);
+
+    font-family: inherit;
+
+    cursor: pointer;
+
+    transition:
+      background 0.18s ease,
+      color 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  .council-layout
+    .councilor-mobile-sidebar-close:hover {
+    background:
+      var(--c-nav-hover-bg);
+
+    color:
+      var(--c-text-primary);
+  }
+
+  .councilor-layout
+    .councilor-mobile-sidebar-close
+    span {
+    display: block;
+
+    margin-top: -2px;
+
+    font-size: 24px;
+    font-weight: 300;
+
+    line-height: 1;
+  }
+
+  /* =======================================================
+     NAVIGATION
+  ======================================================= */
+
+  .councilor-layout
+    .councilor-nav-label {
+    display: block;
+
+    padding:
+      20px
+      22px
+      8px;
+  }
+
+  .councilor-layout
+    .councilor-nav {
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    overflow: visible;
+
+    padding:
+      4px
+      14px
+      22px;
+  }
+
+  .councilor-layout
+    .councilor-nav-item {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+
+    flex: 0 0 auto;
+
+    padding:
+      10px
+      13px;
+
+    white-space: normal;
+  }
+
+  .councilor-layout
+    .councilor-nav-item.active::before {
+    display: block;
+  }
+
+  /* =======================================================
+     SIDEBAR FOOTER
+  ======================================================= */
+
+  .councilor-layout
+    .councilor-sidebar-footer {
+    display: block;
+
+    margin-top: auto;
+  }
+
+  /* =======================================================
+     BACKDROP
+  ======================================================= */
+
+  .councilor-layout
+    .councilor-mobile-backdrop {
+    position: fixed;
+
+    z-index: 90;
+
+    inset: 0;
+
+    display: block;
+
+    background:
+      rgba(3, 12, 29, 0.48);
+
+    backdrop-filter:
+      blur(2px);
+
+    -webkit-backdrop-filter:
+      blur(2px);
+
+    animation:
+      councilor-mobile-backdrop-in
+      0.2s ease both;
+  }
+
+  /* =======================================================
+     TOPBAR
+  ======================================================= */
+
+  .councilor-layout
+    .councilor-topbar {
+    position: relative;
+
+    z-index: 30;
+
+    min-height: 74px;
+
+    gap: 12px;
+
+    padding:
+      13px
+      17px;
+  }
+
+  .councilor-layout
+    .councilor-topbar-leading {
+    min-width: 0;
+
+    flex: 1;
+
+    gap: 11px;
+  }
+
+  /* =======================================================
+     HAMBURGER BUTTON
+  ======================================================= */
+
+  .councilor-layout
+    .councilor-mobile-menu-button {
+    width: 40px;
+    height: 40px;
+
+    flex: 0 0 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding: 0;
+
+    border:
+      1px solid
+      var(--c-border-soft);
+
+    border-radius: 10px;
+
+    background:
+      var(--c-surface-soft);
+
+    color:
+      var(--c-text-primary);
+
+    box-shadow:
+      0 3px 10px
+      rgba(7, 27, 66, 0.05);
+
+    cursor: pointer;
+
+    transition:
+      background 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .councilor-layout
+    .councilor-mobile-menu-button
+    > span {
+    width: 17px;
+    height: 2px;
+
+    display: block;
+
+    border-radius: 999px;
+
+    background:
+      currentColor;
+
+    transition:
+      transform 0.18s ease;
+  }
+
+  .councilor-layout
+    .councilor-mobile-menu-button:active {
+    transform:
+      scale(0.96);
+  }
+
+  /* =======================================================
+     TOPBAR COPY
+  ======================================================= */
+
+  .councilor-layout
+    .councilor-topbar-copy {
+    min-width: 0;
+  }
+
+  .councilor-layout
+    .councilor-topbar-copy h1 {
+    overflow: hidden;
+
+    font-size: 20px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .councilor-layout
+    .councilor-topbar-copy p {
+    display: none;
+  }
+
+  .councilor-layout
+    .councilor-eyebrow {
+    font-size: 7px;
+  }
+
+  /* =======================================================
+     TOPBAR ACTIONS
+  ======================================================= */
+
+  .councilor-layout
+    .councilor-topbar-actions {
+    gap: 10px;
+  }
+}
+
+/* =========================================================
+   MOBILE BACKDROP ANIMATION
+========================================================= */
+
+@keyframes councilor-mobile-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 520px) {
+  .councilor-layout
+    .councilor-topbar {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .councilor-layout
+    .councilor-mobile-menu-button {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+
+  .councilor-layout
+    .councilor-avatar {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+
+  .councilor-layout
+    .councilor-user-copy {
+    display: none;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .councilor-layout
+    .councilor-topbar-copy h1 {
+    max-width: 125px;
+
+    font-size: 18px;
+  }
+
+  .councilor-layout
+    .councilor-mobile-menu-button {
+    width: 36px;
+    height: 36px;
+
+    flex-basis: 36px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.councilor-mobile-menu-button:focus-visible,
+.councilor-mobile-sidebar-close:focus-visible {
+  outline:
+    3px solid
+    var(--c-focus-ring);
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .councilor-layout
+    .councilor-sidebar,
+  .councilor-layout
+    .councilor-mobile-menu-button {
+    transition: none;
+  }
+
+  .councilor-layout
+    .councilor-mobile-backdrop {
+    animation: none;
+  }
+}
