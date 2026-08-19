@@ -9,6 +9,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -17,10 +18,12 @@ public class FaceRecognitionClient {
 
     private final RestClient restClient;
 
-    public FaceRecognitionClient() {
+    public FaceRecognitionClient(
+            @Value("${face.service.base-url}") String baseUrl
+    ) {
         this.restClient =
                 RestClient.builder()
-                        .baseUrl("http://localhost:8001")
+                        .baseUrl(baseUrl)
                         .build();
     }
 
