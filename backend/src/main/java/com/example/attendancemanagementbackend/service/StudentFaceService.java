@@ -18,6 +18,14 @@ import java.util.UUID;
 @Service
 public class StudentFaceService {
 
+    /**
+     * Cosine distance threshold used to detect
+     * whether a face is already registered.
+     *
+     * Lower distance = more similar face.
+     */
+    private static final double FACE_DUPLICATE_THRESHOLD = 0.50;
+
     private final StudentRepository studentRepository;
     private final StudentFaceRepository studentFaceRepository;
     private final FaceRecognitionClient faceRecognitionClient;
@@ -34,6 +42,17 @@ public class StudentFaceService {
 
     /**
      * Enroll a student's face.
+     *
+     * Flow:
+     *
+     * 1. Find student
+     * 2. Validate image
+     * 3. Check if student already has a face
+     * 4. Generate face embedding using Python service
+     * 5. Validate embedding
+     * 6. Check if face is already registered to another student
+     * 7. Generate face ID
+     * 8. Save embedding
      */
     @Transactional
     public void enrollFace(
@@ -41,7 +60,10 @@ public class StudentFaceService {
             MultipartFile image
     ) throws IOException {
 
-        // 1. Find student
+        // =====================================================
+        // 1. FIND STUDENT
+        // =====================================================
+
         Student student =
                 studentRepository.findById(studentId)
                         .orElseThrow(() ->
@@ -51,23 +73,34 @@ public class StudentFaceService {
                                 )
                         );
 
-        // 2. Validate image
+        // =====================================================
+        // 2. VALIDATE IMAGE
+        // =====================================================
+
         if (image == null || image.isEmpty()) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Image is required"
             );
         }
 
-        // 3. Check if student already has a registered face
+        // =====================================================
+        // 3. CHECK IF STUDENT ALREADY HAS A FACE
+        // =====================================================
+
         if (studentFaceRepository.existsByStudentId(studentId)) {
+
             throw new ApiException(
                     HttpStatus.CONFLICT,
                     "Student already has a registered face"
             );
         }
 
-        // 4. Send image to Python Face Recognition Service
+        // =====================================================
+        // 4. SEND IMAGE TO PYTHON FACE SERVICE
+        // =====================================================
+
         FaceRecognitionClient.FaceEnrollmentResult result =
                 faceRecognitionClient.enrollFace(
                         studentId,
@@ -75,7 +108,10 @@ public class StudentFaceService {
                         image.getOriginalFilename()
                 );
 
-        // 5. Validate Python response
+        // =====================================================
+        // 5. VALIDATE PYTHON RESPONSE
+        // =====================================================
+
         if (result == null ||
                 !result.success() ||
                 result.embedding() == null) {
@@ -86,20 +122,57 @@ public class StudentFaceService {
             );
         }
 
-        // 6. Convert embedding to PostgreSQL vector format
+        // =====================================================
+        // 6. CONVERT EMBEDDING TO PGVECTOR FORMAT
+        // =====================================================
+
         String embedding =
                 toVectorString(
                         result.embedding()
                 );
 
-        // 7. Generate face ID
+        // =====================================================
+        // 7. CHECK FOR DUPLICATE FACE
+        // =====================================================
+        //
+        // Find the closest registered face.
+        //
+        // If there are no registered faces yet,
+        // findMostSimilarFace() returns Optional.empty()
+        // and enrollment is allowed.
+        //
+
+        studentFaceRepository
+                .findMostSimilarFace(embedding)
+                .ifPresent(match -> {
+
+                    if (match.distance() <= FACE_DUPLICATE_THRESHOLD) {
+
+                        throw new ApiException(
+                                HttpStatus.CONFLICT,
+                                "This face is already registered to another student"
+                        );
+                    }
+                });
+
+        // =====================================================
+        // 8. GENERATE FACE ID
+        // =====================================================
+
         String faceId =
                 UUID.randomUUID().toString();
+
+        // =====================================================
+        // 9. CURRENT DATE/TIME
+        // =====================================================
 
         LocalDateTime now =
                 LocalDateTime.now();
 
-        // 8. Insert embedding using native SQL
+        // =====================================================
+        // 10. INSERT FACE EMBEDDING
+        // =====================================================
+
         studentFaceRepository.insertFaceEmbedding(
                 faceId,
                 student.getId(),
@@ -118,6 +191,7 @@ public class StudentFaceService {
     ) {
 
         if (embedding == null) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Face embedding is null"
@@ -125,6 +199,7 @@ public class StudentFaceService {
         }
 
         if (embedding.size() != 512) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Invalid face embedding. Expected 512 dimensions, got "
@@ -138,17 +213,25 @@ public class StudentFaceService {
     /**
      * Find the registered face with the smallest
      * cosine distance from the supplied embedding.
+     *
+     * This method is used by attendance face recognition.
      */
     @Transactional(readOnly = true)
     public FaceMatchResult findMostSimilarFace(
             List<Double> embedding
     ) {
 
-        // 1. Validate and convert embedding
+        // =====================================================
+        // 1. VALIDATE AND CONVERT EMBEDDING
+        // =====================================================
+
         String vector =
                 toVectorString(embedding);
 
-        // 2. Find nearest registered face
+        // =====================================================
+        // 2. FIND NEAREST REGISTERED FACE
+        // =====================================================
+
         return studentFaceRepository
                 .findMostSimilarFace(vector)
                 .orElseThrow(() ->

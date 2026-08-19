@@ -7,15 +7,20 @@ import com.example.attendancemanagementbackend.dto.AttendanceReportDownloadForma
 import com.example.attendancemanagementbackend.dto.AttendanceReportZipFile;
 import com.example.attendancemanagementbackend.dto.SupabaseStorageTestResponse;
 
+import com.example.attendancemanagementbackend.dto.attendance.AttendanceReportResponse;
+import com.example.attendancemanagementbackend.dto.attendance.AttendanceSectionDetailResponse;
 import com.example.attendancemanagementbackend.dto.attendance.PagedResponse;
 
 import com.example.attendancemanagementbackend.entity.AttendanceReportArchive;
 import com.example.attendancemanagementbackend.entity.AttendanceReportType;
 
+import com.example.attendancemanagementbackend.exception.ApiException;
+
 import com.example.attendancemanagementbackend.service.AttendanceReportAccessService;
 import com.example.attendancemanagementbackend.service.AttendanceReportArchiveService;
 import com.example.attendancemanagementbackend.service.AttendanceReportFileService;
 import com.example.attendancemanagementbackend.service.AttendanceReportScheduler;
+import com.example.attendancemanagementbackend.service.AttendanceReportService;
 import com.example.attendancemanagementbackend.service.AttendanceReportStorageService;
 import com.example.attendancemanagementbackend.service.AttendanceReportZipService;
 import com.example.attendancemanagementbackend.service.SupabaseStorageService;
@@ -24,6 +29,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
@@ -63,6 +69,20 @@ public class AttendanceReportController {
        DEPENDENCIES
     ========================================================= */
 
+    /*
+     * OLD DAILY / SECTION REPORTING SERVICE
+     *
+     * Used by:
+     *
+     * GET /sections
+     * GET /sections/{sectionId}/students
+     */
+    private final AttendanceReportService
+            attendanceReportService;
+
+    /*
+     * NEW WEEKLY / MONTHLY REPORT SERVICES
+     */
     private final AttendanceReportAccessService
             attendanceReportAccessService;
 
@@ -90,6 +110,9 @@ public class AttendanceReportController {
 
     public AttendanceReportController(
 
+            AttendanceReportService
+                    attendanceReportService,
+
             AttendanceReportAccessService
                     attendanceReportAccessService,
 
@@ -112,6 +135,9 @@ public class AttendanceReportController {
                     supabaseStorageService
     ) {
 
+        this.attendanceReportService =
+                attendanceReportService;
+
         this.attendanceReportAccessService =
                 attendanceReportAccessService;
 
@@ -133,6 +159,162 @@ public class AttendanceReportController {
         this.supabaseStorageService =
                 supabaseStorageService;
     }
+
+    /* =========================================================
+       OLD ATTENDANCE REPORTING
+    ========================================================= */
+
+    /* =========================================================
+       SECTION OVERVIEW REPORT
+
+       Restored existing endpoint.
+
+       Used by the Councilor Attendance page.
+
+       GET
+       /api/attendance-reports/sections
+
+       Supports:
+       - date filtering
+       - section filtering
+       - adviser filtering
+       - search
+       - pagination
+    ========================================================= */
+
+    @GetMapping("/sections")
+    public ResponseEntity<AttendanceReportResponse>
+    getSectionAttendanceReport(
+
+            @RequestParam(required = false)
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate from,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate to,
+
+            @RequestParam(defaultValue = "")
+            String sectionId,
+
+            @RequestParam(defaultValue = "")
+            String adviserId,
+
+            @RequestParam(defaultValue = "")
+            String search,
+
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "9")
+            int size,
+
+            Authentication authentication
+    ) {
+
+        /*
+         * This is the Councilor-wide attendance overview.
+         *
+         * The generic GET security rule for attendance-reports
+         * also allows Adviser because Adviser needs access to
+         * the new archive endpoints.
+         *
+         * Therefore, explicitly protect this old Councilor
+         * overview endpoint here.
+         */
+        requireCouncilor(
+                authentication
+        );
+
+        AttendanceReportResponse response =
+                attendanceReportService
+                        .getSectionAttendanceReport(
+                                from,
+                                to,
+                                sectionId,
+                                adviserId,
+                                search,
+                                page,
+                                size
+                        );
+
+        return ResponseEntity.ok(
+                response
+        );
+    }
+
+    /* =========================================================
+       DETAILED SECTION STUDENT REPORT
+
+       Restored existing endpoint.
+
+       Used by:
+       Councilor
+       → Attendance
+       → Section Details
+
+       GET
+       /api/attendance-reports/sections/{sectionId}/students
+    ========================================================= */
+
+    @GetMapping("/sections/{sectionId}/students")
+    public ResponseEntity<AttendanceSectionDetailResponse>
+    getSectionStudentAttendanceReport(
+
+            @PathVariable
+            String sectionId,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate from,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate to,
+
+            @RequestParam(defaultValue = "")
+            String search,
+
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "25")
+            int size,
+
+            Authentication authentication
+    ) {
+
+        requireCouncilor(
+                authentication
+        );
+
+        AttendanceSectionDetailResponse response =
+                attendanceReportService
+                        .getSectionStudentAttendanceReport(
+                                sectionId,
+                                from,
+                                to,
+                                search,
+                                page,
+                                size
+                        );
+
+        return ResponseEntity.ok(
+                response
+        );
+    }
+
+    /* =========================================================
+       NEW WEEKLY / MONTHLY REPORTING
+    ========================================================= */
 
     /* =========================================================
        PREVIEW REPORT
@@ -272,8 +454,9 @@ public class AttendanceReportController {
 
        TEMPORARY.
 
-       Remove after full production storage migration
-       has been verified.
+       We can remove this after both the old Attendance
+       feature and the new Attendance Records archive
+       have been verified together.
     ========================================================= */
 
     @PostMapping("/storage-test")
@@ -393,9 +576,7 @@ public class AttendanceReportController {
 
         ContentDisposition disposition;
 
-        if (
-                download
-        ) {
+        if (download) {
 
             disposition =
                     ContentDisposition
@@ -589,5 +770,52 @@ public class AttendanceReportController {
                 .body(
                         zipFile.content()
                 );
+    }
+
+    /* =========================================================
+       COUNCILOR ACCESS GUARD
+
+       Important because GET /api/attendance-reports/**
+       is shared by COUNCILOR and ADVISER for the new archive.
+
+       The two legacy section-wide endpoints expose school-wide
+       information, therefore they remain Councilor-only.
+    ========================================================= */
+
+    private void requireCouncilor(
+            Authentication authentication
+    ) {
+
+        if (
+                authentication == null ||
+                        !authentication.isAuthenticated()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authentication is required"
+            );
+        }
+
+        boolean councilor =
+                authentication
+                        .getAuthorities()
+                        .stream()
+                        .anyMatch(
+                                authority ->
+                                        "ROLE_COUNCILOR"
+                                                .equals(
+                                                        authority
+                                                                .getAuthority()
+                                                )
+                        );
+
+        if (!councilor) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
+                    "Councilor access is required"
+            );
+        }
     }
 }
