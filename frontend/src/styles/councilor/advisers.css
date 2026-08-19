@@ -1051,3 +1051,490 @@
   white-space: nowrap;
 }
 
+/* =========================================================
+   ADVISER MANAGEMENT CRUD
+   EDIT / RESET PASSWORD / DEACTIVATE
+========================================================= */
+
+.councilor-adviser-directory .councilor-table {
+  min-width: 1080px;
+}
+
+.councilor-adviser-directory .councilor-table th:last-child,
+.councilor-adviser-directory .councilor-table td:last-child {
+  width: 330px;
+  min-width: 330px;
+}
+
+/* =========================================================
+   ACTION GROUP
+========================================================= */
+
+.councilor-adviser-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 7px;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+========================================================= */
+
+.councilor-adviser-directory .councilor-table-action {
+  min-height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 11px;
+
+  border: 1px solid var(--c-brand-border);
+  border-radius: 8px;
+
+  background: var(--c-icon-bg);
+
+  color: var(--c-blue-800);
+
+  font: inherit;
+  font-size: 7.5px;
+  font-weight: 780;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+@media (hover: hover) {
+  .councilor-adviser-directory
+    .councilor-table-action:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    border-color: var(--c-blue-800);
+
+    background: var(--c-nav-hover-bg);
+
+    box-shadow: 0 5px 14px rgba(7, 27, 66, 0.07);
+  }
+}
+
+.councilor-adviser-directory
+  .councilor-table-action:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.councilor-adviser-directory .councilor-table-action:focus-visible {
+  outline: 0;
+
+  border-color: var(--c-blue-800);
+
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.11);
+}
+
+/* EDIT */
+
+.councilor-adviser-directory .councilor-table-action.is-edit {
+  border-color: var(--c-brand-border);
+
+  background: var(--c-icon-bg);
+
+  color: var(--c-blue-800);
+}
+
+/* RESET PASSWORD */
+
+.councilor-adviser-directory .councilor-table-action.is-security {
+  border-color: rgba(180, 126, 19, 0.22);
+
+  background: rgba(215, 157, 28, 0.07);
+
+  color: #8a650f;
+}
+
+@media (hover: hover) {
+  .councilor-adviser-directory
+    .councilor-table-action.is-security:hover:not(:disabled) {
+    border-color: rgba(180, 126, 19, 0.38);
+
+    background: rgba(215, 157, 28, 0.13);
+
+    color: #72520b;
+  }
+}
+
+/* DEACTIVATE */
+
+.councilor-adviser-directory .councilor-table-action.is-danger {
+  border-color: rgba(185, 28, 28, 0.22);
+
+  background: rgba(185, 28, 28, 0.055);
+
+  color: #b42318;
+}
+
+@media (hover: hover) {
+  .councilor-adviser-directory
+    .councilor-table-action.is-danger:hover:not(:disabled) {
+    border-color: rgba(185, 28, 28, 0.4);
+
+    background: rgba(185, 28, 28, 0.1);
+
+    color: #991b1b;
+
+    box-shadow: 0 5px 14px rgba(185, 28, 28, 0.08);
+  }
+}
+
+/* DISABLED */
+
+.councilor-adviser-directory .councilor-table-action:disabled {
+  transform: none;
+
+  border-color: var(--c-border-soft);
+
+  background: var(--c-surface-soft);
+
+  color: var(--c-text-muted);
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+
+  opacity: 0.56;
+}
+
+/* =========================================================
+   INACTIVE ADVISER ROW
+========================================================= */
+
+.councilor-adviser-directory .councilor-table tr.is-inactive-row {
+  background: var(--c-surface-soft);
+}
+
+.councilor-adviser-directory
+  .councilor-table
+  tr.is-inactive-row
+  .councilor-person-avatar {
+  filter: grayscale(0.35);
+
+  opacity: 0.72;
+}
+
+.councilor-adviser-directory
+  .councilor-table
+  tr.is-inactive-row
+  .councilor-person
+  strong,
+.councilor-adviser-directory
+  .councilor-table
+  tr.is-inactive-row
+  > td {
+  color: var(--c-text-muted);
+}
+
+/* =========================================================
+   EDIT / DEACTIVATE MODALS
+========================================================= */
+
+.councilor-adviser-edit-modal,
+.councilor-adviser-deactivate-modal {
+  width: min(92vw, 560px);
+}
+
+.councilor-adviser-edit-modal .councilor-modal-form,
+.councilor-adviser-deactivate-modal .councilor-modal-form {
+  gap: 16px;
+}
+
+/* =========================================================
+   ACCOUNT SUMMARY
+========================================================= */
+
+.councilor-adviser-edit-modal .councilor-reset-account,
+.councilor-adviser-deactivate-modal .councilor-reset-account {
+  border-color: var(--c-border-soft);
+
+  background: var(--c-surface-soft);
+}
+
+.councilor-adviser-edit-modal .councilor-reset-account strong,
+.councilor-adviser-deactivate-modal .councilor-reset-account strong {
+  color: var(--c-text-primary);
+}
+
+.councilor-adviser-edit-modal .councilor-reset-account span,
+.councilor-adviser-edit-modal .councilor-reset-account small,
+.councilor-adviser-deactivate-modal .councilor-reset-account span,
+.councilor-adviser-deactivate-modal .councilor-reset-account small {
+  color: var(--c-text-muted);
+}
+
+/* =========================================================
+   DEACTIVATE NOTICE
+========================================================= */
+
+.councilor-adviser-deactivate-notice {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 11px;
+
+  padding: 13px 14px;
+
+  border: 1px solid rgba(185, 28, 28, 0.2);
+  border-radius: 11px;
+
+  background: rgba(185, 28, 28, 0.05);
+}
+
+.councilor-adviser-deactivate-notice > span {
+  width: 25px;
+  height: 25px;
+
+  flex: 0 0 25px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--c-red-600);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.councilor-adviser-deactivate-notice > div {
+  min-width: 0;
+}
+
+.councilor-adviser-deactivate-notice strong {
+  display: block;
+
+  color: var(--c-text-primary);
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.councilor-adviser-deactivate-notice p {
+  margin: 4px 0 0;
+
+  color: var(--c-text-muted);
+
+  font-size: 8px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   DANGER BUTTON
+========================================================= */
+
+.councilor-danger-button {
+  min-height: 39px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 15px;
+
+  border: 1px solid #b42318;
+  border-radius: 9px;
+
+  background: #b42318;
+
+  color: #ffffff;
+
+  font: inherit;
+  font-size: 8px;
+  font-weight: 800;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  box-shadow: 0 6px 16px rgba(180, 35, 24, 0.14);
+
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+@media (hover: hover) {
+  .councilor-danger-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    border-color: #991b1b;
+
+    background: #991b1b;
+
+    box-shadow: 0 8px 19px rgba(153, 27, 27, 0.2);
+  }
+}
+
+.councilor-danger-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.councilor-danger-button:focus-visible {
+  outline: 0;
+
+  box-shadow:
+    0 0 0 3px rgba(185, 28, 28, 0.16),
+    0 6px 16px rgba(180, 35, 24, 0.14);
+}
+
+.councilor-danger-button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.62;
+}
+
+/* =========================================================
+   DARK MODE — CRUD
+========================================================= */
+
+html[data-theme="dark"]
+  .councilor-adviser-directory
+  .councilor-table-action.is-security:not(:disabled) {
+  border-color: rgba(250, 204, 21, 0.2);
+
+  background: rgba(113, 63, 18, 0.2);
+
+  color: #fde68a;
+}
+
+html[data-theme="dark"]
+  .councilor-adviser-directory
+  .councilor-table-action.is-danger:not(:disabled) {
+  border-color: rgba(248, 113, 113, 0.24);
+
+  background: rgba(127, 29, 29, 0.18);
+
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .councilor-adviser-deactivate-notice {
+  border-color: rgba(248, 113, 113, 0.2);
+
+  background: rgba(127, 29, 29, 0.14);
+}
+
+html[data-theme="dark"] .councilor-danger-button {
+  border-color: #b91c1c;
+
+  background: #b91c1c;
+}
+
+@media (hover: hover) {
+  html[data-theme="dark"]
+    .councilor-adviser-directory
+    .councilor-table-action.is-danger:hover:not(:disabled) {
+    border-color: rgba(248, 113, 113, 0.42);
+
+    background: rgba(127, 29, 29, 0.3);
+
+    color: #fecaca;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — CRUD
+========================================================= */
+
+@media (max-width: 1040px) {
+  .councilor-adviser-directory .councilor-table {
+    min-width: 1020px;
+  }
+
+  .councilor-adviser-directory .councilor-table th:last-child,
+  .councilor-adviser-directory .councilor-table td:last-child {
+    width: 315px;
+    min-width: 315px;
+  }
+}
+
+@media (max-width: 720px) {
+  .councilor-adviser-edit-modal,
+  .councilor-adviser-deactivate-modal {
+    width: calc(100vw - 24px);
+  }
+
+  .councilor-adviser-directory .councilor-table {
+    min-width: 990px;
+  }
+
+  .councilor-adviser-actions {
+    gap: 6px;
+  }
+
+  .councilor-adviser-directory .councilor-table-action {
+    min-height: 31px;
+
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 560px) {
+  .councilor-adviser-edit-modal,
+  .councilor-adviser-deactivate-modal {
+    width: calc(100vw - 20px);
+  }
+
+  .councilor-adviser-deactivate-modal .councilor-modal-actions {
+    display: grid;
+
+    grid-template-columns: 1fr;
+  }
+
+  .councilor-adviser-deactivate-modal
+    .councilor-modal-actions
+    button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .councilor-adviser-edit-modal,
+  .councilor-adviser-deactivate-modal {
+    width: calc(100vw - 16px);
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION — CRUD
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .councilor-adviser-directory .councilor-table-action,
+  .councilor-danger-button {
+    transition: none;
+  }
+
+  .councilor-adviser-directory
+    .councilor-table-action:hover:not(:disabled),
+  .councilor-danger-button:hover:not(:disabled) {
+    transform: none;
+  }
+}

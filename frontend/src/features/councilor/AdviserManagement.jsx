@@ -18,6 +18,11 @@ const INITIAL_FORM = {
   password: "",
 };
 
+const INITIAL_EDIT_FORM = {
+  name: "",
+  email: "",
+};
+
 const INITIAL_RESET_FORM = {
   newPassword: "",
   confirmPassword: "",
@@ -136,6 +141,8 @@ function Advisers() {
 
   const [creating, setCreating] = useState(false);
 
+  const [updating, setUpdating] = useState(false);
+
   const [resettingPassword, setResettingPassword] = useState(false);
 
   /* =======================================================
@@ -173,6 +180,16 @@ function Advisers() {
   const [resetPasswordVisibility, setResetPasswordVisibility] = useState(
     INITIAL_RESET_PASSWORD_VISIBILITY,
   );
+
+  /* =======================================================
+     EDIT ADVISER MODAL STATE
+  ======================================================= */
+
+  const [editingAdviser, setEditingAdviser] = useState(null);
+
+  const [editFormData, setEditFormData] = useState(INITIAL_EDIT_FORM);
+
+  const [editFormError, setEditFormError] = useState("");
 
   /* =======================================================
      INITIAL LOAD
@@ -219,7 +236,10 @@ function Advisers() {
   ======================================================= */
 
   useEffect(() => {
-    const hasOpenModal = showModal || showResetModal;
+    const hasOpenModal =
+      showModal ||
+      showResetModal ||
+      Boolean(editingAdviser);
 
     if (!hasOpenModal) {
       return undefined;
@@ -234,31 +254,26 @@ function Advisers() {
         return;
       }
 
-      /* ADD ADVISER */
-
-      if (showModal && !creating) {
-        setShowModal(false);
-
-        setFormData(INITIAL_FORM);
-
-        setFormError("");
-
-        setShowCreatePassword(false);
+      if (creating || updating || resettingPassword) {
+        return;
       }
 
-      /* RESET PASSWORD */
+      setShowModal(false);
+      setShowResetModal(false);
 
-      if (showResetModal && !resettingPassword) {
-        setShowResetModal(false);
+      setSelectedAdviser(null);
+      setEditingAdviser(null);
 
-        setSelectedAdviser(null);
+      setFormData(INITIAL_FORM);
+      setEditFormData(INITIAL_EDIT_FORM);
+      setResetFormData(INITIAL_RESET_FORM);
 
-        setResetFormData(INITIAL_RESET_FORM);
+      setFormError("");
+      setEditFormError("");
+      setResetFormError("");
 
-        setResetFormError("");
-
-        setResetPasswordVisibility(INITIAL_RESET_PASSWORD_VISIBILITY);
-      }
+      setShowCreatePassword(false);
+      setResetPasswordVisibility(INITIAL_RESET_PASSWORD_VISIBILITY);
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -268,7 +283,14 @@ function Advisers() {
 
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [showModal, showResetModal, creating, resettingPassword]);
+  }, [
+    showModal,
+    showResetModal,
+    editingAdviser,
+    creating,
+    updating,
+    resettingPassword,
+  ]);
 
   /* =======================================================
      DERIVED DATA
@@ -328,6 +350,13 @@ function Advisers() {
 
   const openModal = () => {
     resetForm();
+
+    setShowResetModal(false);
+    setSelectedAdviser(null);
+
+    setEditingAdviser(null);
+    setEditFormData(INITIAL_EDIT_FORM);
+    setEditFormError("");
 
     setSuccess("");
     setError("");
@@ -479,7 +508,17 @@ function Advisers() {
   ======================================================= */
 
   const openResetModal = (adviser) => {
+    if (!adviser?.id || adviser.active === false) {
+      return;
+    }
+
     resetPasswordForm();
+
+    setShowModal(false);
+
+    setEditingAdviser(null);
+    setEditFormData(INITIAL_EDIT_FORM);
+    setEditFormError("");
 
     setError("");
     setSuccess("");
@@ -597,6 +636,182 @@ function Advisers() {
   };
 
   /* =======================================================
+     EDIT ADVISER FORM HELPERS
+  ======================================================= */
+
+  const resetEditForm = () => {
+    setEditingAdviser(null);
+
+    setEditFormData(INITIAL_EDIT_FORM);
+
+    setEditFormError("");
+  };
+
+  const handleEditFormChange = (event) => {
+    const { name, value } = event.target;
+
+    setEditFormData((current) => ({
+      ...current,
+      [name]: value,
+    }));
+
+    if (editFormError) {
+      setEditFormError("");
+    }
+  };
+
+  const validateEditForm = () => {
+    const name = editFormData.name.trim();
+
+    const email = editFormData.email.trim().toLowerCase();
+
+    if (!name || !email) {
+      return {
+        valid: false,
+
+        message: "Please complete all fields.",
+      };
+    }
+
+    if (!EMAIL_PATTERN.test(email)) {
+      return {
+        valid: false,
+
+        message: "Please enter a valid email address.",
+      };
+    }
+
+    return {
+      valid: true,
+
+      data: {
+        name,
+        email,
+      },
+    };
+  };
+
+  /* =======================================================
+     EDIT ADVISER MODAL CONTROLS
+  ======================================================= */
+
+  const openEditModal = (adviser) => {
+    if (!adviser?.id || adviser.active === false) {
+      return;
+    }
+
+    setShowModal(false);
+
+    setShowResetModal(false);
+    setSelectedAdviser(null);
+    resetPasswordForm();
+
+    setEditingAdviser(adviser);
+
+    setEditFormData({
+      name: adviser.name || "",
+      email: adviser.email || "",
+    });
+
+    setEditFormError("");
+
+    setError("");
+    setSuccess("");
+  };
+
+  const closeEditModal = () => {
+    if (updating) {
+      return;
+    }
+
+    resetEditForm();
+  };
+
+  /* =======================================================
+     UPDATE ADVISER
+  ======================================================= */
+
+  const handleUpdateAdviser = async (event) => {
+    event.preventDefault();
+
+    if (!editingAdviser?.id) {
+      setEditFormError("Unable to identify the selected adviser.");
+
+      return;
+    }
+
+    const validation = validateEditForm();
+
+    if (!validation.valid) {
+      setEditFormError(validation.message);
+
+      return;
+    }
+
+    const adviserId = editingAdviser.id;
+
+    const adviserName = validation.data.name;
+
+    try {
+      setUpdating(true);
+
+      setEditFormError("");
+      setError("");
+      setSuccess("");
+
+      const updatedAdviser = await councilorService.updateAdviser(
+        adviserId,
+        validation.data,
+      );
+
+      if (updatedAdviser?.id) {
+        setAdvisers((currentAdvisers) =>
+          currentAdvisers.map((adviser) =>
+            adviser.id === updatedAdviser.id
+              ? {
+                  ...adviser,
+                  ...updatedAdviser,
+                }
+              : adviser,
+          ),
+        );
+      }
+
+      try {
+        await refreshAdvisers();
+      } catch (refreshError) {
+        console.warn(
+          "Unable to refresh advisers after update:",
+          refreshError,
+        );
+      }
+
+      resetEditForm();
+
+      setSuccess(`${adviserName}'s account was updated successfully.`);
+    } catch (err) {
+      console.error("Unable to update adviser:", err);
+
+      if (err?.response?.status === 409) {
+        setEditFormError(
+          getErrorMessage(
+            err,
+            "That email address already belongs to another account.",
+          ),
+        );
+
+        return;
+      }
+
+      setEditFormError(
+        getErrorMessage(err, "Unable to update adviser account."),
+      );
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  /* =======================================================
      RENDER
   ======================================================= */
 
@@ -623,8 +838,9 @@ function Advisers() {
               <h2>Manage adviser accounts</h2>
 
               <p>
-                Create, organize, and manage registered adviser accounts for
-                Signal Village National High School.
+                Create and maintain reusable adviser accounts for Signal
+                Village National High School. When staffing changes, update the
+                account details and password for the next assigned adviser.
               </p>
 
               <div className="councilor-welcome-meta">
@@ -870,7 +1086,10 @@ function Advisers() {
                     const isActive = adviser.active !== false;
 
                     return (
-                      <tr key={adviser.id}>
+                      <tr
+                        key={adviser.id}
+                        className={isActive ? "" : "is-inactive-row"}
+                      >
                         {/* ADVISER */}
 
                         <td>
@@ -911,16 +1130,29 @@ function Advisers() {
                           </span>
                         </td>
 
-                        {/* ACTION */}
+                        {/* ACTIONS */}
 
                         <td>
-                          <button
-                            type="button"
-                            className="councilor-table-action"
-                            onClick={() => openResetModal(adviser)}
-                          >
-                            Reset Password
-                          </button>
+                          <div className="councilor-adviser-actions">
+                            <button
+                              type="button"
+                              className="councilor-table-action is-edit"
+                              disabled={!isActive}
+                              onClick={() => openEditModal(adviser)}
+                            >
+                              Edit
+                            </button>
+
+                            <button
+                              type="button"
+                              className="councilor-table-action is-security"
+                              disabled={!isActive}
+                              onClick={() => openResetModal(adviser)}
+                            >
+                              Reset Password
+                            </button>
+
+                          </div>
                         </td>
                       </tr>
                     );
@@ -1339,6 +1571,146 @@ function Advisers() {
             </div>
           </div>
         )}
+
+        {/* =================================================
+            EDIT ADVISER MODAL
+        ================================================== */}
+
+        {editingAdviser && (
+          <div
+            className="councilor-modal-backdrop"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                closeEditModal();
+              }
+            }}
+          >
+            <div
+              className="councilor-modal councilor-adviser-edit-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="edit-adviser-title"
+            >
+              <div className="councilor-modal-header">
+                <div>
+                  <span>ACCOUNT MANAGEMENT</span>
+
+                  <h2 id="edit-adviser-title">Edit Adviser</h2>
+
+                  <p>
+                    Update the adviser's account name and school email address.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="councilor-modal-close"
+                  onClick={closeEditModal}
+                  disabled={updating}
+                  aria-label="Close edit adviser modal"
+                >
+                  ×
+                </button>
+              </div>
+
+              <form
+                className="councilor-modal-form"
+                onSubmit={handleUpdateAdviser}
+                noValidate
+              >
+                <div className="councilor-reset-account">
+                  <div className="councilor-person-avatar">
+                    {editingAdviser.name?.trim()?.charAt(0)?.toUpperCase() ||
+                      "A"}
+                  </div>
+
+                  <div>
+                    <span>Editing adviser account</span>
+
+                    <strong>{editingAdviser.name}</strong>
+
+                    <small>{editingAdviser.email}</small>
+                  </div>
+                </div>
+
+                <div className="councilor-modal-field">
+                  <label htmlFor="edit-adviser-name">Full Name</label>
+
+                  <input
+                    id="edit-adviser-name"
+                    name="name"
+                    type="text"
+                    placeholder="Enter adviser name"
+                    value={editFormData.name}
+                    onChange={handleEditFormChange}
+                    autoComplete="name"
+                    disabled={updating}
+                    autoFocus
+                  />
+                </div>
+
+                <div className="councilor-modal-field">
+                  <label htmlFor="edit-adviser-email">Email Address</label>
+
+                  <input
+                    id="edit-adviser-email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter school email"
+                    value={editFormData.email}
+                    onChange={handleEditFormChange}
+                    autoComplete="email"
+                    disabled={updating}
+                  />
+
+                  <span className="councilor-field-hint">
+                    The email address must remain unique across all user
+                    accounts.
+                  </span>
+                </div>
+
+                {editFormError && (
+                  <div className="councilor-modal-error" role="alert">
+                    <span aria-hidden="true">!</span>
+
+                    <p>{editFormError}</p>
+                  </div>
+                )}
+
+                <div className="councilor-modal-actions">
+                  <button
+                    type="button"
+                    className="councilor-secondary-button"
+                    onClick={closeEditModal}
+                    disabled={updating}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="councilor-primary-button"
+                    disabled={
+                      updating ||
+                      !editFormData.name.trim() ||
+                      !editFormData.email.trim()
+                    }
+                  >
+                    {updating && (
+                      <span
+                        className="councilor-button-spinner"
+                        aria-hidden="true"
+                      />
+                    )}
+
+                    {updating ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
       </section>
     </CouncilorLayout>
   );

@@ -1187,3 +1187,526 @@ html[data-theme="dark"] .section-welcome-card {
     transform: none;
   }
 }
+
+/* =========================================================
+   SECTION MANAGEMENT CRUD
+   EDIT / DEACTIVATE ACTIONS
+========================================================= */
+
+/*
+ * The section directory now has a fifth column for actions.
+ * Keep enough horizontal room so the existing columns do not
+ * become compressed on desktop or tablet layouts.
+ */
+.section-directory-panel .councilor-table {
+  min-width: 980px;
+}
+
+.section-directory-panel .councilor-table th:last-child {
+  width: 205px;
+  min-width: 205px;
+}
+
+.section-directory-panel .councilor-table td:last-child {
+  width: 205px;
+  min-width: 205px;
+}
+
+/*
+ * The updated SectionManagement.jsx currently renders the
+ * action wrapper as the last div inside the Actions cell.
+ */
+.section-directory-panel .councilor-table td:last-child > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* =========================================================
+   TABLE ACTION BUTTONS
+========================================================= */
+
+.section-directory-panel .councilor-table-action {
+  min-height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 11px;
+
+  border: 1px solid var(--c-brand-border);
+  border-radius: 8px;
+
+  background: var(--c-icon-bg);
+
+  color: var(--c-blue-800);
+
+  font: inherit;
+  font-size: 7.5px;
+  font-weight: 780;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+@media (hover: hover) {
+  .section-directory-panel
+    .councilor-table-action:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    border-color: var(--c-blue-800);
+
+    background: var(--c-nav-hover-bg);
+
+    box-shadow: 0 5px 14px rgba(7, 27, 66, 0.07);
+  }
+}
+
+.section-directory-panel
+  .councilor-table-action:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.section-directory-panel .councilor-table-action:focus-visible {
+  outline: 0;
+
+  border-color: var(--c-blue-800);
+
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.11);
+}
+
+/* =========================================================
+   DEACTIVATE ACTION
+========================================================= */
+
+/*
+ * The last action is the destructive-looking Deactivate
+ * control. The backend still performs a soft deactivation.
+ */
+.section-directory-panel
+  .councilor-table
+  td:last-child
+  > div
+  > .councilor-table-action:last-child:not(:disabled) {
+  border-color: rgba(185, 28, 28, 0.22);
+
+  background: rgba(185, 28, 28, 0.055);
+
+  color: #b42318;
+}
+
+@media (hover: hover) {
+  .section-directory-panel
+    .councilor-table
+    td:last-child
+    > div
+    > .councilor-table-action:last-child:hover:not(:disabled) {
+    border-color: rgba(185, 28, 28, 0.38);
+
+    background: rgba(185, 28, 28, 0.1);
+
+    color: #991b1b;
+
+    box-shadow: 0 5px 14px rgba(185, 28, 28, 0.08);
+  }
+}
+
+/* =========================================================
+   DISABLED ACTIONS
+========================================================= */
+
+.section-directory-panel .councilor-table-action:disabled {
+  transform: none;
+
+  border-color: var(--c-border-soft);
+
+  background: var(--c-surface-soft);
+
+  color: var(--c-text-muted);
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+
+  opacity: 0.56;
+}
+
+/* =========================================================
+   INACTIVE SECTION ROW
+========================================================= */
+
+.section-directory-panel
+  .councilor-table
+  tbody
+  tr:has(.councilor-status.inactive) {
+  background: color-mix(
+    in srgb,
+    var(--c-surface-soft) 68%,
+    transparent
+  );
+}
+
+.section-directory-panel
+  .councilor-table
+  tbody
+  tr:has(.councilor-status.inactive)
+  .councilor-person-avatar {
+  filter: grayscale(0.35);
+
+  opacity: 0.74;
+}
+
+/* =========================================================
+   CREATE / EDIT / DEACTIVATE MODALS
+========================================================= */
+
+.section-management-page .councilor-modal {
+  width: min(92vw, 560px);
+}
+
+.section-management-page .councilor-modal-form {
+  gap: 16px;
+}
+
+.section-management-page .councilor-modal-field input,
+.section-management-page .councilor-modal-field select {
+  width: 100%;
+}
+
+/*
+ * Student/history preservation warning used in the
+ * Deactivate Section confirmation.
+ */
+.section-management-page
+  .councilor-modal
+  .section-data-warning {
+  margin: 0;
+
+  border-color: rgba(185, 28, 28, 0.2);
+
+  background: rgba(185, 28, 28, 0.05);
+}
+
+.section-management-page
+  .councilor-modal
+  .section-data-warning
+  > span {
+  background: var(--c-red-600);
+}
+
+.section-management-page
+  .councilor-modal
+  .section-data-warning
+  strong {
+  color: var(--c-text-primary);
+}
+
+.section-management-page
+  .councilor-modal
+  .section-data-warning
+  p {
+  color: var(--c-text-muted);
+}
+
+/* =========================================================
+   MODAL SECTION SUMMARY
+========================================================= */
+
+/*
+ * The deactivate confirmation reuses councilor-person.
+ * These rules keep the summary card balanced inside a modal.
+ */
+.section-management-page
+  .councilor-modal-form
+  > .councilor-person {
+  width: 100%;
+
+  min-width: 0;
+}
+
+.section-management-page
+  .councilor-modal-form
+  > .councilor-person
+  > div:last-child {
+  min-width: 0;
+}
+
+.section-management-page
+  .councilor-modal-form
+  > .councilor-person
+  strong {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   DARK MODE — CRUD
+========================================================= */
+
+html[data-theme="dark"]
+  .section-directory-panel
+  .councilor-table
+  td:last-child
+  > div
+  > .councilor-table-action:last-child:not(:disabled) {
+  border-color: rgba(248, 113, 113, 0.24);
+
+  background: rgba(127, 29, 29, 0.18);
+
+  color: #fca5a5;
+}
+
+@media (hover: hover) {
+  html[data-theme="dark"]
+    .section-directory-panel
+    .councilor-table
+    td:last-child
+    > div
+    > .councilor-table-action:last-child:hover:not(:disabled) {
+    border-color: rgba(248, 113, 113, 0.42);
+
+    background: rgba(127, 29, 29, 0.3);
+
+    color: #fecaca;
+  }
+}
+
+html[data-theme="dark"]
+  .section-management-page
+  .councilor-modal
+  .section-data-warning {
+  border-color: rgba(248, 113, 113, 0.2);
+
+  background: rgba(127, 29, 29, 0.14);
+}
+
+/* =========================================================
+   RESPONSIVE — CRUD TABLE
+========================================================= */
+
+@media (max-width: 1040px) {
+  .section-directory-panel .councilor-table {
+    min-width: 940px;
+  }
+
+  .section-directory-panel .councilor-table th:last-child,
+  .section-directory-panel .councilor-table td:last-child {
+    width: 195px;
+    min-width: 195px;
+  }
+}
+
+@media (max-width: 720px) {
+  .section-management-page .councilor-modal {
+    width: calc(100vw - 24px);
+  }
+
+  .section-directory-panel .councilor-table {
+    min-width: 900px;
+  }
+
+  .section-directory-panel .councilor-table th:last-child,
+  .section-directory-panel .councilor-table td:last-child {
+    width: 185px;
+    min-width: 185px;
+  }
+
+  .section-directory-panel .councilor-table-action {
+    min-height: 31px;
+
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 560px) {
+  .section-management-page .councilor-modal {
+    width: calc(100vw - 20px);
+  }
+
+  .section-directory-panel .councilor-table td:last-child > div {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 380px) {
+  .section-management-page .councilor-modal {
+    width: calc(100vw - 16px);
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION — CRUD
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .section-directory-panel .councilor-table-action {
+    transition: none;
+  }
+
+  .section-directory-panel
+    .councilor-table-action:hover:not(:disabled),
+  .section-directory-panel
+    .councilor-table-action:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   EDIT SECTION — LOCKED ADVISER ASSIGNMENT
+========================================================= */
+
+/*
+ * Section editing is intentionally limited to the section
+ * name. The existing adviser remains visible for context,
+ * but cannot be changed from this screen.
+ */
+
+.section-edit-field-label {
+  display: block;
+
+  color: var(--c-text-secondary);
+
+  font-size: 8px;
+  font-weight: 780;
+}
+
+.section-edit-assignment-lock {
+  min-height: 58px;
+
+  display: grid;
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 10px 12px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+
+  background: var(--c-surface-soft);
+}
+
+.section-edit-assignment-avatar {
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 34px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--c-brand-border);
+  border-radius: 9px;
+
+  background: var(--c-icon-bg);
+
+  color: var(--c-blue-800);
+
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.section-edit-assignment-copy {
+  min-width: 0;
+}
+
+.section-edit-assignment-copy strong {
+  display: block;
+
+  overflow: hidden;
+
+  color: var(--c-text-primary);
+
+  font-size: 9px;
+  font-weight: 800;
+
+  line-height: 1.25;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-edit-assignment-copy span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--c-text-muted);
+
+  font-size: 7px;
+
+  line-height: 1.4;
+}
+
+.section-edit-lock-badge {
+  min-height: 24px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 8px;
+
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+
+  background: var(--c-inactive-bg);
+
+  color: var(--c-inactive-text);
+
+  font-size: 6px;
+  font-weight: 850;
+
+  letter-spacing: 0.08em;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   DARK MODE — LOCKED ADVISER
+========================================================= */
+
+html[data-theme="dark"] .section-edit-assignment-lock {
+  background: var(--c-surface-soft);
+}
+
+/* =========================================================
+   RESPONSIVE — LOCKED ADVISER
+========================================================= */
+
+@media (max-width: 560px) {
+  .section-edit-assignment-lock {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+
+    align-items: center;
+  }
+
+  .section-edit-lock-badge {
+    grid-column: 1 / -1;
+
+    justify-self: start;
+  }
+}

@@ -21,6 +21,10 @@ const INITIAL_FORM = {
   adviserId: "",
 };
 
+const INITIAL_EDIT_FORM = {
+  name: "",
+};
+
 const INITIAL_DATA_STATUS = {
   sections: "loading",
   advisers: "loading",
@@ -81,6 +85,41 @@ const clampPercentage = (value) =>
     100,
   );
 
+const validateSectionForm = (
+  data,
+) => {
+  const name =
+    data.name.trim();
+
+  const adviserId =
+    data.adviserId.trim();
+
+  if (!name) {
+    return {
+      valid: false,
+      message:
+        "Please enter a section name.",
+    };
+  }
+
+  if (!adviserId) {
+    return {
+      valid: false,
+      message:
+        "Please select an adviser.",
+    };
+  }
+
+  return {
+    valid: true,
+
+    data: {
+      name,
+      adviserId,
+    },
+  };
+};
+
 /* =========================================================
    COMPONENT
 ========================================================= */
@@ -90,50 +129,102 @@ function SectionManagement() {
      DATA STATE
   ======================================================= */
 
-  const [sections, setSections] =
-    useState([]);
+  const [
+    sections,
+    setSections,
+  ] = useState([]);
 
-  const [advisers, setAdvisers] =
-    useState([]);
+  const [
+    advisers,
+    setAdvisers,
+  ] = useState([]);
 
-  const [search, setSearch] =
-    useState("");
+  const [
+    search,
+    setSearch,
+  ] = useState("");
 
   /* =======================================================
      REQUEST STATE
   ======================================================= */
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
-  const [creating, setCreating] =
-    useState(false);
+  const [
+    creating,
+    setCreating,
+  ] = useState(false);
 
-  const [dataStatus, setDataStatus] =
-    useState(INITIAL_DATA_STATUS);
+  const [
+    updating,
+    setUpdating,
+  ] = useState(false);
+
+  const [
+    dataStatus,
+    setDataStatus,
+  ] = useState(
+    INITIAL_DATA_STATUS,
+  );
 
   /* =======================================================
      FEEDBACK STATE
   ======================================================= */
 
-  const [error, setError] =
-    useState("");
+  const [
+    error,
+    setError,
+  ] = useState("");
 
-  const [success, setSuccess] =
-    useState("");
+  const [
+    success,
+    setSuccess,
+  ] = useState("");
 
   /* =======================================================
-     MODAL STATE
+     CREATE MODAL STATE
   ======================================================= */
 
-  const [showModal, setShowModal] =
-    useState(false);
+  const [
+    showModal,
+    setShowModal,
+  ] = useState(false);
 
-  const [formData, setFormData] =
-    useState(INITIAL_FORM);
+  const [
+    formData,
+    setFormData,
+  ] = useState(
+    INITIAL_FORM,
+  );
 
-  const [formError, setFormError] =
-    useState("");
+  const [
+    formError,
+    setFormError,
+  ] = useState("");
+
+  /* =======================================================
+     EDIT MODAL STATE
+  ======================================================= */
+
+  const [
+    editingSection,
+    setEditingSection,
+  ] = useState(null);
+
+  const [
+    editFormData,
+    setEditFormData,
+  ] = useState(
+    INITIAL_EDIT_FORM,
+  );
+
+  const [
+    editError,
+    setEditError,
+  ] = useState("");
 
   /* =======================================================
      INITIAL DATA LOAD
@@ -145,6 +236,7 @@ function SectionManagement() {
     const loadInitialData =
       async () => {
         setLoading(true);
+
         setError("");
 
         const [
@@ -196,7 +288,9 @@ function SectionManagement() {
           setAdvisers([]);
         }
 
-        setDataStatus(nextStatus);
+        setDataStatus(
+          nextStatus,
+        );
 
         const unavailable = [];
 
@@ -242,13 +336,20 @@ function SectionManagement() {
      MODAL SIDE EFFECTS
   ======================================================= */
 
+  const modalOpen =
+    showModal ||
+    Boolean(
+      editingSection,
+    );
+
   useEffect(() => {
-    if (!showModal) {
+    if (!modalOpen) {
       return undefined;
     }
 
     const previousOverflow =
-      document.body.style.overflow;
+      document.body.style
+        .overflow;
 
     document.body.style.overflow =
       "hidden";
@@ -257,17 +358,35 @@ function SectionManagement() {
       event,
     ) => {
       if (
-        event.key === "Escape" &&
-        !creating
+        event.key !== "Escape"
       ) {
-        setShowModal(false);
-
-        setFormData(
-          INITIAL_FORM,
-        );
-
-        setFormError("");
+        return;
       }
+
+      if (
+        creating ||
+        updating
+      ) {
+        return;
+      }
+
+      setShowModal(false);
+
+      setEditingSection(
+        null,
+      );
+
+      setFormData(
+        INITIAL_FORM,
+      );
+
+      setEditFormData(
+        INITIAL_EDIT_FORM,
+      );
+
+      setFormError("");
+
+      setEditError("");
     };
 
     window.addEventListener(
@@ -285,8 +404,9 @@ function SectionManagement() {
       );
     };
   }, [
-    showModal,
+    modalOpen,
     creating,
+    updating,
   ]);
 
   /* =======================================================
@@ -311,11 +431,47 @@ function SectionManagement() {
       );
     }, [advisers]);
 
+  /*
+   * One active section = one adviser.
+   *
+   * Advisers already assigned to another ACTIVE section
+   * are removed from the Add Section dropdown.
+   */
+  const assignedActiveAdviserIds =
+    useMemo(() => {
+      return new Set(
+        sections
+          .filter(
+            (section) =>
+              section.active !== false &&
+              Boolean(section.adviserId),
+          )
+          .map(
+            (section) =>
+              section.adviserId,
+          ),
+      );
+    }, [sections]);
+
+  const availableAdvisers =
+    useMemo(() => {
+      return activeAdvisers.filter(
+        (adviser) =>
+          !assignedActiveAdviserIds.has(
+            adviser.id,
+          ),
+      );
+    }, [
+      activeAdvisers,
+      assignedActiveAdviserIds,
+    ]);
+
   const filteredSections =
     useMemo(() => {
-      const keyword = search
-        .trim()
-        .toLowerCase();
+      const keyword =
+        search
+          .trim()
+          .toLowerCase();
 
       if (!keyword) {
         return sections;
@@ -402,11 +558,15 @@ function SectionManagement() {
         setDataStatus(
           (current) => ({
             ...current,
-            sections: "ready",
+
+            sections:
+              "ready",
           }),
         );
 
         setError("");
+
+        return data;
       } catch (err) {
         console.error(
           "Unable to refresh sections:",
@@ -416,7 +576,9 @@ function SectionManagement() {
         setDataStatus(
           (current) => ({
             ...current,
-            sections: "error",
+
+            sections:
+              "error",
           }),
         );
 
@@ -425,11 +587,13 @@ function SectionManagement() {
     };
 
   /* =======================================================
-     FORM HELPERS
+     CREATE FORM HELPERS
   ======================================================= */
 
   const resetForm = () => {
-    setFormData(INITIAL_FORM);
+    setFormData(
+      INITIAL_FORM,
+    );
 
     setFormError("");
   };
@@ -445,7 +609,9 @@ function SectionManagement() {
     setFormData(
       (current) => ({
         ...current,
-        [name]: value,
+
+        [name]:
+          value,
       }),
     );
 
@@ -455,13 +621,20 @@ function SectionManagement() {
   };
 
   /* =======================================================
-     MODAL CONTROLS
+     CREATE MODAL CONTROLS
   ======================================================= */
 
   const openModal = () => {
     resetForm();
 
+    setEditingSection(
+      null,
+    );
+
+    setEditError("");
+
     setError("");
+
     setSuccess("");
 
     setShowModal(true);
@@ -478,45 +651,6 @@ function SectionManagement() {
   };
 
   /* =======================================================
-     VALIDATION
-  ======================================================= */
-
-  const validateForm = () => {
-    const name =
-      formData.name.trim();
-
-    const adviserId =
-      formData.adviserId.trim();
-
-    if (!name) {
-      return {
-        valid: false,
-
-        message:
-          "Please enter a section name.",
-      };
-    }
-
-    if (!adviserId) {
-      return {
-        valid: false,
-
-        message:
-          "Please select an adviser.",
-      };
-    }
-
-    return {
-      valid: true,
-
-      data: {
-        name,
-        adviserId,
-      },
-    };
-  };
-
-  /* =======================================================
      CREATE SECTION
   ======================================================= */
 
@@ -525,7 +659,9 @@ function SectionManagement() {
       event.preventDefault();
 
       const validation =
-        validateForm();
+        validateSectionForm(
+          formData,
+        );
 
       if (!validation.valid) {
         setFormError(
@@ -539,7 +675,9 @@ function SectionManagement() {
         setCreating(true);
 
         setFormError("");
-        setError("");
+
+      setError("");
+
         setSuccess("");
 
         await councilorService.createSection(
@@ -573,6 +711,222 @@ function SectionManagement() {
     };
 
   /* =======================================================
+     EDIT SECTION FORM HELPERS
+  ======================================================= */
+
+  const resetEditForm = () => {
+    setEditingSection(
+      null,
+    );
+
+    setEditFormData(
+      INITIAL_EDIT_FORM,
+    );
+
+    setEditError("");
+  };
+
+  const handleEditFormChange =
+    (event) => {
+      const {
+        name,
+        value,
+      } = event.target;
+
+      setEditFormData(
+        (current) => ({
+          ...current,
+
+          [name]:
+            value,
+        }),
+      );
+
+      if (editError) {
+        setEditError("");
+      }
+    };
+
+  /* =======================================================
+     EDIT SECTION MODAL
+  ======================================================= */
+
+  const openEditSection =
+    (section) => {
+      if (
+        !section?.id ||
+        section.active ===
+          false
+      ) {
+        return;
+      }
+
+      setShowModal(false);
+
+      setFormError("");
+
+      setError("");
+
+      setSuccess("");
+
+      setEditingSection(
+        section,
+      );
+
+      setEditFormData({
+        name:
+          section.name ||
+          "",
+      });
+
+      setEditError("");
+    };
+
+  const closeEditSection =
+    () => {
+      if (updating) {
+        return;
+      }
+
+      resetEditForm();
+    };
+
+  /* =======================================================
+     UPDATE SECTION
+     SECTION NAME ONLY
+  ======================================================= */
+
+  const handleUpdateSection =
+    async (event) => {
+      event.preventDefault();
+
+      if (
+        !editingSection?.id
+      ) {
+        setEditError(
+          "Section information is unavailable.",
+        );
+
+        return;
+      }
+
+      const sectionName =
+        editFormData.name.trim();
+
+      if (!sectionName) {
+        setEditError(
+          "Please enter a section name.",
+        );
+
+        return;
+      }
+
+      /*
+       * Adviser reassignment is intentionally NOT allowed
+       * from Section Management.
+       *
+       * The current backend UpdateSectionRequest still
+       * requires adviserId, so we safely send the section's
+       * existing adviser ID unchanged.
+       */
+      const existingAdviserId =
+        editingSection.adviserId;
+
+      if (!existingAdviserId) {
+        setEditError(
+          "This section does not have a valid adviser assignment.",
+        );
+
+        return;
+      }
+
+      const sectionId =
+        editingSection.id;
+
+      try {
+        setUpdating(true);
+
+        setEditError("");
+
+        setError("");
+
+        setSuccess("");
+
+        const updatedSection =
+          await councilorService.updateSection(
+            sectionId,
+            {
+              name:
+                sectionName,
+
+              adviserId:
+                existingAdviserId,
+            },
+          );
+
+        /*
+         * Immediately update the local table
+         * if the backend returns the updated
+         * SectionResponse.
+         */
+        if (
+          updatedSection?.id
+        ) {
+          setSections(
+            (
+              currentSections,
+            ) =>
+              currentSections.map(
+                (section) =>
+                  section.id ===
+                  updatedSection.id
+                    ? {
+                        ...section,
+                        ...updatedSection,
+                      }
+                    : section,
+              ),
+          );
+        }
+
+        /*
+         * Refetch to keep everything fully
+         * synchronized with the backend.
+         */
+        try {
+          await refreshSections();
+        } catch (
+          refreshError
+        ) {
+          console.warn(
+            "Unable to refresh sections after update:",
+            refreshError,
+          );
+        }
+
+        resetEditForm();
+
+        setSuccess(
+          `${sectionName} was updated successfully.`,
+        );
+      } catch (err) {
+        console.error(
+          "Unable to update section:",
+          err,
+        );
+
+        setEditError(
+          getErrorMessage(
+            err,
+            "Unable to update section.",
+          ),
+        );
+      } finally {
+        setUpdating(false);
+      }
+    };
+
+  /* =======================================================
      RENDER
   ======================================================= */
 
@@ -595,13 +949,15 @@ function SectionManagement() {
               </span>
 
               <h2>
-                Organize school sections
+                Organize school
+                sections
               </h2>
 
               <p>
-                Create academic sections,
-                assign active advisers, and
-                monitor section readiness
+                Create and maintain
+                reusable academic
+                sections with fixed
+                adviser assignments
                 across Signal Village
                 National High School.
               </p>
@@ -705,7 +1061,8 @@ function SectionManagement() {
                 </p>
 
                 <small>
-                  Sections with advisers
+                  Sections with
+                  advisers
                 </small>
               </div>
 
@@ -735,11 +1092,11 @@ function SectionManagement() {
                 </span>
 
                 <p>
-                  Active Advisers
+                  Available Advisers
                 </p>
 
                 <small>
-                  Eligible for assignment
+                  Unassigned and active
                 </small>
               </div>
 
@@ -748,7 +1105,7 @@ function SectionManagement() {
                 !advisersReady
                   ? "—"
                   : formatNumber(
-                      activeAdvisers.length,
+                      availableAdvisers.length,
                     )}
               </strong>
             </article>
@@ -760,7 +1117,8 @@ function SectionManagement() {
         ================================================== */}
 
         {sectionsReady &&
-          sections.length > 0 && (
+          sections.length >
+            0 && (
             <section
               className={`section-assignment-health ${
                 unassignedSectionCount >
@@ -814,7 +1172,8 @@ function SectionManagement() {
               <div className="section-assignment-health-progress">
                 <div className="section-assignment-health-progress-top">
                   <span>
-                    Assignment Coverage
+                    Assignment
+                    Coverage
                   </span>
 
                   <strong>
@@ -927,9 +1286,9 @@ function SectionManagement() {
 
               <p>
                 Review registered
-                sections, adviser
-                assignments, and
-                operational status.
+                sections, fixed adviser
+                assignments, and update
+                section names when needed.
               </p>
             </div>
 
@@ -942,7 +1301,7 @@ function SectionManagement() {
                 }
                 disabled={
                   !advisersReady ||
-                  activeAdvisers.length ===
+                  availableAdvisers.length ===
                     0
                 }
               >
@@ -973,7 +1332,9 @@ function SectionManagement() {
                 type="search"
                 aria-label="Search sections"
                 placeholder="Search by section or adviser..."
-                value={search}
+                value={
+                  search
+                }
                 onChange={(
                   event,
                 ) =>
@@ -1032,8 +1393,9 @@ function SectionManagement() {
               </strong>
 
               <p>
-                Fetching school section
-                and assignment
+                Fetching school
+                section and
+                assignment
                 information...
               </p>
             </div>
@@ -1079,7 +1441,7 @@ function SectionManagement() {
 
               {!search &&
                 advisersReady &&
-                activeAdvisers.length >
+                availableAdvisers.length >
                   0 && (
                   <button
                     type="button"
@@ -1111,6 +1473,10 @@ function SectionManagement() {
 
                     <th scope="col">
                       STATUS
+                    </th>
+
+                    <th scope="col">
+                      ACTIONS
                     </th>
                   </tr>
                 </thead>
@@ -1244,6 +1610,42 @@ function SectionManagement() {
                                 : "Inactive"}
                             </span>
                           </td>
+
+                          {/* ACTIONS */}
+
+                          <td>
+                            <div
+                              style={{
+                                display:
+                                  "flex",
+
+                                alignItems:
+                                  "center",
+
+                                gap:
+                                  "8px",
+
+                                flexWrap:
+                                  "wrap",
+                              }}
+                            >
+                              <button
+                                type="button"
+                                className="councilor-table-action"
+                                disabled={
+                                  !isActive
+                                }
+                                onClick={() =>
+                                  openEditSection(
+                                    section,
+                                  )
+                                }
+                              >
+                                Edit
+                              </button>
+
+                            </div>
+                          </td>
                         </tr>
                       );
                     },
@@ -1315,15 +1717,12 @@ function SectionManagement() {
               aria-modal="true"
               aria-labelledby="add-section-title"
             >
-              {/* =========================================
-                  MODAL HEADER
-              ========================================== */}
+              {/* HEADER */}
 
               <div className="councilor-modal-header">
                 <div>
                   <span>
-                    ACADEMIC
-                    MANAGEMENT
+                    ACADEMIC MANAGEMENT
                   </span>
 
                   <h2 id="add-section-title">
@@ -1333,8 +1732,8 @@ function SectionManagement() {
                   <p>
                     Create a new
                     academic section
-                    and assign an active
-                    adviser.
+                    and assign an
+                    active adviser.
                   </p>
                 </div>
 
@@ -1353,9 +1752,7 @@ function SectionManagement() {
                 </button>
               </div>
 
-              {/* =========================================
-                  FORM
-              ========================================== */}
+              {/* FORM */}
 
               <form
                 className="councilor-modal-form"
@@ -1408,7 +1805,7 @@ function SectionManagement() {
                     }
                     disabled={
                       creating ||
-                      activeAdvisers.length ===
+                      availableAdvisers.length ===
                         0
                     }
                   >
@@ -1417,10 +1814,8 @@ function SectionManagement() {
                       adviser
                     </option>
 
-                    {activeAdvisers.map(
-                      (
-                        adviser,
-                      ) => (
+                    {availableAdvisers.map(
+                      (adviser) => (
                         <option
                           key={
                             adviser.id
@@ -1442,16 +1837,17 @@ function SectionManagement() {
                   </select>
 
                   <span className="councilor-field-hint">
-                    Only active
-                    adviser accounts
-                    can be assigned to
-                    a section.
+                    Only active,
+                    currently unassigned
+                    advisers can be
+                    assigned to a new
+                    section.
                   </span>
                 </div>
 
                 {/* NO ACTIVE ADVISER */}
 
-                {activeAdvisers.length ===
+                {availableAdvisers.length ===
                   0 && (
                   <div
                     className="councilor-modal-error"
@@ -1464,11 +1860,12 @@ function SectionManagement() {
                     </span>
 
                     <p>
-                      No active
-                      adviser accounts
-                      are available.
-                      Create or activate
-                      an adviser first.
+                      No adviser is
+                      currently available.
+                      Every active adviser
+                      may already be
+                      assigned to an
+                      active section.
                     </p>
                   </div>
                 )}
@@ -1515,7 +1912,7 @@ function SectionManagement() {
                     className="councilor-primary-button"
                     disabled={
                       creating ||
-                      activeAdvisers.length ===
+                      availableAdvisers.length ===
                         0
                     }
                   >
@@ -1535,6 +1932,207 @@ function SectionManagement() {
             </div>
           </div>
         )}
+
+        {/* =================================================
+            EDIT SECTION MODAL
+        ================================================== */}
+
+        {editingSection && (
+          <div
+            className="councilor-modal-backdrop"
+            onMouseDown={(
+              event,
+            ) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                closeEditSection();
+              }
+            }}
+          >
+            <div
+              className="councilor-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="edit-section-title"
+            >
+              {/* HEADER */}
+
+              <div className="councilor-modal-header">
+                <div>
+                  <span>
+                    ACADEMIC MANAGEMENT
+                  </span>
+
+                  <h2 id="edit-section-title">
+                    Edit Section
+                  </h2>
+
+                  <p>
+                    Update the
+                    section name while
+                    keeping its current
+                    adviser assignment.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="councilor-modal-close"
+                  onClick={
+                    closeEditSection
+                  }
+                  disabled={
+                    updating
+                  }
+                  aria-label="Close edit section modal"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* FORM */}
+
+              <form
+                className="councilor-modal-form"
+                onSubmit={
+                  handleUpdateSection
+                }
+                noValidate
+              >
+                {/* SECTION NAME */}
+
+                <div className="councilor-modal-field">
+                  <label htmlFor="edit-section-name">
+                    Section Name
+                  </label>
+
+                  <input
+                    id="edit-section-name"
+                    name="name"
+                    type="text"
+                    placeholder="e.g. STEM 11 - Newton"
+                    value={
+                      editFormData.name
+                    }
+                    onChange={
+                      handleEditFormChange
+                    }
+                    autoComplete="off"
+                    disabled={
+                      updating
+                    }
+                    autoFocus
+                  />
+                </div>
+
+                {/* LOCKED ADVISER ASSIGNMENT */}
+
+                <div className="councilor-modal-field">
+                  <span className="section-edit-field-label">
+                    Assigned Adviser
+                  </span>
+
+                  <div className="section-edit-assignment-lock">
+                    <div
+                      className="section-edit-assignment-avatar"
+                      aria-hidden="true"
+                    >
+                      {editingSection.adviserName
+                        ?.trim()
+                        ?.charAt(0)
+                        ?.toUpperCase() ||
+                        "A"}
+                    </div>
+
+                    <div className="section-edit-assignment-copy">
+                      <strong>
+                        {editingSection.adviserName ||
+                          "Assigned adviser unavailable"}
+                      </strong>
+
+                      <span>
+                        Adviser assignment is locked for this section.
+                      </span>
+                    </div>
+
+                    <span
+                      className="section-edit-lock-badge"
+                      aria-label="Adviser assignment locked"
+                    >
+                      LOCKED
+                    </span>
+                  </div>
+
+                  <span className="councilor-field-hint">
+                    One section is assigned to one adviser. Editing a section
+                    only changes its section name.
+                  </span>
+                </div>
+
+                {/* ERROR */}
+
+                {editError && (
+                  <div
+                    className="councilor-modal-error"
+                    role="alert"
+                  >
+                    <span
+                      aria-hidden="true"
+                    >
+                      !
+                    </span>
+
+                    <p>
+                      {
+                        editError
+                      }
+                    </p>
+                  </div>
+                )}
+
+                {/* ACTIONS */}
+
+                <div className="councilor-modal-actions">
+                  <button
+                    type="button"
+                    className="councilor-secondary-button"
+                    onClick={
+                      closeEditSection
+                    }
+                    disabled={
+                      updating
+                    }
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="councilor-primary-button"
+                    disabled={
+                      updating ||
+                      !editFormData.name.trim()
+                    }
+                  >
+                    {updating && (
+                      <span
+                        className="councilor-button-spinner"
+                        aria-hidden="true"
+                      />
+                    )}
+
+                    {updating
+                      ? "Saving..."
+                      : "Save Changes"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
       </div>
     </CouncilorLayout>
   );
