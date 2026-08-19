@@ -2,6 +2,7 @@ package com.example.attendancemanagementbackend.controller;
 
 import com.example.attendancemanagementbackend.dto.UserResponse;
 import com.example.attendancemanagementbackend.dto.adviser.CreateAdviserRequest;
+import com.example.attendancemanagementbackend.dto.adviser.UpdateAdviserRequest;
 import com.example.attendancemanagementbackend.dto.password.ChangePasswordRequest;
 import com.example.attendancemanagementbackend.dto.password.ResetPasswordRequest;
 import com.example.attendancemanagementbackend.service.UserService;
@@ -45,7 +46,42 @@ public class UserController {
     public UserResponse createAdviser(
             @Valid @RequestBody CreateAdviserRequest request
     ) {
-        return userService.createAdviser(request);
+        return userService.createAdviser(
+                request
+        );
+    }
+
+    /* =========================================================
+       UPDATE ADVISER
+       Councilor only
+    ========================================================= */
+
+    @PatchMapping("/advisers/{adviserId}")
+    public UserResponse updateAdviser(
+            @PathVariable String adviserId,
+            @Valid @RequestBody UpdateAdviserRequest request
+    ) {
+
+        return userService.updateAdviser(
+                adviserId,
+                request
+        );
+    }
+
+    /* =========================================================
+       DEACTIVATE ADVISER
+       Councilor only
+    ========================================================= */
+
+    @DeleteMapping("/advisers/{adviserId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAdviser(
+            @PathVariable String adviserId
+    ) {
+
+        userService.deactivateAdviser(
+                adviserId
+        );
     }
 
     /* =========================================================

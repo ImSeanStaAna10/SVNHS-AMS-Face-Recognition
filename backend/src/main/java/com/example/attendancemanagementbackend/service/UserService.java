@@ -2,11 +2,13 @@ package com.example.attendancemanagementbackend.service;
 
 import com.example.attendancemanagementbackend.dto.UserResponse;
 import com.example.attendancemanagementbackend.dto.adviser.CreateAdviserRequest;
+import com.example.attendancemanagementbackend.dto.adviser.UpdateAdviserRequest;
 import com.example.attendancemanagementbackend.dto.password.ChangePasswordRequest;
 import com.example.attendancemanagementbackend.dto.password.ResetPasswordRequest;
 import com.example.attendancemanagementbackend.entity.Role;
 import com.example.attendancemanagementbackend.entity.User;
 import com.example.attendancemanagementbackend.exception.ApiException;
+import com.example.attendancemanagementbackend.repository.SectionRepository;
 import com.example.attendancemanagementbackend.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,13 +20,16 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final SectionRepository sectionRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(
             UserRepository userRepository,
+            SectionRepository sectionRepository,
             PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
+        this.sectionRepository = sectionRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -92,6 +97,133 @@ public class UserService {
     }
 
     /* =========================================================
+       UPDATE ADVISER
+    ========================================================= */
+
+    public UserResponse updateAdviser(
+            String adviserId,
+            UpdateAdviserRequest request
+    ) {
+
+        User adviser =
+                findAdviserById(
+                        adviserId
+                );
+
+        String name =
+                request
+                        .getName()
+                        .trim();
+
+        String email =
+                request
+                        .getEmail()
+                        .trim();
+
+        /*
+         * Email must remain unique.
+         *
+         * The current adviser is excluded
+         * so keeping the same email is allowed.
+         */
+        if (
+                userRepository
+                        .existsByEmailAndIdNot(
+                                email,
+                                adviserId
+                        )
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "Email already exists"
+            );
+        }
+
+        /*
+         * Only adviser profile information
+         * is modified.
+         *
+         * Password, role, active status,
+         * sections, students, and attendance
+         * data remain unchanged.
+         */
+        adviser.setName(
+                name
+        );
+
+        adviser.setEmail(
+                email
+        );
+
+        User savedAdviser =
+                userRepository.save(
+                        adviser
+                );
+
+        return mapToResponse(
+                savedAdviser
+        );
+    }
+
+    /* =========================================================
+       DEACTIVATE ADVISER
+       SOFT DELETE
+    ========================================================= */
+
+    public void deactivateAdviser(
+            String adviserId
+    ) {
+
+        User adviser =
+                findAdviserById(
+                        adviserId
+                );
+
+        if (!adviser.isActive()) {
+            return;
+        }
+
+        /*
+         * Do not deactivate an adviser who
+         * is still responsible for an active
+         * section.
+         *
+         * This prevents an active section
+         * from being left with an inactive
+         * adviser account.
+         */
+        boolean hasActiveSection =
+                sectionRepository
+                        .existsByAdviserIdAndActiveTrue(
+                                adviserId
+                        );
+
+        if (hasActiveSection) {
+
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "Adviser is assigned to an active section. Reassign or deactivate the section first."
+            );
+        }
+
+        /*
+         * SOFT DELETE ONLY.
+         *
+         * We do not physically delete the
+         * adviser so historical relationships
+         * remain intact.
+         */
+        adviser.setActive(
+                false
+        );
+
+        userRepository.save(
+                adviser
+        );
+    }
+
+    /* =========================================================
        CHANGE OWN PASSWORD
 
        Available to authenticated users.
@@ -147,9 +279,13 @@ public class UserService {
                         request.getNewPassword()
                 );
 
-        user.setPassword(hashedPassword);
+        user.setPassword(
+                hashedPassword
+        );
 
-        userRepository.save(user);
+        userRepository.save(
+                user
+        );
     }
 
     /* =========================================================
@@ -165,9 +301,14 @@ public class UserService {
     ) {
 
         User adviser =
-                findUserById(adviserId);
+                findUserById(
+                        adviserId
+                );
 
-        if (adviser.getRole() != Role.ADVISER) {
+        if (
+                adviser.getRole() !=
+                        Role.ADVISER
+        ) {
 
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
@@ -180,9 +321,40 @@ public class UserService {
                         request.getNewPassword()
                 );
 
-        adviser.setPassword(hashedPassword);
+        adviser.setPassword(
+                hashedPassword
+        );
 
-        userRepository.save(adviser);
+        userRepository.save(
+                adviser
+        );
+    }
+
+    /* =========================================================
+       SHARED ADVISER LOOKUP
+    ========================================================= */
+
+    private User findAdviserById(
+            String adviserId
+    ) {
+
+        User adviser =
+                findUserById(
+                        adviserId
+                );
+
+        if (
+                adviser.getRole() !=
+                        Role.ADVISER
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Selected user is not an adviser"
+            );
+        }
+
+        return adviser;
     }
 
     /* =========================================================

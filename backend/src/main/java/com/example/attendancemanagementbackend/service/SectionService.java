@@ -2,6 +2,7 @@ package com.example.attendancemanagementbackend.service;
 
 import com.example.attendancemanagementbackend.dto.section.CreateSectionRequest;
 import com.example.attendancemanagementbackend.dto.section.SectionResponse;
+import com.example.attendancemanagementbackend.dto.section.UpdateSectionRequest;
 import com.example.attendancemanagementbackend.entity.Role;
 import com.example.attendancemanagementbackend.entity.Section;
 import com.example.attendancemanagementbackend.entity.User;
@@ -13,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,13 +31,19 @@ public class SectionService {
         this.userRepository = userRepository;
     }
 
-    // CREATE SECTION
+    /* =========================================================
+       CREATE SECTION
+    ========================================================= */
+
     public SectionResponse createSection(
             CreateSectionRequest request
     ) {
 
         User adviser =
-                userRepository.findById(request.getAdviserId())
+                userRepository
+                        .findById(
+                                request.getAdviserId()
+                        )
                         .orElseThrow(() ->
                                 new ApiException(
                                         HttpStatus.NOT_FOUND,
@@ -44,7 +52,11 @@ public class SectionService {
                         );
 
         // Selected user must be an adviser
-        if (adviser.getRole() != Role.ADVISER) {
+        if (
+                adviser.getRole() !=
+                        Role.ADVISER
+        ) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Selected user is not an adviser"
@@ -53,6 +65,7 @@ public class SectionService {
 
         // Adviser account must be active
         if (!adviser.isActive()) {
+
             throw new ApiException(
                     HttpStatus.CONFLICT,
                     "Adviser account is inactive"
@@ -66,12 +79,19 @@ public class SectionService {
                 );
 
         Section savedSection =
-                sectionRepository.save(section);
+                sectionRepository.save(
+                        section
+                );
 
-        return mapToResponse(savedSection);
+        return mapToResponse(
+                savedSection
+        );
     }
 
-    // GET SECTIONS
+    /* =========================================================
+       GET SECTIONS
+    ========================================================= */
+
     public List<SectionResponse> getAllSections() {
 
         Authentication authentication =
@@ -83,11 +103,15 @@ public class SectionService {
                 authentication.getName();
 
         boolean isCouncilor =
-                authentication.getAuthorities()
+                authentication
+                        .getAuthorities()
                         .stream()
                         .anyMatch(authority ->
-                                authority.getAuthority()
-                                        .equals("ROLE_COUNCILOR")
+                                authority
+                                        .getAuthority()
+                                        .equals(
+                                                "ROLE_COUNCILOR"
+                                        )
                         );
 
         List<Section> sections;
@@ -96,15 +120,17 @@ public class SectionService {
 
             // Councilor can see all sections
             sections =
-                    sectionRepository.findAll();
+                    sectionRepository
+                            .findAll();
 
         } else {
 
             // Adviser can only see assigned sections
             sections =
-                    sectionRepository.findByAdviserId(
-                            userId
-                    );
+                    sectionRepository
+                            .findByAdviserId(
+                                    userId
+                            );
         }
 
         return sections
@@ -113,7 +139,165 @@ public class SectionService {
                 .toList();
     }
 
-    // SHARED RESPONSE MAPPER
+    /* =========================================================
+       UPDATE SECTION
+    ========================================================= */
+
+    public SectionResponse updateSection(
+            String sectionId,
+            UpdateSectionRequest request
+    ) {
+
+        Section section =
+                findSectionById(
+                        sectionId
+                );
+
+        User adviser =
+                findActiveAdviser(
+                        request.getAdviserId()
+                );
+
+        String sectionName =
+                request
+                        .getName()
+                        .trim();
+
+        /*
+         * Only section name and adviser
+         * assignment are changed.
+         *
+         * Existing students, attendance
+         * sessions, records, and section ID
+         * remain untouched.
+         */
+        section.setName(
+                sectionName
+        );
+
+        section.setAdviser(
+                adviser
+        );
+
+        section.setUpdatedAt(
+                LocalDateTime.now()
+        );
+
+        Section savedSection =
+                sectionRepository.save(
+                        section
+                );
+
+        return mapToResponse(
+                savedSection
+        );
+    }
+
+    /* =========================================================
+       DEACTIVATE SECTION
+       SOFT DELETE
+    ========================================================= */
+
+    public void deactivateSection(
+            String sectionId
+    ) {
+
+        Section section =
+                findSectionById(
+                        sectionId
+                );
+
+        if (!section.isActive()) {
+            return;
+        }
+
+        /*
+         * SOFT DELETE ONLY.
+         *
+         * Students, adviser assignment,
+         * attendance sessions, records,
+         * and historical reports remain
+         * associated with this section.
+         */
+        section.setActive(
+                false
+        );
+
+        section.setUpdatedAt(
+                LocalDateTime.now()
+        );
+
+        sectionRepository.save(
+                section
+        );
+    }
+
+    /* =========================================================
+       FIND ACTIVE ADVISER
+    ========================================================= */
+
+    private User findActiveAdviser(
+            String adviserId
+    ) {
+
+        User adviser =
+                userRepository
+                        .findById(
+                                adviserId
+                        )
+                        .orElseThrow(() ->
+                                new ApiException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Adviser not found"
+                                )
+                        );
+
+        if (
+                adviser.getRole() !=
+                        Role.ADVISER
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Selected user is not an adviser"
+            );
+        }
+
+        if (!adviser.isActive()) {
+
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "Adviser account is inactive"
+            );
+        }
+
+        return adviser;
+    }
+
+    /* =========================================================
+       FIND SECTION
+    ========================================================= */
+
+    private Section findSectionById(
+            String sectionId
+    ) {
+
+        return sectionRepository
+                .findById(
+                        sectionId
+                )
+                .orElseThrow(() ->
+                        new ApiException(
+                                HttpStatus.NOT_FOUND,
+                                "Section not found"
+                        )
+                );
+    }
+
+    /* =========================================================
+       SHARED RESPONSE MAPPER
+    ========================================================= */
+
     private SectionResponse mapToResponse(
             Section section
     ) {
@@ -124,8 +308,12 @@ public class SectionService {
         return new SectionResponse(
                 section.getId(),
                 section.getName(),
-                adviser != null ? adviser.getId() : null,
-                adviser != null ? adviser.getName() : null,
+                adviser != null
+                        ? adviser.getId()
+                        : null,
+                adviser != null
+                        ? adviser.getName()
+                        : null,
                 section.isActive()
         );
     }

@@ -7,5 +7,11 @@ import java.util.List;
 
 public interface SectionRepository extends JpaRepository<Section, String> {
 
-    List<Section> findByAdviserId(String adviserId);
+    List<Section> findByAdviserId(
+            String adviserId
+    );
+
+    boolean existsByAdviserIdAndActiveTrue(
+            String adviserId
+    );
 }
