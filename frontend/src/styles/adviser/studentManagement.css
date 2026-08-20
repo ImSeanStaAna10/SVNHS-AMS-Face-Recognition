@@ -7063,3 +7063,806 @@ html[data-theme="dark"]
     transition: none;
   }
 }
+
+
+/* =========================================================
+   STUDENT FACE ENROLLMENT V7
+   Attendance-session scanner parity
+   Final overrides — keep this block LAST
+========================================================= */
+
+/* =========================================================
+   CAMERA WORKSPACE
+========================================================= */
+
+.student-enrollment-modal .student-enrollment-photo,
+.student-identity-modal .student-identity-camera {
+  background:
+    radial-gradient(circle at 50% 8%, rgba(18, 61, 126, 0.09), transparent 38%),
+    var(--c-surface);
+}
+
+.student-enrollment-modal .student-face-camera-shell,
+.student-identity-modal .student-face-camera-shell {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(42, 61, 94, 0.72);
+  border-radius: 20px;
+  outline: 0;
+  background:
+    radial-gradient(circle at 50% 45%, #17284a 0%, #091326 52%, #050b16 100%);
+  box-shadow:
+    0 28px 62px rgba(10, 26, 53, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.student-enrollment-modal .student-face-camera-shell {
+  height: clamp(390px, 51vh, 520px);
+  min-height: 390px;
+  max-height: 520px;
+}
+
+.student-identity-modal .student-face-camera-shell {
+  height: clamp(380px, 50vh, 500px);
+  min-height: 380px;
+  max-height: 500px;
+}
+
+.student-face-camera-shell.scanner-holding,
+.student-face-camera-shell.scanner-countdown {
+  border-color: rgba(74, 222, 128, 0.88);
+  box-shadow:
+    0 0 0 4px rgba(34, 197, 94, 0.07),
+    0 28px 62px rgba(10, 26, 53, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.student-face-camera-shell.scanner-capturing {
+  border-color: rgba(96, 165, 250, 0.9);
+}
+
+.student-face-camera-shell.is-captured {
+  border-color: rgba(34, 197, 94, 0.9);
+  box-shadow:
+    0 0 0 4px rgba(34, 197, 94, 0.065),
+    0 28px 62px rgba(10, 26, 53, 0.2);
+}
+
+.student-face-camera-shell.is-error {
+  border-color: rgba(251, 113, 133, 0.9);
+}
+
+.student-face-camera-shell video,
+.student-face-captured-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.student-face-camera-shell video {
+  opacity: 0;
+  transform: scaleX(-1);
+  filter: none;
+  transition: opacity 0.22s ease;
+}
+
+.student-face-camera-shell video.is-active {
+  opacity: 1;
+}
+
+.student-face-captured-image {
+  transform: scaleX(-1);
+}
+
+/* =========================================================
+   CAMERA SHADE
+========================================================= */
+
+.student-face-camera-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3, 8, 18, 0.44) 0%,
+      transparent 23%,
+      transparent 63%,
+      rgba(3, 8, 18, 0.78) 100%
+    );
+}
+
+/* =========================================================
+   FACE TARGET — SAME LANGUAGE AS ATTENDANCE SESSION
+========================================================= */
+
+.student-face-target {
+  position: absolute;
+  z-index: 5;
+  top: 49%;
+  left: 50%;
+  width: clamp(205px, 25vw, 285px);
+  height: clamp(280px, 34vw, 375px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.student-face-target-oval {
+  position: absolute;
+  inset: 10px 18px;
+  border: 2px solid rgba(255, 255, 255, 0.62);
+  border-radius: 48% 48% 46% 46%;
+  box-shadow:
+    0 0 0 999px rgba(5, 10, 22, 0.09),
+    0 0 34px rgba(255, 255, 255, 0.08);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.student-face-target-line {
+  position: absolute;
+  top: 11%;
+  left: 17%;
+  width: 66%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #69b7ff, transparent);
+  box-shadow: 0 0 12px rgba(105, 183, 255, 0.92);
+  opacity: 0;
+}
+
+.student-face-target.scanner-positioning .student-face-target-line,
+.student-face-target.scanner-holding .student-face-target-line,
+.student-face-target.scanner-countdown .student-face-target-line,
+.student-face-target.scanner-capturing .student-face-target-line {
+  opacity: 1;
+  animation: student-attendance-scan-line 1.55s ease-in-out infinite;
+}
+
+.student-face-target.scanner-holding .student-face-target-oval,
+.student-face-target.scanner-countdown .student-face-target-oval {
+  border-color: #4ade80;
+  box-shadow:
+    0 0 0 999px rgba(5, 10, 22, 0.08),
+    0 0 42px rgba(74, 222, 128, 0.28);
+}
+
+.student-face-target.scanner-capturing .student-face-target-oval {
+  border-color: #60a5fa;
+  box-shadow:
+    0 0 0 999px rgba(5, 10, 22, 0.1),
+    0 0 42px rgba(96, 165, 250, 0.3);
+}
+
+.student-face-target .corner {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-color: rgba(255, 255, 255, 0.96);
+  border-style: solid;
+}
+
+.student-face-target .corner-one {
+  top: 0;
+  left: 0;
+  border-width: 3px 0 0 3px;
+  border-radius: 14px 0 0 0;
+}
+
+.student-face-target .corner-two {
+  top: 0;
+  right: 0;
+  border-width: 3px 3px 0 0;
+  border-radius: 0 14px 0 0;
+}
+
+.student-face-target .corner-three {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 3px 3px;
+  border-radius: 0 0 0 14px;
+}
+
+.student-face-target .corner-four {
+  right: 0;
+  bottom: 0;
+  border-width: 0 3px 3px 0;
+  border-radius: 0 0 14px 0;
+}
+
+/* Old enrollment oval is replaced by the attendance-style target. */
+.student-face-biometric-guide,
+.student-face-camera-vignette,
+.student-face-instruction,
+.student-face-camera-meta {
+  display: none !important;
+}
+
+/* =========================================================
+   LIVE / AUTO BADGES
+========================================================= */
+
+.student-face-live-badge,
+.student-face-auto-badge {
+  position: absolute;
+  z-index: 7;
+  top: 17px;
+  min-height: 29px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  backdrop-filter: blur(9px);
+}
+
+.student-face-live-badge {
+  left: 17px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(7, 27, 66, 0.7);
+}
+
+.student-face-live-badge > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.16);
+  animation: student-camera-pulse 1.35s ease-in-out infinite;
+}
+
+.student-face-auto-badge {
+  right: 17px;
+  border: 1px solid rgba(147, 197, 253, 0.24);
+  background: rgba(18, 61, 126, 0.72);
+  color: #e8f2ff;
+}
+
+.student-face-auto-badge > span {
+  font-size: 10px;
+}
+
+.student-face-manual-capture {
+  position: absolute;
+  z-index: 8;
+  top: 55px;
+  right: 17px;
+  min-height: 30px;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(4, 12, 27, 0.7);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 7px;
+  font-weight: 850;
+  cursor: pointer;
+  backdrop-filter: blur(9px);
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.student-face-manual-capture:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(147, 197, 253, 0.58);
+  background: rgba(18, 61, 126, 0.88);
+}
+
+.student-face-manual-capture:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   BOTTOM SCANNER MESSAGE
+========================================================= */
+
+.student-face-scanner-message {
+  position: absolute;
+  z-index: 7;
+  right: 20px;
+  bottom: 18px;
+  left: 20px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 13px;
+  background: rgba(4, 12, 27, 0.78);
+  color: #ffffff;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+
+.student-face-scanner-message > span {
+  display: block;
+  color: #f2c75c;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.student-face-scanner-message strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.student-face-scanner-message small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 7px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   COUNTDOWN / PROCESSING
+========================================================= */
+
+.student-face-countdown {
+  position: absolute;
+  z-index: 10;
+  top: 48%;
+  left: 50%;
+  width: auto;
+  height: auto;
+  display: block;
+  transform: translate(-50%, -50%);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+  backdrop-filter: none;
+  filter: drop-shadow(0 8px 26px rgba(0, 0, 0, 0.3));
+  animation: none;
+}
+
+.student-face-countdown small {
+  display: block;
+  margin: 0;
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.student-face-countdown span {
+  display: block;
+  margin: -2px 0 0;
+  color: #ffffff;
+  font-size: clamp(78px, 10vw, 118px);
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -4px;
+}
+
+.student-face-processing-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: rgba(4, 10, 24, 0.64);
+  color: #ffffff;
+  backdrop-filter: blur(3px);
+}
+
+.student-face-processing-spinner {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 14px;
+  border: 4px solid rgba(255, 255, 255, 0.18);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: student-spin 0.75s linear infinite;
+}
+
+.student-face-processing-overlay strong {
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.student-face-processing-overlay span {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 7px;
+}
+
+/* =========================================================
+   CAMERA OFF PLACEHOLDER
+========================================================= */
+
+.student-face-camera-placeholder {
+  z-index: 8;
+  padding: 34px;
+}
+
+.student-face-camera-placeholder > .student-face-placeholder-kicker {
+  display: block;
+  margin-bottom: 3px;
+  color: #f2c75c;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.student-face-camera-placeholder strong {
+  margin-top: 4px;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.student-face-camera-placeholder p {
+  max-width: 390px;
+  margin: 8px auto 18px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 8px;
+  line-height: 1.55;
+}
+
+.student-face-camera-placeholder .adviser-primary-button {
+  min-height: 40px;
+  padding-inline: 15px;
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #0c2d63;
+}
+
+/* =========================================================
+   CAPTURED RESULT
+========================================================= */
+
+.student-face-captured-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3, 8, 18, 0.25) 0%,
+      transparent 35%,
+      transparent 57%,
+      rgba(3, 8, 18, 0.86) 100%
+    );
+  pointer-events: none;
+}
+
+.student-face-captured-label {
+  position: absolute;
+  z-index: 6;
+  top: 17px;
+  left: 17px;
+  min-height: 29px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 1px solid rgba(134, 239, 172, 0.24);
+  border-radius: 999px;
+  background: rgba(20, 83, 45, 0.82);
+  color: #ffffff;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(9px);
+}
+
+.student-face-captured-label > span {
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #ffffff;
+  font-size: 8px;
+}
+
+.student-face-captured-summary {
+  position: absolute;
+  z-index: 7;
+  right: 20px;
+  bottom: 18px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 13px;
+  background: rgba(4, 12, 27, 0.78);
+  color: #ffffff;
+  backdrop-filter: blur(12px);
+}
+
+.student-face-captured-check {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.student-face-captured-summary strong {
+  display: block;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.student-face-captured-summary p {
+  margin: 4px 0 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 7px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   SUPPORTING CONTENT BELOW CAMERA
+========================================================= */
+
+.student-face-camera-loading {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--c-border-soft);
+  background: var(--c-surface-soft);
+}
+
+.student-face-privacy-note {
+  border-radius: 10px;
+}
+
+.student-face-capture-tips {
+  gap: 7px;
+}
+
+.student-face-capture-tips > span {
+  min-height: 37px;
+  border-radius: 9px;
+}
+
+/* =========================================================
+   EXISTING STUDENT FACE MODAL — CAMERA-FIRST
+========================================================= */
+
+.student-identity-modal {
+  width: min(860px, calc(100vw - 48px));
+  max-height: calc(100dvh - 40px);
+  border-radius: 18px;
+}
+
+.student-identity-modal .student-face-student {
+  margin: 15px 20px 0;
+}
+
+.student-identity-camera {
+  padding: 14px 20px 18px;
+}
+
+.student-identity-modal .student-face-modal-actions {
+  padding: 12px 20px;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-enrollment-modal .student-enrollment-photo,
+html[data-theme="dark"] .student-identity-modal .student-identity-camera {
+  background:
+    radial-gradient(circle at 50% 8%, rgba(59, 130, 246, 0.1), transparent 38%),
+    var(--c-surface);
+}
+
+html[data-theme="dark"] .student-face-camera-loading {
+  border-color: #26354b;
+  background: #101c2e;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) and (min-width: 861px) {
+  .student-enrollment-modal .student-face-camera-shell {
+    height: clamp(340px, 46vh, 440px);
+    min-height: 340px;
+  }
+
+  .student-face-target {
+    width: 205px;
+    height: 280px;
+  }
+}
+
+@media (max-width: 860px) {
+  .student-enrollment-modal .student-face-camera-shell,
+  .student-identity-modal .student-face-camera-shell {
+    height: auto;
+    min-height: 390px;
+    max-height: none;
+    aspect-ratio: 4 / 3;
+  }
+
+  .student-face-target {
+    width: 205px;
+    height: 280px;
+  }
+}
+
+@media (max-width: 650px) {
+  .student-enrollment-modal .student-face-camera-shell,
+  .student-identity-modal .student-face-camera-shell {
+    min-height: 320px;
+    border-radius: 16px;
+  }
+
+  .student-face-target {
+    width: 175px;
+    height: 245px;
+  }
+
+  .student-face-target .corner {
+    width: 34px;
+    height: 34px;
+  }
+
+  .student-face-live-badge,
+  .student-face-auto-badge {
+    top: 12px;
+    min-height: 27px;
+    padding-inline: 9px;
+    font-size: 6px;
+  }
+
+  .student-face-live-badge {
+    left: 12px;
+  }
+
+  .student-face-auto-badge {
+    right: 12px;
+  }
+
+  .student-face-manual-capture {
+    top: 48px;
+    right: 12px;
+    min-height: 27px;
+    font-size: 6px;
+  }
+
+  .student-face-scanner-message,
+  .student-face-captured-summary {
+    right: 11px;
+    bottom: 11px;
+    left: 11px;
+    padding: 10px 11px;
+  }
+
+  .student-face-scanner-message strong {
+    font-size: 11px;
+  }
+
+  .student-face-scanner-message small {
+    font-size: 6px;
+  }
+
+  .student-face-countdown span {
+    font-size: 86px;
+  }
+
+  .student-face-camera-placeholder strong {
+    font-size: 17px;
+  }
+
+  .student-identity-modal {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+}
+
+@media (max-width: 440px) {
+  .student-enrollment-modal .student-face-camera-shell,
+  .student-identity-modal .student-face-camera-shell {
+    min-height: 285px;
+  }
+
+  .student-face-target {
+    width: 150px;
+    height: 210px;
+  }
+
+  .student-face-target-oval {
+    inset: 9px 15px;
+  }
+
+  .student-face-auto-badge {
+    max-width: 126px;
+  }
+
+  .student-face-manual-capture {
+    top: 46px;
+    right: 9px;
+  }
+
+  .student-face-live-badge {
+    left: 9px;
+  }
+
+  .student-face-auto-badge {
+    right: 9px;
+  }
+
+  .student-face-scanner-message,
+  .student-face-captured-summary {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+  }
+
+  .student-face-countdown span {
+    font-size: 76px;
+  }
+
+  .student-face-camera-placeholder {
+    padding: 24px 18px;
+  }
+
+  .student-face-camera-placeholder strong {
+    font-size: 15px;
+  }
+
+  .student-face-camera-placeholder p {
+    font-size: 7px;
+  }
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes student-attendance-scan-line {
+  0% {
+    top: 11%;
+  }
+
+  50% {
+    top: 84%;
+  }
+
+  100% {
+    top: 11%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-face-target-line,
+  .student-face-processing-spinner,
+  .student-face-live-badge > span {
+    animation: none;
+  }
+}

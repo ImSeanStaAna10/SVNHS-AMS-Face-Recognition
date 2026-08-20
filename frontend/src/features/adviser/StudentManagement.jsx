@@ -170,27 +170,73 @@ function FaceCapturePanel({
   onEnableCamera,
   onManualCapture,
 }) {
-  const scannerActive =
-    cameraActive &&
-    !capturedFacePreview;
+  const scannerActive = cameraActive && !capturedFacePreview;
 
-  const readyForHold =
-    scanPhase === "holding" ||
-    scanPhase === "countdown" ||
-    scanPhase === "capturing" ||
-    scanPhase === "captured";
+  const scannerCopy = useMemo(() => {
+    if (scanPhase === "capturing" || capturingFace) {
+      return {
+        eyebrow: "CAPTURING ENROLLMENT PHOTO",
+        title: "Hold still",
+        description: "Creating the face image used for attendance recognition.",
+      };
+    }
+
+    if (scanPhase === "countdown") {
+      return {
+        eyebrow: "FACE POSITION ACCEPTED",
+        title: "Hold still",
+        description: "Automatic capture is starting.",
+      };
+    }
+
+    if (scanPhase === "holding") {
+      return {
+        eyebrow: "POSITION ACCEPTED",
+        title: "Look straight at the camera",
+        description: "Keep your face centered while the scanner prepares the capture.",
+      };
+    }
+
+    if (scanPhase === "positioning") {
+      return {
+        eyebrow: "AUTO CAPTURE ACTIVE",
+        title: "Center your face",
+        description: "Keep one face inside the guide and look directly at the camera.",
+      };
+    }
+
+    if (scanPhase === "preparing" || (cameraActive && !cameraReady)) {
+      return {
+        eyebrow: "PREPARING CAMERA",
+        title: "Starting enrollment scanner",
+        description: "The camera will be ready in a moment.",
+      };
+    }
+
+    if (cameraActive && cameraReady) {
+      return {
+        eyebrow: "FACE ENROLLMENT READY",
+        title: scanMessage || "Position one student in frame",
+        description: "Auto capture is enabled. You can also use Capture Now.",
+      };
+    }
+
+    return {
+      eyebrow: "FACE ENROLLMENT",
+      title: "Camera unavailable",
+      description: "Enable the camera to begin guided face enrollment.",
+    };
+  }, [cameraActive, cameraReady, capturingFace, scanMessage, scanPhase]);
 
   return (
     <div className="student-face-camera-content">
       <div
-        className={`student-face-camera-shell is-${scanPhase}`}
+        className={`student-face-camera-shell is-${scanPhase} scanner-${scanPhase}`}
       >
         {capturedFacePreview ? (
           <>
             <img
-              src={
-                capturedFacePreview
-              }
+              src={capturedFacePreview}
               alt={`Captured face of ${subjectName}`}
               className="student-face-captured-image"
             />
@@ -198,13 +244,8 @@ function FaceCapturePanel({
             <div className="student-face-captured-shade" />
 
             <div className="student-face-captured-label">
-              <span
-                aria-hidden="true"
-              >
-                ✓
-              </span>
-
-              Enrollment photo ready
+              <span aria-hidden="true">✓</span>
+              ENROLLMENT PHOTO READY
             </div>
 
             <div className="student-face-captured-summary">
@@ -216,14 +257,10 @@ function FaceCapturePanel({
               </span>
 
               <div>
-                <strong>
-                  Capture complete
-                </strong>
-
+                <strong>Capture complete</strong>
                 <p>
-                  Review the photo,
-                  then complete the
-                  student enrollment.
+                  Review the student's face photo. Retake it if needed, then
+                  save the enrollment.
                 </p>
               </div>
             </div>
@@ -235,14 +272,8 @@ function FaceCapturePanel({
               autoPlay
               muted
               playsInline
-              className={
-                cameraActive
-                  ? "is-active"
-                  : ""
-              }
-              onCanPlay={
-                onCameraReady
-              }
+              className={cameraActive ? "is-active" : ""}
+              onCanPlay={onCameraReady}
             />
 
             {!cameraActive && (
@@ -257,25 +288,22 @@ function FaceCapturePanel({
                   <span />
                 </div>
 
-                <strong>
-                  Camera access required
-                </strong>
+                <span className="student-face-placeholder-kicker">
+                  CAMERA OFF
+                </span>
+
+                <strong>Start the face enrollment scanner</strong>
 
                 <p>
-                  Allow camera access
-                  to start the guided
-                  face enrollment.
+                  Allow camera access to capture the student's registered face
+                  identity for attendance recognition.
                 </p>
 
                 <button
                   type="button"
                   className="adviser-primary-button"
-                  disabled={
-                    registeringFace
-                  }
-                  onClick={
-                    onEnableCamera
-                  }
+                  disabled={registeringFace}
+                  onClick={onEnableCamera}
                 >
                   Enable Camera
                 </button>
@@ -284,29 +312,20 @@ function FaceCapturePanel({
 
             {scannerActive && (
               <>
-                <div
-                  className="student-face-camera-vignette"
-                  aria-hidden="true"
-                />
+                <div className="student-face-camera-shade" aria-hidden="true" />
 
                 <div
-                  className={`student-face-biometric-guide ${
-                    readyForHold
-                      ? "is-ready"
-                      : ""
-                  }`}
+                  className={`student-face-target scanner-${scanPhase}`}
                   aria-hidden="true"
                 >
-                  <div className="student-face-oval">
-                    <span className="student-face-oval-dot is-top" />
-                    <span className="student-face-oval-dot is-right" />
-                    <span className="student-face-oval-dot is-bottom" />
-                    <span className="student-face-oval-dot is-left" />
-                  </div>
+                  <div className="student-face-target-oval" />
 
-                  {cameraReady && (
-                    <span className="student-face-scan-line" />
-                  )}
+                  {cameraReady && <div className="student-face-target-line" />}
+
+                  <span className="corner corner-one" />
+                  <span className="corner corner-two" />
+                  <span className="corner corner-three" />
+                  <span className="corner corner-four" />
                 </div>
 
                 <div className="student-face-live-badge">
@@ -315,141 +334,49 @@ function FaceCapturePanel({
                 </div>
 
                 <div className="student-face-auto-badge">
-                  <span
-                    aria-hidden="true"
-                  >
-                    ◎
-                  </span>
-
+                  <span aria-hidden="true">◎</span>
                   AUTO CAPTURE
                 </div>
 
-                {countdown !==
-                  null && (
-                  <div
-                    className="student-face-countdown"
-                    aria-live="polite"
+                {cameraReady && scanPhase !== "countdown" && (
+                  <button
+                    type="button"
+                    className="student-face-manual-capture"
+                    disabled={
+                      registeringFace || capturingFace || !cameraReady
+                    }
+                    onClick={onManualCapture}
                   >
-                    <span>
-                      {countdown}
-                    </span>
+                    Capture Now
+                  </button>
+                )}
 
-                    <small>
-                      Hold still
-                    </small>
+                <div className="student-face-scanner-message">
+                  <span>{scannerCopy.eyebrow}</span>
+                  <strong>{scannerCopy.title}</strong>
+                  <small>{scannerCopy.description}</small>
+                </div>
+
+                {countdown !== null && (
+                  <div className="student-face-countdown" aria-live="polite">
+                    <small>HOLD STILL</small>
+                    <span>{countdown}</span>
                   </div>
                 )}
 
-                <div className="student-face-instruction">
-                  <div
-                    className="student-face-instruction-icon"
-                    aria-hidden="true"
-                  >
-                    {scanPhase ===
-                      "holding" ||
-                    scanPhase ===
-                      "countdown"
-                      ? "✓"
-                      : "◎"}
+                {(capturingFace || scanPhase === "capturing") && (
+                  <div className="student-face-processing-overlay">
+                    <div className="student-face-processing-spinner" />
+                    <strong>Capturing face</strong>
+                    <span>Preparing enrollment photo...</span>
                   </div>
-
-                  <div>
-                    <strong>
-                      {
-                        scanMessage
-                      }
-                    </strong>
-
-                    <span>
-                      {cameraReady
-                        ? "Keep one face inside the oval and look straight ahead."
-                        : "Preparing the camera for face enrollment..."}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="student-face-camera-meta">
-                  <span
-                    className={
-                      cameraReady
-                        ? "is-complete"
-                        : ""
-                    }
-                  >
-                    <i
-                      aria-hidden="true"
-                    >
-                      {cameraReady
-                        ? "✓"
-                        : "1"}
-                    </i>
-
-                    Camera ready
-                  </span>
-
-                  <span
-                    className={
-                      readyForHold
-                        ? "is-complete"
-                        : ""
-                    }
-                  >
-                    <i
-                      aria-hidden="true"
-                    >
-                      {readyForHold
-                        ? "✓"
-                        : "2"}
-                    </i>
-
-                    Hold position
-                  </span>
-
-                  <span
-                    className={
-                      capturingFace
-                        ? "is-complete"
-                        : ""
-                    }
-                  >
-                    <i
-                      aria-hidden="true"
-                    >
-                      {capturingFace
-                        ? "✓"
-                        : "3"}
-                    </i>
-
-                    Auto capture
-                  </span>
-                </div>
-
-                {cameraReady &&
-                  scanPhase !==
-                    "countdown" && (
-                    <button
-                      type="button"
-                      className="student-face-manual-capture"
-                      disabled={
-                        registeringFace ||
-                        capturingFace ||
-                        !cameraReady
-                      }
-                      onClick={
-                        onManualCapture
-                      }
-                    >
-                      Capture now
-                    </button>
-                  )}
+                )}
               </>
             )}
 
             <div
               className={`student-face-camera-flash ${
-                flashActive
-                  ? "is-active"
-                  : ""
+                flashActive ? "is-active" : ""
               }`}
               aria-hidden="true"
             />
@@ -457,82 +384,43 @@ function FaceCapturePanel({
         )}
       </div>
 
-      <canvas
-        ref={canvasRef}
-        hidden
-      />
+      <canvas ref={canvasRef} hidden />
 
-      {!capturedFacePreview &&
-        cameraActive &&
-        !cameraReady && (
-          <div className="student-face-camera-loading">
-            <span className="student-face-loading-dot" />
-            Preparing secure camera
-            preview...
-          </div>
-        )}
+      {!capturedFacePreview && cameraActive && !cameraReady && (
+        <div className="student-face-camera-loading">
+          <span className="student-face-loading-dot" />
+          Preparing secure camera preview...
+        </div>
+      )}
 
       {cameraError && (
-        <div
-          className="student-face-feedback is-error"
-          role="alert"
-        >
-          <span
-            aria-hidden="true"
-          >
-            !
-          </span>
+        <div className="student-face-feedback is-error" role="alert">
+          <span aria-hidden="true">!</span>
 
           <div>
-            <strong>
-              Camera unavailable
-            </strong>
-
-            <p>
-              {cameraError}
-            </p>
+            <strong>Camera unavailable</strong>
+            <p>{cameraError}</p>
           </div>
         </div>
       )}
 
       {faceError && (
-        <div
-          className="student-face-feedback is-error"
-          role="alert"
-        >
-          <span
-            aria-hidden="true"
-          >
-            !
-          </span>
+        <div className="student-face-feedback is-error" role="alert">
+          <span aria-hidden="true">!</span>
 
           <div>
-            <strong>
-              Face registration
-            </strong>
-
-            <p>
-              {faceError}
-            </p>
+            <strong>Face registration</strong>
+            <p>{faceError}</p>
           </div>
         </div>
       )}
 
       <div className="student-face-privacy-note">
-        <span
-          aria-hidden="true"
-        >
-          ▣
-        </span>
+        <span aria-hidden="true">▣</span>
 
         <p>
-          <strong>
-            Face enrollment photo
-          </strong>
-
-          The captured image is
-          submitted only when you
-          complete enrollment.
+          <strong>Face enrollment photo</strong>
+          The captured image is submitted only when you complete enrollment.
         </p>
       </div>
 
