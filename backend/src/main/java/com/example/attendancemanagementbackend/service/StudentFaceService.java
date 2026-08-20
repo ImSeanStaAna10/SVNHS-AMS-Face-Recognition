@@ -19,10 +19,10 @@ import java.util.UUID;
 public class StudentFaceService {
 
     /**
-     * Cosine distance threshold used to detect
-     * whether a face is already registered.
+     * Cosine distance threshold used to determine
+     * whether the supplied face is already registered.
      *
-     * Lower distance = more similar face.
+     * Lower distance = more similar.
      */
     private static final double FACE_DUPLICATE_THRESHOLD = 0.50;
 
@@ -41,18 +41,17 @@ public class StudentFaceService {
     }
 
     /**
-     * Enroll a student's face.
+     * Registers OR updates a student's face.
      *
      * Flow:
      *
      * 1. Find student
      * 2. Validate image
-     * 3. Check if student already has a face
-     * 4. Generate face embedding using Python service
+     * 3. Determine whether student already has a face
+     * 4. Generate embedding using Python face service
      * 5. Validate embedding
-     * 6. Check if face is already registered to another student
-     * 7. Generate face ID
-     * 8. Save embedding
+     * 6. Check duplicate faces belonging to OTHER students
+     * 7. UPDATE existing face or INSERT new face
      */
     @Transactional
     public void enrollFace(
@@ -78,7 +77,6 @@ public class StudentFaceService {
         // =====================================================
 
         if (image == null || image.isEmpty()) {
-
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Image is required"
@@ -86,16 +84,18 @@ public class StudentFaceService {
         }
 
         // =====================================================
-        // 3. CHECK IF STUDENT ALREADY HAS A FACE
+        // 3. CHECK WHETHER STUDENT ALREADY HAS A FACE
+        //
+        // IMPORTANT:
+        // This is no longer an error.
+        //
+        // false = REGISTER
+        // true  = UPDATE
         // =====================================================
 
-        if (studentFaceRepository.existsByStudentId(studentId)) {
-
-            throw new ApiException(
-                    HttpStatus.CONFLICT,
-                    "Student already has a registered face"
-            );
-        }
+        boolean alreadyRegistered =
+                studentFaceRepository
+                        .existsByStudentId(studentId);
 
         // =====================================================
         // 4. SEND IMAGE TO PYTHON FACE SERVICE
@@ -132,18 +132,21 @@ public class StudentFaceService {
                 );
 
         // =====================================================
-        // 7. CHECK FOR DUPLICATE FACE
+        // 7. CHECK DUPLICATE FACE
+        //
+        // IMPORTANT:
+        // Exclude the current student.
+        //
+        // Otherwise, while updating a face,
+        // the student's old face could be detected
+        // as the nearest duplicate.
         // =====================================================
-        //
-        // Find the closest registered face.
-        //
-        // If there are no registered faces yet,
-        // findMostSimilarFace() returns Optional.empty()
-        // and enrollment is allowed.
-        //
 
         studentFaceRepository
-                .findMostSimilarFace(embedding)
+                .findMostSimilarFaceExcludingStudent(
+                        embedding,
+                        studentId
+                )
                 .ifPresent(match -> {
 
                     if (match.distance() <= FACE_DUPLICATE_THRESHOLD) {
@@ -156,22 +159,42 @@ public class StudentFaceService {
                 });
 
         // =====================================================
-        // 8. GENERATE FACE ID
-        // =====================================================
-
-        String faceId =
-                UUID.randomUUID().toString();
-
-        // =====================================================
-        // 9. CURRENT DATE/TIME
+        // 8. CURRENT DATE/TIME
         // =====================================================
 
         LocalDateTime now =
                 LocalDateTime.now();
 
         // =====================================================
-        // 10. INSERT FACE EMBEDDING
+        // 9. UPDATE EXISTING FACE
         // =====================================================
+
+        if (alreadyRegistered) {
+
+            int updatedRows =
+                    studentFaceRepository
+                            .updateFaceEmbedding(
+                                    studentId,
+                                    embedding,
+                                    now
+                            );
+
+            if (updatedRows == 0) {
+                throw new ApiException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Unable to update student face"
+                );
+            }
+
+            return;
+        }
+
+        // =====================================================
+        // 10. INSERT NEW FACE
+        // =====================================================
+
+        String faceId =
+                UUID.randomUUID().toString();
 
         studentFaceRepository.insertFaceEmbedding(
                 faceId,
@@ -214,7 +237,7 @@ public class StudentFaceService {
      * Find the registered face with the smallest
      * cosine distance from the supplied embedding.
      *
-     * This method is used by attendance face recognition.
+     * Used by attendance face recognition.
      */
     @Transactional(readOnly = true)
     public FaceMatchResult findMostSimilarFace(

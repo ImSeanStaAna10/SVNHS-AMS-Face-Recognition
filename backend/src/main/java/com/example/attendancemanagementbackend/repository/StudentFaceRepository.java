@@ -8,11 +8,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface StudentFaceRepository
         extends JpaRepository<StudentFace, String> {
 
+    /* =========================================================
+       CHECK IF STUDENT HAS REGISTERED FACE
+    ========================================================= */
+
     boolean existsByStudentId(String studentId);
+
+    /* =========================================================
+       INSERT NEW FACE
+    ========================================================= */
 
     @Modifying
     @Query(value = """
@@ -39,6 +48,30 @@ public interface StudentFaceRepository
             @Param("updatedAt") LocalDateTime updatedAt
     );
 
+    /* =========================================================
+       UPDATE EXISTING FACE
+    ========================================================= */
+
+    @Modifying
+    @Query(value = """
+            UPDATE student_faces
+            SET
+                embedding = CAST(:embedding AS vector),
+                updated_at = :updatedAt
+            WHERE student_id = :studentId
+            """, nativeQuery = true)
+    int updateFaceEmbedding(
+            @Param("studentId") String studentId,
+            @Param("embedding") String embedding,
+            @Param("updatedAt") LocalDateTime updatedAt
+    );
+
+    /* =========================================================
+       FIND MOST SIMILAR FACE
+
+       Used by normal attendance face recognition.
+    ========================================================= */
+
     @Query(value = """
             SELECT
                 student_id AS studentId,
@@ -47,7 +80,30 @@ public interface StudentFaceRepository
             ORDER BY embedding <=> CAST(:embedding AS vector)
             LIMIT 1
             """, nativeQuery = true)
-    java.util.Optional<FaceMatchResult> findMostSimilarFace(
+    Optional<FaceMatchResult> findMostSimilarFace(
             @Param("embedding") String embedding
+    );
+
+    /* =========================================================
+       FIND MOST SIMILAR FACE EXCLUDING CURRENT STUDENT
+
+       Used when registering/updating a student's face.
+
+       This prevents the student's OLD face from being
+       detected as a duplicate of their NEW face.
+    ========================================================= */
+
+    @Query(value = """
+            SELECT
+                student_id AS studentId,
+                embedding <=> CAST(:embedding AS vector) AS distance
+            FROM student_faces
+            WHERE student_id <> :studentId
+            ORDER BY embedding <=> CAST(:embedding AS vector)
+            LIMIT 1
+            """, nativeQuery = true)
+    Optional<FaceMatchResult> findMostSimilarFaceExcludingStudent(
+            @Param("embedding") String embedding,
+            @Param("studentId") String studentId
     );
 }
