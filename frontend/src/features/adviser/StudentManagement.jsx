@@ -561,6 +561,11 @@ function StudentManagement() {
     setCreatedStudentRecord,
   ] = useState(null);
 
+  const [
+    enrollmentStep,
+    setEnrollmentStep,
+  ] = useState(1);
+
   /* =======================================================
      EDIT STUDENT STATE
   ======================================================= */
@@ -1597,7 +1602,7 @@ function StudentManagement() {
     };
 
   /* =======================================================
-     ADD STUDENT MODAL
+     ADD STUDENT MODAL / WIZARD
   ======================================================= */
 
   const resetAddStudentForm =
@@ -1611,6 +1616,8 @@ function StudentManagement() {
       setCreatedStudentRecord(
         null,
       );
+
+      setEnrollmentStep(1);
     };
 
   const openAddStudentModal =
@@ -1633,12 +1640,19 @@ function StudentManagement() {
         true,
       );
 
-      scheduleCameraStart();
+      /*
+       * Camera intentionally does NOT start here.
+       * Step 1 is student details only so the enrollment
+       * screen stays focused and camera permission is
+       * requested only when the adviser reaches Step 2.
+       */
     };
 
   const resetAddStudentModal =
     () => {
       resetCamera();
+
+      setEnrollmentStep(1);
 
       setShowAddModal(
         false,
@@ -1656,6 +1670,135 @@ function StudentManagement() {
       }
 
       resetAddStudentModal();
+    };
+
+  const validateEnrollmentDetails =
+    () => {
+      const cleanStudentNumber =
+        studentNumber.trim();
+
+      const cleanName =
+        studentName.trim();
+
+      setCreateError("");
+
+      if (
+        !cleanStudentNumber ||
+        !cleanName
+      ) {
+        setCreateError(
+          "Student number and student name are required.",
+        );
+
+        return false;
+      }
+
+      if (!section?.id) {
+        setCreateError(
+          "No assigned section is available.",
+        );
+
+        return false;
+      }
+
+      return true;
+    };
+
+  const goToEnrollmentDetails =
+    () => {
+      if (
+        creatingStudent
+      ) {
+        return;
+      }
+
+      stopFaceCamera();
+
+      setFaceError("");
+
+      setCameraError("");
+
+      setEnrollmentStep(1);
+    };
+
+  const goToEnrollmentFace =
+    () => {
+      if (
+        creatingStudent
+      ) {
+        return;
+      }
+
+      if (
+        !validateEnrollmentDetails()
+      ) {
+        setEnrollmentStep(1);
+
+        return;
+      }
+
+      setFaceError("");
+
+      setCameraError("");
+
+      setEnrollmentStep(2);
+
+      if (
+        !capturedFacePreview &&
+        !cameraActive
+      ) {
+        scheduleCameraStart();
+      }
+    };
+
+  const goToEnrollmentReview =
+    () => {
+      if (
+        creatingStudent
+      ) {
+        return;
+      }
+
+      if (
+        !capturedFaceFile ||
+        !capturedFacePreview
+      ) {
+        setFaceError(
+          "Please capture the student's face before continuing.",
+        );
+
+        return;
+      }
+
+      stopFaceCamera();
+
+      setCreateError("");
+
+      setFaceError("");
+
+      setEnrollmentStep(3);
+    };
+
+  const returnToEnrollmentFace =
+    () => {
+      if (
+        creatingStudent
+      ) {
+        return;
+      }
+
+      setCreateError("");
+
+      setFaceError("");
+
+      setEnrollmentStep(2);
+
+      if (
+        !capturedFacePreview &&
+        !cameraActive
+      ) {
+        scheduleCameraStart();
+      }
     };
 
   /* =======================================================
@@ -2793,7 +2936,7 @@ function StudentManagement() {
       </section>
 
       {/* ===================================================
-          ADD STUDENT + FACE ENROLLMENT MODAL
+          ADD STUDENT + FACE ENROLLMENT WIZARD
       ==================================================== */}
 
       {showAddModal && (
@@ -2810,35 +2953,42 @@ function StudentManagement() {
           }}
         >
           <form
-            className="adviser-modal student-enrollment-modal"
+            className={`adviser-modal student-enrollment-modal student-enrollment-step-${enrollmentStep}`}
             onSubmit={handleCreateStudent}
             role="dialog"
             aria-modal="true"
             aria-labelledby="student-enrollment-title"
           >
-            <header className="adviser-modal-header student-modal-header">
+            <header className="adviser-modal-header student-modal-header student-wizard-header">
               <div className="student-modal-heading">
                 <div
                   className="adviser-modal-icon student-modal-icon"
                   aria-hidden="true"
                 >
-                  +
+                  {enrollmentStep === 1
+                    ? "+"
+                    : enrollmentStep === 2
+                      ? "◎"
+                      : "✓"}
                 </div>
 
                 <div>
-                  <span>
-                    STUDENT ENROLLMENT
-                  </span>
+                  <span>STUDENT ENROLLMENT</span>
 
                   <h2 id="student-enrollment-title">
-                    Add a student
+                    {enrollmentStep === 1
+                      ? "Add student details"
+                      : enrollmentStep === 2
+                        ? "Capture face identity"
+                        : "Review enrollment"}
                   </h2>
 
                   <p>
-                    Create the student
-                    record and capture
-                    the face identity
-                    used for attendance.
+                    {enrollmentStep === 1
+                      ? "Enter the student's official roster information before opening the camera."
+                      : enrollmentStep === 2
+                        ? "Use the guided scanner to capture one clear, front-facing enrollment photo."
+                        : "Confirm the student details and captured face before saving the enrollment."}
                   </p>
                 </div>
               </div>
@@ -2854,464 +3004,642 @@ function StudentManagement() {
               </button>
             </header>
 
-            <div
-              className="student-enrollment-progress"
+            <nav
+              className="student-wizard-progress"
               aria-label="Enrollment progress"
             >
               <div
-                className={
-                  studentNumber.trim() &&
-                  studentName.trim()
-                    ? "is-complete"
-                    : "is-current"
-                }
-              >
-                <span>
-                  {studentNumber.trim() &&
-                  studentName.trim()
-                    ? "✓"
-                    : "1"}
-                </span>
-
-                <div>
-                  <strong>
-                    Student details
-                  </strong>
-
-                  <small>
-                    Name and student
-                    number
-                  </small>
-                </div>
-              </div>
-
-              <i aria-hidden="true" />
-
-              <div
-                className={
-                  capturedFacePreview
-                    ? "is-complete"
-                    : studentNumber.trim() &&
-                        studentName.trim()
-                      ? "is-current"
-                      : ""
-                }
-              >
-                <span>
-                  {capturedFacePreview
-                    ? "✓"
-                    : "2"}
-                </span>
-
-                <div>
-                  <strong>
-                    Face capture
-                  </strong>
-
-                  <small>
-                    Guided biometric
-                    photo
-                  </small>
-                </div>
-              </div>
-
-              <i aria-hidden="true" />
-
-              <div
-                className={
-                  capturedFacePreview
+                className={`student-wizard-progress-item ${
+                  enrollmentStep === 1
                     ? "is-current"
-                    : ""
-                }
+                    : enrollmentStep > 1
+                      ? "is-complete"
+                      : ""
+                }`}
               >
-                <span>
-                  3
-                </span>
+                <span>{enrollmentStep > 1 ? "✓" : "1"}</span>
 
                 <div>
-                  <strong>
-                    Save enrollment
-                  </strong>
-
-                  <small>
-                    Create and register
-                  </small>
+                  <strong>Student details</strong>
+                  <small>Roster information</small>
                 </div>
               </div>
-            </div>
 
-            <div className="student-enrollment-body">
-              <section className="student-enrollment-details">
-                <div className="student-enrollment-section-heading">
-                  <span>
-                    01
-                  </span>
+              <i aria-hidden="true" />
 
-                  <div>
-                    <strong>
-                      Student
-                      information
-                    </strong>
+              <div
+                className={`student-wizard-progress-item ${
+                  enrollmentStep === 2
+                    ? "is-current"
+                    : enrollmentStep > 2
+                      ? "is-complete"
+                      : ""
+                }`}
+              >
+                <span>{enrollmentStep > 2 ? "✓" : "2"}</span>
+
+                <div>
+                  <strong>Face capture</strong>
+                  <small>Guided scanner</small>
+                </div>
+              </div>
+
+              <i aria-hidden="true" />
+
+              <div
+                className={`student-wizard-progress-item ${
+                  enrollmentStep === 3 ? "is-current" : ""
+                }`}
+              >
+                <span>3</span>
+
+                <div>
+                  <strong>Review & save</strong>
+                  <small>Final confirmation</small>
+                </div>
+              </div>
+            </nav>
+
+            <div className="student-wizard-body">
+              {enrollmentStep === 1 && (
+                <section className="student-wizard-step student-wizard-details-step">
+                  <div className="student-wizard-step-intro">
+                    <span>STEP 1 OF 3</span>
+
+                    <h3>Student information</h3>
 
                     <p>
-                      Enter the
-                      student's official
-                      roster details.
+                      Start with the student's roster details. The camera stays
+                      off until you continue to Face Capture.
                     </p>
                   </div>
-                </div>
 
-                {createdStudentRecord && (
-                  <div className="student-created-notice">
-                    <span
-                      aria-hidden="true"
-                    >
-                      ✓
-                    </span>
+                  {createdStudentRecord && (
+                    <div className="student-created-notice">
+                      <span aria-hidden="true">✓</span>
+
+                      <div>
+                        <strong>Student record already created</strong>
+
+                        <p>
+                          The roster record was saved earlier. Student details
+                          are locked while you finish face registration.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="student-wizard-form-card">
+                    <div className="student-form student-enrollment-form">
+                      <label className="student-form-field">
+                        <span>Student Number</span>
+
+                        <input
+                          type="text"
+                          value={studentNumber}
+                          disabled={
+                            creatingStudent ||
+                            Boolean(
+                              createdStudentRecord,
+                            )
+                          }
+                          autoFocus
+                          autoComplete="off"
+                          placeholder="e.g. 2026-0001"
+                          onChange={(event) => {
+                            setStudentNumber(
+                              event.target.value,
+                            );
+
+                            if (createError) {
+                              setCreateError("");
+                            }
+                          }}
+                        />
+
+                        <small>
+                          Use the official school student number.
+                        </small>
+                      </label>
+
+                      <label className="student-form-field">
+                        <span>Complete Name</span>
+
+                        <input
+                          type="text"
+                          value={studentName}
+                          disabled={
+                            creatingStudent ||
+                            Boolean(
+                              createdStudentRecord,
+                            )
+                          }
+                          autoComplete="off"
+                          placeholder="Enter complete student name"
+                          onChange={(event) => {
+                            setStudentName(
+                              event.target.value,
+                            );
+
+                            if (createError) {
+                              setCreateError("");
+                            }
+                          }}
+                        />
+
+                        <small>
+                          Enter the name exactly as it appears on the class
+                          roster.
+                        </small>
+                      </label>
+
+                      <div className="student-form-field">
+                        <span>Assigned Section</span>
+
+                        <div className="student-locked-field student-wizard-section-field">
+                          <div>
+                            <small>SECTION</small>
+                            <strong>{sectionName}</strong>
+                          </div>
+
+                          <span className="student-locked-badge">
+                            ASSIGNED
+                          </span>
+                        </div>
+
+                        <small>
+                          New students are enrolled only in your assigned
+                          section.
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="student-wizard-info-note">
+                    <span aria-hidden="true">i</span>
 
                     <div>
-                      <strong>
-                        Student record
-                        created
-                      </strong>
+                      <strong>Camera permission comes next</strong>
 
                       <p>
-                        The student
-                        details are now
-                        locked. Retake
-                        the photo and
-                        complete face
-                        registration.
+                        Your browser will request camera access only after you
+                        continue to Step 2.
                       </p>
                     </div>
-                  </div>
-                )}
-
-                <div className="student-form student-enrollment-form">
-                  <label className="student-form-field">
-                    <span>
-                      Student Number
-                    </span>
-
-                    <input
-                      type="text"
-                      value={studentNumber}
-                      disabled={
-                        creatingStudent ||
-                        Boolean(
-                          createdStudentRecord,
-                        )
-                      }
-                      autoFocus
-                      placeholder="e.g. 2026-0001"
-                      onChange={(event) =>
-                        setStudentNumber(
-                          event.target
-                            .value,
-                        )
-                      }
-                    />
-
-                    <small>
-                      Use the official
-                      school student
-                      number.
-                    </small>
-                  </label>
-
-                  <label className="student-form-field">
-                    <span>
-                      Complete Name
-                    </span>
-
-                    <input
-                      type="text"
-                      value={studentName}
-                      disabled={
-                        creatingStudent ||
-                        Boolean(
-                          createdStudentRecord,
-                        )
-                      }
-                      placeholder="Enter complete student name"
-                      onChange={(event) =>
-                        setStudentName(
-                          event.target
-                            .value,
-                        )
-                      }
-                    />
-
-                    <small>
-                      Enter the name as
-                      it appears on the
-                      class roster.
-                    </small>
-                  </label>
-
-                  <div className="student-form-field">
-                    <span>
-                      Assigned Section
-                    </span>
-
-                    <div className="student-locked-field">
-                      <div>
-                        <small>
-                          SECTION
-                        </small>
-
-                        <strong>
-                          {sectionName}
-                        </strong>
-                      </div>
-
-                      <span className="student-locked-badge">
-                        ASSIGNED
-                      </span>
-                    </div>
-
-                    <small>
-                      Enrollment is
-                      restricted to
-                      your assigned
-                      section.
-                    </small>
-                  </div>
-
-                  <div className="student-enrollment-checklist">
-                    <span>
-                      <i
-                        className={
-                          studentNumber.trim()
-                            ? "is-complete"
-                            : ""
-                        }
-                        aria-hidden="true"
-                      >
-                        {studentNumber.trim()
-                          ? "✓"
-                          : "1"}
-                      </i>
-
-                      Student number
-                    </span>
-
-                    <span>
-                      <i
-                        className={
-                          studentName.trim()
-                            ? "is-complete"
-                            : ""
-                        }
-                        aria-hidden="true"
-                      >
-                        {studentName.trim()
-                          ? "✓"
-                          : "2"}
-                      </i>
-
-                      Complete name
-                    </span>
-
-                    <span>
-                      <i
-                        className={
-                          capturedFacePreview
-                            ? "is-complete"
-                            : ""
-                        }
-                        aria-hidden="true"
-                      >
-                        {capturedFacePreview
-                          ? "✓"
-                          : "3"}
-                      </i>
-
-                      Face photo
-                    </span>
                   </div>
 
                   {createError && (
                     <div
-                      className="adviser-modal-error"
+                      className="adviser-modal-error student-wizard-error"
                       role="alert"
                     >
-                      <span
-                        aria-hidden="true"
-                      >
-                        !
-                      </span>
-
-                      <p>
-                        {createError}
-                      </p>
+                      <span aria-hidden="true">!</span>
+                      <p>{createError}</p>
                     </div>
                   )}
-                </div>
-              </section>
+                </section>
+              )}
 
-              <section className="student-enrollment-photo">
-                <div className="student-enrollment-photo-header">
-                  <div className="student-enrollment-section-heading">
-                    <span>
-                      02
+              {enrollmentStep === 2 && (
+                <section className="student-wizard-step student-wizard-camera-step">
+                  <div className="student-wizard-student-bar">
+                    <span className="student-face-student-avatar">
+                      {studentName
+                        ?.charAt(0)
+                        ?.toUpperCase() ||
+                        "S"}
                     </span>
 
                     <div>
+                      <span>ENROLLING STUDENT</span>
+
                       <strong>
-                        Face identity
+                        {studentName.trim() ||
+                          "Student"}
                       </strong>
 
+                      <small>
+                        {studentNumber.trim() ||
+                          "No student number"}
+                        {" • "}
+                        {sectionName}
+                      </small>
+                    </div>
+
+                    <FaceCameraStatus
+                      cameraActive={cameraActive}
+                      capturedFacePreview={
+                        capturedFacePreview
+                      }
+                      scanPhase={scanPhase}
+                    />
+                  </div>
+
+                  <div className="student-wizard-camera-layout">
+                    <div className="student-wizard-camera-main">
+                      <FaceCapturePanel
+                        subjectName={
+                          studentName.trim() ||
+                          "student"
+                        }
+                        videoRef={videoRef}
+                        canvasRef={canvasRef}
+                        cameraActive={
+                          cameraActive
+                        }
+                        cameraReady={
+                          cameraReady
+                        }
+                        cameraError={
+                          cameraError
+                        }
+                        capturedFacePreview={
+                          capturedFacePreview
+                        }
+                        faceError={faceError}
+                        registeringFace={
+                          creatingStudent
+                        }
+                        capturingFace={
+                          capturingFace
+                        }
+                        scanPhase={scanPhase}
+                        scanMessage={
+                          scanMessage
+                        }
+                        countdown={countdown}
+                        flashActive={
+                          flashActive
+                        }
+                        onCameraReady={
+                          handleCameraReady
+                        }
+                        onEnableCamera={() =>
+                          void startFaceCamera()
+                        }
+                        onManualCapture={() =>
+                          void handleCaptureFace()
+                        }
+                      />
+                    </div>
+
+                    <aside className="student-wizard-camera-guide">
+                      <span>FACE CAPTURE</span>
+
+                      <h3>
+                        {capturedFacePreview
+                          ? "Photo ready for review"
+                          : "One clear face is enough"}
+                      </h3>
+
                       <p>
-                        Keep one face
-                        centered and
-                        look straight
-                        at the camera.
+                        {capturedFacePreview
+                          ? "Check the captured image. You can retake it before continuing."
+                          : "Keep the student centered, facing forward, and evenly lit."}
+                      </p>
+
+                      <div className="student-wizard-guide-list">
+                        <div>
+                          <i aria-hidden="true">1</i>
+                          <span>
+                            <strong>Center the face</strong>
+                            Keep the full face inside the guide.
+                          </span>
+                        </div>
+
+                        <div>
+                          <i aria-hidden="true">2</i>
+                          <span>
+                            <strong>Look straight</strong>
+                            Avoid turning or tilting the head.
+                          </span>
+                        </div>
+
+                        <div>
+                          <i aria-hidden="true">3</i>
+                          <span>
+                            <strong>Use clear lighting</strong>
+                            Avoid strong backlight and deep shadows.
+                          </span>
+                        </div>
+                      </div>
+
+                      {capturedFacePreview && (
+                        <div className="student-wizard-ready-note">
+                          <span aria-hidden="true">✓</span>
+
+                          <div>
+                            <strong>Face photo captured</strong>
+                            <p>You can continue to the final review.</p>
+                          </div>
+                        </div>
+                      )}
+                    </aside>
+                  </div>
+                </section>
+              )}
+
+              {enrollmentStep === 3 && (
+                <section className="student-wizard-step student-wizard-review-step">
+                  <div className="student-wizard-step-intro">
+                    <span>STEP 3 OF 3</span>
+
+                    <h3>Review before saving</h3>
+
+                    <p>
+                      Confirm the student record and enrollment photo. Nothing
+                      is submitted until you press the final save button.
+                    </p>
+                  </div>
+
+                  <div className="student-wizard-review-grid">
+                    <article className="student-wizard-review-card">
+                      <div className="student-wizard-review-card-header">
+                        <span className="student-face-student-avatar student-wizard-review-avatar">
+                          {studentName
+                            ?.charAt(0)
+                            ?.toUpperCase() ||
+                            "S"}
+                        </span>
+
+                        <div>
+                          <span>STUDENT RECORD</span>
+                          <strong>{studentName || "Student"}</strong>
+                          <small>{studentNumber || "No student number"}</small>
+                        </div>
+                      </div>
+
+                      <dl className="student-wizard-review-details">
+                        <div>
+                          <dt>Student Number</dt>
+                          <dd>{studentNumber || "—"}</dd>
+                        </div>
+
+                        <div>
+                          <dt>Complete Name</dt>
+                          <dd>{studentName || "—"}</dd>
+                        </div>
+
+                        <div>
+                          <dt>Assigned Section</dt>
+                          <dd>{sectionName}</dd>
+                        </div>
+
+                        <div>
+                          <dt>Face Identity</dt>
+                          <dd className="is-ready">Ready to register</dd>
+                        </div>
+                      </dl>
+                    </article>
+
+                    <article className="student-wizard-review-photo-card">
+                      <div className="student-wizard-review-photo-header">
+                        <div>
+                          <span>FACE IDENTITY</span>
+                          <strong>Enrollment photo</strong>
+                        </div>
+
+                        <span className="student-wizard-review-ready">
+                          ✓ PHOTO READY
+                        </span>
+                      </div>
+
+                      <div className="student-wizard-review-photo">
+                        {capturedFacePreview ? (
+                          <img
+                            src={capturedFacePreview}
+                            alt={`Enrollment preview of ${studentName || "student"}`}
+                          />
+                        ) : (
+                          <div className="student-wizard-review-photo-missing">
+                            <span aria-hidden="true">!</span>
+                            <strong>No photo captured</strong>
+                          </div>
+                        )}
+
+                        {capturedFacePreview && (
+                          <div className="student-wizard-review-photo-overlay">
+                            <span aria-hidden="true">✓</span>
+                            Face capture complete
+                          </div>
+                        )}
+                      </div>
+                    </article>
+                  </div>
+
+                  <div className="student-wizard-final-note">
+                    <span aria-hidden="true">✓</span>
+
+                    <div>
+                      <strong>Ready to complete enrollment</strong>
+
+                      <p>
+                        Saving will create the student record and register this
+                        face image for attendance recognition.
                       </p>
                     </div>
                   </div>
 
-                  <FaceCameraStatus
-                    cameraActive={cameraActive}
-                    capturedFacePreview={
-                      capturedFacePreview
-                    }
-                    scanPhase={scanPhase}
-                  />
-                </div>
+                  {createError && (
+                    <div
+                      className="adviser-modal-error student-wizard-error"
+                      role="alert"
+                    >
+                      <span aria-hidden="true">!</span>
+                      <p>{createError}</p>
+                    </div>
+                  )}
 
-                <FaceCapturePanel
-                  subjectName={
-                    studentName.trim() ||
-                    "student"
-                  }
-                  videoRef={videoRef}
-                  canvasRef={canvasRef}
-                  cameraActive={
-                    cameraActive
-                  }
-                  cameraReady={
-                    cameraReady
-                  }
-                  cameraError={
-                    cameraError
-                  }
-                  capturedFacePreview={
-                    capturedFacePreview
-                  }
-                  faceError={faceError}
-                  registeringFace={
-                    creatingStudent
-                  }
-                  capturingFace={
-                    capturingFace
-                  }
-                  scanPhase={scanPhase}
-                  scanMessage={
-                    scanMessage
-                  }
-                  countdown={countdown}
-                  flashActive={
-                    flashActive
-                  }
-                  onCameraReady={
-                    handleCameraReady
-                  }
-                  onEnableCamera={() =>
-                    void startFaceCamera()
-                  }
-                  onManualCapture={() =>
-                    void handleCaptureFace()
-                  }
-                />
-              </section>
+                  {faceError && (
+                    <div
+                      className="student-face-feedback is-error student-wizard-error"
+                      role="alert"
+                    >
+                      <span aria-hidden="true">!</span>
+
+                      <div>
+                        <strong>Face registration</strong>
+                        <p>{faceError}</p>
+                      </div>
+                    </div>
+                  )}
+                </section>
+              )}
             </div>
 
-            <footer className="adviser-modal-actions student-enrollment-actions">
-              <div className="student-enrollment-footer-copy">
+            <footer className="adviser-modal-actions student-wizard-actions">
+              <div className="student-wizard-footer-copy">
                 <strong>
-                  {capturedFacePreview
-                    ? "Ready to complete enrollment"
-                    : "Face photo required"}
+                  {enrollmentStep === 1
+                    ? "Student details"
+                    : enrollmentStep === 2
+                      ? capturedFacePreview
+                        ? "Face photo ready"
+                        : "Face photo required"
+                      : createdStudentRecord
+                        ? "Complete face registration"
+                        : "Ready to save"}
                 </strong>
 
                 <span>
-                  {capturedFacePreview
-                    ? "Review the captured photo before saving."
-                    : "The final save button becomes available after a face is captured."}
+                  {enrollmentStep === 1
+                    ? "Enter the required roster information to continue."
+                    : enrollmentStep === 2
+                      ? capturedFacePreview
+                        ? "Review the photo or retake it before continuing."
+                        : "Auto capture starts when the camera becomes ready."
+                      : createdStudentRecord
+                        ? "The student record already exists. Only face registration will be retried."
+                        : "Confirm the information, then save the student and face identity."}
                 </span>
               </div>
 
-              <div className="student-enrollment-action-group">
-                <button
-                  type="button"
-                  className="adviser-secondary-button"
-                  disabled={
-                    creatingStudent
-                  }
-                  onClick={
-                    closeAddModal
-                  }
-                >
-                  Cancel
-                </button>
+              <div className="student-wizard-action-group">
+                {enrollmentStep === 1 && (
+                  <>
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      disabled={creatingStudent}
+                      onClick={closeAddModal}
+                    >
+                      Cancel
+                    </button>
 
-                {capturedFacePreview ? (
-                  <button
-                    type="button"
-                    className="adviser-secondary-button"
-                    disabled={
-                      creatingStudent
-                    }
-                    onClick={() =>
-                      void handleRetakeFace()
-                    }
-                  >
-                    Retake Photo
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="adviser-secondary-button"
-                    disabled={
-                      creatingStudent ||
-                      capturingFace ||
-                      !cameraActive ||
-                      !cameraReady
-                    }
-                    onClick={() =>
-                      void handleCaptureFace()
-                    }
-                  >
-                    {capturingFace
-                      ? "Capturing..."
-                      : "Capture Now"}
-                  </button>
+                    <button
+                      type="button"
+                      className="adviser-primary-button student-wizard-next-button"
+                      disabled={
+                        creatingStudent ||
+                        !studentNumber.trim() ||
+                        !studentName.trim() ||
+                        !section?.id
+                      }
+                      onClick={goToEnrollmentFace}
+                    >
+                      Continue to Face Capture
+                      <span aria-hidden="true">→</span>
+                    </button>
+                  </>
                 )}
 
-                <button
-                  type="submit"
-                  className="adviser-primary-button student-enrollment-submit"
-                  disabled={
-                    creatingStudent ||
-                    !capturedFaceFile
-                  }
-                >
-                  {creatingStudent && (
-                    <span
-                      className="adviser-button-spinner"
-                      aria-hidden="true"
-                    />
-                  )}
+                {enrollmentStep === 2 && (
+                  <>
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      disabled={
+                        creatingStudent ||
+                        capturingFace
+                      }
+                      onClick={goToEnrollmentDetails}
+                    >
+                      ← Back to Details
+                    </button>
 
-                  {creatingStudent
-                    ? createdStudentRecord
-                      ? "Registering Face..."
-                      : "Creating Student..."
-                    : createdStudentRecord
-                      ? "Complete Face Registration"
-                      : "Save Student & Face"}
-                </button>
+                    {capturedFacePreview ? (
+                      <>
+                        <button
+                          type="button"
+                          className="adviser-secondary-button"
+                          disabled={
+                            creatingStudent ||
+                            capturingFace
+                          }
+                          onClick={() =>
+                            void handleRetakeFace()
+                          }
+                        >
+                          Retake Photo
+                        </button>
+
+                        <button
+                          type="button"
+                          className="adviser-primary-button student-wizard-next-button"
+                          disabled={
+                            creatingStudent ||
+                            capturingFace ||
+                            !capturedFaceFile
+                          }
+                          onClick={goToEnrollmentReview}
+                        >
+                          Review Enrollment
+                          <span aria-hidden="true">→</span>
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className="adviser-primary-button"
+                        disabled={
+                          creatingStudent ||
+                          capturingFace ||
+                          !cameraActive ||
+                          !cameraReady
+                        }
+                        onClick={() =>
+                          void handleCaptureFace()
+                        }
+                      >
+                        {capturingFace
+                          ? "Capturing..."
+                          : "Capture Now"}
+                      </button>
+                    )}
+                  </>
+                )}
+
+                {enrollmentStep === 3 && (
+                  <>
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      disabled={creatingStudent}
+                      onClick={returnToEnrollmentFace}
+                    >
+                      ← Back to Face
+                    </button>
+
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      disabled={creatingStudent}
+                      onClick={() => {
+                        setEnrollmentStep(2);
+
+                        void handleRetakeFace();
+                      }}
+                    >
+                      Retake Photo
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="adviser-primary-button student-enrollment-submit"
+                      disabled={
+                        creatingStudent ||
+                        !capturedFaceFile ||
+                        !studentNumber.trim() ||
+                        !studentName.trim()
+                      }
+                    >
+                      {creatingStudent && (
+                        <span
+                          className="adviser-button-spinner"
+                          aria-hidden="true"
+                        />
+                      )}
+
+                      {creatingStudent
+                        ? createdStudentRecord
+                          ? "Registering Face..."
+                          : "Saving Enrollment..."
+                        : createdStudentRecord
+                          ? "Complete Face Registration"
+                          : "Save Student & Face"}
+                    </button>
+                  </>
+                )}
               </div>
             </footer>
           </form>

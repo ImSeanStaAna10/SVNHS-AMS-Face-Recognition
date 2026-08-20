@@ -7216,3 +7216,1127 @@ html[data-theme="dark"] .student-face-camera-loading {
     animation: none;
   }
 }
+
+
+/* =========================================================
+   STUDENT ENROLLMENT V7
+   TRUE STEP-BY-STEP WIZARD
+   Step 1: Details
+   Step 2: Face Capture
+   Step 3: Review & Save
+========================================================= */
+
+.student-enrollment-modal {
+  width: min(900px, calc(100vw - 40px));
+  height: min(760px, calc(100dvh - 40px));
+  max-height: calc(100dvh - 40px);
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 18px;
+  background: var(--c-surface);
+  box-shadow:
+    0 34px 90px rgba(2, 8, 23, 0.28),
+    0 10px 28px rgba(2, 8, 23, 0.12);
+}
+
+.student-enrollment-modal.student-enrollment-step-2 {
+  width: min(1120px, calc(100vw - 40px));
+  height: min(850px, calc(100dvh - 40px));
+}
+
+.student-enrollment-modal.student-enrollment-step-3 {
+  width: min(980px, calc(100vw - 40px));
+  height: min(790px, calc(100dvh - 40px));
+}
+
+/* =========================================================
+   WIZARD HEADER
+========================================================= */
+
+.student-wizard-header {
+  min-height: 78px;
+  padding: 17px 20px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background:
+    radial-gradient(
+      circle at 0 0,
+      color-mix(in srgb, var(--c-icon-bg) 88%, transparent),
+      transparent 45%
+    ),
+    var(--c-surface);
+}
+
+.student-wizard-header .student-modal-heading h2 {
+  font-size: 18px;
+}
+
+.student-wizard-header .student-modal-heading p {
+  max-width: 650px;
+  margin-top: 4px;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.student-wizard-header .student-modal-icon {
+  width: 41px;
+  height: 41px;
+  flex-basis: 41px;
+  border-radius: 12px;
+  background: var(--c-blue-900);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(18, 61, 126, 0.18);
+}
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.student-wizard-progress {
+  min-height: 62px;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    52px
+    minmax(0, 1fr)
+    52px
+    minmax(0, 1fr);
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: var(--c-surface-soft);
+}
+
+.student-wizard-progress-item {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  opacity: 0.55;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.student-wizard-progress-item > span {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.student-wizard-progress-item strong {
+  display: block;
+  overflow: hidden;
+  color: var(--c-text-secondary);
+  font-size: 8px;
+  font-weight: 820;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-wizard-progress-item small {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--c-text-muted);
+  font-size: 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-wizard-progress > i {
+  height: 1px;
+  margin-inline: 10px;
+  background: var(--c-border);
+}
+
+.student-wizard-progress-item.is-current,
+.student-wizard-progress-item.is-complete {
+  opacity: 1;
+}
+
+.student-wizard-progress-item.is-current {
+  transform: translateY(-1px);
+}
+
+.student-wizard-progress-item.is-current > span {
+  border-color: var(--c-blue-800);
+  background: var(--c-blue-900);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.student-wizard-progress-item.is-current strong {
+  color: var(--c-blue-800);
+}
+
+.student-wizard-progress-item.is-complete > span {
+  border-color: var(--c-success-border);
+  background: var(--c-success-text);
+  color: #ffffff;
+}
+
+.student-wizard-progress-item.is-complete strong {
+  color: var(--c-success-text);
+}
+
+/* =========================================================
+   BODY / STEP
+========================================================= */
+
+.student-wizard-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background:
+    linear-gradient(
+      180deg,
+      var(--c-surface) 0%,
+      color-mix(in srgb, var(--c-surface-soft) 46%, var(--c-surface)) 100%
+    );
+  scrollbar-width: thin;
+}
+
+.student-wizard-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.student-wizard-body::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--c-border);
+  background-clip: padding-box;
+}
+
+.student-wizard-step {
+  min-height: 100%;
+  padding: 28px;
+}
+
+.student-wizard-step-intro {
+  max-width: 640px;
+  margin: 0 auto 21px;
+  text-align: center;
+}
+
+.student-wizard-step-intro > span {
+  display: block;
+  color: var(--c-blue-800);
+  font-size: 6.5px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.student-wizard-step-intro h3 {
+  margin: 6px 0 0;
+  color: var(--c-text-primary);
+  font-size: 21px;
+  font-weight: 850;
+  letter-spacing: -0.35px;
+}
+
+.student-wizard-step-intro p {
+  max-width: 540px;
+  margin: 7px auto 0;
+  color: var(--c-text-body);
+  font-size: 8px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   STEP 1 — DETAILS
+========================================================= */
+
+.student-wizard-details-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.student-wizard-form-card {
+  width: min(100%, 620px);
+  margin: 0 auto;
+  padding: 22px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 14px;
+  background: var(--c-surface);
+  box-shadow: 0 14px 34px rgba(18, 35, 65, 0.07);
+}
+
+.student-wizard-form-card .student-enrollment-form {
+  gap: 17px;
+}
+
+.student-wizard-form-card .student-form-field > span {
+  font-size: 8px;
+}
+
+.student-wizard-form-card .student-form-field input {
+  min-height: 46px;
+  font-size: 9px;
+}
+
+.student-wizard-section-field {
+  min-height: 48px;
+}
+
+.student-wizard-info-note {
+  width: min(100%, 620px);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 13px auto 0;
+  padding: 11px 12px;
+  border: 1px solid var(--c-brand-border);
+  border-radius: 10px;
+  background: var(--c-icon-bg);
+}
+
+.student-wizard-info-note > span {
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-blue-900);
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.student-wizard-info-note strong {
+  display: block;
+  color: var(--c-text-secondary);
+  font-size: 7.5px;
+  font-weight: 820;
+}
+
+.student-wizard-info-note p {
+  margin: 2px 0 0;
+  color: var(--c-text-body);
+  font-size: 6.5px;
+  line-height: 1.45;
+}
+
+.student-wizard-details-step .student-created-notice {
+  width: min(100%, 620px);
+  margin: 0 auto 13px;
+}
+
+.student-wizard-error {
+  width: min(100%, 620px);
+  margin: 13px auto 0;
+}
+
+/* =========================================================
+   STEP 2 — CAMERA
+========================================================= */
+
+.student-wizard-camera-step {
+  padding: 18px 20px 20px;
+}
+
+.student-wizard-student-bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 13px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+  background: var(--c-surface);
+}
+
+.student-wizard-student-bar > div {
+  min-width: 0;
+}
+
+.student-wizard-student-bar > div > span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.8px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.student-wizard-student-bar strong {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--c-text-primary);
+  font-size: 10px;
+  font-weight: 820;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-wizard-student-bar small {
+  display: block;
+  margin-top: 2px;
+  color: var(--c-text-body);
+  font-size: 6.5px;
+}
+
+.student-wizard-camera-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 275px;
+  align-items: start;
+  gap: 14px;
+}
+
+.student-wizard-camera-main {
+  min-width: 0;
+}
+
+.student-wizard-camera-step .student-face-camera-content {
+  gap: 8px;
+}
+
+.student-wizard-camera-step .student-face-camera-shell {
+  height: clamp(440px, 58vh, 590px);
+  min-height: 440px;
+  max-height: 590px;
+  aspect-ratio: auto;
+  border: 1px solid rgba(74, 112, 167, 0.6);
+  border-radius: 18px;
+  box-shadow:
+    0 24px 54px rgba(2, 8, 23, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.student-wizard-camera-step .student-face-target {
+  width: clamp(205px, 24vw, 300px);
+  height: clamp(275px, 34vw, 390px);
+}
+
+.student-wizard-camera-step .student-face-privacy-note,
+.student-wizard-camera-step .student-face-capture-tips {
+  display: none;
+}
+
+.student-wizard-camera-guide {
+  position: sticky;
+  top: 0;
+  padding: 17px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 13px;
+  background: var(--c-surface);
+  box-shadow: 0 12px 28px rgba(18, 35, 65, 0.06);
+}
+
+.student-wizard-camera-guide > span {
+  display: block;
+  color: var(--c-blue-800);
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.student-wizard-camera-guide h3 {
+  margin: 6px 0 0;
+  color: var(--c-text-primary);
+  font-size: 15px;
+  font-weight: 840;
+  line-height: 1.2;
+}
+
+.student-wizard-camera-guide > p {
+  margin: 6px 0 0;
+  color: var(--c-text-body);
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+.student-wizard-guide-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.student-wizard-guide-list > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+}
+
+.student-wizard-guide-list i {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c-brand-border);
+  border-radius: 7px;
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+  font-style: normal;
+  font-size: 6px;
+  font-weight: 900;
+}
+
+.student-wizard-guide-list span {
+  color: var(--c-text-body);
+  font-size: 6.3px;
+  line-height: 1.4;
+}
+
+.student-wizard-guide-list strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--c-text-secondary);
+  font-size: 7px;
+  font-weight: 820;
+}
+
+.student-wizard-ready-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid var(--c-success-border);
+  border-radius: 9px;
+  background: var(--c-success-bg);
+  color: var(--c-success-text);
+}
+
+.student-wizard-ready-note > span {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-success-text);
+  color: #ffffff;
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.student-wizard-ready-note strong {
+  display: block;
+  font-size: 7px;
+  font-weight: 820;
+}
+
+.student-wizard-ready-note p {
+  margin: 2px 0 0;
+  font-size: 6.2px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   STEP 3 — REVIEW
+========================================================= */
+
+.student-wizard-review-step {
+  padding: 25px 28px;
+}
+
+.student-wizard-review-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(360px, 1.1fr);
+  gap: 15px;
+}
+
+.student-wizard-review-card,
+.student-wizard-review-photo-card {
+  overflow: hidden;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 13px;
+  background: var(--c-surface);
+  box-shadow: 0 12px 28px rgba(18, 35, 65, 0.06);
+}
+
+.student-wizard-review-card {
+  padding: 16px;
+}
+
+.student-wizard-review-card-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.student-wizard-review-card-header > div {
+  min-width: 0;
+}
+
+.student-wizard-review-card-header > div > span,
+.student-wizard-review-photo-header > div > span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.8px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.student-wizard-review-card-header strong,
+.student-wizard-review-photo-header strong {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--c-text-primary);
+  font-size: 10px;
+  font-weight: 820;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-wizard-review-card-header small {
+  display: block;
+  margin-top: 3px;
+  color: var(--c-text-body);
+  font-size: 6.5px;
+}
+
+.student-wizard-review-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+}
+
+.student-wizard-review-details {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.student-wizard-review-details > div {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.student-wizard-review-details > div:last-child {
+  border-bottom: 0;
+}
+
+.student-wizard-review-details dt {
+  color: var(--c-text-muted);
+  font-size: 6.5px;
+  font-weight: 760;
+}
+
+.student-wizard-review-details dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--c-text-secondary);
+  font-size: 7px;
+  font-weight: 800;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-wizard-review-details dd.is-ready {
+  color: var(--c-success-text);
+}
+
+.student-wizard-review-photo-card {
+  padding: 14px;
+}
+
+.student-wizard-review-photo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.student-wizard-review-ready {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--c-success-border);
+  border-radius: 999px;
+  background: var(--c-success-bg);
+  color: var(--c-success-text);
+  font-size: 5.5px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.student-wizard-review-photo {
+  position: relative;
+  min-height: 330px;
+  overflow: hidden;
+  border: 1px solid #24324a;
+  border-radius: 11px;
+  background: #07101f;
+}
+
+.student-wizard-review-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.student-wizard-review-photo-overlay {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: rgba(2, 8, 23, 0.72);
+  color: #ffffff;
+  font-size: 6.5px;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+}
+
+.student-wizard-review-photo-overlay > span {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #16a34a;
+  font-size: 7px;
+}
+
+.student-wizard-review-photo-missing {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.student-wizard-review-photo-missing > span {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.18);
+  color: #fecaca;
+}
+
+.student-wizard-final-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 11px 12px;
+  border: 1px solid var(--c-success-border);
+  border-radius: 10px;
+  background: var(--c-success-bg);
+  color: var(--c-success-text);
+}
+
+.student-wizard-final-note > span {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-success-text);
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.student-wizard-final-note strong {
+  display: block;
+  font-size: 7.5px;
+  font-weight: 820;
+}
+
+.student-wizard-final-note p {
+  margin: 2px 0 0;
+  font-size: 6.5px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.student-wizard-actions {
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 18px;
+  border-top: 1px solid var(--c-border-soft);
+  background: var(--c-surface);
+}
+
+.student-wizard-footer-copy {
+  min-width: 0;
+}
+
+.student-wizard-footer-copy strong {
+  display: block;
+  color: var(--c-text-primary);
+  font-size: 7.5px;
+  font-weight: 820;
+}
+
+.student-wizard-footer-copy span {
+  display: block;
+  max-width: 420px;
+  margin-top: 2px;
+  color: var(--c-text-muted);
+  font-size: 6px;
+  line-height: 1.4;
+}
+
+.student-wizard-action-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.student-wizard-action-group button {
+  min-height: 37px;
+  white-space: nowrap;
+}
+
+.student-wizard-next-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.student-enrollment-submit {
+  min-width: 170px;
+}
+
+/* =========================================================
+   DARK MODE — WIZARD
+========================================================= */
+
+html[data-theme="dark"] .student-wizard-body {
+  background:
+    linear-gradient(
+      180deg,
+      var(--c-surface) 0%,
+      rgba(15, 23, 42, 0.72) 100%
+    );
+}
+
+html[data-theme="dark"] .student-wizard-form-card,
+html[data-theme="dark"] .student-wizard-student-bar,
+html[data-theme="dark"] .student-wizard-camera-guide,
+html[data-theme="dark"] .student-wizard-review-card,
+html[data-theme="dark"] .student-wizard-review-photo-card {
+  background: rgba(15, 23, 42, 0.58);
+}
+
+html[data-theme="dark"] .student-wizard-header {
+  background:
+    radial-gradient(
+      circle at 0 0,
+      rgba(30, 64, 175, 0.18),
+      transparent 45%
+    ),
+    var(--c-surface);
+}
+
+/* =========================================================
+   RESPONSIVE — WIZARD
+========================================================= */
+
+@media (max-width: 980px) {
+  .student-enrollment-modal.student-enrollment-step-2 {
+    width: calc(100vw - 28px);
+  }
+
+  .student-wizard-camera-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .student-wizard-camera-guide {
+    position: static;
+    display: none;
+  }
+
+  .student-wizard-camera-step .student-face-camera-shell {
+    height: clamp(390px, 56vh, 540px);
+    min-height: 390px;
+  }
+}
+
+@media (max-width: 760px) {
+  .student-modal-backdrop {
+    padding: 8px;
+  }
+
+  .student-enrollment-modal,
+  .student-enrollment-modal.student-enrollment-step-2,
+  .student-enrollment-modal.student-enrollment-step-3 {
+    width: calc(100vw - 16px);
+    height: calc(100dvh - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 14px;
+  }
+
+  .student-wizard-header {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .student-wizard-header .student-modal-heading p {
+    max-width: 390px;
+    font-size: 7px;
+  }
+
+  .student-wizard-progress {
+    grid-template-columns:
+      minmax(0, 1fr)
+      24px
+      minmax(0, 1fr)
+      24px
+      minmax(0, 1fr);
+    min-height: 58px;
+    padding: 8px 12px;
+  }
+
+  .student-wizard-progress-item {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .student-wizard-progress-item > span {
+    width: 25px;
+    height: 25px;
+  }
+
+  .student-wizard-progress-item small {
+    display: none;
+  }
+
+  .student-wizard-progress-item strong {
+    max-width: 78px;
+    font-size: 5.8px;
+  }
+
+  .student-wizard-progress > i {
+    margin-inline: 3px;
+  }
+
+  .student-wizard-step {
+    padding: 18px 15px;
+  }
+
+  .student-wizard-step-intro {
+    margin-bottom: 16px;
+  }
+
+  .student-wizard-step-intro h3 {
+    font-size: 18px;
+  }
+
+  .student-wizard-form-card {
+    padding: 17px;
+  }
+
+  .student-wizard-camera-step {
+    padding: 12px;
+  }
+
+  .student-wizard-student-bar {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .student-wizard-student-bar .student-face-camera-status {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .student-wizard-camera-step .student-face-camera-shell {
+    height: auto;
+    min-height: 360px;
+    max-height: none;
+    aspect-ratio: 4 / 3;
+  }
+
+  .student-wizard-camera-step .student-face-target {
+    width: 165px;
+    height: 225px;
+  }
+
+  .student-wizard-review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-wizard-review-photo {
+    min-height: 330px;
+  }
+
+  .student-wizard-actions {
+    padding: 9px 11px;
+  }
+
+  .student-wizard-footer-copy {
+    display: none;
+  }
+
+  .student-wizard-action-group {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .student-wizard-action-group button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 540px) {
+  .student-enrollment-modal,
+  .student-enrollment-modal.student-enrollment-step-2,
+  .student-enrollment-modal.student-enrollment-step-3 {
+    width: calc(100vw - 8px);
+    height: calc(100dvh - 8px);
+    max-height: calc(100dvh - 8px);
+    border-radius: 11px;
+  }
+
+  .student-wizard-header {
+    padding: 12px;
+  }
+
+  .student-wizard-header .student-modal-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .student-wizard-header .student-modal-heading h2 {
+    font-size: 15px;
+  }
+
+  .student-wizard-header .student-modal-heading p {
+    max-width: 220px;
+    font-size: 6.5px;
+  }
+
+  .student-wizard-progress {
+    padding-inline: 7px;
+  }
+
+  .student-wizard-progress-item strong {
+    max-width: 60px;
+    font-size: 5.2px;
+  }
+
+  .student-wizard-step {
+    padding: 15px 11px;
+  }
+
+  .student-wizard-form-card {
+    padding: 14px;
+  }
+
+  .student-wizard-info-note {
+    padding: 9px 10px;
+  }
+
+  .student-wizard-camera-step {
+    padding: 8px;
+  }
+
+  .student-wizard-student-bar {
+    margin-bottom: 8px;
+    padding: 9px;
+  }
+
+  .student-wizard-camera-step .student-face-camera-shell {
+    min-height: 300px;
+    border-radius: 13px;
+  }
+
+  .student-wizard-camera-step .student-face-target {
+    width: 140px;
+    height: 190px;
+  }
+
+  .student-wizard-review-step {
+    padding: 15px 11px;
+  }
+
+  .student-wizard-review-photo {
+    min-height: 280px;
+  }
+
+  .student-wizard-review-details > div {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .student-wizard-review-details dd {
+    text-align: left;
+  }
+
+  .student-wizard-actions {
+    padding: 8px;
+  }
+
+  .student-wizard-action-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .student-wizard-action-group button {
+    width: 100%;
+  }
+
+  .student-enrollment-submit {
+    min-width: 0;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION — WIZARD
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .student-wizard-progress-item {
+    transition: none;
+  }
+
+  .student-wizard-progress-item.is-current {
+    transform: none;
+  }
+}
