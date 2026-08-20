@@ -2399,12 +2399,11 @@ html[data-theme="dark"] .student-face-privacy-note {
   gap: 18px;
   padding: 20px 22px;
   border-bottom: 1px solid var(--c-border-soft);
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--c-icon-bg) 62%, var(--c-surface)),
-      var(--c-surface) 56%
-    );
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-icon-bg) 62%, var(--c-surface)),
+    var(--c-surface) 56%
+  );
 }
 
 .student-modal-heading {
@@ -2605,12 +2604,11 @@ html[data-theme="dark"] .student-face-privacy-note {
 .student-enrollment-details {
   padding: 22px;
   border-right: 1px solid var(--c-border-soft);
-  background:
-    linear-gradient(
-      180deg,
-      var(--c-surface) 0%,
-      color-mix(in srgb, var(--c-surface-soft) 48%, var(--c-surface)) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    var(--c-surface) 0%,
+    color-mix(in srgb, var(--c-surface-soft) 48%, var(--c-surface)) 100%
+  );
 }
 
 .student-enrollment-photo {
@@ -2755,8 +2753,7 @@ html[data-theme="dark"] .student-face-privacy-note {
   margin-bottom: 12px;
 }
 
-.student-enrollment-photo-header
-  .student-enrollment-section-heading {
+.student-enrollment-photo-header .student-enrollment-section-heading {
   margin-bottom: 0;
 }
 
@@ -3072,12 +3069,11 @@ html[data-theme="dark"] .student-modal-backdrop {
 }
 
 html[data-theme="dark"] .student-enrollment-details {
-  background:
-    linear-gradient(
-      180deg,
-      var(--c-surface) 0%,
-      rgba(15, 23, 42, 0.72) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    var(--c-surface) 0%,
+    rgba(15, 23, 42, 0.72) 100%
+  );
 }
 
 html[data-theme="dark"] .student-modal-close {
@@ -3288,9 +3284,7 @@ html[data-theme="dark"] .student-face-action.is-face {
     margin: 14px 16px 0;
   }
 
-  .student-identity-modal
-    .student-face-student
-    .student-face-camera-status {
+  .student-identity-modal .student-face-student .student-face-camera-status {
     grid-column: 1 / -1;
     justify-self: start;
   }
@@ -3487,16 +3481,11 @@ html[data-theme="dark"] .student-face-action.is-face {
 
   border-bottom: 1px solid var(--c-border-soft);
 
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(
-        in srgb,
-        var(--c-icon-bg) 60%,
-        var(--c-surface)
-      ),
-      var(--c-surface) 58%
-    );
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-icon-bg) 60%, var(--c-surface)),
+    var(--c-surface) 58%
+  );
 }
 
 .student-enrollment-modal .student-modal-heading {
@@ -3542,47 +3531,29 @@ html[data-theme="dark"] .student-face-action.is-face {
 
   padding: 9px 20px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface-soft) 84%,
-      var(--c-surface)
-    );
+  background: color-mix(in srgb, var(--c-surface-soft) 84%, var(--c-surface));
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div {
+.student-enrollment-modal .student-enrollment-progress > div {
   gap: 8px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div
-  > span {
+.student-enrollment-modal .student-enrollment-progress > div > span {
   width: 25px;
   height: 25px;
 
   font-size: 6.5px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div
-  strong {
+.student-enrollment-modal .student-enrollment-progress > div strong {
   font-size: 7.5px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div
-  small {
+.student-enrollment-modal .student-enrollment-progress > div small {
   font-size: 5.8px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > i {
+.student-enrollment-modal .student-enrollment-progress > i {
   margin: 0 6px;
 }
 
@@ -3623,48 +3594,33 @@ html[data-theme="dark"] .student-face-action.is-face {
   border-right: 1px solid var(--c-border-soft);
   border-bottom: 0;
 
-  background:
-    linear-gradient(
-      180deg,
-      var(--c-surface) 0%,
-      color-mix(
-        in srgb,
-        var(--c-surface-soft) 54%,
-        var(--c-surface)
-      ) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    var(--c-surface) 0%,
+    color-mix(in srgb, var(--c-surface-soft) 54%, var(--c-surface)) 100%
+  );
 
   scrollbar-width: thin;
 }
 
-.student-enrollment-modal
-  .student-enrollment-details::-webkit-scrollbar {
+.student-enrollment-modal .student-enrollment-details::-webkit-scrollbar {
   width: 7px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-details::-webkit-scrollbar-thumb {
+.student-enrollment-modal .student-enrollment-details::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: 999px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-border) 78%,
-      transparent
-    );
+  background: color-mix(in srgb, var(--c-border) 78%, transparent);
 
   background-clip: padding-box;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading {
+.student-enrollment-modal .student-enrollment-section-heading {
   margin-bottom: 17px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading
-  > span {
+.student-enrollment-modal .student-enrollment-section-heading > span {
   width: 30px;
   height: 30px;
 
@@ -3673,15 +3629,11 @@ html[data-theme="dark"] .student-face-action.is-face {
   border-radius: 9px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading
-  strong {
+.student-enrollment-modal .student-enrollment-section-heading strong {
   font-size: 10.5px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading
-  p {
+.student-enrollment-modal .student-enrollment-section-heading p {
   margin-top: 3px;
 
   font-size: 7px;
@@ -3720,29 +3672,17 @@ html[data-theme="dark"] .student-face-action.is-face {
   font-size: 9px;
 }
 
-.student-enrollment-modal
-  .student-form-field
-  input:hover:not(:disabled) {
-  border-color:
-    color-mix(
-      in srgb,
-      var(--c-blue-800) 38%,
-      var(--c-border)
-    );
+.student-enrollment-modal .student-form-field input:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--c-blue-800) 38%, var(--c-border));
 }
 
-.student-enrollment-modal
-  .student-form-field
-  input:focus {
+.student-enrollment-modal .student-form-field input:focus {
   border-color: var(--c-blue-800);
 
-  box-shadow:
-    0 0 0 3px rgba(18, 61, 126, 0.08);
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.08);
 }
 
-.student-enrollment-modal
-  .student-form-field
-  > small {
+.student-enrollment-modal .student-form-field > small {
   font-size: 6.4px;
 
   line-height: 1.45;
@@ -3759,22 +3699,14 @@ html[data-theme="dark"] .student-face-action.is-face {
 
   border-radius: 10px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface-soft) 80%,
-      var(--c-surface)
-    );
+  background: color-mix(in srgb, var(--c-surface-soft) 80%, var(--c-surface));
 }
 
-.student-enrollment-modal
-  .student-locked-field
-  strong {
+.student-enrollment-modal .student-locked-field strong {
   font-size: 8.5px;
 }
 
-.student-enrollment-modal
-  .student-locked-badge {
+.student-enrollment-modal .student-locked-badge {
   min-height: 22px;
 
   padding: 0 8px;
@@ -3798,8 +3730,7 @@ html[data-theme="dark"] .student-face-action.is-face {
    LEFT — ENROLLMENT CHECKLIST
 ========================================================= */
 
-.student-enrollment-modal
-  .student-enrollment-checklist {
+.student-enrollment-modal .student-enrollment-checklist {
   margin-top: 2px;
 
   gap: 7px;
@@ -3809,17 +3740,13 @@ html[data-theme="dark"] .student-face-action.is-face {
   border-radius: 9px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-checklist
-  > span {
+.student-enrollment-modal .student-enrollment-checklist > span {
   gap: 7px;
 
   font-size: 6.6px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-checklist
-  i {
+.student-enrollment-modal .student-enrollment-checklist i {
   width: 19px;
   height: 19px;
 
@@ -3846,28 +3773,20 @@ html[data-theme="dark"] .student-face-action.is-face {
   scrollbar-width: thin;
 }
 
-.student-enrollment-modal
-  .student-enrollment-photo::-webkit-scrollbar {
+.student-enrollment-modal .student-enrollment-photo::-webkit-scrollbar {
   width: 7px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-photo::-webkit-scrollbar-thumb {
+.student-enrollment-modal .student-enrollment-photo::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: 999px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-border) 78%,
-      transparent
-    );
+  background: color-mix(in srgb, var(--c-border) 78%, transparent);
 
   background-clip: padding-box;
 }
 
-.student-enrollment-modal
-  .student-enrollment-photo-header {
+.student-enrollment-modal .student-enrollment-photo-header {
   display: flex;
 
   align-items: flex-start;
@@ -3890,15 +3809,13 @@ html[data-theme="dark"] .student-face-action.is-face {
    RIGHT — CAMERA CONTAINER
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-camera-content {
+.student-enrollment-modal .student-face-camera-content {
   display: grid;
 
   gap: 10px;
 }
 
-.student-enrollment-modal
-  .student-face-camera-shell {
+.student-enrollment-modal .student-face-camera-shell {
   width: 100%;
 
   min-height: 365px;
@@ -3919,37 +3836,30 @@ html[data-theme="dark"] .student-face-action.is-face {
    CAMERA GUIDE / OVERLAYS
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-biometric-guide {
+.student-enrollment-modal .student-face-biometric-guide {
   width: 180px;
   height: 235px;
 }
 
-.student-enrollment-modal
-  .student-face-live-badge,
-.student-enrollment-modal
-  .student-face-auto-badge {
+.student-enrollment-modal .student-face-live-badge,
+.student-enrollment-modal .student-face-auto-badge {
   top: 13px;
 }
 
-.student-enrollment-modal
-  .student-face-live-badge {
+.student-enrollment-modal .student-face-live-badge {
   left: 13px;
 }
 
-.student-enrollment-modal
-  .student-face-auto-badge {
+.student-enrollment-modal .student-face-auto-badge {
   right: 13px;
 }
 
-.student-enrollment-modal
-  .student-face-manual-capture {
+.student-enrollment-modal .student-face-manual-capture {
   top: 49px;
   right: 13px;
 }
 
-.student-enrollment-modal
-  .student-face-instruction {
+.student-enrollment-modal .student-face-instruction {
   right: 13px;
   bottom: 47px;
   left: 13px;
@@ -3957,15 +3867,13 @@ html[data-theme="dark"] .student-face-action.is-face {
   padding: 10px 12px;
 }
 
-.student-enrollment-modal
-  .student-face-camera-meta {
+.student-enrollment-modal .student-face-camera-meta {
   right: 13px;
   bottom: 11px;
   left: 13px;
 }
 
-.student-enrollment-modal
-  .student-face-captured-summary {
+.student-enrollment-modal .student-face-captured-summary {
   right: 13px;
   bottom: 13px;
   left: 13px;
@@ -3975,19 +3883,15 @@ html[data-theme="dark"] .student-face-action.is-face {
    FACE TIPS
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-capture-tips {
+.student-enrollment-modal .student-face-capture-tips {
   display: grid;
 
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   gap: 7px;
 }
 
-.student-enrollment-modal
-  .student-face-capture-tips
-  > span {
+.student-enrollment-modal .student-face-capture-tips > span {
   min-height: 37px;
 
   padding: 7px 8px;
@@ -4001,8 +3905,7 @@ html[data-theme="dark"] .student-face-action.is-face {
    ENROLLMENT FOOTER
 ========================================================= */
 
-.student-enrollment-modal
-  .student-enrollment-actions {
+.student-enrollment-modal .student-enrollment-actions {
   min-height: 67px;
 
   display: grid;
@@ -4019,35 +3922,24 @@ html[data-theme="dark"] .student-face-action.is-face {
 
   border-top: 1px solid var(--c-border-soft);
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface) 94%,
-      var(--c-surface-soft)
-    );
+  background: color-mix(in srgb, var(--c-surface) 94%, var(--c-surface-soft));
 }
 
-.student-enrollment-modal
-  .student-enrollment-footer-copy {
+.student-enrollment-modal .student-enrollment-footer-copy {
   min-width: 0;
 }
 
-.student-enrollment-modal
-  .student-enrollment-footer-copy
-  strong {
+.student-enrollment-modal .student-enrollment-footer-copy strong {
   font-size: 7.5px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-footer-copy
-  span {
+.student-enrollment-modal .student-enrollment-footer-copy span {
   margin-top: 2px;
 
   font-size: 6.1px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-action-group {
+.student-enrollment-modal .student-enrollment-action-group {
   display: flex;
 
   align-items: center;
@@ -4058,14 +3950,11 @@ html[data-theme="dark"] .student-face-action.is-face {
   flex-wrap: nowrap;
 }
 
-.student-enrollment-modal
-  .student-enrollment-action-group
-  button {
+.student-enrollment-modal .student-enrollment-action-group button {
   white-space: nowrap;
 }
 
-.student-enrollment-modal
-  .student-enrollment-submit {
+.student-enrollment-modal .student-enrollment-submit {
   min-width: 165px;
 }
 
@@ -4078,15 +3967,13 @@ html[data-theme="dark"] .student-face-action.is-face {
     width: min(1160px, calc(100vw - 64px));
   }
 
-  .student-enrollment-modal
-    .student-enrollment-body {
+  .student-enrollment-modal .student-enrollment-body {
     grid-template-columns:
       minmax(320px, 0.7fr)
       minmax(560px, 1.3fr);
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     min-height: 390px;
   }
 }
@@ -4101,27 +3988,22 @@ html[data-theme="dark"] .student-face-action.is-face {
     max-height: calc(100dvh - 36px);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-body {
+  .student-enrollment-modal .student-enrollment-body {
     grid-template-columns:
       minmax(280px, 0.78fr)
       minmax(430px, 1.22fr);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 19px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     min-height: 330px;
   }
 
-  .student-enrollment-modal
-    .student-face-biometric-guide {
+  .student-enrollment-modal .student-face-biometric-guide {
     width: 165px;
     height: 216px;
   }
@@ -4138,31 +4020,26 @@ html[data-theme="dark"] .student-face-action.is-face {
     max-height: calc(100dvh - 28px);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-body {
+  .student-enrollment-modal .student-enrollment-body {
     display: block;
 
     overflow-y: auto;
     overscroll-behavior: contain;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     overflow: visible;
 
     padding: 18px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details {
+  .student-enrollment-modal .student-enrollment-details {
     border-right: 0;
     border-bottom: 1px solid var(--c-border-soft);
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     width: min(100%, 620px);
 
     min-height: 360px;
@@ -4170,35 +4047,30 @@ html[data-theme="dark"] .student-face-action.is-face {
     margin-inline: auto;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo-header {
+  .student-enrollment-modal .student-enrollment-photo-header {
     max-width: 620px;
 
     margin-inline: auto;
     margin-bottom: 13px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-content {
+  .student-enrollment-modal .student-face-camera-content {
     max-width: 620px;
 
     margin-inline: auto;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-footer-copy {
+  .student-enrollment-modal .student-enrollment-footer-copy {
     display: none;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-actions {
+  .student-enrollment-modal .student-enrollment-actions {
     grid-template-columns: 1fr;
 
     gap: 0;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-action-group {
+  .student-enrollment-modal .student-enrollment-action-group {
     width: 100%;
   }
 }
@@ -4216,13 +4088,11 @@ html[data-theme="dark"] .student-face-action.is-face {
     border-radius: 14px;
   }
 
-  .student-enrollment-modal
-    .student-modal-header {
+  .student-enrollment-modal .student-modal-header {
     padding: 15px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress {
+  .student-enrollment-modal .student-enrollment-progress {
     grid-template-columns:
       minmax(0, 1fr)
       22px
@@ -4233,9 +4103,7 @@ html[data-theme="dark"] .student-face-action.is-face {
     padding: 9px 12px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div {
+  .student-enrollment-modal .student-enrollment-progress > div {
     grid-template-columns: 1fr;
 
     justify-items: center;
@@ -4243,17 +4111,11 @@ html[data-theme="dark"] .student-face-action.is-face {
     text-align: center;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div
-    small {
+  .student-enrollment-modal .student-enrollment-progress > div small {
     display: none;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div
-    strong {
+  .student-enrollment-modal .student-enrollment-progress > div strong {
     max-width: 74px;
 
     margin-top: 3px;
@@ -4261,44 +4123,36 @@ html[data-theme="dark"] .student-face-action.is-face {
     font-size: 5.7px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 15px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo-header {
+  .student-enrollment-modal .student-enrollment-photo-header {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     min-height: 290px;
 
     border-radius: 13px;
   }
 
-  .student-enrollment-modal
-    .student-face-biometric-guide {
+  .student-enrollment-modal .student-face-biometric-guide {
     width: 150px;
     height: 198px;
   }
 
-  .student-enrollment-modal
-    .student-face-capture-tips {
+  .student-enrollment-modal .student-face-capture-tips {
     grid-template-columns: 1fr;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-actions {
+  .student-enrollment-modal .student-enrollment-actions {
     padding: 10px 12px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-action-group {
+  .student-enrollment-modal .student-enrollment-action-group {
     display: grid;
 
     grid-template-columns: 1fr;
@@ -4306,14 +4160,11 @@ html[data-theme="dark"] .student-face-action.is-face {
     gap: 7px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-action-group
-    button {
+  .student-enrollment-modal .student-enrollment-action-group button {
     width: 100%;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-submit {
+  .student-enrollment-modal .student-enrollment-submit {
     min-width: 0;
   }
 }
@@ -4331,84 +4182,66 @@ html[data-theme="dark"] .student-face-action.is-face {
     border-radius: 12px;
   }
 
-  .student-enrollment-modal
-    .student-modal-header {
+  .student-enrollment-modal .student-modal-header {
     padding: 13px;
   }
 
-  .student-enrollment-modal
-    .student-modal-heading {
+  .student-enrollment-modal .student-modal-heading {
     gap: 9px;
   }
 
-  .student-enrollment-modal
-    .student-modal-icon {
+  .student-enrollment-modal .student-modal-icon {
     width: 36px;
     height: 36px;
 
     flex-basis: 36px;
   }
 
-  .student-enrollment-modal
-    .student-modal-heading
-    h2 {
+  .student-enrollment-modal .student-modal-heading h2 {
     font-size: 15px;
   }
 
-  .student-enrollment-modal
-    .student-modal-heading
-    p {
+  .student-enrollment-modal .student-modal-heading p {
     max-width: 220px;
 
     font-size: 7px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress {
+  .student-enrollment-modal .student-enrollment-progress {
     padding-inline: 9px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div
-    strong {
+  .student-enrollment-modal .student-enrollment-progress > div strong {
     max-width: 62px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 13px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     min-height: 260px;
   }
 
-  .student-enrollment-modal
-    .student-face-biometric-guide {
+  .student-enrollment-modal .student-face-biometric-guide {
     width: 136px;
     height: 180px;
   }
 
-  .student-enrollment-modal
-    .student-face-instruction {
+  .student-enrollment-modal .student-face-instruction {
     right: 9px;
     bottom: 43px;
     left: 9px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-meta {
+  .student-enrollment-modal .student-face-camera-meta {
     right: 9px;
     bottom: 9px;
     left: 9px;
   }
 
-  .student-enrollment-modal
-    .student-face-manual-capture {
+  .student-enrollment-modal .student-face-manual-capture {
     top: 48px;
     right: 9px;
   }
@@ -4418,26 +4251,16 @@ html[data-theme="dark"] .student-face-action.is-face {
    DARK MODE — ENROLLMENT V4
 ========================================================= */
 
-html[data-theme="dark"]
-  .student-enrollment-modal
-  .student-enrollment-details {
-  background:
-    linear-gradient(
-      180deg,
-      var(--c-surface) 0%,
-      rgba(15, 23, 42, 0.68) 100%
-    );
+html[data-theme="dark"] .student-enrollment-modal .student-enrollment-details {
+  background: linear-gradient(
+    180deg,
+    var(--c-surface) 0%,
+    rgba(15, 23, 42, 0.68) 100%
+  );
 }
 
-html[data-theme="dark"]
-  .student-enrollment-modal
-  .student-enrollment-progress {
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface-soft) 88%,
-      #0f172a
-    );
+html[data-theme="dark"] .student-enrollment-modal .student-enrollment-progress {
+  background: color-mix(in srgb, var(--c-surface-soft) 88%, #0f172a);
 }
 
 /* =========================================================
@@ -4445,9 +4268,7 @@ html[data-theme="dark"]
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .student-enrollment-modal
-    .student-form-field
-    input {
+  .student-enrollment-modal .student-form-field input {
     transition: none;
   }
 }
@@ -4501,16 +4322,11 @@ html[data-theme="dark"]
 
   padding: 16px 18px;
 
-  background:
-    linear-gradient(
-      120deg,
-      color-mix(
-        in srgb,
-        var(--c-icon-bg) 54%,
-        var(--c-surface)
-      ) 0%,
-      var(--c-surface) 62%
-    );
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--c-icon-bg) 54%, var(--c-surface)) 0%,
+    var(--c-surface) 62%
+  );
 }
 
 .student-enrollment-modal .student-modal-heading {
@@ -4525,14 +4341,10 @@ html[data-theme="dark"]
 
   border-radius: 10px;
 
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
-.student-enrollment-modal
-  .student-modal-heading
-  > div:last-child
-  > span {
+.student-enrollment-modal .student-modal-heading > div:last-child > span {
   margin-bottom: 3px;
 
   font-size: 6.5px;
@@ -4581,49 +4393,31 @@ html[data-theme="dark"]
 
   border-bottom: 1px solid var(--c-border-soft);
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface-soft) 78%,
-      var(--c-surface)
-    );
+  background: color-mix(in srgb, var(--c-surface-soft) 78%, var(--c-surface));
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div {
+.student-enrollment-modal .student-enrollment-progress > div {
   gap: 7px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div
-  > span {
+.student-enrollment-modal .student-enrollment-progress > div > span {
   width: 24px;
   height: 24px;
 
   font-size: 6px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div
-  strong {
+.student-enrollment-modal .student-enrollment-progress > div strong {
   font-size: 7px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div
-  small {
+.student-enrollment-modal .student-enrollment-progress > div small {
   margin-top: 1px;
 
   font-size: 5.4px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > i {
+.student-enrollment-modal .student-enrollment-progress > i {
   margin-inline: 4px;
 }
 
@@ -4664,20 +4458,11 @@ html[data-theme="dark"]
 
   border-right: 1px solid var(--c-border-soft);
 
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(
-        in srgb,
-        var(--c-surface-soft) 35%,
-        var(--c-surface)
-      ) 0%,
-      color-mix(
-        in srgb,
-        var(--c-surface-soft) 65%,
-        var(--c-surface)
-      ) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--c-surface-soft) 35%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-surface-soft) 65%, var(--c-surface)) 100%
+  );
 }
 
 .student-enrollment-modal
@@ -4686,14 +4471,11 @@ html[data-theme="dark"]
   margin-bottom: 16px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading {
+.student-enrollment-modal .student-enrollment-section-heading {
   gap: 10px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading
-  > span {
+.student-enrollment-modal .student-enrollment-section-heading > span {
   width: 29px;
   height: 29px;
 
@@ -4702,15 +4484,11 @@ html[data-theme="dark"]
   border-radius: 8px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading
-  strong {
+.student-enrollment-modal .student-enrollment-section-heading strong {
   font-size: 10px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading
-  p {
+.student-enrollment-modal .student-enrollment-section-heading p {
   margin-top: 2px;
 
   font-size: 6.7px;
@@ -4744,9 +4522,7 @@ html[data-theme="dark"]
   font-size: 8.5px;
 }
 
-.student-enrollment-modal
-  .student-form-field
-  > small {
+.student-enrollment-modal .student-form-field > small {
   font-size: 6.1px;
 
   line-height: 1.4;
@@ -4763,30 +4539,19 @@ html[data-theme="dark"]
 
   border-radius: 9px;
 
-  box-shadow:
-    inset 3px 0 0
-      color-mix(
-        in srgb,
-        var(--c-blue-800) 70%,
-        transparent
-      );
+  box-shadow: inset 3px 0 0
+    color-mix(in srgb, var(--c-blue-800) 70%, transparent);
 }
 
-.student-enrollment-modal
-  .student-locked-field
-  > div
-  > small {
+.student-enrollment-modal .student-locked-field > div > small {
   font-size: 5px;
 }
 
-.student-enrollment-modal
-  .student-locked-field
-  strong {
+.student-enrollment-modal .student-locked-field strong {
   font-size: 8.3px;
 }
 
-.student-enrollment-modal
-  .student-locked-badge {
+.student-enrollment-modal .student-locked-badge {
   min-height: 21px;
 
   padding-inline: 7px;
@@ -4804,20 +4569,15 @@ html[data-theme="dark"]
   padding: 9px 10px;
 }
 
-.student-enrollment-modal
-  .student-created-notice
-  strong {
+.student-enrollment-modal .student-created-notice strong {
   font-size: 7.5px;
 }
 
-.student-enrollment-modal
-  .student-created-notice
-  p {
+.student-enrollment-modal .student-created-notice p {
   font-size: 6.2px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-checklist {
+.student-enrollment-modal .student-enrollment-checklist {
   margin-top: 1px;
 
   gap: 6px;
@@ -4826,25 +4586,16 @@ html[data-theme="dark"]
 
   border-radius: 9px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface-soft) 82%,
-      var(--c-surface)
-    );
+  background: color-mix(in srgb, var(--c-surface-soft) 82%, var(--c-surface));
 }
 
-.student-enrollment-modal
-  .student-enrollment-checklist
-  > span {
+.student-enrollment-modal .student-enrollment-checklist > span {
   gap: 7px;
 
   font-size: 6.2px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-checklist
-  i {
+.student-enrollment-modal .student-enrollment-checklist i {
   width: 18px;
   height: 18px;
 
@@ -4871,8 +4622,7 @@ html[data-theme="dark"]
   background: var(--c-surface);
 }
 
-.student-enrollment-modal
-  .student-enrollment-photo-header {
+.student-enrollment-modal .student-enrollment-photo-header {
   flex: 0 0 auto;
 
   align-items: center;
@@ -4898,8 +4648,7 @@ html[data-theme="dark"]
    RIGHT COLUMN — CAMERA
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-camera-content {
+.student-enrollment-modal .student-face-camera-content {
   width: 100%;
 
   display: grid;
@@ -4907,8 +4656,7 @@ html[data-theme="dark"]
   gap: 9px;
 }
 
-.student-enrollment-modal
-  .student-face-camera-shell {
+.student-enrollment-modal .student-face-camera-shell {
   width: 100%;
 
   height: clamp(330px, 46vh, 430px);
@@ -4925,22 +4673,15 @@ html[data-theme="dark"]
       rgba(30, 64, 175, 0.18),
       transparent 38%
     ),
-    linear-gradient(
-      145deg,
-      #0a1630 0%,
-      #050b17 100%
-    );
+    linear-gradient(145deg, #0a1630 0%, #050b17 100%);
 
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.025),
     0 13px 30px rgba(2, 8, 23, 0.15);
 }
 
-.student-enrollment-modal
-  .student-face-camera-shell
-  video,
-.student-enrollment-modal
-  .student-face-captured-image {
+.student-enrollment-modal .student-face-camera-shell video,
+.student-enrollment-modal .student-face-captured-image {
   object-fit: cover;
 }
 
@@ -4948,34 +4689,29 @@ html[data-theme="dark"]
    CAMERA FACE GUIDE
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-biometric-guide {
+.student-enrollment-modal .student-face-biometric-guide {
   top: 46%;
 
   width: 174px;
   height: 226px;
 }
 
-.student-enrollment-modal
-  .student-face-live-badge {
+.student-enrollment-modal .student-face-live-badge {
   top: 12px;
   left: 12px;
 }
 
-.student-enrollment-modal
-  .student-face-auto-badge {
+.student-enrollment-modal .student-face-auto-badge {
   top: 12px;
   right: 12px;
 }
 
-.student-enrollment-modal
-  .student-face-manual-capture {
+.student-enrollment-modal .student-face-manual-capture {
   top: 47px;
   right: 12px;
 }
 
-.student-enrollment-modal
-  .student-face-instruction {
+.student-enrollment-modal .student-face-instruction {
   right: 12px;
   bottom: 45px;
   left: 12px;
@@ -4985,41 +4721,32 @@ html[data-theme="dark"]
   border-radius: 9px;
 }
 
-.student-enrollment-modal
-  .student-face-instruction-icon {
+.student-enrollment-modal .student-face-instruction-icon {
   width: 26px;
   height: 26px;
 
   flex-basis: 26px;
 }
 
-.student-enrollment-modal
-  .student-face-instruction
-  strong {
+.student-enrollment-modal .student-face-instruction strong {
   font-size: 7.8px;
 }
 
-.student-enrollment-modal
-  .student-face-instruction
-  span {
+.student-enrollment-modal .student-face-instruction span {
   font-size: 5.8px;
 }
 
-.student-enrollment-modal
-  .student-face-camera-meta {
+.student-enrollment-modal .student-face-camera-meta {
   right: 12px;
   bottom: 10px;
   left: 12px;
 }
 
-.student-enrollment-modal
-  .student-face-camera-meta
-  > span {
+.student-enrollment-modal .student-face-camera-meta > span {
   font-size: 5.1px;
 }
 
-.student-enrollment-modal
-  .student-face-captured-summary {
+.student-enrollment-modal .student-face-captured-summary {
   right: 12px;
   bottom: 12px;
   left: 12px;
@@ -5033,43 +4760,31 @@ html[data-theme="dark"]
    CAMERA BELOW-CONTENT
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-camera-loading,
-.student-enrollment-modal
-  .student-face-feedback,
-.student-enrollment-modal
-  .student-face-privacy-note {
+.student-enrollment-modal .student-face-camera-loading,
+.student-enrollment-modal .student-face-feedback,
+.student-enrollment-modal .student-face-privacy-note {
   border-radius: 8px;
 }
 
-.student-enrollment-modal
-  .student-face-privacy-note {
+.student-enrollment-modal .student-face-privacy-note {
   padding: 8px 9px;
 }
 
-.student-enrollment-modal
-  .student-face-privacy-note
-  p {
+.student-enrollment-modal .student-face-privacy-note p {
   font-size: 6px;
 }
 
-.student-enrollment-modal
-  .student-face-privacy-note
-  strong {
+.student-enrollment-modal .student-face-privacy-note strong {
   font-size: 6.5px;
 }
 
-.student-enrollment-modal
-  .student-face-capture-tips {
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+.student-enrollment-modal .student-face-capture-tips {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   gap: 6px;
 }
 
-.student-enrollment-modal
-  .student-face-capture-tips
-  > span {
+.student-enrollment-modal .student-face-capture-tips > span {
   min-height: 34px;
 
   gap: 6px;
@@ -5081,9 +4796,7 @@ html[data-theme="dark"]
   font-size: 5.8px;
 }
 
-.student-enrollment-modal
-  .student-face-capture-tips
-  i {
+.student-enrollment-modal .student-face-capture-tips i {
   width: 18px;
   height: 18px;
 
@@ -5094,8 +4807,7 @@ html[data-theme="dark"]
    FOOTER
 ========================================================= */
 
-.student-enrollment-modal
-  .student-enrollment-actions {
+.student-enrollment-modal .student-enrollment-actions {
   min-height: 64px;
 
   grid-template-columns:
@@ -5106,43 +4818,30 @@ html[data-theme="dark"]
 
   padding: 10px 18px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface) 96%,
-      var(--c-surface-soft)
-    );
+  background: color-mix(in srgb, var(--c-surface) 96%, var(--c-surface-soft));
 }
 
-.student-enrollment-modal
-  .student-enrollment-footer-copy
-  strong {
+.student-enrollment-modal .student-enrollment-footer-copy strong {
   font-size: 7.2px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-footer-copy
-  span {
+.student-enrollment-modal .student-enrollment-footer-copy span {
   max-width: 420px;
 
   font-size: 5.9px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-action-group {
+.student-enrollment-modal .student-enrollment-action-group {
   gap: 7px;
 
   flex-wrap: nowrap;
 }
 
-.student-enrollment-modal
-  .student-enrollment-action-group
-  button {
+.student-enrollment-modal .student-enrollment-action-group button {
   min-height: 36px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-submit {
+.student-enrollment-modal .student-enrollment-submit {
   min-width: 170px;
 }
 
@@ -5157,28 +4856,23 @@ html[data-theme="dark"]
     max-height: calc(100dvh - 30px);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-body {
+  .student-enrollment-modal .student-enrollment-body {
     grid-template-columns:
       minmax(285px, 315px)
       minmax(0, 1fr);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 17px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     height: clamp(310px, 43vh, 380px);
     min-height: 310px;
   }
 
-  .student-enrollment-modal
-    .student-face-biometric-guide {
+  .student-enrollment-modal .student-face-biometric-guide {
     width: 160px;
     height: 210px;
   }
@@ -5196,18 +4890,15 @@ html[data-theme="dark"]
     max-height: calc(100dvh - 24px);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-body {
+  .student-enrollment-modal .student-enrollment-body {
     display: block;
 
     overflow-y: auto;
     overscroll-behavior: contain;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     display: block;
 
     overflow: visible;
@@ -5215,23 +4906,19 @@ html[data-theme="dark"]
     padding: 18px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details {
+  .student-enrollment-modal .student-enrollment-details {
     border-right: 0;
     border-bottom: 1px solid var(--c-border-soft);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo-header,
-  .student-enrollment-modal
-    .student-face-camera-content {
+  .student-enrollment-modal .student-enrollment-photo-header,
+  .student-enrollment-modal .student-face-camera-content {
     width: min(100%, 620px);
 
     margin-inline: auto;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     height: auto;
     min-height: 350px;
     max-height: none;
@@ -5239,18 +4926,15 @@ html[data-theme="dark"]
     aspect-ratio: 4 / 3;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-footer-copy {
+  .student-enrollment-modal .student-enrollment-footer-copy {
     display: none;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-actions {
+  .student-enrollment-modal .student-enrollment-actions {
     grid-template-columns: 1fr;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-action-group {
+  .student-enrollment-modal .student-enrollment-action-group {
     width: 100%;
 
     justify-content: flex-end;
@@ -5270,21 +4954,17 @@ html[data-theme="dark"]
     border-radius: 13px;
   }
 
-  .student-enrollment-modal
-    .student-modal-header {
+  .student-enrollment-modal .student-modal-header {
     min-height: 0;
 
     padding: 14px;
   }
 
-  .student-enrollment-modal
-    .student-modal-heading
-    p {
+  .student-enrollment-modal .student-modal-heading p {
     max-width: 280px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress {
+  .student-enrollment-modal .student-enrollment-progress {
     grid-template-columns:
       minmax(0, 1fr)
       18px
@@ -5295,9 +4975,7 @@ html[data-theme="dark"]
     padding: 8px 10px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div {
+  .student-enrollment-modal .student-enrollment-progress > div {
     grid-template-columns: 1fr;
 
     justify-items: center;
@@ -5305,17 +4983,11 @@ html[data-theme="dark"]
     text-align: center;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div
-    small {
+  .student-enrollment-modal .student-enrollment-progress > div small {
     display: none;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div
-    strong {
+  .student-enrollment-modal .student-enrollment-progress > div strong {
     max-width: 72px;
 
     margin-top: 3px;
@@ -5323,45 +4995,37 @@ html[data-theme="dark"]
     font-size: 5.5px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 14px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo-header {
+  .student-enrollment-modal .student-enrollment-photo-header {
     align-items: flex-start;
 
     flex-direction: column;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     min-height: 285px;
 
     border-radius: 12px;
   }
 
-  .student-enrollment-modal
-    .student-face-biometric-guide {
+  .student-enrollment-modal .student-face-biometric-guide {
     width: 148px;
     height: 194px;
   }
 
-  .student-enrollment-modal
-    .student-face-capture-tips {
+  .student-enrollment-modal .student-face-capture-tips {
     grid-template-columns: 1fr;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-actions {
+  .student-enrollment-modal .student-enrollment-actions {
     padding: 9px 10px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-action-group {
+  .student-enrollment-modal .student-enrollment-action-group {
     display: grid;
 
     grid-template-columns: 1fr;
@@ -5369,14 +5033,11 @@ html[data-theme="dark"]
     gap: 6px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-action-group
-    button {
+  .student-enrollment-modal .student-enrollment-action-group button {
     width: 100%;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-submit {
+  .student-enrollment-modal .student-enrollment-submit {
     min-width: 0;
   }
 }
@@ -5394,92 +5055,73 @@ html[data-theme="dark"]
     border-radius: 11px;
   }
 
-  .student-enrollment-modal
-    .student-modal-header {
+  .student-enrollment-modal .student-modal-header {
     padding: 12px;
   }
 
-  .student-enrollment-modal
-    .student-modal-heading {
+  .student-enrollment-modal .student-modal-heading {
     gap: 8px;
   }
 
-  .student-enrollment-modal
-    .student-modal-icon {
+  .student-enrollment-modal .student-modal-icon {
     width: 34px;
     height: 34px;
 
     flex-basis: 34px;
   }
 
-  .student-enrollment-modal
-    .student-modal-heading
-    h2 {
+  .student-enrollment-modal .student-modal-heading h2 {
     font-size: 14px;
   }
 
-  .student-enrollment-modal
-    .student-modal-heading
-    p {
+  .student-enrollment-modal .student-modal-heading p {
     max-width: 205px;
 
     font-size: 6.7px;
   }
 
-  .student-enrollment-modal
-    .student-modal-close {
+  .student-enrollment-modal .student-modal-close {
     width: 30px;
     height: 30px;
 
     flex-basis: 30px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress {
+  .student-enrollment-modal .student-enrollment-progress {
     padding-inline: 7px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div
-    strong {
+  .student-enrollment-modal .student-enrollment-progress > div strong {
     max-width: 58px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 12px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     min-height: 255px;
   }
 
-  .student-enrollment-modal
-    .student-face-biometric-guide {
+  .student-enrollment-modal .student-face-biometric-guide {
     width: 134px;
     height: 176px;
   }
 
-  .student-enrollment-modal
-    .student-face-instruction {
+  .student-enrollment-modal .student-face-instruction {
     right: 8px;
     bottom: 42px;
     left: 8px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-meta {
+  .student-enrollment-modal .student-face-camera-meta {
     right: 8px;
     bottom: 8px;
     left: 8px;
   }
 
-  .student-enrollment-modal
-    .student-face-manual-capture {
+  .student-enrollment-modal .student-face-manual-capture {
     top: 46px;
     right: 8px;
   }
@@ -5489,26 +5131,16 @@ html[data-theme="dark"]
    DARK MODE
 ========================================================= */
 
-html[data-theme="dark"]
-  .student-enrollment-modal
-  .student-enrollment-details {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(15, 23, 42, 0.5) 0%,
-      rgba(15, 23, 42, 0.76) 100%
-    );
+html[data-theme="dark"] .student-enrollment-modal .student-enrollment-details {
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.5) 0%,
+    rgba(15, 23, 42, 0.76) 100%
+  );
 }
 
-html[data-theme="dark"]
-  .student-enrollment-modal
-  .student-enrollment-actions {
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface) 93%,
-      #0f172a
-    );
+html[data-theme="dark"] .student-enrollment-modal .student-enrollment-actions {
+  background: color-mix(in srgb, var(--c-surface) 93%, #0f172a);
 }
 
 /* =========================================================
@@ -5516,11 +5148,8 @@ html[data-theme="dark"]
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .student-enrollment-modal
-    .student-form-field
-    input,
-  .student-enrollment-modal
-    .student-modal-close {
+  .student-enrollment-modal .student-form-field input,
+  .student-enrollment-modal .student-modal-close {
     transition: none;
   }
 }
@@ -5540,12 +5169,7 @@ html[data-theme="dark"]
   max-height: min(900px, calc(100dvh - 40px));
   overflow: hidden;
 
-  border: 1px solid
-    color-mix(
-      in srgb,
-      var(--c-border) 78%,
-      var(--c-blue-800)
-    );
+  border: 1px solid color-mix(in srgb, var(--c-border) 78%, var(--c-blue-800));
 
   border-radius: 18px;
 
@@ -5565,16 +5189,11 @@ html[data-theme="dark"]
 
   padding: 16px 19px;
 
-  background:
-    linear-gradient(
-      120deg,
-      color-mix(
-        in srgb,
-        var(--c-icon-bg) 70%,
-        var(--c-surface)
-      ) 0%,
-      var(--c-surface) 58%
-    );
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--c-icon-bg) 70%, var(--c-surface)) 0%,
+    var(--c-surface) 58%
+  );
 }
 
 .student-enrollment-modal .student-modal-heading {
@@ -5588,29 +5207,19 @@ html[data-theme="dark"]
   flex: 0 0 40px;
 
   border: 1px solid
-    color-mix(
-      in srgb,
-      var(--c-brand-border) 80%,
-      var(--c-blue-800)
-    );
+    color-mix(in srgb, var(--c-brand-border) 80%, var(--c-blue-800));
 
   border-radius: 11px;
 
-  background:
-    linear-gradient(
-      145deg,
-      var(--c-icon-bg),
-      color-mix(
-        in srgb,
-        var(--c-icon-bg) 55%,
-        var(--c-surface)
-      )
-    );
+  background: linear-gradient(
+    145deg,
+    var(--c-icon-bg),
+    color-mix(in srgb, var(--c-icon-bg) 55%, var(--c-surface))
+  );
 
   color: var(--c-blue-800);
 
-  box-shadow:
-    0 7px 18px rgba(18, 61, 126, 0.08);
+  box-shadow: 0 7px 18px rgba(18, 61, 126, 0.08);
 }
 
 .student-enrollment-modal .student-modal-heading h2 {
@@ -5652,24 +5261,14 @@ html[data-theme="dark"]
 
   padding: 8px 19px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface-soft) 82%,
-      var(--c-surface)
-    );
+  background: color-mix(in srgb, var(--c-surface-soft) 82%, var(--c-surface));
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div {
+.student-enrollment-modal .student-enrollment-progress > div {
   gap: 8px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div
-  > span {
+.student-enrollment-modal .student-enrollment-progress > div > span {
   width: 25px;
   height: 25px;
 
@@ -5682,24 +5281,15 @@ html[data-theme="dark"]
     box-shadow 0.18s ease;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div
-  strong {
+.student-enrollment-modal .student-enrollment-progress > div strong {
   font-size: 7.2px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div
-  small {
+.student-enrollment-modal .student-enrollment-progress > div small {
   font-size: 5.5px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-progress
-  > div.is-current
-  > span {
+.student-enrollment-modal .student-enrollment-progress > div.is-current > span {
   box-shadow:
     0 0 0 4px rgba(37, 99, 235, 0.09),
     0 5px 14px rgba(37, 99, 235, 0.12);
@@ -5742,20 +5332,11 @@ html[data-theme="dark"]
 
   border-right: 1px solid var(--c-border-soft);
 
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(
-        in srgb,
-        var(--c-surface-soft) 38%,
-        var(--c-surface)
-      ) 0%,
-      color-mix(
-        in srgb,
-        var(--c-surface-soft) 72%,
-        var(--c-surface)
-      ) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--c-surface-soft) 38%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-surface-soft) 72%, var(--c-surface)) 100%
+  );
 }
 
 .student-enrollment-modal
@@ -5764,9 +5345,7 @@ html[data-theme="dark"]
   margin-bottom: 16px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading
-  > span {
+.student-enrollment-modal .student-enrollment-section-heading > span {
   width: 30px;
   height: 30px;
 
@@ -5776,19 +5355,14 @@ html[data-theme="dark"]
 
   background: var(--c-icon-bg);
 
-  box-shadow:
-    0 5px 14px rgba(18, 61, 126, 0.05);
+  box-shadow: 0 5px 14px rgba(18, 61, 126, 0.05);
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading
-  strong {
+.student-enrollment-modal .student-enrollment-section-heading strong {
   font-size: 10.2px;
 }
 
-.student-enrollment-modal
-  .student-enrollment-section-heading
-  p {
+.student-enrollment-modal .student-enrollment-section-heading p {
   font-size: 6.8px;
 }
 
@@ -5820,33 +5394,20 @@ html[data-theme="dark"]
 
   font-size: 8.7px;
 
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-.student-enrollment-modal
-  .student-form-field
-  input:hover:not(:disabled) {
-  border-color:
-    color-mix(
-      in srgb,
-      var(--c-blue-800) 38%,
-      var(--c-border)
-    );
+.student-enrollment-modal .student-form-field input:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--c-blue-800) 38%, var(--c-border));
 }
 
-.student-enrollment-modal
-  .student-form-field
-  input:focus {
+.student-enrollment-modal .student-form-field input:focus {
   border-color: var(--c-blue-800);
 
-  box-shadow:
-    0 0 0 3px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.student-enrollment-modal
-  .student-form-field
-  > small {
+.student-enrollment-modal .student-form-field > small {
   font-size: 6.2px;
 }
 
@@ -5859,43 +5420,26 @@ html[data-theme="dark"]
 
   padding: 7px 9px 7px 11px;
 
-  border-color:
-    color-mix(
-      in srgb,
-      var(--c-brand-border) 72%,
-      var(--c-border)
-    );
+  border-color: color-mix(in srgb, var(--c-brand-border) 72%, var(--c-border));
 
   border-radius: 9px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-icon-bg) 45%,
-      var(--c-surface-soft)
-    );
+  background: color-mix(in srgb, var(--c-icon-bg) 45%, var(--c-surface-soft));
 
-  box-shadow:
-    inset 3px 0 0
-      color-mix(
-        in srgb,
-        var(--c-blue-800) 82%,
-        transparent
-      );
+  box-shadow: inset 3px 0 0
+    color-mix(in srgb, var(--c-blue-800) 82%, transparent);
 }
 
-.student-enrollment-modal
-  .student-locked-badge {
+.student-enrollment-modal .student-locked-badge {
   min-height: 22px;
 
   padding-inline: 7px;
 
-  border-color:
-    color-mix(
-      in srgb,
-      var(--c-brand-border) 75%,
-      var(--c-blue-800)
-    );
+  border-color: color-mix(
+    in srgb,
+    var(--c-brand-border) 75%,
+    var(--c-blue-800)
+  );
 
   font-size: 5px;
 }
@@ -5909,24 +5453,17 @@ html[data-theme="dark"]
 
   border-radius: 9px;
 
-  box-shadow:
-    inset 3px 0 0 var(--c-success-text);
+  box-shadow: inset 3px 0 0 var(--c-success-text);
 }
 
-.student-enrollment-modal
-  .student-enrollment-checklist {
+.student-enrollment-modal .student-enrollment-checklist {
   gap: 6px;
 
   padding: 10px;
 
   border-radius: 9px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface-soft) 88%,
-      var(--c-surface)
-    );
+  background: color-mix(in srgb, var(--c-surface-soft) 88%, var(--c-surface));
 }
 
 /* =========================================================
@@ -5952,29 +5489,19 @@ html[data-theme="dark"]
     ),
     linear-gradient(
       180deg,
-      color-mix(
-        in srgb,
-        var(--c-icon-bg) 26%,
-        var(--c-surface)
-      ) 0%,
+      color-mix(in srgb, var(--c-icon-bg) 26%, var(--c-surface)) 0%,
       var(--c-surface) 44%
     );
 
-  box-shadow:
-    inset 4px 0 0
-      color-mix(
-        in srgb,
-        var(--c-blue-800) 82%,
-        transparent
-      );
+  box-shadow: inset 4px 0 0
+    color-mix(in srgb, var(--c-blue-800) 82%, transparent);
 }
 
 /*
  * Soft camera-panel halo.
  * Purely visual; does not intercept interaction.
  */
-.student-enrollment-modal
-  .student-enrollment-photo::before {
+.student-enrollment-modal .student-enrollment-photo::before {
   content: "";
 
   position: absolute;
@@ -5982,12 +5509,7 @@ html[data-theme="dark"]
 
   z-index: 0;
 
-  border: 1px solid
-    color-mix(
-      in srgb,
-      var(--c-brand-border) 72%,
-      transparent
-    );
+  border: 1px solid color-mix(in srgb, var(--c-brand-border) 72%, transparent);
 
   border-radius: 16px;
 
@@ -5996,9 +5518,7 @@ html[data-theme="dark"]
   opacity: 0.58;
 }
 
-.student-enrollment-modal
-  .student-enrollment-photo
-  > * {
+.student-enrollment-modal .student-enrollment-photo > * {
   position: relative;
   z-index: 1;
 }
@@ -6007,8 +5527,7 @@ html[data-theme="dark"]
    CAMERA PANEL HEADER
 ========================================================= */
 
-.student-enrollment-modal
-  .student-enrollment-photo-header {
+.student-enrollment-modal .student-enrollment-photo-header {
   min-height: 44px;
 
   display: flex;
@@ -6033,19 +5552,13 @@ html[data-theme="dark"]
   .student-enrollment-photo-header
   .student-enrollment-section-heading
   > span {
-  border-color:
-    color-mix(
-      in srgb,
-      var(--c-blue-800) 30%,
-      var(--c-brand-border)
-    );
+  border-color: color-mix(
+    in srgb,
+    var(--c-blue-800) 30%,
+    var(--c-brand-border)
+  );
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-icon-bg) 80%,
-      var(--c-surface)
-    );
+  background: color-mix(in srgb, var(--c-icon-bg) 80%, var(--c-surface));
 
   color: var(--c-blue-800);
 }
@@ -6054,30 +5567,21 @@ html[data-theme="dark"]
    CAMERA STATUS — MORE VISIBLE
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-camera-status {
+.student-enrollment-modal .student-face-camera-status {
   min-height: 28px;
 
   padding-inline: 10px;
 
   border-width: 1px;
 
-  box-shadow:
-    0 5px 14px rgba(2, 8, 23, 0.05);
+  box-shadow: 0 5px 14px rgba(2, 8, 23, 0.05);
 }
 
-.student-enrollment-modal
-  .student-face-camera-status.is-live,
-.student-enrollment-modal
-  .student-face-camera-status.is-scanning {
+.student-enrollment-modal .student-face-camera-status.is-live,
+.student-enrollment-modal .student-face-camera-status.is-scanning {
   border-color: rgba(37, 99, 235, 0.32);
 
-  background:
-    color-mix(
-      in srgb,
-      rgba(37, 99, 235, 0.1) 80%,
-      var(--c-surface)
-    );
+  background: color-mix(in srgb, rgba(37, 99, 235, 0.1) 80%, var(--c-surface));
 
   color: var(--c-blue-800);
 
@@ -6086,31 +5590,27 @@ html[data-theme="dark"]
     0 6px 15px rgba(37, 99, 235, 0.07);
 }
 
-.student-enrollment-modal
-  .student-face-camera-status.is-captured {
+.student-enrollment-modal .student-face-camera-status.is-captured {
   border-color: var(--c-success-border);
 
   background: var(--c-success-bg);
 
   color: var(--c-success-text);
 
-  box-shadow:
-    0 0 0 3px rgba(22, 163, 74, 0.055);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.055);
 }
 
 /* =========================================================
    CAMERA FRAME — MAIN VISUAL FOCUS
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-camera-content {
+.student-enrollment-modal .student-face-camera-content {
   width: 100%;
 
   gap: 9px;
 }
 
-.student-enrollment-modal
-  .student-face-camera-shell {
+.student-enrollment-modal .student-face-camera-shell {
   width: 100%;
 
   height: clamp(355px, 48vh, 455px);
@@ -6121,8 +5621,7 @@ html[data-theme="dark"]
 
   margin: 0;
 
-  border: 2px solid
-    rgba(96, 165, 250, 0.72);
+  border: 2px solid rgba(96, 165, 250, 0.72);
 
   border-radius: 16px;
 
@@ -6132,14 +5631,9 @@ html[data-theme="dark"]
       rgba(37, 99, 235, 0.23),
       transparent 39%
     ),
-    linear-gradient(
-      145deg,
-      #0b1730 0%,
-      #040a16 100%
-    );
+    linear-gradient(145deg, #0b1730 0%, #040a16 100%);
 
-  outline: 1px solid
-    rgba(37, 99, 235, 0.13);
+  outline: 1px solid rgba(37, 99, 235, 0.13);
 
   outline-offset: 3px;
 
@@ -6157,10 +5651,8 @@ html[data-theme="dark"]
 
 /* Live / positioning */
 
-.student-enrollment-modal
-  .student-face-camera-shell.is-preparing,
-.student-enrollment-modal
-  .student-face-camera-shell.is-positioning {
+.student-enrollment-modal .student-face-camera-shell.is-preparing,
+.student-enrollment-modal .student-face-camera-shell.is-positioning {
   border-color: rgba(96, 165, 250, 0.82);
 
   box-shadow:
@@ -6171,10 +5663,8 @@ html[data-theme="dark"]
 
 /* Face correctly positioned */
 
-.student-enrollment-modal
-  .student-face-camera-shell.is-holding,
-.student-enrollment-modal
-  .student-face-camera-shell.is-countdown {
+.student-enrollment-modal .student-face-camera-shell.is-holding,
+.student-enrollment-modal .student-face-camera-shell.is-countdown {
   border-color: rgba(74, 222, 128, 0.88);
 
   outline-color: rgba(34, 197, 94, 0.18);
@@ -6187,8 +5677,7 @@ html[data-theme="dark"]
 
 /* Captured */
 
-.student-enrollment-modal
-  .student-face-camera-shell.is-captured {
+.student-enrollment-modal .student-face-camera-shell.is-captured {
   border-color: rgba(34, 197, 94, 0.92);
 
   outline-color: rgba(34, 197, 94, 0.22);
@@ -6201,8 +5690,7 @@ html[data-theme="dark"]
 
 /* Error */
 
-.student-enrollment-modal
-  .student-face-camera-shell.is-error {
+.student-enrollment-modal .student-face-camera-shell.is-error {
   border-color: rgba(239, 68, 68, 0.72);
 
   outline-color: rgba(239, 68, 68, 0.15);
@@ -6216,17 +5704,11 @@ html[data-theme="dark"]
    CAMERA VIDEO / PREVIEW
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-camera-shell
-  video {
-  filter:
-    saturate(0.98)
-    contrast(1.025)
-    brightness(1.015);
+.student-enrollment-modal .student-face-camera-shell video {
+  filter: saturate(0.98) contrast(1.025) brightness(1.015);
 }
 
-.student-enrollment-modal
-  .student-face-captured-image {
+.student-enrollment-modal .student-face-captured-image {
   object-fit: cover;
 }
 
@@ -6234,16 +5716,14 @@ html[data-theme="dark"]
    CAMERA GUIDE
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-biometric-guide {
+.student-enrollment-modal .student-face-biometric-guide {
   top: 46%;
 
   width: 188px;
   height: 244px;
 }
 
-.student-enrollment-modal
-  .student-face-oval {
+.student-enrollment-modal .student-face-oval {
   border-width: 2px;
 
   box-shadow:
@@ -6271,8 +5751,7 @@ html[data-theme="dark"]
    CAMERA BADGES
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-live-badge {
+.student-enrollment-modal .student-face-live-badge {
   top: 13px;
   left: 13px;
 
@@ -6280,12 +5759,10 @@ html[data-theme="dark"]
 
   background: rgba(2, 8, 23, 0.74);
 
-  box-shadow:
-    0 5px 16px rgba(2, 8, 23, 0.18);
+  box-shadow: 0 5px 16px rgba(2, 8, 23, 0.18);
 }
 
-.student-enrollment-modal
-  .student-face-auto-badge {
+.student-enrollment-modal .student-face-auto-badge {
   top: 13px;
   right: 13px;
 
@@ -6297,12 +5774,10 @@ html[data-theme="dark"]
 
   color: #eff6ff;
 
-  box-shadow:
-    0 5px 16px rgba(2, 8, 23, 0.15);
+  box-shadow: 0 5px 16px rgba(2, 8, 23, 0.15);
 }
 
-.student-enrollment-modal
-  .student-face-manual-capture {
+.student-enrollment-modal .student-face-manual-capture {
   top: 50px;
   right: 13px;
 
@@ -6319,8 +5794,7 @@ html[data-theme="dark"]
    CAMERA INSTRUCTION
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-instruction {
+.student-enrollment-modal .student-face-instruction {
   right: 13px;
   bottom: 47px;
   left: 13px;
@@ -6333,27 +5807,21 @@ html[data-theme="dark"]
 
   background: rgba(2, 8, 23, 0.78);
 
-  box-shadow:
-    0 7px 22px rgba(2, 8, 23, 0.2);
+  box-shadow: 0 7px 22px rgba(2, 8, 23, 0.2);
 }
 
-.student-enrollment-modal
-  .student-face-instruction-icon {
+.student-enrollment-modal .student-face-instruction-icon {
   width: 27px;
   height: 27px;
 
   flex-basis: 27px;
 }
 
-.student-enrollment-modal
-  .student-face-instruction
-  strong {
+.student-enrollment-modal .student-face-instruction strong {
   font-size: 8px;
 }
 
-.student-enrollment-modal
-  .student-face-instruction
-  span {
+.student-enrollment-modal .student-face-instruction span {
   font-size: 5.9px;
 }
 
@@ -6361,16 +5829,13 @@ html[data-theme="dark"]
    CAMERA META
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-camera-meta {
+.student-enrollment-modal .student-face-camera-meta {
   right: 13px;
   bottom: 10px;
   left: 13px;
 }
 
-.student-enrollment-modal
-  .student-face-camera-meta
-  > span {
+.student-enrollment-modal .student-face-camera-meta > span {
   font-size: 5.1px;
 }
 
@@ -6378,8 +5843,7 @@ html[data-theme="dark"]
    COUNTDOWN
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-countdown {
+.student-enrollment-modal .student-face-countdown {
   width: 94px;
   height: 94px;
 
@@ -6392,9 +5856,7 @@ html[data-theme="dark"]
     0 0 0 7px rgba(255, 255, 255, 0.035);
 }
 
-.student-enrollment-modal
-  .student-face-countdown
-  span {
+.student-enrollment-modal .student-face-countdown span {
   font-size: 41px;
 }
 
@@ -6402,8 +5864,7 @@ html[data-theme="dark"]
    CAPTURED RESULT
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-captured-label {
+.student-enrollment-modal .student-face-captured-label {
   top: 13px;
   left: 13px;
 
@@ -6413,12 +5874,10 @@ html[data-theme="dark"]
 
   background: rgba(21, 128, 61, 0.84);
 
-  box-shadow:
-    0 6px 18px rgba(2, 8, 23, 0.16);
+  box-shadow: 0 6px 18px rgba(2, 8, 23, 0.16);
 }
 
-.student-enrollment-modal
-  .student-face-captured-summary {
+.student-enrollment-modal .student-face-captured-summary {
   right: 13px;
   bottom: 13px;
   left: 13px;
@@ -6429,70 +5888,49 @@ html[data-theme="dark"]
 
   background: rgba(2, 8, 23, 0.8);
 
-  box-shadow:
-    0 8px 24px rgba(2, 8, 23, 0.2);
+  box-shadow: 0 8px 24px rgba(2, 8, 23, 0.2);
 }
 
 /* =========================================================
    CAMERA SUPPORT CONTENT
 ========================================================= */
 
-.student-enrollment-modal
-  .student-face-camera-loading,
-.student-enrollment-modal
-  .student-face-feedback,
-.student-enrollment-modal
-  .student-face-privacy-note {
+.student-enrollment-modal .student-face-camera-loading,
+.student-enrollment-modal .student-face-feedback,
+.student-enrollment-modal .student-face-privacy-note {
   border-radius: 9px;
 }
 
-.student-enrollment-modal
-  .student-face-camera-loading {
+.student-enrollment-modal .student-face-camera-loading {
   border: 1px solid var(--c-border-soft);
 }
 
-.student-enrollment-modal
-  .student-face-privacy-note {
+.student-enrollment-modal .student-face-privacy-note {
   padding: 8px 9px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface-soft) 84%,
-      var(--c-surface)
-    );
+  background: color-mix(in srgb, var(--c-surface-soft) 84%, var(--c-surface));
 }
 
-.student-enrollment-modal
-  .student-face-capture-tips {
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+.student-enrollment-modal .student-face-capture-tips {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   gap: 6px;
 }
 
-.student-enrollment-modal
-  .student-face-capture-tips
-  > span {
+.student-enrollment-modal .student-face-capture-tips > span {
   min-height: 36px;
 
   gap: 6px;
 
   padding: 7px 8px;
 
-  border-color:
-    color-mix(
-      in srgb,
-      var(--c-brand-border) 48%,
-      var(--c-border-soft)
-    );
+  border-color: color-mix(
+    in srgb,
+    var(--c-brand-border) 48%,
+    var(--c-border-soft)
+  );
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-icon-bg) 32%,
-      var(--c-surface-soft)
-    );
+  background: color-mix(in srgb, var(--c-icon-bg) 32%, var(--c-surface-soft));
 
   font-size: 5.9px;
 }
@@ -6501,8 +5939,7 @@ html[data-theme="dark"]
    FOOTER
 ========================================================= */
 
-.student-enrollment-modal
-  .student-enrollment-actions {
+.student-enrollment-modal .student-enrollment-actions {
   min-height: 66px;
 
   grid-template-columns:
@@ -6513,38 +5950,27 @@ html[data-theme="dark"]
 
   padding: 10px 18px;
 
-  background:
-    color-mix(
-      in srgb,
-      var(--c-surface) 96%,
-      var(--c-surface-soft)
-    );
+  background: color-mix(in srgb, var(--c-surface) 96%, var(--c-surface-soft));
 
-  box-shadow:
-    0 -8px 20px rgba(2, 8, 23, 0.025);
+  box-shadow: 0 -8px 20px rgba(2, 8, 23, 0.025);
 }
 
-.student-enrollment-modal
-  .student-enrollment-action-group {
+.student-enrollment-modal .student-enrollment-action-group {
   gap: 8px;
 
   flex-wrap: nowrap;
 }
 
-.student-enrollment-modal
-  .student-enrollment-action-group
-  button {
+.student-enrollment-modal .student-enrollment-action-group button {
   min-height: 37px;
 
   white-space: nowrap;
 }
 
-.student-enrollment-modal
-  .student-enrollment-submit {
+.student-enrollment-modal .student-enrollment-submit {
   min-width: 174px;
 
-  box-shadow:
-    0 7px 18px rgba(18, 61, 126, 0.12);
+  box-shadow: 0 7px 18px rgba(18, 61, 126, 0.12);
 }
 
 /* =========================================================
@@ -6553,16 +5979,14 @@ html[data-theme="dark"]
 ========================================================= */
 
 .student-identity-modal .student-identity-camera {
-  background:
-    radial-gradient(
-      circle at 50% 14%,
-      rgba(37, 99, 235, 0.07),
-      transparent 42%
-    );
+  background: radial-gradient(
+    circle at 50% 14%,
+    rgba(37, 99, 235, 0.07),
+    transparent 42%
+  );
 }
 
-.student-identity-modal
-  .student-face-camera-shell {
+.student-identity-modal .student-face-camera-shell {
   border: 2px solid rgba(96, 165, 250, 0.62);
 
   outline: 1px solid rgba(37, 99, 235, 0.12);
@@ -6573,12 +5997,9 @@ html[data-theme="dark"]
     0 18px 40px rgba(2, 8, 23, 0.18);
 }
 
-.student-identity-modal
-  .student-face-camera-shell.is-holding,
-.student-identity-modal
-  .student-face-camera-shell.is-countdown,
-.student-identity-modal
-  .student-face-camera-shell.is-captured {
+.student-identity-modal .student-face-camera-shell.is-holding,
+.student-identity-modal .student-face-camera-shell.is-countdown,
+.student-identity-modal .student-face-camera-shell.is-captured {
   border-color: rgba(74, 222, 128, 0.84);
 
   box-shadow:
@@ -6596,31 +6017,26 @@ html[data-theme="dark"]
     max-height: calc(100dvh - 30px);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-body {
+  .student-enrollment-modal .student-enrollment-body {
     grid-template-columns:
       minmax(290px, 320px)
       minmax(0, 1fr);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details {
+  .student-enrollment-modal .student-enrollment-details {
     padding: 17px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 16px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     height: clamp(320px, 45vh, 410px);
     min-height: 320px;
   }
 
-  .student-enrollment-modal
-    .student-face-biometric-guide {
+  .student-enrollment-modal .student-face-biometric-guide {
     width: 168px;
     height: 218px;
   }
@@ -6641,58 +6057,44 @@ html[data-theme="dark"]
     max-height: calc(100dvh - 28px);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-body {
+  .student-enrollment-modal .student-enrollment-body {
     display: block;
 
     overflow-y: auto;
     overscroll-behavior: contain;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     overflow: visible;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details {
+  .student-enrollment-modal .student-enrollment-details {
     padding: 18px;
 
     border-right: 0;
     border-bottom: 1px solid var(--c-border-soft);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 18px;
 
-    box-shadow:
-      inset 0 4px 0
-        color-mix(
-          in srgb,
-          var(--c-blue-800) 78%,
-          transparent
-        );
+    box-shadow: inset 0 4px 0
+      color-mix(in srgb, var(--c-blue-800) 78%, transparent);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo::before {
+  .student-enrollment-modal .student-enrollment-photo::before {
     inset: 10px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo-header,
-  .student-enrollment-modal
-    .student-face-camera-content {
+  .student-enrollment-modal .student-enrollment-photo-header,
+  .student-enrollment-modal .student-face-camera-content {
     width: min(100%, 650px);
 
     margin-inline: auto;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     height: auto;
     min-height: 380px;
     max-height: none;
@@ -6700,18 +6102,15 @@ html[data-theme="dark"]
     aspect-ratio: 4 / 3;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-footer-copy {
+  .student-enrollment-modal .student-enrollment-footer-copy {
     display: none;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-actions {
+  .student-enrollment-modal .student-enrollment-actions {
     grid-template-columns: 1fr;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-action-group {
+  .student-enrollment-modal .student-enrollment-action-group {
     width: 100%;
 
     justify-content: flex-end;
@@ -6762,8 +6161,7 @@ html[data-theme="dark"]
     font-size: 7px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress {
+  .student-enrollment-modal .student-enrollment-progress {
     grid-template-columns:
       minmax(0, 1fr)
       18px
@@ -6774,9 +6172,7 @@ html[data-theme="dark"]
     padding: 8px 9px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div {
+  .student-enrollment-modal .student-enrollment-progress > div {
     grid-template-columns: 1fr;
 
     justify-items: center;
@@ -6784,17 +6180,11 @@ html[data-theme="dark"]
     text-align: center;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div
-    small {
+  .student-enrollment-modal .student-enrollment-progress > div small {
     display: none;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div
-    strong {
+  .student-enrollment-modal .student-enrollment-progress > div strong {
     max-width: 70px;
 
     margin-top: 3px;
@@ -6802,13 +6192,11 @@ html[data-theme="dark"]
     font-size: 5.4px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details {
+  .student-enrollment-modal .student-enrollment-details {
     padding: 14px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 14px;
 
     background:
@@ -6820,20 +6208,17 @@ html[data-theme="dark"]
       var(--c-surface);
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo-header {
+  .student-enrollment-modal .student-enrollment-photo-header {
     align-items: flex-start;
 
     flex-direction: column;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-status {
+  .student-enrollment-modal .student-face-camera-status {
     align-self: flex-start;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     min-height: 300px;
 
     border-radius: 13px;
@@ -6845,32 +6230,26 @@ html[data-theme="dark"]
       0 14px 30px rgba(2, 8, 23, 0.18);
   }
 
-  .student-enrollment-modal
-    .student-face-biometric-guide {
+  .student-enrollment-modal .student-face-biometric-guide {
     width: 154px;
     height: 202px;
   }
 
-  .student-enrollment-modal
-    .student-face-capture-tips {
+  .student-enrollment-modal .student-face-capture-tips {
     grid-template-columns: 1fr;
 
     gap: 5px;
   }
 
-  .student-enrollment-modal
-    .student-face-capture-tips
-    > span {
+  .student-enrollment-modal .student-face-capture-tips > span {
     min-height: 33px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-actions {
+  .student-enrollment-modal .student-enrollment-actions {
     padding: 9px 10px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-action-group {
+  .student-enrollment-modal .student-enrollment-action-group {
     display: grid;
 
     grid-template-columns: 1fr;
@@ -6878,14 +6257,11 @@ html[data-theme="dark"]
     gap: 6px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-action-group
-    button {
+  .student-enrollment-modal .student-enrollment-action-group button {
     width: 100%;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-submit {
+  .student-enrollment-modal .student-enrollment-submit {
     min-width: 0;
   }
 }
@@ -6920,74 +6296,59 @@ html[data-theme="dark"]
     flex-basis: 30px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress {
+  .student-enrollment-modal .student-enrollment-progress {
     padding-inline: 6px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-progress
-    > div
-    strong {
+  .student-enrollment-modal .student-enrollment-progress > div strong {
     max-width: 58px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-details,
-  .student-enrollment-modal
-    .student-enrollment-photo {
+  .student-enrollment-modal .student-enrollment-details,
+  .student-enrollment-modal .student-enrollment-photo {
     padding: 12px;
   }
 
-  .student-enrollment-modal
-    .student-enrollment-photo::before {
+  .student-enrollment-modal .student-enrollment-photo::before {
     inset: 7px;
 
     border-radius: 12px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-shell {
+  .student-enrollment-modal .student-face-camera-shell {
     min-height: 265px;
 
     border-width: 1.5px;
   }
 
-  .student-enrollment-modal
-    .student-face-biometric-guide {
+  .student-enrollment-modal .student-face-biometric-guide {
     width: 136px;
     height: 180px;
   }
 
-  .student-enrollment-modal
-    .student-face-instruction {
+  .student-enrollment-modal .student-face-instruction {
     right: 8px;
     bottom: 42px;
     left: 8px;
   }
 
-  .student-enrollment-modal
-    .student-face-camera-meta {
+  .student-enrollment-modal .student-face-camera-meta {
     right: 8px;
     bottom: 8px;
     left: 8px;
   }
 
-  .student-enrollment-modal
-    .student-face-manual-capture {
+  .student-enrollment-modal .student-face-manual-capture {
     top: 47px;
     right: 8px;
   }
 
-  .student-enrollment-modal
-    .student-face-countdown {
+  .student-enrollment-modal .student-face-countdown {
     width: 80px;
     height: 80px;
   }
 
-  .student-enrollment-modal
-    .student-face-countdown
-    span {
+  .student-enrollment-modal .student-face-countdown span {
     font-size: 35px;
   }
 }
@@ -6996,20 +6357,14 @@ html[data-theme="dark"]
    DARK MODE — CAMERA EMPHASIS
 ========================================================= */
 
-html[data-theme="dark"]
-  .student-enrollment-modal
-  .student-enrollment-photo {
+html[data-theme="dark"] .student-enrollment-modal .student-enrollment-photo {
   background:
     radial-gradient(
       circle at 50% 18%,
       rgba(59, 130, 246, 0.13),
       transparent 43%
     ),
-    linear-gradient(
-      180deg,
-      rgba(15, 23, 42, 0.86) 0%,
-      var(--c-surface) 48%
-    );
+    linear-gradient(180deg, rgba(15, 23, 42, 0.86) 0%, var(--c-surface) 48%);
 }
 
 html[data-theme="dark"]
@@ -7018,9 +6373,7 @@ html[data-theme="dark"]
   border-color: rgba(96, 165, 250, 0.14);
 }
 
-html[data-theme="dark"]
-  .student-enrollment-modal
-  .student-face-camera-shell {
+html[data-theme="dark"] .student-enrollment-modal .student-face-camera-shell {
   border-color: rgba(96, 165, 250, 0.72);
 
   outline-color: rgba(96, 165, 250, 0.15);
@@ -7053,17 +6406,12 @@ html[data-theme="dark"]
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .student-enrollment-modal
-    .student-face-camera-shell,
-  .student-enrollment-modal
-    .student-face-camera-status,
-  .student-enrollment-modal
-    .student-form-field
-    input {
+  .student-enrollment-modal .student-face-camera-shell,
+  .student-enrollment-modal .student-face-camera-status,
+  .student-enrollment-modal .student-form-field input {
     transition: none;
   }
 }
-
 
 /* =========================================================
    STUDENT FACE ENROLLMENT V7
@@ -7090,8 +6438,12 @@ html[data-theme="dark"]
   border: 1px solid rgba(42, 61, 94, 0.72);
   border-radius: 20px;
   outline: 0;
-  background:
-    radial-gradient(circle at 50% 45%, #17284a 0%, #091326 52%, #050b16 100%);
+  background: radial-gradient(
+    circle at 50% 45%,
+    #17284a 0%,
+    #091326 52%,
+    #050b16 100%
+  );
   box-shadow:
     0 28px 62px rgba(10, 26, 53, 0.2),
     inset 0 0 0 1px rgba(255, 255, 255, 0.035);
@@ -7169,14 +6521,13 @@ html[data-theme="dark"]
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(3, 8, 18, 0.44) 0%,
-      transparent 23%,
-      transparent 63%,
-      rgba(3, 8, 18, 0.78) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(3, 8, 18, 0.44) 0%,
+    transparent 23%,
+    transparent 63%,
+    rgba(3, 8, 18, 0.78) 100%
+  );
 }
 
 /* =========================================================
@@ -7534,14 +6885,13 @@ html[data-theme="dark"]
   position: absolute;
   inset: 0;
   z-index: 2;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(3, 8, 18, 0.25) 0%,
-      transparent 35%,
-      transparent 57%,
-      rgba(3, 8, 18, 0.86) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(3, 8, 18, 0.25) 0%,
+    transparent 35%,
+    transparent 57%,
+    rgba(3, 8, 18, 0.86) 100%
+  );
   pointer-events: none;
 }
 
