@@ -432,10 +432,12 @@ function SectionManagement() {
     }, [advisers]);
 
   /*
-   * One active section = one adviser.
+   * FRONTEND ADVISORY RULE:
+   * One adviser can only have one ACTIVE advisory section.
    *
-   * Advisers already assigned to another ACTIVE section
-   * are removed from the Add Section dropdown.
+   * Advisers already assigned to an ACTIVE section are
+   * removed from the Add Section dropdown. The backend is
+   * intentionally left unchanged.
    */
   const assignedActiveAdviserIds =
     useMemo(() => {
@@ -465,6 +467,9 @@ function SectionManagement() {
       activeAdvisers,
       assignedActiveAdviserIds,
     ]);
+
+  const hasAvailableAdviser =
+    availableAdvisers.length > 0;
 
   const filteredSections =
     useMemo(() => {
@@ -1300,9 +1305,7 @@ function SectionManagement() {
                   openModal
                 }
                 disabled={
-                  !advisersReady ||
-                  availableAdvisers.length ===
-                    0
+                  !advisersReady
                 }
               >
                 <span
@@ -1440,9 +1443,7 @@ function SectionManagement() {
               </p>
 
               {!search &&
-                advisersReady &&
-                availableAdvisers.length >
-                  0 && (
+                advisersReady && (
                   <button
                     type="button"
                     className="councilor-primary-button"
@@ -1733,7 +1734,7 @@ function SectionManagement() {
                     Create a new
                     academic section
                     and assign an
-                    active adviser.
+                    available adviser.
                   </p>
                 </div>
 
@@ -1805,8 +1806,7 @@ function SectionManagement() {
                     }
                     disabled={
                       creating ||
-                      availableAdvisers.length ===
-                        0
+                      !hasAvailableAdviser
                     }
                   >
                     <option value="">
@@ -1837,18 +1837,16 @@ function SectionManagement() {
                   </select>
 
                   <span className="councilor-field-hint">
-                    Only active,
-                    currently unassigned
-                    advisers can be
-                    assigned to a new
-                    section.
+                    Only active advisers
+                    without a current
+                    active advisory class
+                    can be selected.
                   </span>
                 </div>
 
                 {/* NO ACTIVE ADVISER */}
 
-                {availableAdvisers.length ===
-                  0 && (
+                {!hasAvailableAdviser && (
                   <div
                     className="councilor-modal-error"
                     role="alert"
@@ -1862,10 +1860,14 @@ function SectionManagement() {
                     <p>
                       No adviser is
                       currently available.
-                      Every active adviser
-                      may already be
-                      assigned to an
-                      active section.
+                      The current backend
+                      requires an adviser
+                      when a section is
+                      created, so another
+                      section cannot be
+                      created until an
+                      eligible adviser is
+                      available.
                     </p>
                   </div>
                 )}
@@ -1912,8 +1914,7 @@ function SectionManagement() {
                     className="councilor-primary-button"
                     disabled={
                       creating ||
-                      availableAdvisers.length ===
-                        0
+                      !hasAvailableAdviser
                     }
                   >
                     {creating && (

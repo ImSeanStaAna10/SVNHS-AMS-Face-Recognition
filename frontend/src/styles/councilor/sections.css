@@ -1189,8 +1189,8 @@ html[data-theme="dark"] .section-welcome-card {
 }
 
 /* =========================================================
-   SECTION MANAGEMENT CRUD
-   EDIT / DEACTIVATE ACTIONS
+   SECTION MANAGEMENT
+   EDIT ACTIONS
 ========================================================= */
 
 /*
@@ -1203,13 +1203,13 @@ html[data-theme="dark"] .section-welcome-card {
 }
 
 .section-directory-panel .councilor-table th:last-child {
-  width: 205px;
-  min-width: 205px;
+  width: 120px;
+  min-width: 120px;
 }
 
 .section-directory-panel .councilor-table td:last-child {
-  width: 205px;
-  min-width: 205px;
+  width: 120px;
+  min-width: 120px;
 }
 
 /*
@@ -1263,8 +1263,7 @@ html[data-theme="dark"] .section-welcome-card {
 }
 
 @media (hover: hover) {
-  .section-directory-panel
-    .councilor-table-action:hover:not(:disabled) {
+  .section-directory-panel .councilor-table-action:hover:not(:disabled) {
     transform: translateY(-1px);
 
     border-color: var(--c-blue-800);
@@ -1275,8 +1274,7 @@ html[data-theme="dark"] .section-welcome-card {
   }
 }
 
-.section-directory-panel
-  .councilor-table-action:active:not(:disabled) {
+.section-directory-panel .councilor-table-action:active:not(:disabled) {
   transform: translateY(0);
 }
 
@@ -1286,42 +1284,6 @@ html[data-theme="dark"] .section-welcome-card {
   border-color: var(--c-blue-800);
 
   box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.11);
-}
-
-/* =========================================================
-   DEACTIVATE ACTION
-========================================================= */
-
-/*
- * The last action is the destructive-looking Deactivate
- * control. The backend still performs a soft deactivation.
- */
-.section-directory-panel
-  .councilor-table
-  td:last-child
-  > div
-  > .councilor-table-action:last-child:not(:disabled) {
-  border-color: rgba(185, 28, 28, 0.22);
-
-  background: rgba(185, 28, 28, 0.055);
-
-  color: #b42318;
-}
-
-@media (hover: hover) {
-  .section-directory-panel
-    .councilor-table
-    td:last-child
-    > div
-    > .councilor-table-action:last-child:hover:not(:disabled) {
-    border-color: rgba(185, 28, 28, 0.38);
-
-    background: rgba(185, 28, 28, 0.1);
-
-    color: #991b1b;
-
-    box-shadow: 0 5px 14px rgba(185, 28, 28, 0.08);
-  }
 }
 
 /* =========================================================
@@ -1352,11 +1314,7 @@ html[data-theme="dark"] .section-welcome-card {
   .councilor-table
   tbody
   tr:has(.councilor-status.inactive) {
-  background: color-mix(
-    in srgb,
-    var(--c-surface-soft) 68%,
-    transparent
-  );
+  background: color-mix(in srgb, var(--c-surface-soft) 68%, transparent);
 }
 
 .section-directory-panel
@@ -1370,7 +1328,7 @@ html[data-theme="dark"] .section-welcome-card {
 }
 
 /* =========================================================
-   CREATE / EDIT / DEACTIVATE MODALS
+   CREATE / EDIT MODALS
 ========================================================= */
 
 .section-management-page .councilor-modal {
@@ -1387,12 +1345,9 @@ html[data-theme="dark"] .section-welcome-card {
 }
 
 /*
- * Student/history preservation warning used in the
- * Deactivate Section confirmation.
+ * Reusable warning treatment inside section modals.
  */
-.section-management-page
-  .councilor-modal
-  .section-data-warning {
+.section-management-page .councilor-modal .section-data-warning {
   margin: 0;
 
   border-color: rgba(185, 28, 28, 0.2);
@@ -1400,24 +1355,15 @@ html[data-theme="dark"] .section-welcome-card {
   background: rgba(185, 28, 28, 0.05);
 }
 
-.section-management-page
-  .councilor-modal
-  .section-data-warning
-  > span {
+.section-management-page .councilor-modal .section-data-warning > span {
   background: var(--c-red-600);
 }
 
-.section-management-page
-  .councilor-modal
-  .section-data-warning
-  strong {
+.section-management-page .councilor-modal .section-data-warning strong {
   color: var(--c-text-primary);
 }
 
-.section-management-page
-  .councilor-modal
-  .section-data-warning
-  p {
+.section-management-page .councilor-modal .section-data-warning p {
   color: var(--c-text-muted);
 }
 
@@ -1426,12 +1372,9 @@ html[data-theme="dark"] .section-welcome-card {
 ========================================================= */
 
 /*
- * The deactivate confirmation reuses councilor-person.
- * These rules keep the summary card balanced inside a modal.
+ * Keeps any councilor-person summary balanced inside a modal.
  */
-.section-management-page
-  .councilor-modal-form
-  > .councilor-person {
+.section-management-page .councilor-modal-form > .councilor-person {
   width: 100%;
 
   min-width: 0;
@@ -1444,10 +1387,7 @@ html[data-theme="dark"] .section-welcome-card {
   min-width: 0;
 }
 
-.section-management-page
-  .councilor-modal-form
-  > .councilor-person
-  strong {
+.section-management-page .councilor-modal-form > .councilor-person strong {
   overflow: hidden;
 
   text-overflow: ellipsis;
@@ -1458,34 +1398,6 @@ html[data-theme="dark"] .section-welcome-card {
 /* =========================================================
    DARK MODE — CRUD
 ========================================================= */
-
-html[data-theme="dark"]
-  .section-directory-panel
-  .councilor-table
-  td:last-child
-  > div
-  > .councilor-table-action:last-child:not(:disabled) {
-  border-color: rgba(248, 113, 113, 0.24);
-
-  background: rgba(127, 29, 29, 0.18);
-
-  color: #fca5a5;
-}
-
-@media (hover: hover) {
-  html[data-theme="dark"]
-    .section-directory-panel
-    .councilor-table
-    td:last-child
-    > div
-    > .councilor-table-action:last-child:hover:not(:disabled) {
-    border-color: rgba(248, 113, 113, 0.42);
-
-    background: rgba(127, 29, 29, 0.3);
-
-    color: #fecaca;
-  }
-}
 
 html[data-theme="dark"]
   .section-management-page
@@ -1507,8 +1419,8 @@ html[data-theme="dark"]
 
   .section-directory-panel .councilor-table th:last-child,
   .section-directory-panel .councilor-table td:last-child {
-    width: 195px;
-    min-width: 195px;
+    width: 115px;
+    min-width: 115px;
   }
 }
 
@@ -1523,8 +1435,8 @@ html[data-theme="dark"]
 
   .section-directory-panel .councilor-table th:last-child,
   .section-directory-panel .councilor-table td:last-child {
-    width: 185px;
-    min-width: 185px;
+    width: 110px;
+    min-width: 110px;
   }
 
   .section-directory-panel .councilor-table-action {
@@ -1559,10 +1471,8 @@ html[data-theme="dark"]
     transition: none;
   }
 
-  .section-directory-panel
-    .councilor-table-action:hover:not(:disabled),
-  .section-directory-panel
-    .councilor-table-action:active:not(:disabled) {
+  .section-directory-panel .councilor-table-action:hover:not(:disabled),
+  .section-directory-panel .councilor-table-action:active:not(:disabled) {
     transform: none;
   }
 }
