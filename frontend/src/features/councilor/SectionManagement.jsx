@@ -1858,16 +1858,7 @@ function SectionManagement() {
                     </span>
 
                     <p>
-                      No adviser is
-                      currently available.
-                      The current backend
-                      requires an adviser
-                      when a section is
-                      created, so another
-                      section cannot be
-                      created until an
-                      eligible adviser is
-                      available.
+                     All active advisers already have an advisory class. Please add another adviser before creating a new section.
                     </p>
                   </div>
                 )}
