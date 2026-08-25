@@ -1059,7 +1059,7 @@
       border-color 0.18s ease;
   }
 
-  .council-layout
+  .councilor-layout
     .councilor-mobile-sidebar-close:hover {
     background:
       var(--c-nav-hover-bg);
@@ -1974,5 +1974,870 @@
   .adviser-layout
     .adviser-mobile-sidebar-backdrop {
     animation: none;
+  }
+}
+
+
+/* =========================================================
+   COUNCILOR PORTAL LAYOUT V2 — PRODUCTION SHELL
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Goals:
+   - Match the enlarged Adviser/Councilor feature pages
+   - Stronger sidebar/topbar hierarchy
+   - More readable navigation
+   - Cleaner responsive mobile drawer
+   - Use the new production design tokens
+   - Preserve existing layout/sidebar behavior
+========================================================= */
+
+/* =========================================================
+   ROOT LAYOUT
+========================================================= */
+
+.councilor-page,
+.councilor-layout {
+  background:
+    var(
+      --c-page-gradient,
+      linear-gradient(
+        145deg,
+        var(--c-page-start),
+        var(--c-page-end)
+      )
+    );
+}
+
+/* =========================================================
+   SIDEBAR — DESKTOP
+========================================================= */
+
+.councilor-sidebar {
+  width: 278px;
+
+  flex-basis: 278px;
+
+  border-right:
+    1px
+    solid
+    var(--c-border-soft);
+
+  scrollbar-width: thin;
+  scrollbar-color:
+    var(--c-scrollbar-thumb, rgba(75, 94, 122, 0.25))
+    transparent;
+}
+
+.councilor-sidebar::-webkit-scrollbar {
+  width: 7px;
+}
+
+.councilor-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.councilor-sidebar::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+
+  background:
+    var(--c-scrollbar-thumb, rgba(75, 94, 122, 0.25));
+}
+
+.councilor-sidebar::-webkit-scrollbar-thumb:hover {
+  background:
+    var(--c-scrollbar-thumb-hover, rgba(75, 94, 122, 0.4));
+}
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.councilor-brand {
+  min-height: 102px;
+
+  gap: 14px;
+
+  padding:
+    20px
+    21px;
+}
+
+.councilor-brand-logo {
+  width: 54px;
+  height: 54px;
+
+  flex-basis: 54px;
+
+  padding: 5px;
+
+  border-radius: 50%;
+
+  box-shadow:
+    var(
+      --c-shadow-sm,
+      0 4px 12px rgba(7, 27, 66, 0.05)
+    );
+}
+
+.councilor-brand strong,
+.councilor-brand-copy strong {
+  font-size: 17px;
+
+  letter-spacing: 0.025em;
+}
+
+.councilor-brand > div:last-child > span,
+.councilor-brand-copy span {
+  max-width: 172px;
+
+  margin-top: 5px;
+
+  font-size: 10px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   NAVIGATION LABEL
+========================================================= */
+
+.councilor-nav-label {
+  padding:
+    24px
+    25px
+    9px;
+
+  font-size: 9px;
+
+  letter-spacing: 0.14em;
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.councilor-nav {
+  gap: 6px;
+
+  padding:
+    5px
+    14px
+    24px;
+}
+
+.councilor-nav-item {
+  min-height: 48px;
+
+  gap: 12px;
+
+  padding:
+    11px
+    14px;
+
+  border-radius:
+    var(--c-radius-md, 10px);
+
+  font-size: 13px;
+  font-weight: 680;
+
+  transition:
+    color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .councilor-nav-item:hover:not(:disabled) {
+    transform:
+      translateX(2px);
+  }
+}
+
+.councilor-nav-item.active {
+  border:
+    1px
+    solid
+    var(--c-nav-active-border, var(--c-brand-border));
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255, 255, 255, 0.16);
+}
+
+.councilor-nav-item.active::before {
+  top: 8px;
+  bottom: 8px;
+
+  width: 4px;
+}
+
+.councilor-nav-icon,
+.councilor-nav-item > span:first-child {
+  width: 24px;
+  height: 24px;
+
+  flex-basis: 24px;
+
+  font-size: 17px;
+}
+
+.councilor-nav-item small {
+  padding:
+    4px
+    6px;
+
+  border-radius:
+    var(--c-radius-xs, 6px);
+
+  font-size: 7px;
+}
+
+/* =========================================================
+   SIDEBAR FOOTER
+========================================================= */
+
+.councilor-sidebar-footer {
+  padding:
+    16px
+    14px
+    18px;
+}
+
+.councilor-sidebar-school {
+  margin:
+    0
+    8px
+    15px;
+}
+
+.councilor-sidebar-school span {
+  font-size: 8px;
+}
+
+.councilor-sidebar-school strong {
+  margin-top: 5px;
+
+  font-size: 9px;
+
+  line-height: 1.5;
+}
+
+.councilor-logout {
+  min-height: 46px;
+
+  gap: 12px;
+
+  padding:
+    11px
+    14px;
+
+  border-radius:
+    var(--c-radius-md, 10px);
+
+  font-size: 13px;
+}
+
+@media (hover: hover) {
+  .councilor-logout:hover {
+    transform:
+      translateX(2px);
+  }
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.councilor-header,
+.councilor-topbar {
+  min-height: 102px;
+
+  gap: 32px;
+
+  padding:
+    19px
+    36px;
+
+  backdrop-filter:
+    blur(12px);
+
+  -webkit-backdrop-filter:
+    blur(12px);
+}
+
+.councilor-topbar {
+  z-index:
+    var(--c-z-header, 600);
+}
+
+.councilor-eyebrow {
+  margin-bottom: 5px;
+
+  font-size: 9px;
+
+  letter-spacing: 0.15em;
+}
+
+.councilor-header h1,
+.councilor-topbar h1 {
+  font-size:
+    clamp(
+      23px,
+      2vw,
+      28px
+    );
+
+  letter-spacing:
+    -0.025em;
+}
+
+.councilor-header p,
+.councilor-topbar p {
+  margin-top: 6px;
+
+  font-size: 11px;
+
+  line-height: 1.45;
+}
+
+.councilor-header-actions,
+.councilor-topbar-actions {
+  gap: 19px;
+}
+
+/* =========================================================
+   TOPBAR LOGOS
+========================================================= */
+
+.councilor-header-logos,
+.councilor-topbar-logos {
+  gap: 8px;
+}
+
+.councilor-header-logos img,
+.councilor-topbar-logos img {
+  width: 34px;
+  height: 34px;
+
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    opacity var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .councilor-header-logos img:hover,
+  .councilor-topbar-logos img:hover {
+    transform:
+      translateY(-2px);
+
+    opacity: 1;
+  }
+}
+
+.councilor-header-divider,
+.councilor-topbar-divider {
+  height: 42px;
+}
+
+/* =========================================================
+   USER
+========================================================= */
+
+.councilor-user {
+  gap: 12px;
+}
+
+.councilor-avatar {
+  width: 45px;
+  height: 45px;
+
+  flex-basis: 45px;
+
+  font-size: 15px;
+
+  box-shadow:
+    0 5px 14px
+    rgba(197, 31, 45, 0.16);
+}
+
+.councilor-user strong {
+  max-width: 200px;
+
+  font-size: 13px;
+}
+
+.councilor-user span {
+  margin-top: 3px;
+
+  font-size: 9px;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.councilor-content {
+  max-width: 1520px;
+
+  padding:
+    32px
+    36px
+    52px;
+}
+
+/* =========================================================
+   SUBTLE SHELL ANIMATION
+========================================================= */
+
+.councilor-brand {
+  animation:
+    councilor-shell-brand-enter
+    0.45s
+    var(--c-ease-enter, ease-out)
+    both;
+}
+
+.councilor-topbar-copy,
+.councilor-header-copy {
+  animation:
+    councilor-shell-topbar-enter
+    0.42s
+    0.04s
+    var(--c-ease-enter, ease-out)
+    both;
+}
+
+.councilor-user {
+  animation:
+    councilor-shell-user-enter
+    0.42s
+    0.08s
+    var(--c-ease-enter, ease-out)
+    both;
+}
+
+@keyframes councilor-shell-brand-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes councilor-shell-topbar-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes councilor-shell-user-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 920px) {
+  .councilor-sidebar {
+    width: 230px;
+
+    flex-basis: 230px;
+  }
+
+  .councilor-brand {
+    padding-inline: 17px;
+  }
+
+  .councilor-brand-logo {
+    width: 48px;
+    height: 48px;
+
+    flex-basis: 48px;
+  }
+
+  .councilor-header,
+  .councilor-topbar,
+  .councilor-content {
+    padding-right: 25px;
+    padding-left: 25px;
+  }
+}
+
+/* =========================================================
+   MOBILE DRAWER — PRODUCTION POLISH
+========================================================= */
+
+@media (max-width: 720px) {
+  .councilor-layout
+  .councilor-sidebar {
+    z-index:
+      var(--c-z-modal, 1200);
+
+    width:
+      min(
+        320px,
+        88vw
+      );
+
+    box-shadow:
+      18px
+      0
+      52px
+      rgba(5, 20, 50, 0.28);
+  }
+
+  .councilor-layout
+  .councilor-mobile-backdrop {
+    z-index:
+      calc(
+        var(--c-z-modal, 1200) -
+        10
+      );
+
+    background:
+      rgba(
+        3,
+        12,
+        29,
+        0.54
+      );
+
+    backdrop-filter:
+      blur(3px);
+
+    -webkit-backdrop-filter:
+      blur(3px);
+  }
+
+  .councilor-layout
+  .councilor-brand {
+    min-height: 86px;
+
+    padding:
+      16px
+      14px
+      16px
+      18px;
+  }
+
+  .councilor-layout
+  .councilor-brand-logo {
+    width: 46px;
+    height: 46px;
+
+    flex-basis: 46px;
+  }
+
+  .councilor-layout
+  .councilor-brand-copy strong {
+    font-size: 16px;
+  }
+
+  .councilor-layout
+  .councilor-brand-copy span {
+    font-size: 9px;
+  }
+
+  .councilor-layout
+  .councilor-mobile-sidebar-close {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+
+    border-radius:
+      var(--c-radius-md, 10px);
+  }
+
+  .councilor-layout
+  .councilor-nav-label {
+    padding:
+      21px
+      22px
+      9px;
+
+    font-size: 9px;
+  }
+
+  .councilor-layout
+  .councilor-nav {
+    gap: 6px;
+
+    padding:
+      5px
+      14px
+      24px;
+  }
+
+  .councilor-layout
+  .councilor-nav-item {
+    min-height: 48px;
+
+    padding:
+      11px
+      14px;
+
+    font-size: 13px;
+  }
+
+  .councilor-layout
+  .councilor-topbar {
+    min-height: 78px;
+
+    padding:
+      14px
+      18px;
+  }
+
+  .councilor-layout
+  .councilor-mobile-menu-button {
+    width: 42px;
+    height: 42px;
+
+    flex-basis: 42px;
+
+    border-color:
+      var(--c-border);
+
+    border-radius:
+      var(--c-radius-md, 10px);
+
+    background:
+      var(--c-surface);
+
+    box-shadow:
+      var(
+        --c-shadow-sm,
+        0 4px 12px rgba(7, 27, 66, 0.05)
+      );
+  }
+
+  @media (hover: hover) {
+    .councilor-layout
+    .councilor-mobile-menu-button:hover {
+      border-color:
+        var(--c-focus-color);
+
+      background:
+        var(--c-nav-hover-bg);
+    }
+  }
+
+  .councilor-layout
+  .councilor-topbar-copy h1 {
+    font-size: 21px;
+  }
+
+  .councilor-layout
+  .councilor-eyebrow {
+    font-size: 8px;
+  }
+
+  .councilor-content {
+    padding:
+      21px
+      17px
+      37px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 520px) {
+  .councilor-layout
+  .councilor-topbar {
+    min-height: 74px;
+
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .councilor-layout
+  .councilor-mobile-menu-button {
+    width: 40px;
+    height: 40px;
+
+    flex-basis: 40px;
+  }
+
+  .councilor-layout
+  .councilor-avatar {
+    width: 40px;
+    height: 40px;
+
+    flex-basis: 40px;
+  }
+
+  .councilor-layout
+  .councilor-topbar-copy h1 {
+    font-size: 19px;
+  }
+
+  .councilor-content {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .councilor-layout
+  .councilor-topbar-copy h1 {
+    max-width: 132px;
+
+    font-size: 18px;
+  }
+
+  .councilor-layout
+  .councilor-mobile-menu-button {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+}
+
+/* =========================================================
+   ADVISER DRAWER — KEEP VISUAL PARITY
+   Only styling consistency; Adviser behavior stays intact.
+========================================================= */
+
+@media (max-width: 720px) {
+  .adviser-layout
+  .adviser-sidebar {
+    width:
+      min(
+        320px,
+        88vw
+      );
+
+    box-shadow:
+      18px
+      0
+      52px
+      rgba(5, 20, 50, 0.28);
+  }
+
+  .adviser-layout
+  .adviser-mobile-sidebar-backdrop {
+    background:
+      rgba(
+        3,
+        12,
+        29,
+        0.54
+      );
+
+    backdrop-filter:
+      blur(3px);
+
+    -webkit-backdrop-filter:
+      blur(3px);
+  }
+
+  .adviser-layout
+  .adviser-mobile-menu-button {
+    width: 42px;
+    height: 42px;
+
+    flex-basis: 42px;
+
+    border-color:
+      var(--c-border);
+
+    background:
+      var(--c-surface);
+
+    box-shadow:
+      var(
+        --c-shadow-sm,
+        0 4px 12px rgba(7, 27, 66, 0.05)
+      );
+  }
+}
+
+/* =========================================================
+   DARK MODE SHELL POLISH
+========================================================= */
+
+html[data-theme="dark"]
+.councilor-sidebar {
+  border-right-color:
+    var(--c-border-soft);
+}
+
+html[data-theme="dark"]
+.councilor-nav-item.active {
+  border-color:
+    var(--c-nav-active-border);
+}
+
+html[data-theme="dark"]
+.councilor-avatar {
+  border-color:
+    rgba(248, 113, 113, 0.18);
+}
+
+html[data-theme="dark"]
+.councilor-mobile-menu-button,
+html[data-theme="dark"]
+.councilor-mobile-sidebar-close {
+  box-shadow:
+    0 5px 16px
+    rgba(0, 0, 0, 0.18);
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .councilor-brand,
+  .councilor-topbar-copy,
+  .councilor-header-copy,
+  .councilor-user {
+    animation: none !important;
+  }
+
+  .councilor-nav-item:hover:not(:disabled),
+  .councilor-logout:hover {
+    transform: none !important;
   }
 }

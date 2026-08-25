@@ -1620,3 +1620,1143 @@ html[data-theme="dark"] .section-edit-assignment-lock {
     justify-self: start;
   }
 }
+
+/* =========================================================
+   COUNCILOR SECTION MANAGEMENT V2 — READABLE + SEMANTIC UI
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Goals:
+   - Larger / easier-to-read typography
+   - Same visual language as Adviser + Councilor pages
+   - Semantic section/assignment colors
+   - Cleaner directory + table hierarchy
+   - Better floating Create/Edit modals
+   - Clearer locked adviser assignment
+   - Subtle production animation
+   - Existing functionality preserved
+========================================================= */
+
+/* =========================================================
+   PAGE RHYTHM
+========================================================= */
+
+.section-management-page {
+  gap: 22px;
+}
+
+/* =========================================================
+   OVERVIEW
+========================================================= */
+
+.section-management-overview {
+  gap: 18px;
+
+  grid-template-columns:
+    minmax(0, 1.72fr)
+    minmax(310px, 0.75fr);
+}
+
+/* =========================================================
+   HERO — LARGER / READABLE
+========================================================= */
+
+.section-welcome-card {
+  min-height: 250px;
+
+  gap: 40px;
+
+  padding: 42px 44px;
+
+  border-radius: 19px;
+}
+
+.section-welcome-content {
+  max-width: 700px;
+}
+
+.section-welcome-content > span {
+  gap: 9px;
+
+  font-size: 10px;
+
+  letter-spacing: 0.16em;
+}
+
+.section-welcome-content > span::before {
+  width: 27px;
+}
+
+.section-welcome-content h2 {
+  max-width: 620px;
+
+  margin-top: 13px;
+
+  font-size: clamp(31px, 2.9vw, 39px);
+
+  line-height: 1.1;
+}
+
+.section-welcome-content p {
+  max-width: 640px;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+}
+
+.section-welcome-meta {
+  gap: 10px;
+
+  margin-top: 21px;
+
+  font-size: 9px;
+}
+
+.section-welcome-badge {
+  width: 120px;
+  height: 120px;
+
+  flex-basis: 120px;
+
+  padding: 15px;
+}
+
+/* =========================================================
+   METRICS — LARGER
+========================================================= */
+
+.section-management-metrics {
+  gap: 12px;
+}
+
+.section-management-metric {
+  grid-template-columns:
+    48px
+    minmax(0, 1fr)
+    auto;
+
+  gap: 14px;
+
+  min-height: 72px;
+
+  padding: 16px 18px;
+
+  border-radius: 14px;
+}
+
+.section-management-metric::before {
+  top: 14px;
+  bottom: 14px;
+
+  width: 4px;
+}
+
+.section-management-metric-icon {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 12px;
+
+  font-size: 17px;
+}
+
+.section-management-metric-copy > span {
+  margin-bottom: 5px;
+
+  font-size: 8px;
+}
+
+.section-management-metric-copy p {
+  font-size: 12px;
+}
+
+.section-management-metric-copy small {
+  margin-top: 4px;
+
+  font-size: 9px;
+}
+
+.section-management-metric > strong {
+  min-width: 42px;
+
+  font-size: 31px;
+}
+
+/* =========================================================
+   METRIC SEMANTIC COLORS
+========================================================= */
+
+/* TOTAL SECTIONS — BLUE */
+.section-management-metric:not(.is-assigned):not(.is-adviser) {
+  border-color: #c9dcf4;
+
+  background: linear-gradient(
+    90deg,
+    rgba(239, 246, 255, 0.88),
+    var(--c-surface) 64%
+  );
+}
+
+.section-management-metric:not(.is-assigned):not(.is-adviser)
+  .section-management-metric-icon {
+  background: #dbeafe;
+
+  color: #1d4ed8;
+}
+
+/* ASSIGNED — GREEN */
+.section-management-metric.is-assigned {
+  border-color: #c7e7d0;
+
+  background: linear-gradient(
+    90deg,
+    rgba(240, 253, 244, 0.9),
+    var(--c-surface) 64%
+  );
+}
+
+.section-management-metric.is-assigned .section-management-metric-icon {
+  background: #dcfce7;
+
+  color: #15803d;
+}
+
+/* ADVISER / MANAGEMENT — VIOLET */
+.section-management-metric.is-adviser {
+  border-color: #ddd6fe;
+
+  background: linear-gradient(
+    90deg,
+    rgba(245, 243, 255, 0.92),
+    var(--c-surface) 64%
+  );
+}
+
+.section-management-metric.is-adviser::before {
+  background: #7c3aed;
+}
+
+.section-management-metric.is-adviser .section-management-metric-icon {
+  background: #ede9fe;
+
+  color: #6d28d9;
+}
+
+/* =========================================================
+   ASSIGNMENT HEALTH — LARGER
+========================================================= */
+
+.section-assignment-health {
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    minmax(220px, 0.48fr);
+
+  gap: 18px;
+
+  padding: 17px 20px;
+
+  border-radius: 14px;
+}
+
+.section-assignment-health-icon {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 11px;
+
+  font-size: 14px;
+}
+
+.section-assignment-health-copy > span {
+  font-size: 8px;
+}
+
+.section-assignment-health-copy strong {
+  margin-top: 5px;
+
+  font-size: 12px;
+}
+
+.section-assignment-health-copy p {
+  margin-top: 5px;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+.section-assignment-health-progress-top {
+  font-size: 9px;
+}
+
+.section-assignment-health-progress-top strong {
+  font-size: 10px;
+}
+
+.section-assignment-progress-track {
+  height: 7px;
+
+  margin-top: 8px;
+}
+
+/* semantic warning/complete states */
+
+.section-assignment-health.has-warning {
+  border-color: #f1deab;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 251, 235, 0.9),
+    var(--c-surface) 70%
+  );
+}
+
+.section-assignment-health.is-complete {
+  border-color: #c7e7d0;
+
+  background: linear-gradient(
+    90deg,
+    rgba(240, 253, 244, 0.9),
+    var(--c-surface) 70%
+  );
+}
+
+/* =========================================================
+   DATA WARNING
+========================================================= */
+
+.section-data-warning {
+  gap: 12px;
+
+  padding: 14px 16px;
+
+  border-radius: 12px;
+}
+
+.section-data-warning > span {
+  width: 27px;
+  height: 27px;
+
+  flex-basis: 27px;
+
+  font-size: 11px;
+}
+
+.section-data-warning strong {
+  font-size: 11px;
+}
+
+.section-data-warning p {
+  margin-top: 4px;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   DIRECTORY PANEL
+========================================================= */
+
+.section-directory-panel {
+  border-radius: 16px;
+}
+
+.section-directory-panel .councilor-panel-header {
+  min-height: 104px;
+
+  padding: 24px 27px;
+
+  background: linear-gradient(
+    90deg,
+    rgba(239, 246, 255, 0.72),
+    transparent 70%
+  );
+}
+
+.section-directory-panel .councilor-panel-header h2 {
+  margin-top: 6px;
+
+  font-size: 21px;
+}
+
+.section-directory-panel .councilor-panel-header p {
+  margin-top: 6px;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   DIRECTORY TOOLBAR
+========================================================= */
+
+.section-directory-panel .councilor-toolbar {
+  min-height: 74px;
+
+  gap: 12px;
+
+  padding: 14px 27px;
+}
+
+.section-directory-panel .councilor-search {
+  width: min(500px, 100%);
+}
+
+.section-directory-panel .councilor-search input {
+  height: 46px;
+
+  padding-inline: 14px;
+
+  border-radius: 10px;
+
+  font-size: 13px;
+}
+
+.section-directory-summary {
+  gap: 8px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   TABLE — READABLE
+========================================================= */
+
+.section-directory-panel .councilor-table {
+  min-width: 1040px;
+}
+
+.section-directory-panel .councilor-table th {
+  padding: 15px 27px;
+
+  font-size: 10px;
+}
+
+.section-directory-panel .councilor-table td {
+  padding: 17px 27px;
+
+  font-size: 11px;
+}
+
+/* Shared person treatment */
+.section-directory-panel .councilor-person-avatar {
+  width: 40px;
+  height: 40px;
+
+  border-radius: 10px;
+
+  background: #e8f1ff;
+  color: #1d4ed8;
+
+  font-size: 13px;
+}
+
+.section-directory-panel .councilor-person strong {
+  font-size: 12px;
+}
+
+.section-directory-panel .councilor-person small,
+.section-directory-panel .councilor-person span {
+  font-size: 9px;
+}
+
+/* =========================================================
+   ASSIGNMENT LABELS
+========================================================= */
+
+.section-unassigned {
+  min-height: 31px;
+
+  padding: 5px 10px;
+
+  border-color: #f1deab;
+
+  border-radius: 7px;
+
+  background: #fffaf0;
+
+  color: #9a6700;
+
+  font-size: 9px;
+}
+
+.section-assignment-status {
+  gap: 7px;
+
+  font-size: 9px;
+}
+
+.section-assignment-status > span {
+  width: 7px;
+  height: 7px;
+}
+
+/* =========================================================
+   ACTION COLUMN
+========================================================= */
+
+.section-directory-panel .councilor-table th:last-child,
+.section-directory-panel .councilor-table td:last-child {
+  width: 140px;
+  min-width: 140px;
+}
+
+.section-directory-panel .councilor-table td:last-child > div {
+  gap: 8px;
+}
+
+/* =========================================================
+   TABLE ACTION BUTTONS
+========================================================= */
+
+.section-directory-panel .councilor-table-action {
+  min-height: 36px;
+
+  padding: 0 12px;
+
+  border-color: #bfdbfe;
+
+  border-radius: 9px;
+
+  background: #eff6ff;
+
+  color: #1d4ed8;
+
+  font-size: 9px;
+}
+
+@media (hover: hover) {
+  .section-directory-panel .councilor-table-action:hover:not(:disabled) {
+    border-color: #93c5fd;
+
+    background: #dbeafe;
+
+    color: #1e40af;
+
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.09);
+  }
+}
+
+/* =========================================================
+   INACTIVE ROW
+========================================================= */
+
+.section-directory-panel
+  .councilor-table
+  tbody
+  tr:has(.councilor-status.inactive) {
+  background: color-mix(in srgb, var(--c-surface-soft) 78%, transparent);
+}
+
+.section-directory-panel
+  .councilor-table
+  tbody
+  tr:has(.councilor-status.inactive)
+  .councilor-person-avatar {
+  background: #eef2f6;
+
+  color: #64748b;
+
+  filter: grayscale(0.22);
+
+  opacity: 0.82;
+}
+
+/* =========================================================
+   CREATE / EDIT MODALS — FLOAT SAFETY
+========================================================= */
+
+.section-management-page .councilor-modal-backdrop {
+  padding: 16px;
+
+  overflow: hidden;
+}
+
+.section-management-page .councilor-modal {
+  width: min(100%, 580px);
+
+  max-height: calc(100dvh - 32px);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+.section-management-page .councilor-modal .councilor-modal-header {
+  flex: 0 0 auto;
+
+  padding: 19px 20px;
+}
+
+.section-management-page .councilor-modal .councilor-modal-header h2 {
+  font-size: 20px;
+}
+
+.section-management-page .councilor-modal .councilor-modal-header p {
+  font-size: 11px;
+
+  line-height: 1.45;
+}
+
+.section-management-page .councilor-modal-form {
+  min-height: 0;
+
+  flex: 1 1 auto;
+
+  gap: 14px;
+
+  padding: 17px 20px 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  overscroll-behavior: contain;
+}
+
+.section-management-page .councilor-modal-field {
+  gap: 6px;
+}
+
+.section-management-page .councilor-modal-field label {
+  font-size: 11px;
+}
+
+.section-management-page .councilor-modal-field input,
+.section-management-page .councilor-modal-field select {
+  min-height: 44px;
+
+  border-radius: 9px;
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   LOCKED ADVISER ASSIGNMENT — CLEARER
+========================================================= */
+
+.section-edit-field-label {
+  font-size: 10px;
+}
+
+.section-edit-assignment-lock {
+  min-height: 68px;
+
+  gap: 12px;
+
+  padding: 12px 13px;
+
+  border-color: #d8cffa;
+
+  border-radius: 11px;
+
+  background: linear-gradient(
+    90deg,
+    rgba(245, 243, 255, 0.92),
+    var(--c-surface-soft)
+  );
+}
+
+.section-edit-assignment-avatar {
+  width: 40px;
+  height: 40px;
+
+  flex-basis: 40px;
+
+  border-color: #ddd6fe;
+
+  border-radius: 10px;
+
+  background: #ede9fe;
+
+  color: #6d28d9;
+
+  font-size: 12px;
+}
+
+.section-edit-assignment-copy strong {
+  font-size: 11px;
+}
+
+.section-edit-assignment-copy span {
+  margin-top: 4px;
+
+  font-size: 9px;
+}
+
+.section-edit-lock-badge {
+  min-height: 27px;
+
+  padding-inline: 9px;
+
+  border-color: #ddd6fe;
+
+  background: #f5f3ff;
+
+  color: #6d28d9;
+
+  font-size: 8px;
+}
+
+/* =========================================================
+   MODAL WARNING
+========================================================= */
+
+.section-management-page .councilor-modal .section-data-warning {
+  padding: 13px 14px;
+}
+
+/* =========================================================
+   MODAL ACTIONS — STICKY
+========================================================= */
+
+.section-management-page .councilor-modal .councilor-modal-actions {
+  position: sticky;
+  bottom: 0;
+
+  z-index: 4;
+
+  flex: 0 0 auto;
+
+  margin: 3px -20px 0;
+
+  padding: 12px 20px 15px;
+
+  border-top: 1px solid var(--c-border-soft);
+
+  background: color-mix(in srgb, var(--c-surface) 96%, transparent);
+
+  backdrop-filter: blur(10px);
+}
+
+.section-management-page .councilor-modal .councilor-modal-actions button {
+  min-height: 40px;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   SUBTLE ANIMATION
+========================================================= */
+
+.section-welcome-card {
+  animation: section-management-hero-enter 0.55s cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+.section-welcome-badge {
+  animation: section-management-badge-enter 0.58s 0.08s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.section-management-metric {
+  animation: section-management-card-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+.section-management-metric:nth-child(1) {
+  animation-delay: 0.06s;
+}
+
+.section-management-metric:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.section-management-metric:nth-child(3) {
+  animation-delay: 0.14s;
+}
+
+.section-assignment-health {
+  animation: section-management-card-enter 0.44s 0.15s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.section-directory-panel {
+  animation: section-management-directory-enter 0.48s 0.18s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.section-assignment-progress-track > div {
+  animation: section-management-progress-enter 0.7s 0.15s ease-out both;
+}
+
+@keyframes section-management-hero-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes section-management-badge-enter {
+  from {
+    opacity: 0;
+
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+@keyframes section-management-card-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes section-management-directory-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes section-management-progress-enter {
+  from {
+    transform: scaleX(0);
+
+    transform-origin: left center;
+  }
+
+  to {
+    transform: scaleX(1);
+
+    transform-origin: left center;
+  }
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"]
+  .section-management-metric:not(.is-assigned):not(.is-adviser),
+html[data-theme="dark"] .section-management-metric.is-assigned,
+html[data-theme="dark"] .section-management-metric.is-adviser {
+  border-color: #293b52;
+
+  background: var(--c-surface);
+}
+
+html[data-theme="dark"] .section-assignment-health.has-warning,
+html[data-theme="dark"] .section-assignment-health.is-complete {
+  border-color: #304158;
+
+  background: var(--c-surface);
+}
+
+html[data-theme="dark"] .section-directory-panel .councilor-panel-header {
+  background: linear-gradient(90deg, rgba(30, 64, 175, 0.14), transparent);
+}
+
+html[data-theme="dark"] .section-unassigned {
+  border-color: rgba(250, 204, 21, 0.22);
+
+  background: rgba(113, 63, 18, 0.2);
+
+  color: #fde68a;
+}
+
+html[data-theme="dark"]
+  .section-directory-panel
+  .councilor-table-action:not(:disabled) {
+  border-color: rgba(96, 165, 250, 0.28);
+
+  background: rgba(30, 64, 175, 0.18);
+
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .section-edit-assignment-lock {
+  border-color: rgba(196, 181, 253, 0.2);
+
+  background: rgba(109, 40, 217, 0.12);
+}
+
+html[data-theme="dark"] .section-edit-assignment-avatar {
+  border-color: rgba(196, 181, 253, 0.24);
+
+  background: rgba(109, 40, 217, 0.18);
+
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"] .section-edit-lock-badge {
+  border-color: rgba(196, 181, 253, 0.24);
+
+  background: rgba(109, 40, 217, 0.18);
+
+  color: #c4b5fd;
+}
+
+/* =========================================================
+   RESPONSIVE — MEDIUM
+========================================================= */
+
+@media (max-width: 1180px) {
+  .section-management-overview {
+    grid-template-columns:
+      minmax(0, 1.5fr)
+      minmax(290px, 0.72fr);
+  }
+
+  .section-welcome-card {
+    padding: 37px 38px;
+  }
+
+  .section-welcome-badge {
+    width: 104px;
+    height: 104px;
+
+    flex-basis: 104px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 1040px) {
+  .section-management-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .section-management-metrics {
+    gap: 10px;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .section-management-metric {
+    min-height: 115px;
+
+    grid-template-columns:
+      44px
+      minmax(0, 1fr);
+
+    align-content: center;
+  }
+
+  .section-management-metric > strong {
+    grid-column: 1 / -1;
+
+    margin-top: 5px;
+
+    text-align: left;
+  }
+
+  .section-assignment-health {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      minmax(190px, 0.42fr);
+  }
+
+  .section-directory-panel .councilor-table {
+    min-width: 1000px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 720px) {
+  .section-management-page {
+    gap: 17px;
+  }
+
+  .section-welcome-card {
+    min-height: 200px;
+
+    padding: 31px 26px;
+
+    border-radius: 15px;
+  }
+
+  .section-welcome-content h2 {
+    font-size: 26px;
+  }
+
+  .section-welcome-content p {
+    font-size: 12px;
+  }
+
+  .section-welcome-badge {
+    width: 84px;
+    height: 84px;
+
+    flex-basis: 84px;
+  }
+
+  .section-assignment-health {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+
+    padding: 15px 17px;
+  }
+
+  .section-assignment-health-progress {
+    grid-column: 1 / -1;
+  }
+
+  .section-directory-panel .councilor-panel-header {
+    padding: 20px;
+  }
+
+  .section-directory-panel .councilor-toolbar {
+    padding: 13px 20px;
+  }
+
+  .section-directory-panel .councilor-table th,
+  .section-directory-panel .councilor-table td {
+    padding-inline: 20px;
+  }
+
+  .section-management-page .councilor-modal-backdrop {
+    padding: 10px;
+  }
+
+  .section-management-page .councilor-modal {
+    width: calc(100vw - 20px);
+
+    max-height: calc(100dvh - 20px);
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 560px) {
+  .section-welcome-card {
+    min-height: 190px;
+
+    padding: 28px 22px;
+  }
+
+  .section-welcome-content > span {
+    font-size: 9px;
+  }
+
+  .section-welcome-content h2 {
+    font-size: 23px;
+  }
+
+  .section-welcome-content p {
+    font-size: 11px;
+  }
+
+  .section-management-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .section-management-metric {
+    min-height: 82px;
+
+    grid-template-columns:
+      44px
+      minmax(0, 1fr)
+      auto;
+  }
+
+  .section-management-metric > strong {
+    grid-column: auto;
+
+    margin-top: 0;
+
+    font-size: 27px;
+
+    text-align: right;
+  }
+
+  .section-directory-panel .councilor-panel-header h2 {
+    font-size: 19px;
+  }
+
+  .section-edit-assignment-lock {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+  }
+
+  .section-edit-lock-badge {
+    grid-column: 1 / -1;
+
+    justify-self: start;
+  }
+
+  .section-management-page .councilor-modal .councilor-modal-actions {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 7px;
+  }
+
+  .section-management-page .councilor-modal .councilor-modal-actions button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .section-welcome-card {
+    padding: 26px 18px;
+  }
+
+  .section-welcome-content h2 {
+    font-size: 21px;
+  }
+
+  .section-management-metric {
+    gap: 10px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .section-welcome-card,
+  .section-welcome-badge,
+  .section-management-metric,
+  .section-assignment-health,
+  .section-directory-panel,
+  .section-assignment-progress-track > div {
+    animation: none !important;
+  }
+}

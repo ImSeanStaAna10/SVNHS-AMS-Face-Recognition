@@ -62,6 +62,7 @@
   padding: 14px 15px;
 
   border: 1px solid var(--c-border-soft);
+
   border-radius: 11px;
 
   background: linear-gradient(
@@ -84,11 +85,17 @@
 
   border-radius: 50%;
 
-  background: linear-gradient(135deg, var(--c-red-600), var(--c-red-700));
+  background: linear-gradient(
+    135deg,
+    var(--c-red-600),
+    var(--c-red-700)
+  );
 
   color: #ffffff;
 
-  box-shadow: 0 4px 11px rgba(197, 31, 45, 0.14);
+  box-shadow:
+    0 4px 11px
+    rgba(197, 31, 45, 0.14);
 
   font-size: 14px;
   font-weight: 850;
@@ -152,6 +159,7 @@
   padding: 12px 13px;
 
   border: 1px solid var(--c-brand-border);
+
   border-radius: 10px;
 
   background: var(--c-icon-bg);
@@ -218,6 +226,7 @@
   padding: 12px 14px;
 
   border: 1px solid var(--c-success-border);
+
   border-radius: 10px;
 
   background: var(--c-success-bg);
@@ -274,76 +283,21 @@
    FORM POLISH
 ========================================================= */
 
-.councilor-password-form .councilor-modal-field input {
+.councilor-password-form
+.councilor-modal-field input {
   transition:
     border-color 0.18s ease,
     box-shadow 0.18s ease,
     background 0.18s ease;
 }
 
-.councilor-password-form .councilor-modal-field input:focus {
+.councilor-password-form
+.councilor-modal-field input:focus {
   border-color: var(--c-blue-800);
 
-  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.09);
-}
-
-/* =========================================================
-   DARK MODE
-========================================================= */
-
-html[data-theme="dark"] .councilor-password-account {
-  background: var(--c-surface-soft);
-}
-
-html[data-theme="dark"] .councilor-password-notice {
-  background: var(--c-icon-bg);
-}
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width: 720px) {
-  .councilor-password-nav-item {
-    margin-top: 0;
-  }
-
-  .councilor-password-nav-item::before {
-    display: none;
-  }
-}
-
-@media (max-width: 520px) {
-  .councilor-password-modal {
-    width: 100%;
-  }
-
-  .councilor-password-account {
-    padding: 13px;
-  }
-
-  .councilor-password-notice {
-    padding: 11px 12px;
-  }
-}
-
-/* =========================================================
-   ACCESSIBILITY
-========================================================= */
-
-.councilor-password-nav-item:focus-visible {
-  outline: 3px solid var(--c-focus-ring);
-  outline-offset: 2px;
-}
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .councilor-password-form .councilor-modal-field input {
-    transition: none;
-  }
+  box-shadow:
+    0 0 0 3px
+    rgba(18, 61, 126, 0.09);
 }
 
 /* =========================================================
@@ -415,6 +369,7 @@ html[data-theme="dark"] .councilor-password-notice {
 
 .councilor-password-toggle:focus-visible {
   outline: 3px solid var(--c-focus-ring);
+
   outline-offset: 1px;
 }
 
@@ -428,7 +383,8 @@ html[data-theme="dark"] .councilor-password-notice {
    INPUT FOCUS
 ========================================================= */
 
-.councilor-password-input:focus-within .councilor-password-toggle {
+.councilor-password-input:focus-within
+.councilor-password-toggle {
   color: var(--c-blue-800);
 }
 
@@ -436,8 +392,57 @@ html[data-theme="dark"] .councilor-password-notice {
    DARK MODE
 ========================================================= */
 
-html[data-theme="dark"] .councilor-password-toggle:hover:not(:disabled) {
+html[data-theme="dark"]
+.councilor-password-account {
+  background: var(--c-surface-soft);
+}
+
+html[data-theme="dark"]
+.councilor-password-notice {
+  background: var(--c-icon-bg);
+}
+
+html[data-theme="dark"]
+.councilor-password-toggle:hover:not(:disabled) {
   background: var(--c-nav-hover-bg);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 720px) {
+  .councilor-password-nav-item {
+    margin-top: 0;
+  }
+
+  .councilor-password-nav-item::before {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .councilor-password-modal {
+    width: 100%;
+  }
+
+  .councilor-password-account {
+    padding: 13px;
+  }
+
+  .councilor-password-notice {
+    padding: 11px 12px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.councilor-password-nav-item:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
+
+  outline-offset: 2px;
 }
 
 /* =========================================================
@@ -445,7 +450,683 @@ html[data-theme="dark"] .councilor-password-toggle:hover:not(:disabled) {
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+  .councilor-password-form
+  .councilor-modal-field input,
   .councilor-password-toggle {
     transition: none;
+  }
+}
+
+
+/* =========================================================
+   COUNCILOR ACCOUNT SECURITY V2
+   READABLE + VIEWPORT-SAFE FLOATING MODAL
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+========================================================= */
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.councilor-password-nav-item {
+  margin-top: 8px;
+}
+
+.councilor-password-nav-item::before {
+  right: 14px;
+  left: 14px;
+}
+
+.councilor-password-nav-icon {
+  transition:
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
+@media (hover: hover) {
+  .councilor-password-nav-item:hover
+  .councilor-password-nav-icon {
+    transform: scale(1.06);
+  }
+}
+
+/* =========================================================
+   MODAL BACKDROP SAFETY
+========================================================= */
+
+.councilor-modal-backdrop {
+  padding: 16px;
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   PASSWORD MODAL
+========================================================= */
+
+.councilor-password-modal {
+  width: min(
+    100%,
+    560px
+  );
+
+  max-height:
+    calc(
+      100dvh -
+      32px
+    );
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border-radius: 16px;
+}
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.councilor-password-modal
+.councilor-modal-header {
+  flex: 0 0 auto;
+
+  padding:
+    20px
+    21px;
+
+  border-bottom:
+    1px
+    solid
+    var(--c-border-soft);
+}
+
+.councilor-password-modal
+.councilor-modal-header h2 {
+  font-size: 21px;
+
+  line-height: 1.2;
+}
+
+.councilor-password-modal
+.councilor-modal-header p {
+  margin-top: 6px;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   FORM — INTERNAL SCROLL ONLY
+========================================================= */
+
+.councilor-password-form {
+  min-height: 0;
+
+  flex: 1 1 auto;
+
+  gap: 16px;
+
+  padding:
+    18px
+    21px
+    0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  overscroll-behavior: contain;
+
+  scrollbar-width: thin;
+}
+
+/* =========================================================
+   ACCOUNT SUMMARY
+========================================================= */
+
+.councilor-password-account {
+  gap: 14px;
+
+  padding:
+    15px
+    16px;
+
+  border-color: #c9dcf4;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f3f8ff,
+      var(--c-surface-soft)
+    );
+}
+
+.councilor-password-avatar {
+  width: 48px;
+  height: 48px;
+
+  flex-basis: 48px;
+
+  border-width: 3px;
+
+  font-size: 16px;
+}
+
+.councilor-password-account-copy > span {
+  margin-bottom: 4px;
+
+  font-size: 9px;
+}
+
+.councilor-password-account-copy strong {
+  font-size: 13px;
+}
+
+.councilor-password-account-copy small {
+  margin-top: 4px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   SECURITY NOTICE
+========================================================= */
+
+.councilor-password-notice {
+  gap: 11px;
+
+  padding:
+    13px
+    14px;
+
+  border-color: #bfdbfe;
+
+  border-radius: 11px;
+
+  background: #eff6ff;
+}
+
+.councilor-password-notice-icon {
+  width: 25px;
+  height: 25px;
+
+  flex-basis: 25px;
+
+  font-size: 10px;
+}
+
+.councilor-password-notice strong {
+  margin-bottom: 4px;
+
+  font-size: 11px;
+}
+
+.councilor-password-notice p {
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SUCCESS MESSAGE
+========================================================= */
+
+.councilor-password-success {
+  gap: 11px;
+
+  padding:
+    13px
+    15px;
+
+  border-radius: 11px;
+
+  animation:
+    councilor-password-success-enter
+    0.3s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.councilor-password-success > span {
+  width: 26px;
+  height: 26px;
+
+  flex-basis: 26px;
+
+  font-size: 11px;
+}
+
+.councilor-password-success strong {
+  font-size: 11px;
+}
+
+.councilor-password-success p {
+  margin-top: 4px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   FORM FIELDS — READABLE
+========================================================= */
+
+.councilor-password-form
+.councilor-modal-field {
+  gap: 7px;
+}
+
+.councilor-password-form
+.councilor-modal-field label,
+.councilor-password-form
+.councilor-modal-field > span {
+  font-size: 11px;
+
+  font-weight: 760;
+}
+
+.councilor-password-form
+.councilor-modal-field input {
+  min-height: 46px;
+
+  padding:
+    0
+    13px;
+
+  border-radius: 10px;
+
+  font-size: 12px;
+}
+
+.councilor-password-input input {
+  padding-right: 50px !important;
+}
+
+/* =========================================================
+   PASSWORD TOGGLE
+========================================================= */
+
+.councilor-password-toggle {
+  right: 7px;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 8px;
+}
+
+.councilor-password-toggle svg {
+  width: 19px;
+  height: 19px;
+
+  transition:
+    transform 0.16s ease;
+}
+
+@media (hover: hover) {
+  .councilor-password-toggle:hover:not(:disabled)
+  svg {
+    transform: scale(1.08);
+  }
+}
+
+/* =========================================================
+   MODAL ACTIONS — STICKY FOOTER
+========================================================= */
+
+.councilor-password-modal
+.councilor-modal-actions {
+  position: sticky;
+
+  bottom: 0;
+
+  z-index: 5;
+
+  flex: 0 0 auto;
+
+  margin:
+    4px
+    -21px
+    0;
+
+  padding:
+    13px
+    21px
+    16px;
+
+  border-top:
+    1px
+    solid
+    var(--c-border-soft);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--c-surface) 96%,
+      transparent
+    );
+
+  backdrop-filter:
+    blur(10px);
+}
+
+.councilor-password-modal
+.councilor-modal-actions button {
+  min-height: 41px;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   MODAL ENTER ANIMATION
+========================================================= */
+
+.councilor-password-modal {
+  animation:
+    councilor-password-modal-enter
+    0.28s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.councilor-password-account,
+.councilor-password-notice {
+  animation:
+    councilor-password-item-enter
+    0.36s
+    ease-out
+    both;
+}
+
+.councilor-password-account {
+  animation-delay: 0.04s;
+}
+
+.councilor-password-notice {
+  animation-delay: 0.08s;
+}
+
+@keyframes councilor-password-modal-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(12px)
+      scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes councilor-password-item-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes councilor-password-success-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"]
+.councilor-password-account {
+  border-color: #304660;
+
+  background: #111f33;
+}
+
+html[data-theme="dark"]
+.councilor-password-notice {
+  border-color:
+    rgba(
+      96,
+      165,
+      250,
+      0.22
+    );
+
+  background:
+    rgba(
+      30,
+      64,
+      175,
+      0.16
+    );
+}
+
+html[data-theme="dark"]
+.councilor-password-notice-icon {
+  background: #2563eb;
+}
+
+html[data-theme="dark"]
+.councilor-password-modal
+.councilor-modal-actions {
+  background:
+    rgba(
+      13,
+      23,
+      39,
+      0.96
+    );
+}
+
+/* =========================================================
+   SHORT VIEWPORT
+========================================================= */
+
+@media (max-height: 700px) and (min-width: 521px) {
+  .councilor-modal-backdrop {
+    padding: 8px;
+  }
+
+  .councilor-password-modal {
+    max-height:
+      calc(
+        100dvh -
+        16px
+      );
+  }
+
+  .councilor-password-modal
+  .councilor-modal-header {
+    padding:
+      15px
+      18px;
+  }
+
+  .councilor-password-form {
+    gap: 12px;
+
+    padding:
+      14px
+      18px
+      0;
+  }
+
+  .councilor-password-account,
+  .councilor-password-notice {
+    padding:
+      11px
+      12px;
+  }
+
+  .councilor-password-modal
+  .councilor-modal-actions {
+    margin-right: -18px;
+    margin-left: -18px;
+
+    padding:
+      10px
+      18px
+      12px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 520px) {
+  .councilor-modal-backdrop {
+    padding: 6px;
+  }
+
+  .councilor-password-modal {
+    width:
+      calc(
+        100vw -
+        12px
+      );
+
+    max-height:
+      calc(
+        100dvh -
+        12px
+      );
+
+    border-radius: 13px;
+  }
+
+  .councilor-password-modal
+  .councilor-modal-header {
+    padding:
+      16px
+      15px;
+  }
+
+  .councilor-password-modal
+  .councilor-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .councilor-password-modal
+  .councilor-modal-header p {
+    font-size: 10px;
+  }
+
+  .councilor-password-form {
+    gap: 13px;
+
+    padding:
+      14px
+      15px
+      0;
+  }
+
+  .councilor-password-account {
+    padding: 12px;
+  }
+
+  .councilor-password-avatar {
+    width: 43px;
+    height: 43px;
+
+    flex-basis: 43px;
+  }
+
+  .councilor-password-notice {
+    padding:
+      11px
+      12px;
+  }
+
+  .councilor-password-form
+  .councilor-modal-field input {
+    min-height: 45px;
+  }
+
+  .councilor-password-modal
+  .councilor-modal-actions {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 7px;
+
+    margin-right: -15px;
+    margin-left: -15px;
+
+    padding:
+      10px
+      15px
+      13px;
+  }
+
+  .councilor-password-modal
+  .councilor-modal-actions button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .councilor-password-modal,
+  .councilor-password-account,
+  .councilor-password-notice,
+  .councilor-password-success {
+    animation: none !important;
+  }
+
+  .councilor-password-nav-icon,
+  .councilor-password-toggle svg {
+    transition: none !important;
+  }
+
+  .councilor-password-nav-item:hover
+  .councilor-password-nav-icon,
+  .councilor-password-toggle:hover:not(:disabled)
+  svg {
+    transform: none !important;
   }
 }

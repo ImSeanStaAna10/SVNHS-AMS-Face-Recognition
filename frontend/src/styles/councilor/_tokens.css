@@ -1,6 +1,12 @@
 /* =========================================================
    SVNHS COUNCILOR PORTAL
-   DESIGN TOKENS
+   DESIGN TOKENS — PRODUCTION V2
+
+   Safe upgrade:
+   - Existing token names preserved
+   - Adds semantic/status/layout/motion scales
+   - Improves dark-mode neutrality and consistency
+   - Keeps SVNHS blue/red/gold institutional identity
 ========================================================= */
 
 /* =========================================================
@@ -10,25 +16,91 @@
 :root {
   color-scheme: light;
 
-  /* Brand */
+  /* =======================================================
+     BRAND
+  ======================================================= */
+
   --c-navy-950: #071b42;
   --c-navy-900: #10244b;
 
+  --c-blue-950: #0a2c5d;
   --c-blue-900: #123d7e;
   --c-blue-800: #24559a;
   --c-blue-700: #315891;
   --c-blue-600: #3f6ba7;
+  --c-blue-500: #4f7fbc;
+  --c-blue-100: #dbeafe;
+  --c-blue-50: #eff6ff;
 
+  --c-red-800: #8f1520;
   --c-red-700: #a91522;
   --c-red-600: #c51f2d;
+  --c-red-500: #d83a47;
+  --c-red-100: #fee2e2;
+  --c-red-50: #fff5f5;
 
   --c-gold: #f7c945;
+  --c-gold-700: #a66b08;
+  --c-gold-100: #fef3c7;
+  --c-gold-50: #fffbeb;
 
-  /* Page */
+  /* =======================================================
+     SEMANTIC PALETTE
+  ======================================================= */
+
+  --c-info-bg: #eff6ff;
+  --c-info-text: #1d4ed8;
+  --c-info-border: #bfdbfe;
+  --c-info-dot: #3b82f6;
+
+  --c-success-bg: #eaf7ef;
+  --c-success-text: #277748;
+  --c-success-dot: #35a363;
+  --c-success-border: #ccebd8;
+
+  --c-warning-bg: #fff8e8;
+  --c-warning-text: #9a6700;
+  --c-warning-dot: #d39b21;
+  --c-warning-border: #efdba4;
+
+  --c-violet-bg: #f5f3ff;
+  --c-violet-text: #6d28d9;
+  --c-violet-dot: #8b5cf6;
+  --c-violet-border: #ddd6fe;
+
+  --c-cyan-bg: #ecfeff;
+  --c-cyan-text: #0e7490;
+  --c-cyan-dot: #06b6d4;
+  --c-cyan-border: #bae6fd;
+
+  --c-error-bg: #fff2f3;
+  --c-error-text: #a91e2b;
+  --c-error-border: #f1c2c7;
+  --c-error-dot: #dc3545;
+
+  --c-inactive-bg: #f1f3f5;
+  --c-inactive-text: #747f8e;
+  --c-inactive-dot: #929ba8;
+  --c-inactive-border: #dde2e8;
+
+  /* =======================================================
+     PAGE
+  ======================================================= */
+
   --c-page-start: #f8f9fc;
-  --c-page-end: #f5f7fb;
+  --c-page-end: #f4f7fb;
 
-  /* Surfaces */
+  --c-page-gradient:
+    linear-gradient(
+      180deg,
+      var(--c-page-start) 0%,
+      var(--c-page-end) 100%
+    );
+
+  /* =======================================================
+     SURFACES
+  ======================================================= */
+
   --c-sidebar-start: #ffffff;
   --c-sidebar-end: #fbfcfe;
 
@@ -37,43 +109,131 @@
   --c-header-end: rgba(255, 255, 255, 0.98);
 
   --c-surface: #ffffff;
-  --c-surface-soft: #fcfdff;
+  --c-surface-soft: #f8fafc;
+  --c-surface-muted: #f3f6fa;
+  --c-surface-raised: #ffffff;
 
-  --c-table-head: #fafbfd;
+  --c-table-head: #f8fafc;
   --c-input-bg: #ffffff;
   --c-logo-bg: #ffffff;
 
-  /* Typography */
+  /* =======================================================
+     TYPOGRAPHY
+  ======================================================= */
+
   --c-text-primary: #10244b;
   --c-text-secondary: #23365b;
-  --c-text-body: #6b7280;
-  --c-text-muted: #9aa3b2;
+  --c-text-body: #5f6b7c;
+  --c-text-muted: #8994a5;
+  --c-text-disabled: #a9b1bd;
+  --c-text-inverse: #ffffff;
 
-  /* Borders */
+  --c-font-size-2xs: 8px;
+  --c-font-size-xs: 9px;
+  --c-font-size-sm: 10px;
+  --c-font-size-md: 12px;
+  --c-font-size-lg: 14px;
+  --c-font-size-xl: 18px;
+  --c-font-size-2xl: 22px;
+  --c-font-size-3xl: 30px;
+  --c-font-size-4xl: 38px;
+
+  --c-font-weight-medium: 550;
+  --c-font-weight-semibold: 700;
+  --c-font-weight-bold: 800;
+  --c-font-weight-heavy: 850;
+
+  --c-line-height-tight: 1.2;
+  --c-line-height-body: 1.5;
+  --c-line-height-relaxed: 1.7;
+
+  /* =======================================================
+     BORDERS
+  ======================================================= */
+
   --c-border: #d7dce5;
   --c-border-soft: #e7e9ee;
+  --c-border-strong: #c4ccd8;
+
   --c-brand-border: rgba(18, 61, 126, 0.14);
 
-  /* Navigation */
+  /* =======================================================
+     RADIUS SCALE
+  ======================================================= */
+
+  --c-radius-xs: 6px;
+  --c-radius-sm: 8px;
+  --c-radius-md: 10px;
+  --c-radius-lg: 12px;
+  --c-radius-xl: 16px;
+  --c-radius-2xl: 20px;
+  --c-radius-pill: 999px;
+
+  /* =======================================================
+     SPACING SCALE
+  ======================================================= */
+
+  --c-space-1: 4px;
+  --c-space-2: 8px;
+  --c-space-3: 12px;
+  --c-space-4: 16px;
+  --c-space-5: 20px;
+  --c-space-6: 24px;
+  --c-space-7: 28px;
+  --c-space-8: 32px;
+
+  /* =======================================================
+     CONTROL HEIGHTS
+  ======================================================= */
+
+  --c-control-sm: 34px;
+  --c-control-md: 40px;
+  --c-control-lg: 46px;
+  --c-control-xl: 52px;
+
+  /* =======================================================
+     NAVIGATION
+  ======================================================= */
+
   --c-nav-text: #68778b;
-  --c-nav-hover-bg: #f5f8fc;
+
+  --c-nav-hover-bg: #f3f7fc;
   --c-nav-hover-text: #24559a;
 
-  --c-nav-active-start: #eaf1fa;
-  --c-nav-active-end: #f2f6fb;
+  --c-nav-active-start: #e9f1fb;
+  --c-nav-active-end: #f2f7fd;
   --c-nav-active-text: #123d7e;
+
+  --c-nav-active-border: #bcd2ed;
 
   --c-nav-soon-bg: #f0f2f5;
   --c-nav-soon-text: #929ba8;
 
-  /* Icons / badges */
+  /* =======================================================
+     ICONS / BADGES
+  ======================================================= */
+
   --c-icon-bg: #edf3fb;
   --c-icon-text: #315891;
 
   --c-role-bg: #edf3fb;
   --c-role-text: #123d7e;
 
-  /* Secondary button */
+  /* =======================================================
+     PRIMARY BUTTON
+  ======================================================= */
+
+  --c-primary-bg: #123d7e;
+  --c-primary-text: #ffffff;
+  --c-primary-border: #123d7e;
+
+  --c-primary-hover-bg: #0f336b;
+  --c-primary-hover-border: #0f336b;
+
+  /* =======================================================
+     SECONDARY BUTTON
+  ======================================================= */
+
   --c-secondary-bg: #ffffff;
   --c-secondary-text: #315891;
   --c-secondary-border: #d7dce5;
@@ -82,60 +242,98 @@
   --c-secondary-hover-text: #123d7e;
   --c-secondary-hover-border: #b8c1d0;
 
-  /* Inputs */
+  /* =======================================================
+     DESTRUCTIVE BUTTON
+  ======================================================= */
+
+  --c-danger-bg: #b42318;
+  --c-danger-text: #ffffff;
+  --c-danger-border: #b42318;
+
+  --c-danger-hover-bg: #991b1b;
+  --c-danger-hover-border: #991b1b;
+
+  /* =======================================================
+     INPUTS
+  ======================================================= */
+
   --c-input-text: #182b4e;
-  --c-input-placeholder: #9aa3b2;
+  --c-input-placeholder: #929cab;
+
+  --c-input-border: #d7dce5;
   --c-input-hover-border: #b8c1d0;
 
   --c-focus-color: #24559a;
-  --c-focus-ring: rgba(36, 85, 154, 0.12);
+  --c-focus-ring: rgba(36, 85, 154, 0.14);
 
-  /* Table */
-  --c-table-text: #6b7280;
+  --c-disabled-bg: #f3f5f8;
+  --c-disabled-text: #98a2b1;
+  --c-disabled-border: #e0e4ea;
+
+  /* =======================================================
+     TABLE
+  ======================================================= */
+
+  --c-table-text: #5f6b7c;
   --c-table-title: #23365b;
-  --c-table-muted: #9aa3b2;
-  --c-table-hover: #fafcff;
+  --c-table-muted: #8994a5;
 
-  /* Status */
-  --c-success-bg: #eaf7ef;
-  --c-success-text: #277748;
-  --c-success-dot: #35a363;
-  --c-success-border: #ccebd8;
+  --c-table-hover: #f7faff;
+  --c-table-selected: #edf4fd;
 
-  --c-inactive-bg: #f1f3f5;
-  --c-inactive-text: #747f8e;
-  --c-inactive-dot: #929ba8;
+  /* =======================================================
+     HERO
+  ======================================================= */
 
-  --c-error-bg: #fff2f3;
-  --c-error-text: #a91e2b;
-  --c-error-border: #f1c2c7;
-
-  /* Hero */
   --c-hero-bg: #071b42;
   --c-hero-border: transparent;
 
-  --c-hero-overlay: linear-gradient(
-    90deg,
-    rgba(7, 27, 66, 0.96) 0%,
-    rgba(7, 27, 66, 0.86) 42%,
-    rgba(7, 27, 66, 0.55) 100%
-  );
+  --c-hero-overlay:
+    linear-gradient(
+      90deg,
+      rgba(7, 27, 66, 0.96) 0%,
+      rgba(7, 27, 66, 0.86) 42%,
+      rgba(7, 27, 66, 0.55) 100%
+    );
 
-  --c-hero-pattern: rgba(255, 255, 255, 0.045);
+  --c-hero-pattern:
+    rgba(255, 255, 255, 0.045);
 
-  --c-hero-seal-bg: rgba(255, 255, 255, 0.12);
-  --c-hero-seal-border: rgba(255, 255, 255, 0.25);
+  --c-hero-seal-bg:
+    rgba(255, 255, 255, 0.12);
 
-  /* Feature welcome */
-  --c-welcome-bg: linear-gradient(
-    120deg,
-    #071b42 0%,
-    #123d7e 48%,
-    #6c1b2b 80%,
-    #a91522 100%
-  );
+  --c-hero-seal-border:
+    rgba(255, 255, 255, 0.25);
 
-  /* Shadows */
+  /* =======================================================
+     FEATURE WELCOME
+  ======================================================= */
+
+  --c-welcome-bg:
+    linear-gradient(
+      120deg,
+      #071b42 0%,
+      #123d7e 48%,
+      #6c1b2b 80%,
+      #a91522 100%
+    );
+
+  /* =======================================================
+     SHADOW SCALE
+  ======================================================= */
+
+  --c-shadow-xs:
+    0 1px 2px rgba(7, 27, 66, 0.03);
+
+  --c-shadow-sm:
+    0 4px 12px rgba(7, 27, 66, 0.045);
+
+  --c-shadow-md:
+    0 8px 22px rgba(7, 27, 66, 0.07);
+
+  --c-shadow-lg:
+    0 16px 40px rgba(7, 27, 66, 0.12);
+
   --c-sidebar-shadow: none;
 
   --c-header-shadow:
@@ -150,15 +348,50 @@
   --c-panel-shadow:
     0 5px 18px rgba(7, 27, 66, 0.04);
 
-  /* Modal */
-  --c-modal-backdrop: rgba(7, 27, 66, 0.62);
+  /* =======================================================
+     MODAL
+  ======================================================= */
+
+  --c-modal-backdrop:
+    rgba(7, 27, 66, 0.58);
+
   --c-modal-bg: #ffffff;
 
   --c-modal-shadow:
     0 30px 80px rgba(7, 27, 66, 0.3),
     0 8px 25px rgba(7, 27, 66, 0.12);
 
-  /* Theme toggle */
+  /* =======================================================
+     MOTION
+  ======================================================= */
+
+  --c-motion-fast: 140ms;
+  --c-motion-base: 180ms;
+  --c-motion-slow: 280ms;
+
+  --c-ease-standard:
+    cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --c-ease-enter:
+    cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* =======================================================
+     Z-INDEX
+  ======================================================= */
+
+  --c-z-base: 1;
+  --c-z-dropdown: 100;
+  --c-z-sticky: 200;
+  --c-z-sidebar: 500;
+  --c-z-header: 600;
+  --c-z-backdrop: 1100;
+  --c-z-modal: 1200;
+  --c-z-toast: 1400;
+
+  /* =======================================================
+     THEME TOGGLE
+  ======================================================= */
+
   --c-toggle-track-bg: #f5f7fb;
   --c-toggle-track-border: #d7dce5;
 
@@ -174,6 +407,7 @@
     0 2px 7px rgba(7, 27, 66, 0.18);
 }
 
+
 /* =========================================================
    DARK MODE
 ========================================================= */
@@ -181,144 +415,284 @@
 html[data-theme="dark"] {
   color-scheme: dark;
 
-  /* Page */
-  --c-page-start: #091a35;
-  --c-page-end: #22121d;
+  /* =======================================================
+     PAGE
+  ======================================================= */
 
-  /* Surfaces */
-  --c-sidebar-start: #0b2344;
-  --c-sidebar-end: #191521;
+  --c-page-start: #0a1830;
+  --c-page-end: #101a2b;
 
-  --c-header-start: #0d294f;
-  --c-header-mid: #132540;
-  --c-header-end: #28141e;
+  --c-page-gradient:
+    linear-gradient(
+      180deg,
+      var(--c-page-start) 0%,
+      var(--c-page-end) 100%
+    );
 
-  --c-surface: #132c4b;
-  --c-surface-soft: #17263b;
+  /* =======================================================
+     SURFACES
+     Neutral navy surfaces prevent every component from
+     looking red/purple in dark mode.
+  ======================================================= */
 
-  --c-table-head: #102641;
-  --c-input-bg: #101f36;
+  --c-sidebar-start: #0b203d;
+  --c-sidebar-end: #0d1b31;
 
-  --c-logo-bg: rgba(255, 255, 255, 0.97);
+  --c-header-start: rgba(12, 32, 59, 0.98);
+  --c-header-mid: rgba(13, 31, 55, 0.98);
+  --c-header-end: rgba(15, 28, 48, 0.98);
 
-  /* Typography */
+  --c-surface: #102641;
+  --c-surface-soft: #132c48;
+  --c-surface-muted: #172f4c;
+  --c-surface-raised: #152d49;
+
+  --c-table-head: #0e223b;
+  --c-input-bg: #0e2038;
+
+  --c-logo-bg:
+    rgba(255, 255, 255, 0.97);
+
+  /* =======================================================
+     TYPOGRAPHY
+  ======================================================= */
+
   --c-text-primary: #f5f8fd;
   --c-text-secondary: #d9e3ef;
   --c-text-body: #b5c1d1;
-  --c-text-muted: #8795a8;
+  --c-text-muted: #8998ab;
+  --c-text-disabled: #66758a;
+  --c-text-inverse: #08182e;
 
-  /* Borders */
-  --c-border: rgba(106, 163, 222, 0.18);
-  --c-border-soft: rgba(197, 31, 45, 0.1);
+  /* =======================================================
+     BORDERS
+     Neutral blue-gray instead of global red-tinted borders.
+  ======================================================= */
 
-  --c-brand-border: rgba(197, 31, 45, 0.2);
+  --c-border:
+    rgba(128, 166, 207, 0.22);
 
-  /* Navigation */
-  --c-nav-text: #a9b9cc;
+  --c-border-soft:
+    rgba(128, 166, 207, 0.12);
 
-  --c-nav-hover-bg: linear-gradient(
-    90deg,
-    rgba(47, 111, 181, 0.13),
-    rgba(197, 31, 45, 0.07)
-  );
+  --c-border-strong:
+    rgba(144, 180, 218, 0.3);
 
-  --c-nav-hover-text: #ffffff;
+  --c-brand-border:
+    rgba(96, 165, 250, 0.2);
 
-  --c-nav-active-start: rgba(44, 105, 177, 0.3);
-  --c-nav-active-end: rgba(197, 31, 45, 0.15);
+  /* =======================================================
+     SEMANTIC PALETTE
+  ======================================================= */
 
-  --c-nav-active-text: #ffffff;
+  --c-info-bg:
+    rgba(37, 99, 235, 0.18);
 
-  --c-nav-soon-bg: rgba(255, 255, 255, 0.06);
-  --c-nav-soon-text: #8291a5;
+  --c-info-text: #93c5fd;
 
-  /* Icons */
-  --c-icon-bg: linear-gradient(
-    135deg,
-    rgba(74, 143, 214, 0.17),
-    rgba(197, 31, 45, 0.1)
-  );
+  --c-info-border:
+    rgba(96, 165, 250, 0.26);
 
-  --c-icon-text: #8ec5ff;
+  --c-info-dot: #60a5fa;
 
-  --c-role-bg: rgba(61, 128, 201, 0.16);
-  --c-role-text: #9dccff;
+  --c-success-bg:
+    rgba(44, 143, 82, 0.18);
 
-  /* Secondary button */
-  --c-secondary-bg: linear-gradient(
-    135deg,
-    rgba(66, 130, 199, 0.08),
-    rgba(197, 31, 45, 0.06)
-  );
-
-  --c-secondary-text: #cedbeb;
-
-  --c-secondary-border:
-    rgba(116, 169, 224, 0.18);
-
-  --c-secondary-hover-bg: linear-gradient(
-    135deg,
-    rgba(61, 133, 208, 0.15),
-    rgba(197, 31, 45, 0.1)
-  );
-
-  --c-secondary-hover-text: #ffffff;
-
-  --c-secondary-hover-border:
-    rgba(197, 31, 45, 0.3);
-
-  /* Inputs */
-  --c-input-text: #f5f8fd;
-  --c-input-placeholder: #78899d;
-
-  --c-input-hover-border:
-    rgba(116, 169, 224, 0.3);
-
-  --c-focus-color: #5d9fe3;
-  --c-focus-ring: rgba(197, 31, 45, 0.12);
-
-  /* Table */
-  --c-table-text: #b9c6d6;
-  --c-table-title: #edf4fc;
-  --c-table-muted: #8090a4;
-
-  --c-table-hover: linear-gradient(
-    90deg,
-    rgba(63, 130, 202, 0.05),
-    rgba(197, 31, 45, 0.035)
-  );
-
-  /* Status */
-  --c-success-bg: rgba(44, 143, 82, 0.18);
   --c-success-text: #82dda3;
   --c-success-dot: #5bc581;
 
   --c-success-border:
     rgba(71, 183, 110, 0.24);
 
-  --c-inactive-bg: rgba(255, 255, 255, 0.06);
+  --c-warning-bg:
+    rgba(146, 100, 16, 0.22);
+
+  --c-warning-text: #fde68a;
+  --c-warning-dot: #fbbf24;
+
+  --c-warning-border:
+    rgba(250, 204, 21, 0.24);
+
+  --c-violet-bg:
+    rgba(109, 40, 217, 0.2);
+
+  --c-violet-text: #c4b5fd;
+  --c-violet-dot: #a78bfa;
+
+  --c-violet-border:
+    rgba(196, 181, 253, 0.24);
+
+  --c-cyan-bg:
+    rgba(8, 145, 178, 0.18);
+
+  --c-cyan-text: #67e8f9;
+  --c-cyan-dot: #22d3ee;
+
+  --c-cyan-border:
+    rgba(103, 232, 249, 0.22);
+
+  --c-inactive-bg:
+    rgba(255, 255, 255, 0.06);
+
   --c-inactive-text: #9cabbb;
   --c-inactive-dot: #8391a3;
 
-  --c-error-bg: rgba(197, 31, 45, 0.14);
-  --c-error-text: #ff949d;
-  --c-error-border: rgba(225, 60, 73, 0.3);
+  --c-inactive-border:
+    rgba(148, 163, 184, 0.16);
 
-  /* Hero */
+  --c-error-bg:
+    rgba(197, 31, 45, 0.14);
+
+  --c-error-text: #ff949d;
+  --c-error-dot: #f87171;
+
+  --c-error-border:
+    rgba(225, 60, 73, 0.3);
+
+  /* =======================================================
+     NAVIGATION
+     Blue remains primary. Red is reserved for destructive
+     actions and institutional accents.
+  ======================================================= */
+
+  --c-nav-text: #a9b9cc;
+
+  --c-nav-hover-bg:
+    rgba(59, 130, 246, 0.1);
+
+  --c-nav-hover-text: #f8fbff;
+
+  --c-nav-active-start:
+    rgba(37, 99, 235, 0.24);
+
+  --c-nav-active-end:
+    rgba(37, 99, 235, 0.12);
+
+  --c-nav-active-text: #ffffff;
+
+  --c-nav-active-border:
+    rgba(96, 165, 250, 0.28);
+
+  --c-nav-soon-bg:
+    rgba(255, 255, 255, 0.06);
+
+  --c-nav-soon-text: #8291a5;
+
+  /* =======================================================
+     ICONS / BADGES
+  ======================================================= */
+
+  --c-icon-bg:
+    rgba(59, 130, 246, 0.15);
+
+  --c-icon-text: #93c5fd;
+
+  --c-role-bg:
+    rgba(61, 128, 201, 0.16);
+
+  --c-role-text: #9dccff;
+
+  /* =======================================================
+     PRIMARY BUTTON
+  ======================================================= */
+
+  --c-primary-bg: #2563a8;
+  --c-primary-text: #ffffff;
+  --c-primary-border: #347bc2;
+
+  --c-primary-hover-bg: #2f73b8;
+  --c-primary-hover-border: #4b8ed0;
+
+  /* =======================================================
+     SECONDARY BUTTON
+  ======================================================= */
+
+  --c-secondary-bg:
+    rgba(66, 130, 199, 0.08);
+
+  --c-secondary-text: #cedbeb;
+
+  --c-secondary-border:
+    rgba(116, 169, 224, 0.18);
+
+  --c-secondary-hover-bg:
+    rgba(61, 133, 208, 0.15);
+
+  --c-secondary-hover-text: #ffffff;
+
+  --c-secondary-hover-border:
+    rgba(116, 169, 224, 0.34);
+
+  /* =======================================================
+     DESTRUCTIVE BUTTON
+  ======================================================= */
+
+  --c-danger-bg: #b91c1c;
+  --c-danger-text: #ffffff;
+  --c-danger-border: #dc2626;
+
+  --c-danger-hover-bg: #991b1b;
+  --c-danger-hover-border: #ef4444;
+
+  /* =======================================================
+     INPUTS
+  ======================================================= */
+
+  --c-input-text: #f5f8fd;
+  --c-input-placeholder: #78899d;
+
+  --c-input-border:
+    rgba(128, 166, 207, 0.22);
+
+  --c-input-hover-border:
+    rgba(116, 169, 224, 0.36);
+
+  --c-focus-color: #60a5fa;
+
+  --c-focus-ring:
+    rgba(96, 165, 250, 0.16);
+
+  --c-disabled-bg:
+    rgba(255, 255, 255, 0.045);
+
+  --c-disabled-text: #68788c;
+
+  --c-disabled-border:
+    rgba(128, 166, 207, 0.1);
+
+  /* =======================================================
+     TABLE
+  ======================================================= */
+
+  --c-table-text: #b9c6d6;
+  --c-table-title: #edf4fc;
+  --c-table-muted: #8090a4;
+
+  --c-table-hover:
+    rgba(59, 130, 246, 0.055);
+
+  --c-table-selected:
+    rgba(59, 130, 246, 0.1);
+
+  /* =======================================================
+     HERO
+  ======================================================= */
+
   --c-hero-bg: #071b42;
 
   --c-hero-border:
-    rgba(197, 31, 45, 0.18);
+    rgba(96, 165, 250, 0.16);
 
-  --c-hero-overlay: linear-gradient(
-    90deg,
-    rgba(7, 27, 66, 0.97) 0%,
-    rgba(18, 61, 126, 0.88) 48%,
-    rgba(126, 21, 34, 0.62) 100%
-  );
+  --c-hero-overlay:
+    linear-gradient(
+      90deg,
+      rgba(7, 27, 66, 0.97) 0%,
+      rgba(18, 61, 126, 0.88) 48%,
+      rgba(76, 28, 48, 0.58) 100%
+    );
 
   --c-hero-pattern:
-    rgba(197, 31, 45, 0.09);
+    rgba(96, 165, 250, 0.07);
 
   --c-hero-seal-bg:
     rgba(255, 255, 255, 0.1);
@@ -326,16 +700,35 @@ html[data-theme="dark"] {
   --c-hero-seal-border:
     rgba(255, 255, 255, 0.2);
 
-  /* Feature welcome */
-  --c-welcome-bg: linear-gradient(
-    120deg,
-    #071b42 0%,
-    #123d7e 45%,
-    #6c1b2b 78%,
-    #a91522 100%
-  );
+  /* =======================================================
+     FEATURE WELCOME
+  ======================================================= */
 
-  /* Shadows */
+  --c-welcome-bg:
+    linear-gradient(
+      120deg,
+      #071b42 0%,
+      #123d7e 50%,
+      #542136 82%,
+      #821c2b 100%
+    );
+
+  /* =======================================================
+     SHADOWS
+  ======================================================= */
+
+  --c-shadow-xs:
+    0 1px 2px rgba(0, 0, 0, 0.12);
+
+  --c-shadow-sm:
+    0 5px 14px rgba(0, 0, 0, 0.16);
+
+  --c-shadow-md:
+    0 10px 26px rgba(0, 0, 0, 0.2);
+
+  --c-shadow-lg:
+    0 20px 48px rgba(0, 0, 0, 0.28);
+
   --c-sidebar-shadow:
     5px 0 22px rgba(0, 0, 0, 0.12);
 
@@ -351,38 +744,99 @@ html[data-theme="dark"] {
   --c-panel-shadow:
     0 8px 24px rgba(0, 0, 0, 0.16);
 
-  /* Modal */
+  /* =======================================================
+     MODAL
+  ======================================================= */
+
   --c-modal-backdrop:
     rgba(4, 11, 25, 0.8);
 
-  --c-modal-bg: #132c4b;
+  --c-modal-bg: #102641;
 
   --c-modal-shadow:
     0 32px 85px rgba(0, 0, 0, 0.48);
 
-  /* Theme toggle */
-  --c-toggle-track-bg: linear-gradient(
-    90deg,
-    #123d7e,
-    #5b1b2a
-  );
+  /* =======================================================
+     THEME TOGGLE
+  ======================================================= */
+
+  --c-toggle-track-bg:
+    linear-gradient(
+      90deg,
+      #123d7e,
+      #3d2845
+    );
 
   --c-toggle-track-border:
-    rgba(197, 31, 45, 0.22);
+    rgba(96, 165, 250, 0.22);
 
   --c-toggle-sun: #8192a6;
   --c-toggle-moon: #f7c945;
 
-  --c-toggle-thumb-bg: linear-gradient(
-    135deg,
-    #377fc4,
-    #c51f2d
-  );
+  --c-toggle-thumb-bg:
+    linear-gradient(
+      135deg,
+      #377fc4,
+      #24559a
+    );
 
   --c-toggle-thumb-text: #ffffff;
 
   --c-toggle-thumb-x: 32px;
 
   --c-toggle-shadow:
-    0 4px 12px rgba(197, 31, 45, 0.22);
+    0 4px 12px rgba(0, 0, 0, 0.28);
+}
+
+
+/* =========================================================
+   OPTIONAL GLOBAL UTILITY TOKENS
+   Safe to use in future CSS without redefining values.
+========================================================= */
+
+:root {
+  --c-overlay-soft:
+    rgba(7, 27, 66, 0.08);
+
+  --c-overlay-medium:
+    rgba(7, 27, 66, 0.18);
+
+  --c-overlay-strong:
+    rgba(7, 27, 66, 0.42);
+
+  --c-scrollbar-thumb:
+    rgba(75, 94, 122, 0.28);
+
+  --c-scrollbar-thumb-hover:
+    rgba(75, 94, 122, 0.42);
+}
+
+html[data-theme="dark"] {
+  --c-overlay-soft:
+    rgba(0, 0, 0, 0.14);
+
+  --c-overlay-medium:
+    rgba(0, 0, 0, 0.26);
+
+  --c-overlay-strong:
+    rgba(0, 0, 0, 0.52);
+
+  --c-scrollbar-thumb:
+    rgba(147, 197, 253, 0.2);
+
+  --c-scrollbar-thumb-hover:
+    rgba(147, 197, 253, 0.32);
+}
+
+
+/* =========================================================
+   REDUCED MOTION TOKEN FALLBACK
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --c-motion-fast: 0ms;
+    --c-motion-base: 0ms;
+    --c-motion-slow: 0ms;
+  }
 }

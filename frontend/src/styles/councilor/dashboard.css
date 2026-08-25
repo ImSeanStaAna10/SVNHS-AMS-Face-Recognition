@@ -1701,3 +1701,1043 @@
     transform: translateY(-50%);
   }
 }
+
+/* =========================================================
+   COUNCILOR DASHBOARD V2 — READABLE + SEMANTIC UI
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Goals:
+   - Larger, easier-to-read typography
+   - Same institutional visual language as Adviser pages
+   - Semantic colors for quick visual scanning
+   - Cleaner spacing and card hierarchy
+   - Subtle production-level motion
+   - Existing layout structure preserved
+========================================================= */
+
+/* =========================================================
+   PAGE RHYTHM
+========================================================= */
+
+.dashboard-page {
+  gap: 22px;
+}
+
+/* =========================================================
+   HERO — LARGER / CLEANER
+========================================================= */
+
+.councilor-hero {
+  min-height: 270px;
+
+  border-radius: 19px;
+}
+
+.councilor-hero-content {
+  width: min(100%, 790px);
+
+  padding: 44px 46px;
+}
+
+.councilor-hero-kicker {
+  gap: 9px;
+
+  font-size: 11px;
+  font-weight: 850;
+
+  letter-spacing: 0.16em;
+}
+
+.councilor-hero-kicker::before {
+  width: 28px;
+}
+
+.councilor-hero h2 {
+  max-width: 650px;
+
+  margin-top: 13px;
+
+  font-size: clamp(32px, 3vw, 42px);
+
+  line-height: 1.1;
+}
+
+.councilor-hero p {
+  max-width: 650px;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+}
+
+.councilor-hero-meta {
+  gap: 10px;
+
+  margin-top: 18px;
+
+  font-size: 9px;
+}
+
+.dashboard-hero-actions {
+  gap: 10px;
+
+  margin-top: 24px;
+}
+
+.dashboard-hero-actions button {
+  min-height: 42px;
+
+  padding-inline: 16px;
+
+  border-radius: 9px;
+
+  font-size: 11px;
+}
+
+.councilor-hero-seal {
+  right: 52px;
+
+  width: 126px;
+  height: 126px;
+
+  padding: 15px;
+}
+
+/* =========================================================
+   DATA WARNING
+========================================================= */
+
+.dashboard-data-warning {
+  gap: 12px;
+
+  padding: 14px 16px;
+
+  border-radius: 12px;
+}
+
+.dashboard-data-warning > span {
+  width: 27px;
+  height: 27px;
+
+  flex-basis: 27px;
+
+  font-size: 11px;
+}
+
+.dashboard-data-warning strong {
+  font-size: 12px;
+}
+
+.dashboard-data-warning p {
+  margin-top: 4px;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   KPI GRID
+========================================================= */
+
+.dashboard-kpi-grid {
+  gap: 14px;
+}
+
+.dashboard-kpi-card {
+  min-height: 165px;
+
+  padding: 20px 20px 19px;
+
+  border-radius: 15px;
+}
+
+.dashboard-kpi-icon {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 11px;
+
+  font-size: 16px;
+}
+
+.dashboard-kpi-tag {
+  font-size: 8px;
+
+  letter-spacing: 0.12em;
+}
+
+.dashboard-kpi-value {
+  margin-top: 19px;
+
+  font-size: clamp(31px, 2.8vw, 39px);
+}
+
+.dashboard-kpi-card h3 {
+  margin-top: 9px;
+
+  font-size: 12px;
+}
+
+.dashboard-kpi-card p {
+  margin-top: 5px;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   KPI SEMANTIC COLOR ORGANIZATION
+========================================================= */
+
+.dashboard-kpi-grid .dashboard-kpi-card:nth-child(1) {
+  border-color: #c9dcf4;
+
+  background: linear-gradient(
+    180deg,
+    rgba(239, 246, 255, 0.86),
+    var(--c-surface) 72%
+  );
+}
+
+.dashboard-kpi-grid .dashboard-kpi-card:nth-child(1) .dashboard-kpi-icon {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.dashboard-kpi-grid .dashboard-kpi-card:nth-child(2) {
+  border-color: #c7e7d0;
+
+  background: linear-gradient(
+    180deg,
+    rgba(240, 253, 244, 0.88),
+    var(--c-surface) 72%
+  );
+}
+
+.dashboard-kpi-grid .dashboard-kpi-card:nth-child(2) .dashboard-kpi-icon {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.dashboard-kpi-grid .dashboard-kpi-card:nth-child(3) {
+  border-color: #e3d5f7;
+
+  background: linear-gradient(
+    180deg,
+    rgba(250, 245, 255, 0.9),
+    var(--c-surface) 72%
+  );
+}
+
+.dashboard-kpi-grid .dashboard-kpi-card:nth-child(3) .dashboard-kpi-icon {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.dashboard-kpi-grid .dashboard-kpi-card:nth-child(4) {
+  border-color: #f1deab;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255, 251, 235, 0.92),
+    var(--c-surface) 72%
+  );
+}
+
+.dashboard-kpi-grid .dashboard-kpi-card:nth-child(4) .dashboard-kpi-icon {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* =========================================================
+   OPERATIONAL GRID
+========================================================= */
+
+.dashboard-operational-grid {
+  gap: 16px;
+}
+
+/* =========================================================
+   SHARED PANELS
+========================================================= */
+
+.dashboard-panel {
+  border-radius: 16px;
+}
+
+.dashboard-panel-header {
+  gap: 22px;
+
+  padding: 22px 24px;
+}
+
+.dashboard-panel-header > div > span {
+  font-size: 8px;
+
+  letter-spacing: 0.13em;
+}
+
+.dashboard-panel-header h2 {
+  margin-top: 6px;
+
+  font-size: 19px;
+}
+
+.dashboard-panel-header p {
+  margin-top: 6px;
+
+  font-size: 10px;
+
+  line-height: 1.55;
+}
+
+.dashboard-panel-link {
+  gap: 7px;
+
+  min-height: 34px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   PANEL HEADER SEMANTICS
+========================================================= */
+
+.dashboard-operational-grid
+  .dashboard-panel:first-child
+  .dashboard-panel-header {
+  background: linear-gradient(90deg, rgba(239, 246, 255, 0.86), transparent);
+}
+
+.dashboard-operational-grid
+  .dashboard-panel:first-child
+  .dashboard-panel-header
+  > div
+  > span {
+  color: #1d4ed8;
+}
+
+.dashboard-operational-grid
+  .dashboard-panel:last-child
+  .dashboard-panel-header {
+  background: linear-gradient(90deg, rgba(250, 245, 255, 0.88), transparent);
+}
+
+.dashboard-operational-grid
+  .dashboard-panel:last-child
+  .dashboard-panel-header
+  > div
+  > span {
+  color: #6d28d9;
+}
+
+/* =========================================================
+   ATTENDANCE OVERVIEW
+========================================================= */
+
+.dashboard-attendance-overall {
+  gap: 24px;
+
+  padding: 24px 24px 16px;
+}
+
+.dashboard-attendance-overall > div:first-child > span {
+  font-size: 8px;
+}
+
+.dashboard-attendance-overall > div:first-child > strong {
+  margin-top: 8px;
+
+  font-size: clamp(36px, 3.4vw, 46px);
+}
+
+.dashboard-attendance-overall p {
+  margin-top: 8px;
+
+  font-size: 10px;
+}
+
+.dashboard-attendance-session-box {
+  min-width: 118px;
+
+  padding: 15px 17px;
+
+  border-color: #d6e3f3;
+
+  border-radius: 12px;
+
+  background: #f4f8fe;
+}
+
+.dashboard-attendance-session-box strong {
+  font-size: 25px;
+}
+
+.dashboard-attendance-session-box span {
+  margin-top: 5px;
+
+  font-size: 9px;
+}
+
+/* =========================================================
+   MAIN ATTENDANCE PROGRESS
+========================================================= */
+
+.dashboard-main-progress {
+  height: 8px;
+
+  margin-inline: 24px;
+}
+
+/* =========================================================
+   ATTENDANCE BREAKDOWN
+========================================================= */
+
+.dashboard-attendance-breakdown {
+  gap: 11px;
+
+  padding: 19px 24px 24px;
+}
+
+.dashboard-attendance-metric {
+  gap: 11px;
+
+  padding: 14px 13px;
+
+  border-radius: 12px;
+}
+
+.dashboard-attendance-dot {
+  width: 9px;
+  height: 9px;
+
+  flex-basis: 9px;
+
+  margin-top: 4px;
+}
+
+.dashboard-attendance-metric span:not(.dashboard-attendance-dot) {
+  font-size: 9px;
+}
+
+.dashboard-attendance-metric strong {
+  margin-top: 4px;
+
+  font-size: 18px;
+}
+
+.dashboard-attendance-metric small {
+  margin-top: 3px;
+
+  font-size: 8px;
+}
+
+/* semantic metric boxes */
+
+.dashboard-attendance-present {
+  border-color: #c7e7d0;
+
+  background: #f2fbf5;
+}
+
+.dashboard-attendance-late {
+  border-color: #f0dda8;
+
+  background: #fffaf0;
+}
+
+.dashboard-attendance-absent {
+  border-color: #efc8cc;
+
+  background: #fff5f5;
+}
+
+/* =========================================================
+   READINESS
+========================================================= */
+
+.dashboard-readiness-list {
+  gap: 20px;
+
+  padding: 22px 24px;
+}
+
+.dashboard-readiness-top {
+  gap: 16px;
+}
+
+.dashboard-readiness-top > div > strong {
+  font-size: 11px;
+}
+
+.dashboard-readiness-top > div > span {
+  margin-top: 4px;
+
+  font-size: 9px;
+}
+
+.dashboard-readiness-top > strong {
+  font-size: 11px;
+}
+
+.dashboard-readiness-progress {
+  height: 6px;
+
+  margin-top: 9px;
+}
+
+/* =========================================================
+   QUICK ACTIONS
+========================================================= */
+
+.dashboard-quick-actions {
+  padding: 0 16px 16px;
+}
+
+.dashboard-quick-actions button {
+  grid-template-columns:
+    36px
+    minmax(0, 1fr)
+    auto;
+
+  gap: 11px;
+
+  padding: 13px 9px;
+
+  border-radius: 8px;
+}
+
+.dashboard-quick-actions button > span:first-child {
+  width: 36px;
+  height: 36px;
+
+  border-radius: 9px;
+
+  font-size: 14px;
+}
+
+.dashboard-quick-actions button strong {
+  font-size: 10px;
+}
+
+.dashboard-quick-actions button small {
+  margin-top: 3px;
+
+  font-size: 8px;
+}
+
+.dashboard-quick-actions button > span:last-child {
+  font-size: 13px;
+}
+
+/* blue / violet / green action cues */
+
+.dashboard-quick-actions button:nth-child(1) > span:first-child {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.dashboard-quick-actions button:nth-child(2) > span:first-child {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.dashboard-quick-actions button:nth-child(3) > span:first-child {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* =========================================================
+   ADVISER LIST
+========================================================= */
+
+.dashboard-adviser-row {
+  grid-template-columns:
+    minmax(240px, 1.5fr)
+    minmax(100px, 0.5fr)
+    auto;
+
+  gap: 22px;
+
+  padding: 15px 24px;
+}
+
+.dashboard-adviser-person {
+  gap: 12px;
+}
+
+.dashboard-adviser-avatar {
+  width: 40px;
+  height: 40px;
+
+  flex-basis: 40px;
+
+  border-radius: 10px;
+
+  background: #e8f1ff;
+  color: #1d4ed8;
+
+  font-size: 13px;
+}
+
+.dashboard-adviser-person strong {
+  font-size: 11px;
+}
+
+.dashboard-adviser-person span {
+  margin-top: 4px;
+
+  font-size: 9px;
+}
+
+.dashboard-adviser-role {
+  padding: 5px 8px;
+
+  border-radius: 6px;
+
+  background: #f0ecff;
+  color: #6d28d9;
+
+  font-size: 8px;
+}
+
+.dashboard-adviser-status {
+  gap: 7px;
+
+  font-size: 9px;
+}
+
+.dashboard-adviser-status > span {
+  width: 7px;
+  height: 7px;
+}
+
+.dashboard-adviser-footer {
+  padding: 13px 24px;
+
+  font-size: 9px;
+}
+
+.dashboard-adviser-footer button {
+  font-size: 9px;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.dashboard-panel-empty {
+  min-height: 210px;
+
+  padding: 32px;
+}
+
+.dashboard-panel-empty > span {
+  width: 44px;
+  height: 44px;
+
+  margin-bottom: 12px;
+}
+
+.dashboard-panel-empty strong {
+  font-size: 12px;
+}
+
+.dashboard-panel-empty p {
+  margin-top: 6px;
+
+  font-size: 10px;
+}
+
+.dashboard-panel-empty button {
+  margin-top: 14px;
+
+  min-height: 36px;
+
+  padding: 0 13px;
+
+  border-radius: 8px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   SUBTLE PRODUCTION ANIMATION
+========================================================= */
+
+.dashboard-kpi-card,
+.dashboard-panel,
+.dashboard-data-warning {
+  animation: councilor-dashboard-card-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+.dashboard-kpi-card:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+.dashboard-kpi-card:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.dashboard-kpi-card:nth-child(3) {
+  animation-delay: 0.12s;
+}
+
+.dashboard-kpi-card:nth-child(4) {
+  animation-delay: 0.16s;
+}
+
+.dashboard-operational-grid .dashboard-panel:first-child {
+  animation-delay: 0.18s;
+}
+
+.dashboard-operational-grid .dashboard-panel:last-child {
+  animation-delay: 0.22s;
+}
+
+.councilor-hero-content {
+  animation: councilor-dashboard-hero-content-enter 0.58s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.councilor-hero-seal {
+  animation: councilor-dashboard-seal-enter 0.6s 0.08s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.dashboard-main-progress > div,
+.dashboard-readiness-progress > div {
+  animation: councilor-dashboard-progress-enter 0.7s 0.15s ease-out both;
+}
+
+@keyframes councilor-dashboard-card-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes councilor-dashboard-hero-content-enter {
+  from {
+    opacity: 0;
+
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes councilor-dashboard-seal-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(-50%) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+@keyframes councilor-dashboard-progress-enter {
+  from {
+    transform: scaleX(0);
+
+    transform-origin: left center;
+  }
+
+  to {
+    transform: scaleX(1);
+
+    transform-origin: left center;
+  }
+}
+
+/* =========================================================
+   DARK MODE SEMANTIC OVERRIDES
+========================================================= */
+
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(1),
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(2),
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(3),
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(4) {
+  border-color: #293b52;
+
+  background: var(--c-surface);
+}
+
+html[data-theme="dark"] .dashboard-attendance-session-box {
+  border-color: #304660;
+
+  background: #111f33;
+}
+
+html[data-theme="dark"] .dashboard-attendance-present {
+  border-color: #28583b;
+
+  background: rgba(22, 101, 52, 0.14);
+}
+
+html[data-theme="dark"] .dashboard-attendance-late {
+  border-color: #675526;
+
+  background: rgba(146, 104, 18, 0.13);
+}
+
+html[data-theme="dark"] .dashboard-attendance-absent {
+  border-color: #673036;
+
+  background: rgba(127, 29, 29, 0.13);
+}
+
+html[data-theme="dark"]
+  .dashboard-quick-actions
+  button:nth-child(1)
+  > span:first-child {
+  background: rgba(37, 99, 235, 0.18);
+
+  color: #93c5fd;
+}
+
+html[data-theme="dark"]
+  .dashboard-quick-actions
+  button:nth-child(2)
+  > span:first-child {
+  background: rgba(109, 40, 217, 0.19);
+
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"]
+  .dashboard-quick-actions
+  button:nth-child(3)
+  > span:first-child {
+  background: rgba(21, 128, 61, 0.18);
+
+  color: #86efac;
+}
+
+html[data-theme="dark"] .dashboard-adviser-avatar {
+  background: rgba(37, 99, 235, 0.18);
+
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .dashboard-adviser-role {
+  background: rgba(109, 40, 217, 0.17);
+
+  color: #c4b5fd;
+}
+
+/* =========================================================
+   RESPONSIVE — LARGE TABLET
+========================================================= */
+
+@media (max-width: 1180px) {
+  .councilor-hero {
+    min-height: 260px;
+  }
+
+  .councilor-hero-content {
+    padding: 40px 38px;
+  }
+
+  .councilor-hero-seal {
+    right: 34px;
+
+    width: 112px;
+    height: 112px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 920px) {
+  .councilor-hero-content {
+    max-width: calc(100% - 125px);
+  }
+
+  .councilor-hero-seal {
+    width: 92px;
+    height: 92px;
+  }
+
+  .dashboard-panel-header h2 {
+    font-size: 18px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 720px) {
+  .dashboard-page {
+    gap: 17px;
+  }
+
+  .councilor-hero {
+    min-height: 270px;
+  }
+
+  .councilor-hero-content {
+    padding: 31px 26px;
+  }
+
+  .councilor-hero h2 {
+    font-size: clamp(27px, 8vw, 34px);
+  }
+
+  .councilor-hero p {
+    font-size: 12px;
+  }
+
+  .dashboard-kpi-card {
+    min-height: 150px;
+  }
+
+  .dashboard-kpi-value {
+    font-size: 31px;
+  }
+
+  .dashboard-panel-header {
+    padding: 20px 19px;
+  }
+
+  .dashboard-attendance-overall {
+    padding-inline: 19px;
+  }
+
+  .dashboard-main-progress {
+    margin-inline: 19px;
+  }
+
+  .dashboard-attendance-breakdown {
+    padding: 18px 19px 20px;
+  }
+
+  .dashboard-readiness-list {
+    padding: 20px 19px;
+  }
+
+  .dashboard-adviser-row {
+    padding: 14px 19px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 520px) {
+  .councilor-hero {
+    min-height: 290px;
+  }
+
+  .councilor-hero-content {
+    padding: 29px 21px;
+  }
+
+  .councilor-hero-kicker {
+    font-size: 9px;
+  }
+
+  .councilor-hero h2 {
+    font-size: 27px;
+  }
+
+  .councilor-hero p {
+    font-size: 11px;
+  }
+
+  .dashboard-hero-actions button {
+    min-height: 42px;
+
+    font-size: 11px;
+  }
+
+  .dashboard-kpi-card {
+    min-height: 0;
+
+    padding: 18px;
+  }
+
+  .dashboard-kpi-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dashboard-kpi-tag {
+    font-size: 8px;
+  }
+
+  .dashboard-kpi-card h3 {
+    font-size: 12px;
+  }
+
+  .dashboard-kpi-card p {
+    font-size: 10px;
+  }
+
+  .dashboard-panel-header h2 {
+    font-size: 18px;
+  }
+
+  .dashboard-panel-header p {
+    font-size: 10px;
+  }
+
+  .dashboard-attendance-session-box {
+    min-height: 64px;
+  }
+
+  .dashboard-attendance-session-box strong {
+    font-size: 23px;
+  }
+
+  .dashboard-adviser-person strong {
+    font-size: 11px;
+  }
+
+  .dashboard-adviser-person span {
+    font-size: 9px;
+  }
+
+  .dashboard-adviser-status {
+    font-size: 9px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-kpi-card,
+  .dashboard-panel,
+  .dashboard-data-warning,
+  .councilor-hero-content,
+  .councilor-hero-seal,
+  .dashboard-main-progress > div,
+  .dashboard-readiness-progress > div {
+    animation: none !important;
+  }
+}
