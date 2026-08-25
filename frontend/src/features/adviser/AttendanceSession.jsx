@@ -1,12 +1,10 @@
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
-import * as XLSX from "xlsx";
-
 import adviserService from "../../services/adviserService";
 import authService from "../../services/authService";
 
-import depedLogo from "../../assets/kagawaran-educ-logo.svg";
 import seniorHighSchoolLogo from "../../assets/shs-logo.svg";
 
 import "../../styles/adviser/attendanceSession.css";
@@ -129,28 +127,6 @@ const formatSchoolDate = (value = new Date()) =>
     year: "numeric",
   }).format(value);
 
-const formatShortDate = (value = new Date()) =>
-  new Intl.DateTimeFormat("en-PH", {
-    timeZone: PH_TIME_ZONE,
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  }).format(value);
-
-const sanitizeFileName = (value) => {
-  const text = String(value || "attendance-session").trim();
-
-  const invalidCharacters = ["<", ">", ":", '"', "/", "\\", "|", "?", "*"];
-
-  let result = text;
-
-  invalidCharacters.forEach((character) => {
-    result = result.split(character).join("-");
-  });
-
-  return result.split(" ").filter(Boolean).join("_").slice(0, 90);
-};
-
 const canvasToImageFile = (canvas) =>
   new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -199,6 +175,8 @@ function AttendanceSession() {
 
   const scanLockRef = useRef(false);
 
+  const filterMenuRef = useRef(null);
+
   /* =======================================================
      DATA
   ======================================================= */
@@ -222,6 +200,18 @@ function AttendanceSession() {
   const [liveClock, setLiveClock] = useState(new Date());
 
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [attendanceStatusFilter, setAttendanceStatusFilter] = useState("ALL");
+
+  const [attendanceMethodFilter, setAttendanceMethodFilter] = useState("ALL");
+
+  const [attendanceSort, setAttendanceSort] = useState("DEFAULT");
+
+  const [pageSize, setPageSize] = useState(10);
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
 
   /* =======================================================
      CAMERA / AUTO SCAN
@@ -434,21 +424,213 @@ function AttendanceSession() {
     activeSession && String(getSessionId(activeSession)) === String(sessionId),
   );
 
-  const filteredStudents = useMemo(() => {
+  const attendanceRows = useMemo(
+    () =>
+      activeStudents.map((student, originalIndex) => {
+        const record = presentRecords.find(
+          (item) => String(getRecordStudentId(item)) === String(student.id),
+        );
+
+        return {
+          student,
+          record,
+          present: Boolean(record),
+          originalIndex,
+        };
+      }),
+    [activeStudents, presentRecords],
+  );
+
+  const filteredStudentRows = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
-    if (!query) {
-      return activeStudents;
-    }
-
-    return activeStudents.filter((student) => {
+    const rows = attendanceRows.filter(({ student, record, present }) => {
       const name = String(student?.name || "").toLowerCase();
 
       const number = String(student?.studentNumber || "").toLowerCase();
 
-      return name.includes(query) || number.includes(query);
+      const method = String(getRecordMethod(record) || "").toUpperCase();
+
+      const matchesSearch =
+        !query || name.includes(query) || number.includes(query);
+
+      const matchesStatus =
+        attendanceStatusFilter === "ALL" ||
+        (attendanceStatusFilter === "PRESENT" && present) ||
+        (attendanceStatusFilter === "PENDING" && !present);
+
+      const matchesMethod =
+        attendanceMethodFilter === "ALL" ||
+        (attendanceMethodFilter === "FACE" && method.includes("FACE")) ||
+        (attendanceMethodFilter === "MANUAL" && method.includes("MANUAL"));
+
+      return matchesSearch && matchesStatus && matchesMethod;
     });
-  }, [activeStudents, searchQuery]);
+
+    return [...rows].sort((left, right) => {
+      if (attendanceSort === "NAME_ASC") {
+        return String(left.student?.name || "").localeCompare(
+          String(right.student?.name || ""),
+          "en",
+          { sensitivity: "base" },
+        );
+      }
+
+      if (attendanceSort === "NAME_DESC") {
+        return String(right.student?.name || "").localeCompare(
+          String(left.student?.name || ""),
+          "en",
+          { sensitivity: "base" },
+        );
+      }
+
+      if (attendanceSort === "NUMBER_ASC") {
+        return String(left.student?.studentNumber || "").localeCompare(
+          String(right.student?.studentNumber || ""),
+          "en",
+          { numeric: true, sensitivity: "base" },
+        );
+      }
+
+      if (attendanceSort === "RECENT") {
+        const leftTime = left.record ? new Date(getRecordTime(left.record)) : null;
+        const rightTime = right.record
+          ? new Date(getRecordTime(right.record))
+          : null;
+
+        const leftValue =
+          leftTime && !Number.isNaN(leftTime.getTime())
+            ? leftTime.getTime()
+            : -Infinity;
+
+        const rightValue =
+          rightTime && !Number.isNaN(rightTime.getTime())
+            ? rightTime.getTime()
+            : -Infinity;
+
+        return rightValue - leftValue;
+      }
+
+      return left.originalIndex - right.originalIndex;
+    });
+  }, [
+    attendanceRows,
+    searchQuery,
+    attendanceStatusFilter,
+    attendanceMethodFilter,
+    attendanceSort,
+  ]);
+
+  const totalFilteredStudents = filteredStudentRows.length;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalFilteredStudents / Math.max(pageSize, 1)),
+  );
+
+  const paginatedStudentRows = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+
+    return filteredStudentRows.slice(startIndex, startIndex + pageSize);
+  }, [filteredStudentRows, currentPage, pageSize]);
+
+  const paginationItems = useMemo(() => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, index) => index + 1);
+    }
+
+    const items = [1];
+
+    if (currentPage > 4) {
+      items.push("left-ellipsis");
+    }
+
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let page = start; page <= end; page += 1) {
+      items.push(page);
+    }
+
+    if (currentPage < totalPages - 3) {
+      items.push("right-ellipsis");
+    }
+
+    items.push(totalPages);
+
+    return items;
+  }, [currentPage, totalPages]);
+
+  const visibleStart = totalFilteredStudents
+    ? (currentPage - 1) * pageSize + 1
+    : 0;
+
+  const visibleEnd = Math.min(currentPage * pageSize, totalFilteredStudents);
+
+  const filterMenuActiveCount = [
+    attendanceStatusFilter !== "ALL",
+    attendanceMethodFilter !== "ALL",
+    attendanceSort !== "DEFAULT",
+    pageSize !== 10,
+  ].filter(Boolean).length;
+
+  const filtersAreActive = Boolean(
+    searchQuery.trim() || filterMenuActiveCount > 0,
+  );
+
+  const resetAttendanceView = useCallback(() => {
+    setSearchQuery("");
+    setAttendanceStatusFilter("ALL");
+    setAttendanceMethodFilter("ALL");
+    setAttendanceSort("DEFAULT");
+    setPageSize(10);
+    setCurrentPage(1);
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    searchQuery,
+    attendanceStatusFilter,
+    attendanceMethodFilter,
+    attendanceSort,
+    pageSize,
+  ]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  useEffect(() => {
+    if (!filterMenuOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (
+        filterMenuRef.current &&
+        !filterMenuRef.current.contains(event.target)
+      ) {
+        setFilterMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setFilterMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [filterMenuOpen]);
 
   /* =======================================================
      TIMERS
@@ -1065,85 +1247,6 @@ function AttendanceSession() {
   };
 
   /* =======================================================
-     EXPORT
-  ======================================================= */
-
-  const getAttendanceRows = () =>
-    activeStudents.map((student, index) => {
-      const record = presentRecords.find(
-        (item) => String(getRecordStudentId(item)) === String(student.id),
-      );
-
-      return {
-        No: index + 1,
-        "Student Number": student.studentNumber || "",
-        "Student Name": student.name || "",
-        Status: record ? "PRESENT" : "PENDING",
-        "Recorded At": record ? formatSchoolTime(getRecordTime(record)) : "",
-        Method: getRecordMethod(record) || (record ? "Attendance" : ""),
-      };
-    });
-
-  const handleExportExcel = () => {
-    const workbook = XLSX.utils.book_new();
-
-    const rows = getAttendanceRows();
-
-    const attendanceSheet = XLSX.utils.json_to_sheet(rows);
-
-    XLSX.utils.book_append_sheet(workbook, attendanceSheet, "Attendance Sheet");
-
-    const summaryRows = [
-      {
-        Field: "Section",
-        Value: sectionName,
-      },
-      {
-        Field: "Adviser",
-        Value: adviserName,
-      },
-      {
-        Field: "Date",
-        Value: formatShortDate(),
-      },
-      {
-        Field: "Session Started",
-        Value: formatSchoolTime(sessionStartedAt),
-      },
-      {
-        Field: "Total Students",
-        Value: activeStudents.length,
-      },
-      {
-        Field: "Present",
-        Value: presentCount,
-      },
-      {
-        Field: "Pending",
-        Value: remainingCount,
-      },
-      {
-        Field: "Completion",
-        Value: `${completionPercentage}%`,
-      },
-    ];
-
-    const summarySheet = XLSX.utils.json_to_sheet(summaryRows);
-
-    XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
-
-    const fileName = sanitizeFileName(
-      `Attendance_${sectionName}_${formatShortDate()}`,
-    );
-
-    XLSX.writeFile(workbook, `${fileName}.xlsx`);
-  };
-
-  const handleExportPdf = () => {
-    window.print();
-  };
-
-  /* =======================================================
      END SESSION
   ======================================================= */
 
@@ -1385,17 +1488,17 @@ function AttendanceSession() {
                 </div>
 
                 <div className="attendance-camera-stats">
-                  <div>
+                  <div className="is-present">
                     <span>PRESENT</span>
                     <strong>{presentCount}</strong>
                   </div>
 
-                  <div>
+                  <div className="is-remaining">
                     <span>REMAINING</span>
                     <strong>{remainingCount}</strong>
                   </div>
 
-                  <div>
+                  <div className="is-completion">
                     <span>COMPLETION</span>
                     <strong>{completionPercentage}%</strong>
                   </div>
@@ -1608,49 +1711,37 @@ function AttendanceSession() {
       <section className="attendance-live-report-section">
         <header className="attendance-live-report-header">
           <div>
-            <span>OFFICIAL CLASS RECORD</span>
+            <span>LIVE CLASS RECORD</span>
 
             <h2>Student Attendance Register</h2>
 
             <p>
-              Review manual entries, current attendance status, and export the
-              official session record.
+              Review the current session, manage manual attendance, and quickly
+              find students without leaving the live scanner.
             </p>
-          </div>
-
-          <div className="attendance-report-actions">
-            <button type="button" onClick={handleExportPdf}>
-              PDF
-              <span>Export PDF</span>
-            </button>
-
-            <button type="button" onClick={handleExportExcel}>
-              XLS
-              <span>Export Excel</span>
-            </button>
           </div>
         </header>
 
         <div className="attendance-report-summary">
-          <div>
+          <div className="attendance-summary-card is-students">
             <span>STUDENTS</span>
 
             <strong>{activeStudents.length}</strong>
           </div>
 
-          <div>
+          <div className="attendance-summary-card is-present">
             <span>PRESENT</span>
 
             <strong className="is-success">{presentCount}</strong>
           </div>
 
-          <div>
+          <div className="attendance-summary-card is-remaining">
             <span>REMAINING</span>
 
             <strong>{remainingCount}</strong>
           </div>
 
-          <div>
+          <div className="attendance-summary-card is-completion">
             <span>COMPLETION</span>
 
             <strong>{completionPercentage}%</strong>
@@ -1658,27 +1749,217 @@ function AttendanceSession() {
         </div>
 
         <div className="attendance-report-toolbar">
-          <label>
-            <span>⌕</span>
+          <div className="attendance-report-search-block">
+            <label
+              className="attendance-report-search"
+              htmlFor="attendance-search"
+            >
+              <span aria-hidden="true">⌕</span>
 
-            <input
-              type="search"
-              value={searchQuery}
-              placeholder="Search student name or student number..."
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
+              <input
+                id="attendance-search"
+                type="search"
+                value={searchQuery}
+                placeholder="Search student name or student number..."
+                onChange={(event) => setSearchQuery(event.target.value)}
+              />
 
-            {searchQuery && (
-              <button type="button" onClick={() => setSearchQuery("")}>
-                ×
-              </button>
-            )}
-          </label>
+              {searchQuery && (
+                <button
+                  type="button"
+                  aria-label="Clear student search"
+                  onClick={() => setSearchQuery("")}
+                >
+                  ×
+                </button>
+              )}
+            </label>
 
-          <span>
-            {filteredStudents.length} student
-            {filteredStudents.length === 1 ? "" : "s"}
-          </span>
+            <div className="attendance-report-toolbar-right">
+              <div className="attendance-report-result-copy">
+                <strong>{totalFilteredStudents}</strong>
+                <span>
+                  result{totalFilteredStudents === 1 ? "" : "s"} found
+                </span>
+              </div>
+
+              {filtersAreActive && (
+                <button
+                  type="button"
+                  className="attendance-view-reset-button"
+                  onClick={resetAttendanceView}
+                >
+                  Reset
+                </button>
+              )}
+
+              <div className="attendance-filter-menu" ref={filterMenuRef}>
+                <button
+                  type="button"
+                  className={`attendance-filter-trigger ${
+                    filterMenuOpen ? "is-open" : ""
+                  } ${filterMenuActiveCount ? "has-active" : ""}`}
+                  aria-expanded={filterMenuOpen}
+                  aria-haspopup="dialog"
+                  onClick={() => setFilterMenuOpen((current) => !current)}
+                >
+                  <span className="attendance-filter-trigger-icon" aria-hidden="true">
+                    ☷
+                  </span>
+                  <span>Filters</span>
+
+                  {filterMenuActiveCount > 0 && (
+                    <strong>{filterMenuActiveCount}</strong>
+                  )}
+
+                  <i aria-hidden="true">▾</i>
+                </button>
+
+                {filterMenuOpen && (
+                  <div
+                    className="attendance-filter-popover"
+                    role="dialog"
+                    aria-label="Attendance filters and table view"
+                  >
+                    <div className="attendance-filter-popover-header">
+                      <div>
+                        <strong>Filters</strong>
+                        <span>Refine the attendance list</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        aria-label="Close filters"
+                        onClick={() => setFilterMenuOpen(false)}
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    <div className="attendance-filter-popover-list">
+                      <label className="attendance-filter-field is-status">
+                        <span className="attendance-filter-field-label">
+                          <i aria-hidden="true" />
+                          Status
+                        </span>
+
+                        <select
+                          value={attendanceStatusFilter}
+                          onChange={(event) =>
+                            setAttendanceStatusFilter(event.target.value)
+                          }
+                        >
+                          <option value="ALL">All statuses</option>
+                          <option value="PRESENT">Present only</option>
+                          <option value="PENDING">Pending only</option>
+                        </select>
+                      </label>
+
+                      <label className="attendance-filter-field is-method">
+                        <span className="attendance-filter-field-label">
+                          <i aria-hidden="true" />
+                          Method
+                        </span>
+
+                        <select
+                          value={attendanceMethodFilter}
+                          onChange={(event) =>
+                            setAttendanceMethodFilter(event.target.value)
+                          }
+                        >
+                          <option value="ALL">All methods</option>
+                          <option value="FACE">Face recognition</option>
+                          <option value="MANUAL">Manual entry</option>
+                        </select>
+                      </label>
+
+                      <label className="attendance-filter-field is-sort">
+                        <span className="attendance-filter-field-label">
+                          <i aria-hidden="true" />
+                          Sort by
+                        </span>
+
+                        <select
+                          value={attendanceSort}
+                          onChange={(event) =>
+                            setAttendanceSort(event.target.value)
+                          }
+                        >
+                          <option value="DEFAULT">Default roster order</option>
+                          <option value="NAME_ASC">Name A–Z</option>
+                          <option value="NAME_DESC">Name Z–A</option>
+                          <option value="NUMBER_ASC">Student number</option>
+                          <option value="RECENT">Most recently recorded</option>
+                        </select>
+                      </label>
+
+                      <label className="attendance-filter-field is-rows">
+                        <span className="attendance-filter-field-label">
+                          <i aria-hidden="true" />
+                          Rows
+                        </span>
+
+                        <select
+                          value={pageSize}
+                          onChange={(event) =>
+                            setPageSize(Number(event.target.value))
+                          }
+                        >
+                          <option value={10}>10 per page</option>
+                          <option value={15}>15 per page</option>
+                          <option value={25}>25 per page</option>
+                          <option value={50}>50 per page</option>
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="attendance-filter-popover-footer">
+                      <button
+                        type="button"
+                        className="is-reset"
+                        disabled={!filtersAreActive}
+                        onClick={resetAttendanceView}
+                      >
+                        Reset
+                      </button>
+
+                      <button
+                        type="button"
+                        className="is-done"
+                        onClick={() => setFilterMenuOpen(false)}
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {filterMenuActiveCount > 0 && (
+            <div className="attendance-active-filter-chips" aria-label="Active filters">
+              {attendanceStatusFilter !== "ALL" && (
+                <span className="is-status">
+                  Status: {attendanceStatusFilter === "PRESENT" ? "Present" : "Pending"}
+                </span>
+              )}
+
+              {attendanceMethodFilter !== "ALL" && (
+                <span className="is-method">
+                  Method: {attendanceMethodFilter === "FACE" ? "Face" : "Manual"}
+                </span>
+              )}
+
+              {attendanceSort !== "DEFAULT" && (
+                <span className="is-sort">Custom sort</span>
+              )}
+
+              {pageSize !== 10 && (
+                <span className="is-rows">{pageSize} rows</span>
+              )}
+            </div>
+          )}
         </div>
 
         {manualMessage && (
@@ -1707,186 +1988,197 @@ function AttendanceSession() {
 
                 <th>Recorded At</th>
 
+                <th>Method</th>
+
                 <th>Action</th>
               </tr>
             </thead>
 
             <tbody>
-              {filteredStudents.map((student, index) => {
-                const present = presentStudentIds.has(String(student.id));
+              {paginatedStudentRows.length ? (
+                paginatedStudentRows.map(({ student, record, present }, index) => {
+                  const marking = markingStudentId === student.id;
 
-                const record = presentRecords.find(
-                  (item) =>
-                    String(getRecordStudentId(item)) === String(student.id),
-                );
+                  const removing = removingStudentId === student.id;
 
-                const marking = markingStudentId === student.id;
+                  const methodLabel = record
+                    ? getRecordMethod(record) || "Attendance"
+                    : "—";
 
-                const removing = removingStudentId === student.id;
+                  const methodUpper = String(methodLabel).toUpperCase();
 
-                return (
-                  <tr
-                    key={student.id || student.studentNumber}
-                    className={present ? "is-present" : ""}
-                  >
-                    <td>{String(index + 1).padStart(2, "0")}</td>
+                  const methodClass = !record
+                    ? "is-empty"
+                    : methodUpper.includes("FACE")
+                      ? "is-face"
+                      : methodUpper.includes("MANUAL")
+                        ? "is-manual"
+                        : "is-generic";
 
-                    <td>
-                      <span className="attendance-live-student-number">
-                        {student.studentNumber || "—"}
-                      </span>
-                    </td>
+                  const rowNumber = (currentPage - 1) * pageSize + index + 1;
 
-                    <td>
-                      <div className="attendance-live-student">
-                        <span>
-                          {student.name?.charAt(0)?.toUpperCase() || "S"}
+                  return (
+                    <tr
+                      key={student.id || student.studentNumber}
+                      className={present ? "is-present" : ""}
+                    >
+                      <td>{String(rowNumber).padStart(2, "0")}</td>
+
+                      <td>
+                        <span className="attendance-live-student-number">
+                          {student.studentNumber || "—"}
                         </span>
+                      </td>
 
-                        <div>
-                          <strong>{student.name || "Unnamed Student"}</strong>
+                      <td>
+                        <div className="attendance-live-student">
+                          <span>
+                            {student.name?.charAt(0)?.toUpperCase() || "S"}
+                          </span>
 
-                          <small>{sectionName}</small>
+                          <div>
+                            <strong>{student.name || "Unnamed Student"}</strong>
+
+                            <small>{sectionName}</small>
+                          </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td>
-                      <span
-                        className={`attendance-live-status ${
-                          present ? "is-present" : "is-pending"
-                        }`}
-                      >
-                        <i />
+                      <td>
+                        <span
+                          className={`attendance-live-status ${
+                            present ? "is-present" : "is-pending"
+                          }`}
+                        >
+                          <i />
 
-                        {present ? "Present" : "Pending"}
-                      </span>
-                    </td>
+                          {present ? "Present" : "Pending"}
+                        </span>
+                      </td>
 
-                    <td>
-                      {record ? formatSchoolTime(getRecordTime(record)) : "—"}
-                    </td>
+                      <td>
+                        {record ? formatSchoolTime(getRecordTime(record)) : "—"}
+                      </td>
 
-                    <td>
-                      {present ? (
+                      <td>
+                        <span
+                          className={`attendance-live-method ${methodClass}`}
+                        >
+                          {methodLabel}
+                        </span>
+                      </td>
+
+                      <td>
+                        {present ? (
+                          <button
+                            type="button"
+                            className="attendance-live-remove"
+                            disabled={!sessionIsActive || removing}
+                            onClick={() => void handleRemoveAttendance(student)}
+                          >
+                            {removing ? "Removing..." : "Remove"}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="attendance-live-mark"
+                            disabled={!sessionIsActive || marking}
+                            onClick={() => void handleMarkPresent(student)}
+                          >
+                            {marking ? "Marking..." : "Mark Present"}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={7}>
+                    <div className="attendance-table-empty-state">
+                      <span>⌕</span>
+
+                      <strong>No students match these filters</strong>
+
+                      <p>
+                        Try changing the search term or clearing one of the
+                        attendance filters.
+                      </p>
+
+                      {filtersAreActive && (
                         <button
                           type="button"
-                          className="attendance-live-remove"
-                          disabled={!sessionIsActive || removing}
-                          onClick={() => void handleRemoveAttendance(student)}
+                          onClick={resetAttendanceView}
                         >
-                          {removing ? "Removing..." : "Remove"}
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="attendance-live-mark"
-                          disabled={!sessionIsActive || marking}
-                          onClick={() => void handleMarkPresent(student)}
-                        >
-                          {marking ? "Marking..." : "Mark Present"}
+                          Clear filters
                         </button>
                       )}
-                    </td>
-                  </tr>
-                );
-              })}
+                    </div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-      </section>
 
-      {/* =================================================
-          PRINT SHEET
-      ================================================== */}
-
-      <section className="attendance-print-sheet">
-        <header>
-          <div className="attendance-print-logos">
-            <img src={depedLogo} alt="Department of Education" />
-
-            <img
-              src={seniorHighSchoolLogo}
-              alt="Signal Village National High School"
-            />
+        <footer className="attendance-pagination-bar">
+          <div className="attendance-pagination-copy">
+            <span>Showing</span>
+            <strong>
+              {visibleStart}–{visibleEnd}
+            </strong>
+            <span>of {totalFilteredStudents} students</span>
           </div>
 
-          <div>
-            <span>REPUBLIC OF THE PHILIPPINES</span>
+          {totalFilteredStudents > 0 && (
+            <div
+              className="attendance-pagination-controls"
+              aria-label="Pagination"
+            >
+              <button
+                type="button"
+                className="attendance-pagination-nav"
+                disabled={currentPage <= 1}
+                onClick={() =>
+                  setCurrentPage((page) => Math.max(1, page - 1))
+                }
+              >
+                Previous
+              </button>
 
-            <strong>Signal Village National High School</strong>
+              <div className="attendance-pagination-pages">
+                {paginationItems.map((item) =>
+                  typeof item === "number" ? (
+                    <button
+                      type="button"
+                      key={item}
+                      className={currentPage === item ? "is-active" : ""}
+                      aria-current={currentPage === item ? "page" : undefined}
+                      onClick={() => setCurrentPage(item)}
+                    >
+                      {item}
+                    </button>
+                  ) : (
+                    <span key={item} aria-hidden="true">
+                      …
+                    </span>
+                  ),
+                )}
+              </div>
 
-            <small>Attendance Management System</small>
-          </div>
-        </header>
-
-        <div className="attendance-print-title">
-          <span>OFFICIAL SCHOOL RECORD</span>
-
-          <h1>Student Attendance Register</h1>
-
-          <p>
-            {sectionName} · {formatSchoolDate()}
-          </p>
-        </div>
-
-        <div className="attendance-print-meta">
-          <div>
-            <span>Adviser</span>
-            <strong>{adviserName}</strong>
-          </div>
-
-          <div>
-            <span>Started</span>
-            <strong>{formatSchoolTime(sessionStartedAt)}</strong>
-          </div>
-
-          <div>
-            <span>Present</span>
-            <strong>{presentCount}</strong>
-          </div>
-
-          <div>
-            <span>Pending</span>
-            <strong>{remainingCount}</strong>
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-
-              <th>Student Number</th>
-
-              <th>Student Name</th>
-
-              <th>Status</th>
-
-              <th>Recorded At</th>
-
-              <th>Method</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {getAttendanceRows().map((row) => (
-              <tr key={`${row.No}-${row["Student Number"]}`}>
-                <td>{row.No}</td>
-
-                <td>{row["Student Number"]}</td>
-
-                <td>{row["Student Name"]}</td>
-
-                <td>{row.Status}</td>
-
-                <td>{row["Recorded At"]}</td>
-
-                <td>{row.Method}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              <button
+                type="button"
+                className="attendance-pagination-nav"
+                disabled={currentPage >= totalPages}
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(totalPages, page + 1))
+                }
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </footer>
       </section>
 
       {/* =================================================
