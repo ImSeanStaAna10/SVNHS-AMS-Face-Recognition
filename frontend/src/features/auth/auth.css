@@ -170,9 +170,7 @@
 
   object-fit: contain;
 
-  filter: drop-shadow(
-    0 4px 10px rgba(0, 0, 0, 0.25)
-  );
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
 }
 
 .auth-logos .auth-school-logo {
@@ -459,8 +457,7 @@
 
   background: #ffffff;
 
-  box-shadow:
-    0 0 0 3px rgba(36, 85, 154, 0.12);
+  box-shadow: 0 0 0 3px rgba(36, 85, 154, 0.12);
 }
 
 .auth-input-wrapper input:disabled {
@@ -545,8 +542,7 @@
   cursor: not-allowed;
 }
 
-.auth-password-input-wrapper:focus-within
-  .auth-password-toggle {
+.auth-password-input-wrapper:focus-within .auth-password-toggle {
   color: #24559a;
 }
 
@@ -668,11 +664,7 @@
 
   border-radius: 9px;
 
-  background: linear-gradient(
-    135deg,
-    #c51f2d,
-    #a91522
-  );
+  background: linear-gradient(135deg, #c51f2d, #a91522);
 
   color: #ffffff;
 
@@ -686,8 +678,7 @@
 
   cursor: pointer;
 
-  box-shadow:
-    0 8px 18px rgba(197, 31, 45, 0.25);
+  box-shadow: 0 8px 18px rgba(197, 31, 45, 0.25);
 
   transition:
     transform 0.18s ease,
@@ -698,8 +689,7 @@
 .auth-submit:hover:not(:disabled) {
   transform: translateY(-1px);
 
-  box-shadow:
-    0 12px 24px rgba(197, 31, 45, 0.3);
+  box-shadow: 0 12px 24px rgba(197, 31, 45, 0.3);
 }
 
 .auth-submit:active:not(:disabled) {
@@ -846,9 +836,7 @@
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 
-  animation:
-    auth-backdrop-enter
-    0.18s ease-out;
+  animation: auth-backdrop-enter 0.18s ease-out;
 }
 
 /* =========================================================
@@ -875,9 +863,7 @@
     0 34px 100px rgba(0, 0, 0, 0.4),
     0 10px 28px rgba(0, 0, 0, 0.18);
 
-  animation:
-    auth-modal-enter
-    0.2s ease-out;
+  animation: auth-modal-enter 0.2s ease-out;
 }
 
 /* =========================================================
@@ -1110,8 +1096,7 @@
 
   background: #f8fbff;
 
-  box-shadow:
-    0 6px 16px rgba(18, 61, 126, 0.06);
+  box-shadow: 0 6px 16px rgba(18, 61, 126, 0.06);
 }
 
 .auth-recovery-councilor:hover {
@@ -1119,8 +1104,7 @@
 
   background: #fffafb;
 
-  box-shadow:
-    0 6px 16px rgba(197, 31, 45, 0.05);
+  box-shadow: 0 6px 16px rgba(197, 31, 45, 0.05);
 }
 
 /* =========================================================
@@ -1144,28 +1128,16 @@
   font-weight: 900;
 }
 
-.auth-recovery-adviser
-  .auth-recovery-role-icon {
-  background: linear-gradient(
-    135deg,
-    #123d7e,
-    #24559a
-  );
+.auth-recovery-adviser .auth-recovery-role-icon {
+  background: linear-gradient(135deg, #123d7e, #24559a);
 
-  box-shadow:
-    0 6px 14px rgba(18, 61, 126, 0.17);
+  box-shadow: 0 6px 14px rgba(18, 61, 126, 0.17);
 }
 
-.auth-recovery-councilor
-  .auth-recovery-role-icon {
-  background: linear-gradient(
-    135deg,
-    #c51f2d,
-    #a91522
-  );
+.auth-recovery-councilor .auth-recovery-role-icon {
+  background: linear-gradient(135deg, #c51f2d, #a91522);
 
-  box-shadow:
-    0 6px 14px rgba(197, 31, 45, 0.17);
+  box-shadow: 0 6px 14px rgba(197, 31, 45, 0.17);
 }
 
 /* =========================================================
@@ -1187,13 +1159,11 @@
   letter-spacing: 0.12em;
 }
 
-.auth-recovery-adviser
-  .auth-recovery-role-copy > span {
+.auth-recovery-adviser .auth-recovery-role-copy > span {
   color: #123d7e;
 }
 
-.auth-recovery-councilor
-  .auth-recovery-role-copy > span {
+.auth-recovery-councilor .auth-recovery-role-copy > span {
   color: #c51f2d;
 }
 
@@ -1307,11 +1277,7 @@
 
   border-radius: 8px;
 
-  background: linear-gradient(
-    135deg,
-    #123d7e,
-    #0d326d
-  );
+  background: linear-gradient(135deg, #123d7e, #0d326d);
 
   color: #ffffff;
 
@@ -1323,8 +1289,7 @@
 
   cursor: pointer;
 
-  box-shadow:
-    0 7px 16px rgba(18, 61, 126, 0.2);
+  box-shadow: 0 7px 16px rgba(18, 61, 126, 0.2);
 
   transition:
     transform 0.16s ease,
@@ -1335,8 +1300,7 @@
 .auth-recovery-button:hover {
   transform: translateY(-1px);
 
-  box-shadow:
-    0 10px 20px rgba(18, 61, 126, 0.25);
+  box-shadow: 0 10px 20px rgba(18, 61, 126, 0.25);
 }
 
 .auth-recovery-button:active {
@@ -1367,17 +1331,13 @@
   from {
     opacity: 0;
 
-    transform:
-      translateY(10px)
-      scale(0.975);
+    transform: translateY(10px) scale(0.975);
   }
 
   to {
     opacity: 1;
 
-    transform:
-      translateY(0)
-      scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -1391,10 +1351,7 @@
   }
 
   .auth-container {
-    width: min(
-      650px,
-      calc(100% - 32px)
-    );
+    width: min(650px, calc(100% - 32px));
 
     grid-template-columns: 1fr;
 
@@ -1408,11 +1365,7 @@
   }
 
   .auth-school-title h1 {
-    font-size: clamp(
-      30px,
-      7vw,
-      48px
-    );
+    font-size: clamp(30px, 7vw, 48px);
   }
 
   .auth-login-card {
@@ -1458,8 +1411,7 @@
     height: 48px;
   }
 
-  .auth-logos
-    .auth-school-logo {
+  .auth-logos .auth-school-logo {
     width: 58px;
     height: 58px;
   }
@@ -1596,8 +1548,7 @@
     height: 43px;
   }
 
-  .auth-logos
-    .auth-school-logo {
+  .auth-logos .auth-school-logo {
     width: 52px;
     height: 52px;
   }
@@ -1651,5 +1602,684 @@
   .auth-modal-backdrop,
   .auth-recovery-modal {
     animation: none;
+  }
+}
+
+/* =========================================================
+   AUTH V2 — SUBTLE PRODUCTION ANIMATION
+   Final safe override layer.
+   Existing login / recovery functionality is unchanged.
+========================================================= */
+
+/* =========================================================
+   PAGE LOAD
+========================================================= */
+
+.auth-page {
+  isolation: isolate;
+}
+
+/*
+ * Very slow background movement adds depth without making
+ * the login page feel busy.
+ */
+.auth-background {
+  transform: scale(1.025);
+
+  animation: auth-background-breathe 20s ease-in-out infinite alternate;
+}
+
+.auth-background-overlay {
+  animation: auth-overlay-enter 0.8s ease-out both;
+}
+
+/* =========================================================
+   DECORATIVE WAVES
+========================================================= */
+
+.auth-decoration-left {
+  animation: auth-decoration-left-enter 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-decoration-right {
+  animation: auth-decoration-right-enter 1s 0.08s cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+.auth-wave-red {
+  animation: auth-wave-red-drift 12s ease-in-out infinite alternate;
+}
+
+.auth-wave-blue {
+  animation: auth-wave-blue-drift 14s ease-in-out infinite alternate;
+}
+
+/* =========================================================
+   BRANDING ENTRANCE
+========================================================= */
+
+.auth-brand {
+  animation: auth-brand-enter 0.72s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-republic {
+  animation: auth-copy-enter 0.55s 0.12s ease-out both;
+}
+
+.auth-logos img {
+  transform-origin: center;
+
+  animation: auth-logo-enter 0.58s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  transition:
+    transform 0.22s ease,
+    filter 0.22s ease;
+}
+
+.auth-logos img:nth-child(1) {
+  animation-delay: 0.14s;
+}
+
+.auth-logos img:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.auth-logos img:nth-child(3) {
+  animation-delay: 0.26s;
+}
+
+.auth-logos img:nth-child(4) {
+  animation-delay: 0.32s;
+}
+
+.auth-logos img:hover {
+  transform: translateY(-3px) scale(1.035);
+
+  filter: drop-shadow(0 7px 14px rgba(0, 0, 0, 0.28));
+}
+
+.auth-school-title {
+  animation: auth-school-title-enter 0.68s 0.2s cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+.auth-title-divider span {
+  transform-origin: center;
+
+  animation: auth-divider-grow 0.65s 0.42s ease-out both;
+}
+
+.auth-title-divider strong {
+  animation: auth-divider-label-enter 0.45s 0.48s ease-out both;
+}
+
+/* =========================================================
+   LOGIN CARD ENTRANCE
+========================================================= */
+
+.auth-login-section {
+  animation: auth-login-section-enter 0.72s 0.12s cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+.auth-login-card {
+  transform-origin: center right;
+}
+
+/*
+ * Accent line receives a one-time soft light sweep.
+ */
+.auth-card-top-line {
+  overflow: hidden;
+}
+
+.auth-card-top-line::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+  left: -35%;
+
+  width: 28%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.7),
+    transparent
+  );
+
+  transform: skewX(-18deg);
+
+  animation: auth-accent-sweep 1.2s 0.55s ease-out both;
+}
+
+/* =========================================================
+   LOGIN CONTENT STAGGER
+========================================================= */
+
+.auth-login-header {
+  animation: auth-card-content-enter 0.52s 0.28s ease-out both;
+}
+
+.auth-form {
+  animation: auth-card-content-enter 0.52s 0.36s ease-out both;
+}
+
+.auth-login-footer {
+  animation: auth-card-content-enter 0.5s 0.44s ease-out both;
+}
+
+/* =========================================================
+   INPUT INTERACTIONS
+========================================================= */
+
+.auth-input-wrapper {
+  transition: transform 0.17s ease;
+}
+
+.auth-input-wrapper:focus-within {
+  transform: translateY(-1px);
+}
+
+.auth-input-icon {
+  transition:
+    color 0.17s ease,
+    transform 0.17s ease;
+}
+
+.auth-input-wrapper:focus-within .auth-input-icon {
+  color: #123d7e;
+
+  transform: scale(1.06);
+}
+
+.auth-input-wrapper input {
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.auth-password-toggle svg {
+  transition: transform 0.18s ease;
+}
+
+.auth-password-toggle:hover:not(:disabled) svg {
+  transform: scale(1.08);
+}
+
+/* =========================================================
+   FORGOT PASSWORD
+========================================================= */
+
+.auth-forgot-password {
+  position: relative;
+}
+
+.auth-forgot-password::after {
+  content: "";
+
+  position: absolute;
+
+  right: 0;
+  bottom: -1px;
+
+  width: 0;
+  height: 1px;
+
+  background: currentColor;
+
+  transition: width 0.18s ease;
+}
+
+.auth-forgot-password:hover {
+  text-decoration: none;
+}
+
+.auth-forgot-password:hover::after {
+  width: 100%;
+}
+
+/* =========================================================
+   ERROR ENTER ANIMATION
+========================================================= */
+
+.auth-error {
+  animation: auth-error-enter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* =========================================================
+   LOGIN BUTTON
+========================================================= */
+
+.auth-submit {
+  overflow: hidden;
+}
+
+.auth-submit::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+  left: -40%;
+
+  width: 30%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.19),
+    transparent
+  );
+
+  transform: skewX(-18deg);
+
+  transition: left 0.5s ease;
+}
+
+.auth-submit:hover:not(:disabled)::before {
+  left: 115%;
+}
+
+.auth-submit:active:not(:disabled) {
+  transform: translateY(1px) scale(0.995);
+}
+
+/* =========================================================
+   BOTTOM LABEL
+========================================================= */
+
+.auth-bottom-label {
+  animation: auth-bottom-label-enter 0.6s 0.55s ease-out both;
+}
+
+/* =========================================================
+   RECOVERY MODAL POLISH
+========================================================= */
+
+.auth-modal-backdrop {
+  animation: auth-backdrop-enter-v2 0.2s ease-out both;
+}
+
+.auth-recovery-modal {
+  transform-origin: center;
+
+  animation: auth-recovery-modal-enter-v2 0.26s cubic-bezier(0.22, 1, 0.36, 1)
+    both;
+}
+
+.auth-recovery-intro {
+  animation: auth-recovery-item-enter 0.36s 0.07s ease-out both;
+}
+
+.auth-recovery-card {
+  animation: auth-recovery-item-enter 0.36s ease-out both;
+}
+
+.auth-recovery-card:nth-child(1) {
+  animation-delay: 0.11s;
+}
+
+.auth-recovery-card:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.auth-recovery-security-note {
+  animation: auth-recovery-item-enter 0.36s 0.2s ease-out both;
+}
+
+.auth-recovery-actions {
+  animation: auth-recovery-item-enter 0.36s 0.24s ease-out both;
+}
+
+/* =========================================================
+   ANIMATION KEYFRAMES
+========================================================= */
+
+@keyframes auth-background-breathe {
+  from {
+    transform: scale(1.025) translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: scale(1.06) translate3d(-0.4%, -0.25%, 0);
+  }
+}
+
+@keyframes auth-overlay-enter {
+  from {
+    opacity: 0.75;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes auth-decoration-left-enter {
+  from {
+    opacity: 0;
+
+    transform: translateX(-35px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes auth-decoration-right-enter {
+  from {
+    opacity: 0;
+
+    transform: scaleX(-1) translateX(-35px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scaleX(-1) translateX(0);
+  }
+}
+
+@keyframes auth-wave-red-drift {
+  from {
+    transform: rotate(-12deg) translate3d(0, -4px, 0);
+  }
+
+  to {
+    transform: rotate(-10.5deg) translate3d(8px, 7px, 0);
+  }
+}
+
+@keyframes auth-wave-blue-drift {
+  from {
+    transform: rotate(-12deg) translate3d(0, 5px, 0);
+  }
+
+  to {
+    transform: rotate(-13.5deg) translate3d(-7px, -6px, 0);
+  }
+}
+
+@keyframes auth-brand-enter {
+  from {
+    opacity: 0;
+
+    transform: translate3d(-22px, 10px, 0);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes auth-copy-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes auth-logo-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(12px) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes auth-school-title-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes auth-divider-grow {
+  from {
+    opacity: 0;
+
+    transform: scaleX(0);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scaleX(1);
+  }
+}
+
+@keyframes auth-divider-label-enter {
+  from {
+    opacity: 0;
+
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+@keyframes auth-login-section-enter {
+  from {
+    opacity: 0;
+
+    transform: translate3d(24px, 10px, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes auth-accent-sweep {
+  from {
+    left: -35%;
+
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  to {
+    left: 112%;
+
+    opacity: 0;
+  }
+}
+
+@keyframes auth-card-content-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes auth-error-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(-5px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes auth-bottom-label-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes auth-backdrop-enter-v2 {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes auth-recovery-modal-enter-v2 {
+  from {
+    opacity: 0;
+
+    transform: translateY(14px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes auth-recovery-item-enter {
+  from {
+    opacity: 0;
+
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   SMALLER SCREENS
+   Reduce decorative movement so mobile stays calm.
+========================================================= */
+
+@media (max-width: 950px) {
+  .auth-background {
+    animation-duration: 24s;
+  }
+
+  .auth-decoration {
+    opacity: 0.82;
+  }
+}
+
+@media (max-width: 600px) {
+  .auth-decoration-left,
+  .auth-decoration-right {
+    animation-duration: 0.7s;
+  }
+
+  .auth-logos img:hover {
+    transform: translateY(-2px) scale(1.02);
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-background,
+  .auth-background-overlay,
+  .auth-decoration-left,
+  .auth-decoration-right,
+  .auth-wave-red,
+  .auth-wave-blue,
+  .auth-brand,
+  .auth-republic,
+  .auth-logos img,
+  .auth-school-title,
+  .auth-title-divider span,
+  .auth-title-divider strong,
+  .auth-login-section,
+  .auth-login-header,
+  .auth-form,
+  .auth-login-footer,
+  .auth-error,
+  .auth-bottom-label,
+  .auth-modal-backdrop,
+  .auth-recovery-modal,
+  .auth-recovery-intro,
+  .auth-recovery-card,
+  .auth-recovery-security-note,
+  .auth-recovery-actions {
+    animation: none !important;
+  }
+
+  .auth-background {
+    transform: none !important;
+  }
+
+  .auth-input-wrapper,
+  .auth-input-icon,
+  .auth-password-toggle svg,
+  .auth-logos img,
+  .auth-submit::before,
+  .auth-forgot-password::after {
+    transition: none !important;
+  }
+
+  .auth-input-wrapper:focus-within,
+  .auth-logos img:hover,
+  .auth-submit:active:not(:disabled) {
+    transform: none !important;
   }
 }

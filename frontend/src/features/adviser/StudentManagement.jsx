@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useLocation } from "react-router-dom";
 
@@ -18,26 +13,15 @@ import "../../styles/adviser/studentManagement.css";
    HELPERS
 ========================================================= */
 
-const normalizeArray = (data) =>
-  Array.isArray(data) ? data : [];
+const normalizeArray = (data) => (Array.isArray(data) ? data : []);
 
-const getErrorMessage = (
-  error,
-  fallbackMessage,
-) =>
+const getErrorMessage = (error, fallbackMessage) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   fallbackMessage;
 
-const hasFaceRegistered = (
-  student,
-  locallyRegisteredIds,
-) => {
-  if (
-    locallyRegisteredIds.has(
-      student?.id,
-    )
-  ) {
+const hasFaceRegistered = (student, locallyRegisteredIds) => {
+  if (locallyRegisteredIds.has(student?.id)) {
     return true;
   }
 
@@ -53,59 +37,39 @@ const stopMediaStream = (stream) => {
     return;
   }
 
-  stream
-    .getTracks()
-    .forEach((track) => {
-      track.stop();
-    });
+  stream.getTracks().forEach((track) => {
+    track.stop();
+  });
 };
 
-const canvasToImageFile = (
-  canvas,
-) =>
-  new Promise(
-    (resolve, reject) => {
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(
-              new Error(
-                "Unable to capture the face image.",
-              ),
-            );
+const canvasToImageFile = (canvas) =>
+  new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("Unable to capture the face image."));
 
-            return;
-          }
+          return;
+        }
 
-          resolve(
-            new File(
-              [blob],
-              `student-face-${Date.now()}.jpg`,
-              {
-                type: "image/jpeg",
-              },
-            ),
-          );
-        },
-        "image/jpeg",
-        0.95,
-      );
-    },
-  );
+        resolve(
+          new File([blob], `student-face-${Date.now()}.jpg`, {
+            type: "image/jpeg",
+          }),
+        );
+      },
+      "image/jpeg",
+      0.95,
+    );
+  });
 
-const scopeStudentsToSection = (
-  students,
-  sectionId,
-) => {
+const scopeStudentsToSection = (students, sectionId) => {
   if (!sectionId) {
     return students;
   }
 
   return students.filter(
-    (student) =>
-      !student.sectionId ||
-      student.sectionId ===
-        sectionId,
+    (student) => !student.sectionId || student.sectionId === sectionId,
   );
 };
 
@@ -113,15 +77,10 @@ const scopeStudentsToSection = (
    CAMERA STATUS
 ========================================================= */
 
-function FaceCameraStatus({
-  cameraActive,
-  capturedFacePreview,
-  scanPhase,
-}) {
+function FaceCameraStatus({ cameraActive, capturedFacePreview, scanPhase }) {
   const statusClass = capturedFacePreview
     ? "is-captured"
-    : scanPhase === "countdown" ||
-        scanPhase === "holding"
+    : scanPhase === "countdown" || scanPhase === "holding"
       ? "is-scanning"
       : cameraActive
         ? "is-live"
@@ -138,9 +97,7 @@ function FaceCameraStatus({
           : "CAMERA OFF";
 
   return (
-    <span
-      className={`student-face-camera-status ${statusClass}`}
-    >
+    <span className={`student-face-camera-status ${statusClass}`}>
       <span aria-hidden="true" />
       {statusText}
     </span>
@@ -193,7 +150,8 @@ function FaceCapturePanel({
       return {
         eyebrow: "POSITION ACCEPTED",
         title: "Look straight at the camera",
-        description: "Keep your face centered while the scanner prepares the capture.",
+        description:
+          "Keep your face centered while the scanner prepares the capture.",
       };
     }
 
@@ -201,7 +159,8 @@ function FaceCapturePanel({
       return {
         eyebrow: "AUTO CAPTURE ACTIVE",
         title: "Center your face",
-        description: "Keep one face inside the guide and look directly at the camera.",
+        description:
+          "Keep one face inside the guide and look directly at the camera.",
       };
     }
 
@@ -249,10 +208,7 @@ function FaceCapturePanel({
             </div>
 
             <div className="student-face-captured-summary">
-              <span
-                className="student-face-captured-check"
-                aria-hidden="true"
-              >
+              <span className="student-face-captured-check" aria-hidden="true">
                 ✓
               </span>
 
@@ -342,9 +298,7 @@ function FaceCapturePanel({
                   <button
                     type="button"
                     className="student-face-manual-capture"
-                    disabled={
-                      registeringFace || capturingFace || !cameraReady
-                    }
+                    disabled={registeringFace || capturingFace || !cameraReady}
                     onClick={onManualCapture}
                   >
                     Capture Now
@@ -424,10 +378,7 @@ function FaceCapturePanel({
         </p>
       </div>
 
-      <div
-        className="student-face-capture-tips"
-        aria-label="Face capture tips"
-      >
+      <div className="student-face-capture-tips" aria-label="Face capture tips">
         <span>
           <i aria-hidden="true">1</i>
           Face centered
@@ -452,228 +403,135 @@ function FaceCapturePanel({
 ========================================================= */
 
 function StudentManagement() {
-  const location =
-    useLocation();
+  const location = useLocation();
 
-  const user =
-    authService.getUser();
+  const user = authService.getUser();
 
   /* =======================================================
      CAMERA REFS
   ======================================================= */
 
-  const videoRef =
-    useRef(null);
+  const videoRef = useRef(null);
 
-  const canvasRef =
-    useRef(null);
+  const canvasRef = useRef(null);
 
-  const streamRef =
-    useRef(null);
+  const streamRef = useRef(null);
 
-  const previewUrlRef =
-    useRef("");
+  const previewUrlRef = useRef("");
 
-  const cameraStartFrameRef =
-    useRef(null);
+  const cameraStartFrameRef = useRef(null);
 
-  const autoCaptureTimeoutsRef =
-    useRef([]);
+  const autoCaptureTimeoutsRef = useRef([]);
 
-  const autoCaptureSessionRef =
-    useRef(0);
+  const autoCaptureSessionRef = useRef(0);
 
-  const autoCaptureStartedRef =
-    useRef(false);
+  const autoCaptureStartedRef = useRef(false);
 
-  const flashTimeoutRef =
-    useRef(null);
+  const flashTimeoutRef = useRef(null);
+
+  const filterMenuRef = useRef(null);
+
+  const enrollmentBodyRef = useRef(null);
 
   /* =======================================================
      DATA STATE
   ======================================================= */
 
-  const [
-    section,
-    setSection,
-  ] = useState(null);
+  const [section, setSection] = useState(null);
 
-  const [
-    students,
-    setStudents,
-  ] = useState([]);
+  const [students, setStudents] = useState([]);
 
   /* =======================================================
      PAGE STATE
   ======================================================= */
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] = useState("");
 
-  const [
-    searchQuery,
-    setSearchQuery,
-  ] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [
-    successMessage,
-    setSuccessMessage,
-  ] = useState("");
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+
+  const [statusFilter, setStatusFilter] = useState("ALL");
+
+  const [faceFilter, setFaceFilter] = useState("ALL");
+
+  const [sortOrder, setSortOrder] = useState("DEFAULT");
+
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [successMessage, setSuccessMessage] = useState("");
 
   /* =======================================================
      ADD STUDENT STATE
   ======================================================= */
 
-  const [
-    showAddModal,
-    setShowAddModal,
-  ] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
-  const [
-    studentNumber,
-    setStudentNumber,
-  ] = useState("");
+  const [studentNumber, setStudentNumber] = useState("");
 
-  const [
-    studentName,
-    setStudentName,
-  ] = useState("");
+  const [studentName, setStudentName] = useState("");
 
-  const [
-    creatingStudent,
-    setCreatingStudent,
-  ] = useState(false);
+  const [creatingStudent, setCreatingStudent] = useState(false);
 
-  const [
-    createError,
-    setCreateError,
-  ] = useState("");
+  const [createError, setCreateError] = useState("");
 
-  const [
-    createdStudentRecord,
-    setCreatedStudentRecord,
-  ] = useState(null);
+  const [createdStudentRecord, setCreatedStudentRecord] = useState(null);
 
-  const [
-    enrollmentStep,
-    setEnrollmentStep,
-  ] = useState(1);
+  const [enrollmentStep, setEnrollmentStep] = useState(1);
 
   /* =======================================================
      EDIT STUDENT STATE
   ======================================================= */
 
-  const [
-    editingStudent,
-    setEditingStudent,
-  ] = useState(null);
+  const [editingStudent, setEditingStudent] = useState(null);
 
-  const [
-    editStudentNumber,
-    setEditStudentNumber,
-  ] = useState("");
+  const [editStudentNumber, setEditStudentNumber] = useState("");
 
-  const [
-    editStudentName,
-    setEditStudentName,
-  ] = useState("");
+  const [editStudentName, setEditStudentName] = useState("");
 
-  const [
-    updatingStudent,
-    setUpdatingStudent,
-  ] = useState(false);
+  const [updatingStudent, setUpdatingStudent] = useState(false);
 
-  const [
-    editError,
-    setEditError,
-  ] = useState("");
+  const [editError, setEditError] = useState("");
 
   /* =======================================================
      EXISTING STUDENT FACE STATE
   ======================================================= */
 
-  const [
-    selectedStudent,
-    setSelectedStudent,
-  ] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
-  const [
-    registeringFace,
-    setRegisteringFace,
-  ] = useState(false);
+  const [registeringFace, setRegisteringFace] = useState(false);
 
   /* =======================================================
      SHARED CAMERA STATE
   ======================================================= */
 
-  const [
-    cameraActive,
-    setCameraActive,
-  ] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
 
-  const [
-    cameraReady,
-    setCameraReady,
-  ] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
 
-  const [
-    cameraError,
-    setCameraError,
-  ] = useState("");
+  const [cameraError, setCameraError] = useState("");
 
-  const [
-    capturingFace,
-    setCapturingFace,
-  ] = useState(false);
+  const [capturingFace, setCapturingFace] = useState(false);
 
-  const [
-    capturedFaceFile,
-    setCapturedFaceFile,
-  ] = useState(null);
+  const [capturedFaceFile, setCapturedFaceFile] = useState(null);
 
-  const [
-    capturedFacePreview,
-    setCapturedFacePreview,
-  ] = useState("");
+  const [capturedFacePreview, setCapturedFacePreview] = useState("");
 
-  const [
-    faceError,
-    setFaceError,
-  ] = useState("");
+  const [faceError, setFaceError] = useState("");
 
-  const [
-    scanPhase,
-    setScanPhase,
-  ] = useState("idle");
+  const [scanPhase, setScanPhase] = useState("idle");
 
-  const [
-    scanMessage,
-    setScanMessage,
-  ] = useState(
-    "Camera is off",
-  );
+  const [scanMessage, setScanMessage] = useState("Camera is off");
 
-  const [
-    countdown,
-    setCountdown,
-  ] = useState(null);
+  const [countdown, setCountdown] = useState(null);
 
-  const [
-    flashActive,
-    setFlashActive,
-  ] = useState(false);
+  const [flashActive, setFlashActive] = useState(false);
 
-  const [
-    locallyRegisteredFaceIds,
-    setLocallyRegisteredFaceIds,
-  ] = useState(
+  const [locallyRegisteredFaceIds, setLocallyRegisteredFaceIds] = useState(
     () => new Set(),
   );
 
@@ -684,79 +542,47 @@ function StudentManagement() {
   useEffect(() => {
     let isMounted = true;
 
-    const loadPageData =
-      async () => {
-        try {
-          setLoading(true);
+    const loadPageData = async () => {
+      try {
+        setLoading(true);
 
-          setError("");
+        setError("");
 
-          const [
-            sectionData,
-            studentData,
-          ] =
-            await Promise.all([
-              adviserService.getSections(),
-              adviserService.getStudents(),
-            ]);
+        const [sectionData, studentData] = await Promise.all([
+          adviserService.getSections(),
+          adviserService.getStudents(),
+        ]);
 
-          if (!isMounted) {
-            return;
-          }
-
-          const sections =
-            normalizeArray(
-              sectionData,
-            );
-
-          const allStudents =
-            normalizeArray(
-              studentData,
-            );
-
-          const assignedSection =
-            sections.find(
-              (item) =>
-                item.active !==
-                false,
-            ) ||
-            sections[0] ||
-            null;
-
-          setSection(
-            assignedSection,
-          );
-
-          setStudents(
-            scopeStudentsToSection(
-              allStudents,
-              assignedSection?.id,
-            ),
-          );
-        } catch (
-          requestError
-        ) {
-          console.error(
-            "Unable to load students:",
-            requestError,
-          );
-
-          if (!isMounted) {
-            return;
-          }
-
-          setError(
-            getErrorMessage(
-              requestError,
-              "Unable to load student records.",
-            ),
-          );
-        } finally {
-          if (isMounted) {
-            setLoading(false);
-          }
+        if (!isMounted) {
+          return;
         }
-      };
+
+        const sections = normalizeArray(sectionData);
+
+        const allStudents = normalizeArray(studentData);
+
+        const assignedSection =
+          sections.find((item) => item.active !== false) || sections[0] || null;
+
+        setSection(assignedSection);
+
+        setStudents(scopeStudentsToSection(allStudents, assignedSection?.id));
+      } catch (requestError) {
+        console.error("Unable to load students:", requestError);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setError(
+          getErrorMessage(requestError, "Unable to load student records."),
+        );
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
 
     void loadPageData();
 
@@ -771,48 +597,28 @@ function StudentManagement() {
 
   useEffect(() => {
     return () => {
-      if (
-        cameraStartFrameRef.current
-      ) {
-        window.cancelAnimationFrame(
-          cameraStartFrameRef.current,
-        );
+      if (cameraStartFrameRef.current) {
+        window.cancelAnimationFrame(cameraStartFrameRef.current);
       }
 
-      autoCaptureTimeoutsRef.current.forEach(
-        (timeoutId) =>
-          window.clearTimeout(
-            timeoutId,
-          ),
+      autoCaptureTimeoutsRef.current.forEach((timeoutId) =>
+        window.clearTimeout(timeoutId),
       );
 
-      autoCaptureTimeoutsRef.current =
-        [];
+      autoCaptureTimeoutsRef.current = [];
 
-      if (
-        flashTimeoutRef.current
-      ) {
-        window.clearTimeout(
-          flashTimeoutRef.current,
-        );
+      if (flashTimeoutRef.current) {
+        window.clearTimeout(flashTimeoutRef.current);
       }
 
-      stopMediaStream(
-        streamRef.current,
-      );
+      stopMediaStream(streamRef.current);
 
-      streamRef.current =
-        null;
+      streamRef.current = null;
 
-      if (
-        previewUrlRef.current
-      ) {
-        URL.revokeObjectURL(
-          previewUrlRef.current,
-        );
+      if (previewUrlRef.current) {
+        URL.revokeObjectURL(previewUrlRef.current);
 
-        previewUrlRef.current =
-          "";
+        previewUrlRef.current = "";
       }
     };
   }, []);
@@ -822,1563 +628,1205 @@ function StudentManagement() {
   ======================================================= */
 
   const modalOpen =
-    showAddModal ||
-    Boolean(
-      selectedStudent,
-    ) ||
-    Boolean(
-      editingStudent,
-    );
+    showAddModal || Boolean(selectedStudent) || Boolean(editingStudent);
 
   useEffect(() => {
     if (!modalOpen) {
       return undefined;
     }
 
-    const previousOverflow =
-      document.body.style
-        .overflow;
+    const previousOverflow = document.body.style.overflow;
 
-    document.body.style.overflow =
-      "hidden";
+    document.body.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
+      document.body.style.overflow = previousOverflow;
     };
   }, [modalOpen]);
+
+  /* =======================================================
+     FILTER DROPDOWN
+  ======================================================= */
+
+  useEffect(() => {
+    if (!filterMenuOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (
+        filterMenuRef.current &&
+        !filterMenuRef.current.contains(event.target)
+      ) {
+        setFilterMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setFilterMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [filterMenuOpen]);
 
   /* =======================================================
      DERIVED DATA
   ======================================================= */
 
-  const adviserName =
-    user?.name?.trim() ||
-    section?.adviserName ||
-    "Adviser";
+  const adviserName = user?.name?.trim() || section?.adviserName || "Adviser";
 
-  const sectionName =
-    section?.name ||
-    "No assigned section";
+  const sectionName = section?.name || "No assigned section";
 
-  const faceRegisteredCount =
-    useMemo(
-      () =>
-        students.filter(
-          (student) =>
-            hasFaceRegistered(
-              student,
-              locallyRegisteredFaceIds,
-            ),
-        ).length,
-      [
-        students,
+  const faceRegisteredCount = useMemo(
+    () =>
+      students.filter((student) =>
+        hasFaceRegistered(student, locallyRegisteredFaceIds),
+      ).length,
+    [students, locallyRegisteredFaceIds],
+  );
+
+  const facePendingCount = Math.max(students.length - faceRegisteredCount, 0);
+
+  const filteredStudents = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    let result = students.filter((student) => {
+      const name = String(student?.name || "").toLowerCase();
+
+      const number = String(student?.studentNumber || "").toLowerCase();
+
+      const matchesSearch =
+        !query || name.includes(query) || number.includes(query);
+
+      const active = student?.active !== false;
+
+      const matchesStatus =
+        statusFilter === "ALL" ||
+        (statusFilter === "ACTIVE" && active) ||
+        (statusFilter === "INACTIVE" && !active);
+
+      const faceRegistered = hasFaceRegistered(
+        student,
         locallyRegisteredFaceIds,
-      ],
-    );
-
-  const facePendingCount =
-    Math.max(
-      students.length -
-        faceRegisteredCount,
-      0,
-    );
-
-  const filteredStudents =
-    useMemo(() => {
-      const query =
-        searchQuery
-          .trim()
-          .toLowerCase();
-
-      if (!query) {
-        return students;
-      }
-
-      return students.filter(
-        (student) => {
-          const name =
-            String(
-              student?.name ||
-                "",
-            ).toLowerCase();
-
-          const number =
-            String(
-              student?.studentNumber ||
-                "",
-            ).toLowerCase();
-
-          return (
-            name.includes(
-              query,
-            ) ||
-            number.includes(
-              query,
-            )
-          );
-        },
       );
-    }, [
-      students,
-      searchQuery,
-    ]);
 
-  const faceRegistrationIntent =
-    location.state?.action ===
-    "register-face";
+      const matchesFace =
+        faceFilter === "ALL" ||
+        (faceFilter === "REGISTERED" && faceRegistered) ||
+        (faceFilter === "PENDING" && !faceRegistered);
+
+      return matchesSearch && matchesStatus && matchesFace;
+    });
+
+    if (sortOrder !== "DEFAULT") {
+      result = [...result].sort((first, second) => {
+        const firstName = String(first?.name || "");
+
+        const secondName = String(second?.name || "");
+
+        const firstNumber = String(first?.studentNumber || "");
+
+        const secondNumber = String(second?.studentNumber || "");
+
+        if (sortOrder === "NAME_ASC") {
+          return firstName.localeCompare(secondName, undefined, {
+            sensitivity: "base",
+          });
+        }
+
+        if (sortOrder === "NAME_DESC") {
+          return secondName.localeCompare(firstName, undefined, {
+            sensitivity: "base",
+          });
+        }
+
+        if (sortOrder === "NUMBER_ASC") {
+          return firstNumber.localeCompare(secondNumber, undefined, {
+            numeric: true,
+            sensitivity: "base",
+          });
+        }
+
+        if (sortOrder === "NUMBER_DESC") {
+          return secondNumber.localeCompare(firstNumber, undefined, {
+            numeric: true,
+            sensitivity: "base",
+          });
+        }
+
+        return 0;
+      });
+    }
+
+    return result;
+  }, [
+    students,
+    searchQuery,
+    statusFilter,
+    faceFilter,
+    sortOrder,
+    locallyRegisteredFaceIds,
+  ]);
+
+  const activeFilterCount = [
+    statusFilter !== "ALL",
+    faceFilter !== "ALL",
+    sortOrder !== "DEFAULT",
+  ].filter(Boolean).length;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredStudents.length / rowsPerPage),
+  );
+
+  const pageStartIndex = (currentPage - 1) * rowsPerPage;
+
+  const paginatedStudents = filteredStudents.slice(
+    pageStartIndex,
+    pageStartIndex + rowsPerPage,
+  );
+
+  const visibleStart = filteredStudents.length === 0 ? 0 : pageStartIndex + 1;
+
+  const visibleEnd = Math.min(
+    pageStartIndex + rowsPerPage,
+    filteredStudents.length,
+  );
+
+  const paginationItems = useMemo(() => {
+    if (totalPages <= 5) {
+      return Array.from(
+        {
+          length: totalPages,
+        },
+        (_, index) => index + 1,
+      );
+    }
+
+    if (currentPage <= 3) {
+      return [1, 2, 3, 4, "ellipsis-right", totalPages];
+    }
+
+    if (currentPage >= totalPages - 2) {
+      return [
+        1,
+        "ellipsis-left",
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
+    }
+
+    return [
+      1,
+      "ellipsis-left",
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      "ellipsis-right",
+      totalPages,
+    ];
+  }, [currentPage, totalPages]);
+
+  const resetRosterView = () => {
+    setSearchQuery("");
+    setStatusFilter("ALL");
+    setFaceFilter("ALL");
+    setSortOrder("DEFAULT");
+    setRowsPerPage(10);
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, faceFilter, sortOrder, rowsPerPage]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  /* =======================================================
+     ENROLLMENT STEP SCROLL RESET
+     Each wizard step opens from the top instead of inheriting
+     the previous step's internal scroll position.
+  ======================================================= */
+
+  useEffect(() => {
+    if (!showAddModal || !enrollmentBodyRef.current) {
+      return undefined;
+    }
+
+    const frameId = window.requestAnimationFrame(() => {
+      enrollmentBodyRef.current?.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "auto",
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [enrollmentStep, showAddModal]);
+
+  const faceRegistrationIntent = location.state?.action === "register-face";
 
   /* =======================================================
      REFRESH STUDENTS
   ======================================================= */
 
-  const refreshStudents =
-    async () => {
-      const data =
-        normalizeArray(
-          await adviserService.getStudents(),
-        );
+  const refreshStudents = async () => {
+    const data = normalizeArray(await adviserService.getStudents());
 
-      const scoped =
-        scopeStudentsToSection(
-          data,
-          section?.id,
-        );
+    const scoped = scopeStudentsToSection(data, section?.id);
 
-      setStudents(scoped);
+    setStudents(scoped);
 
-      return scoped;
-    };
+    return scoped;
+  };
 
   /* =======================================================
      CLEAR CAPTURE
   ======================================================= */
 
-  const clearCapturedFace =
-    () => {
-      if (
-        previewUrlRef.current
-      ) {
-        URL.revokeObjectURL(
-          previewUrlRef.current,
-        );
+  const clearCapturedFace = () => {
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
 
-        previewUrlRef.current =
-          "";
-      }
+      previewUrlRef.current = "";
+    }
 
-      setCapturedFaceFile(
-        null,
-      );
+    setCapturedFaceFile(null);
 
-      setCapturedFacePreview(
-        "",
-      );
-    };
+    setCapturedFacePreview("");
+  };
 
   /* =======================================================
      AUTO CAPTURE TIMER HELPERS
   ======================================================= */
 
-  const clearAutoCaptureTimers =
-    () => {
-      autoCaptureTimeoutsRef.current.forEach(
-        (timeoutId) =>
-          window.clearTimeout(
-            timeoutId,
-          ),
-      );
+  const clearAutoCaptureTimers = () => {
+    autoCaptureTimeoutsRef.current.forEach((timeoutId) =>
+      window.clearTimeout(timeoutId),
+    );
 
-      autoCaptureTimeoutsRef.current =
-        [];
+    autoCaptureTimeoutsRef.current = [];
 
-      autoCaptureSessionRef.current +=
-        1;
+    autoCaptureSessionRef.current += 1;
 
-      setCountdown(null);
-    };
+    setCountdown(null);
+  };
 
-  const scheduleAutoCaptureStep =
-    (
-      callback,
-      delay,
-      sessionId,
-    ) => {
-      const timeoutId =
-        window.setTimeout(
-          () => {
-            if (
-              autoCaptureSessionRef.current !==
-              sessionId
-            ) {
-              return;
-            }
+  const scheduleAutoCaptureStep = (callback, delay, sessionId) => {
+    const timeoutId = window.setTimeout(() => {
+      if (autoCaptureSessionRef.current !== sessionId) {
+        return;
+      }
 
-            callback();
-          },
-          delay,
-        );
+      callback();
+    }, delay);
 
-      autoCaptureTimeoutsRef.current.push(
-        timeoutId,
-      );
-    };
+    autoCaptureTimeoutsRef.current.push(timeoutId);
+  };
 
   /* =======================================================
      STOP CAMERA
   ======================================================= */
 
-  const stopFaceCamera =
-    () => {
-      clearAutoCaptureTimers();
+  const stopFaceCamera = () => {
+    clearAutoCaptureTimers();
 
-      stopMediaStream(
-        streamRef.current,
-      );
+    stopMediaStream(streamRef.current);
 
-      streamRef.current =
-        null;
+    streamRef.current = null;
 
-      if (videoRef.current) {
-        videoRef.current.srcObject =
-          null;
-      }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
 
-      setCameraActive(
-        false,
-      );
+    setCameraActive(false);
 
-      setCameraReady(
-        false,
-      );
-    };
+    setCameraReady(false);
+  };
 
   /* =======================================================
      START CAMERA
   ======================================================= */
 
-  const startFaceCamera =
-    async () => {
-      try {
-        clearAutoCaptureTimers();
+  const startFaceCamera = async () => {
+    try {
+      clearAutoCaptureTimers();
 
-        autoCaptureStartedRef.current =
-          false;
+      autoCaptureStartedRef.current = false;
 
-        setScanPhase(
-          "preparing",
-        );
+      setScanPhase("preparing");
 
-        setScanMessage(
-          "Preparing camera...",
-        );
+      setScanMessage("Preparing camera...");
 
-        setCameraError("");
+      setCameraError("");
 
-        setFaceError("");
+      setFaceError("");
 
-        setCameraReady(
-          false,
-        );
+      setCameraReady(false);
 
-        if (
-          !navigator
-            .mediaDevices
-            ?.getUserMedia
-        ) {
-          setCameraError(
-            "Camera access is not supported by this browser.",
-          );
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraError("Camera access is not supported by this browser.");
 
-          return;
-        }
-
-        stopFaceCamera();
-
-        const stream =
-          await navigator.mediaDevices.getUserMedia(
-            {
-              video: {
-                facingMode:
-                  "user",
-
-                width: {
-                  ideal: 1280,
-                },
-
-                height: {
-                  ideal: 720,
-                },
-              },
-
-              audio: false,
-            },
-          );
-
-        const video =
-          videoRef.current;
-
-        if (!video) {
-          stopMediaStream(
-            stream,
-          );
-
-          return;
-        }
-
-        streamRef.current =
-          stream;
-
-        video.srcObject =
-          stream;
-
-        setCameraActive(
-          true,
-        );
-
-        await video.play();
-      } catch (
-        requestError
-      ) {
-        console.error(
-          "Unable to start camera:",
-          requestError,
-        );
-
-        stopFaceCamera();
-
-        setScanPhase(
-          "error",
-        );
-
-        setScanMessage(
-          "Camera unavailable",
-        );
-
-        if (
-          requestError?.name ===
-          "NotAllowedError"
-        ) {
-          setCameraError(
-            "Camera permission was denied. Please allow camera access in your browser.",
-          );
-
-          return;
-        }
-
-        if (
-          requestError?.name ===
-          "NotFoundError"
-        ) {
-          setCameraError(
-            "No camera was detected on this device.",
-          );
-
-          return;
-        }
-
-        if (
-          requestError?.name ===
-          "NotReadableError"
-        ) {
-          setCameraError(
-            "The camera is currently being used by another application.",
-          );
-
-          return;
-        }
-
-        setCameraError(
-          "Unable to access the camera.",
-        );
+        return;
       }
-    };
+
+      stopFaceCamera();
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+
+          width: {
+            ideal: 1280,
+          },
+
+          height: {
+            ideal: 720,
+          },
+        },
+
+        audio: false,
+      });
+
+      const video = videoRef.current;
+
+      if (!video) {
+        stopMediaStream(stream);
+
+        return;
+      }
+
+      streamRef.current = stream;
+
+      video.srcObject = stream;
+
+      setCameraActive(true);
+
+      await video.play();
+    } catch (requestError) {
+      console.error("Unable to start camera:", requestError);
+
+      stopFaceCamera();
+
+      setScanPhase("error");
+
+      setScanMessage("Camera unavailable");
+
+      if (requestError?.name === "NotAllowedError") {
+        setCameraError(
+          "Camera permission was denied. Please allow camera access in your browser.",
+        );
+
+        return;
+      }
+
+      if (requestError?.name === "NotFoundError") {
+        setCameraError("No camera was detected on this device.");
+
+        return;
+      }
+
+      if (requestError?.name === "NotReadableError") {
+        setCameraError(
+          "The camera is currently being used by another application.",
+        );
+
+        return;
+      }
+
+      setCameraError("Unable to access the camera.");
+    }
+  };
 
   /* =======================================================
      SCHEDULE CAMERA START
   ======================================================= */
 
-  const scheduleCameraStart =
-    () => {
-      if (
-        cameraStartFrameRef.current
-      ) {
-        window.cancelAnimationFrame(
-          cameraStartFrameRef.current,
-        );
-      }
+  const scheduleCameraStart = () => {
+    if (cameraStartFrameRef.current) {
+      window.cancelAnimationFrame(cameraStartFrameRef.current);
+    }
 
-      cameraStartFrameRef.current =
-        window.requestAnimationFrame(
-          () => {
-            cameraStartFrameRef.current =
-              window.requestAnimationFrame(
-                () => {
-                  cameraStartFrameRef.current =
-                    null;
+    cameraStartFrameRef.current = window.requestAnimationFrame(() => {
+      cameraStartFrameRef.current = window.requestAnimationFrame(() => {
+        cameraStartFrameRef.current = null;
 
-                  void startFaceCamera();
-                },
-              );
-          },
-        );
-    };
+        void startFaceCamera();
+      });
+    });
+  };
 
   /* =======================================================
      RESET CAMERA
   ======================================================= */
 
-  const resetCamera =
-    () => {
-      if (
-        cameraStartFrameRef.current
-      ) {
-        window.cancelAnimationFrame(
-          cameraStartFrameRef.current,
-        );
+  const resetCamera = () => {
+    if (cameraStartFrameRef.current) {
+      window.cancelAnimationFrame(cameraStartFrameRef.current);
 
-        cameraStartFrameRef.current =
-          null;
-      }
+      cameraStartFrameRef.current = null;
+    }
 
-      stopFaceCamera();
+    stopFaceCamera();
 
-      clearCapturedFace();
+    clearCapturedFace();
 
-      setCameraError("");
+    setCameraError("");
 
-      setFaceError("");
+    setFaceError("");
 
-      setCapturingFace(
-        false,
-      );
+    setCapturingFace(false);
 
-      autoCaptureStartedRef.current =
-        false;
+    autoCaptureStartedRef.current = false;
 
-      setScanPhase("idle");
+    setScanPhase("idle");
 
-      setScanMessage(
-        "Camera is off",
-      );
+    setScanMessage("Camera is off");
 
-      setCountdown(null);
+    setCountdown(null);
 
-      setFlashActive(
-        false,
-      );
-    };
+    setFlashActive(false);
+  };
 
   /* =======================================================
      CAPTURE FACE
   ======================================================= */
 
-  const handleCaptureFace =
-    async ({
-      automatic = false,
-    } = {}) => {
-      if (
-        capturingFace ||
-        registeringFace ||
-        creatingStudent
-      ) {
-        return;
+  const handleCaptureFace = async ({ automatic = false } = {}) => {
+    if (capturingFace || registeringFace || creatingStudent) {
+      return;
+    }
+
+    if (!automatic && (!cameraActive || !cameraReady)) {
+      setFaceError("Camera is not ready yet.");
+
+      return;
+    }
+
+    const video = videoRef.current;
+
+    const canvas = canvasRef.current;
+
+    if (
+      !streamRef.current ||
+      !video ||
+      !canvas ||
+      !video.videoWidth ||
+      !video.videoHeight
+    ) {
+      setFaceError("Unable to capture the camera image.");
+
+      setScanPhase("error");
+
+      setScanMessage("Capture failed");
+
+      return;
+    }
+
+    try {
+      clearAutoCaptureTimers();
+
+      setCapturingFace(true);
+
+      setScanPhase("capturing");
+
+      setScanMessage("Capturing enrollment photo...");
+
+      setFaceError("");
+
+      canvas.width = video.videoWidth;
+
+      canvas.height = video.videoHeight;
+
+      const context = canvas.getContext("2d");
+
+      if (!context) {
+        throw new Error("Unable to prepare the face image.");
       }
 
-      if (
-        !automatic &&
-        (!cameraActive ||
-          !cameraReady)
-      ) {
-        setFaceError(
-          "Camera is not ready yet.",
-        );
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        return;
+      setFlashActive(true);
+
+      if (flashTimeoutRef.current) {
+        window.clearTimeout(flashTimeoutRef.current);
       }
 
-      const video =
-        videoRef.current;
+      flashTimeoutRef.current = window.setTimeout(() => {
+        setFlashActive(false);
 
-      const canvas =
-        canvasRef.current;
+        flashTimeoutRef.current = null;
+      }, 180);
 
-      if (
-        !streamRef.current ||
-        !video ||
-        !canvas ||
-        !video.videoWidth ||
-        !video.videoHeight
-      ) {
-        setFaceError(
-          "Unable to capture the camera image.",
-        );
+      const imageFile = await canvasToImageFile(canvas);
 
-        setScanPhase(
-          "error",
-        );
+      clearCapturedFace();
 
-        setScanMessage(
-          "Capture failed",
-        );
+      const previewUrl = URL.createObjectURL(imageFile);
 
-        return;
-      }
+      previewUrlRef.current = previewUrl;
 
-      try {
-        clearAutoCaptureTimers();
+      setCapturedFaceFile(imageFile);
 
-        setCapturingFace(
-          true,
-        );
+      setCapturedFacePreview(previewUrl);
 
-        setScanPhase(
-          "capturing",
-        );
+      setScanPhase("captured");
 
-        setScanMessage(
-          "Capturing enrollment photo...",
-        );
+      setScanMessage("Enrollment photo ready");
 
-        setFaceError("");
+      stopFaceCamera();
+    } catch (captureError) {
+      console.error("Unable to capture face:", captureError);
 
-        canvas.width =
-          video.videoWidth;
+      setScanPhase("error");
 
-        canvas.height =
-          video.videoHeight;
+      setScanMessage("Capture failed");
 
-        const context =
-          canvas.getContext(
-            "2d",
-          );
-
-        if (!context) {
-          throw new Error(
-            "Unable to prepare the face image.",
-          );
-        }
-
-        context.drawImage(
-          video,
-          0,
-          0,
-          canvas.width,
-          canvas.height,
-        );
-
-        setFlashActive(
-          true,
-        );
-
-        if (
-          flashTimeoutRef.current
-        ) {
-          window.clearTimeout(
-            flashTimeoutRef.current,
-          );
-        }
-
-        flashTimeoutRef.current =
-          window.setTimeout(
-            () => {
-              setFlashActive(
-                false,
-              );
-
-              flashTimeoutRef.current =
-                null;
-            },
-            180,
-          );
-
-        const imageFile =
-          await canvasToImageFile(
-            canvas,
-          );
-
-        clearCapturedFace();
-
-        const previewUrl =
-          URL.createObjectURL(
-            imageFile,
-          );
-
-        previewUrlRef.current =
-          previewUrl;
-
-        setCapturedFaceFile(
-          imageFile,
-        );
-
-        setCapturedFacePreview(
-          previewUrl,
-        );
-
-        setScanPhase(
-          "captured",
-        );
-
-        setScanMessage(
-          "Enrollment photo ready",
-        );
-
-        stopFaceCamera();
-      } catch (
-        captureError
-      ) {
-        console.error(
-          "Unable to capture face:",
-          captureError,
-        );
-
-        setScanPhase(
-          "error",
-        );
-
-        setScanMessage(
-          "Capture failed",
-        );
-
-        setFaceError(
-          captureError?.message ||
-            "Unable to capture the student's face.",
-        );
-      } finally {
-        setCapturingFace(
-          false,
-        );
-      }
-    };
+      setFaceError(
+        captureError?.message || "Unable to capture the student's face.",
+      );
+    } finally {
+      setCapturingFace(false);
+    }
+  };
 
   /* =======================================================
      AUTO CAPTURE SEQUENCE
   ======================================================= */
 
-  const startAutoCaptureSequence =
-    () => {
-      if (
-        autoCaptureStartedRef.current ||
-        !streamRef.current ||
-        previewUrlRef.current
-      ) {
-        return;
-      }
+  const startAutoCaptureSequence = () => {
+    if (
+      autoCaptureStartedRef.current ||
+      !streamRef.current ||
+      previewUrlRef.current
+    ) {
+      return;
+    }
 
-      clearAutoCaptureTimers();
+    clearAutoCaptureTimers();
 
-      autoCaptureStartedRef.current =
-        true;
+    autoCaptureStartedRef.current = true;
 
-      const sessionId =
-        autoCaptureSessionRef.current;
+    const sessionId = autoCaptureSessionRef.current;
 
-      setScanPhase(
-        "positioning",
-      );
+    setScanPhase("positioning");
 
-      setScanMessage(
-        "Center your face inside the oval",
-      );
+    setScanMessage("Center your face inside the oval");
 
-      scheduleAutoCaptureStep(
-        () => {
-          if (
-            !streamRef.current
-          ) {
-            return;
-          }
+    scheduleAutoCaptureStep(
+      () => {
+        if (!streamRef.current) {
+          return;
+        }
 
-          setScanPhase(
-            "holding",
-          );
+        setScanPhase("holding");
 
-          setScanMessage(
-            "Great. Look straight ahead and hold still",
-          );
-        },
-        1300,
-        sessionId,
-      );
+        setScanMessage("Great. Look straight ahead and hold still");
+      },
+      1300,
+      sessionId,
+    );
 
-      scheduleAutoCaptureStep(
-        () => {
-          setScanPhase(
-            "countdown",
-          );
+    scheduleAutoCaptureStep(
+      () => {
+        setScanPhase("countdown");
 
-          setScanMessage(
-            "Hold still",
-          );
+        setScanMessage("Hold still");
 
-          setCountdown(3);
-        },
-        2600,
-        sessionId,
-      );
+        setCountdown(3);
+      },
+      2600,
+      sessionId,
+    );
 
-      scheduleAutoCaptureStep(
-        () =>
-          setCountdown(2),
-        3400,
-        sessionId,
-      );
+    scheduleAutoCaptureStep(() => setCountdown(2), 3400, sessionId);
 
-      scheduleAutoCaptureStep(
-        () =>
-          setCountdown(1),
-        4200,
-        sessionId,
-      );
+    scheduleAutoCaptureStep(() => setCountdown(1), 4200, sessionId);
 
-      scheduleAutoCaptureStep(
-        () => {
-          setCountdown(null);
+    scheduleAutoCaptureStep(
+      () => {
+        setCountdown(null);
 
-          void handleCaptureFace({
-            automatic: true,
-          });
-        },
-        5000,
-        sessionId,
-      );
-    };
+        void handleCaptureFace({
+          automatic: true,
+        });
+      },
+      5000,
+      sessionId,
+    );
+  };
 
-  const handleCameraReady =
-    () => {
-      if (
-        autoCaptureStartedRef.current ||
-        previewUrlRef.current
-      ) {
-        return;
-      }
+  const handleCameraReady = () => {
+    if (autoCaptureStartedRef.current || previewUrlRef.current) {
+      return;
+    }
 
-      setCameraReady(
-        true,
-      );
+    setCameraReady(true);
 
-      setScanPhase(
-        "positioning",
-      );
+    setScanPhase("positioning");
 
-      setScanMessage(
-        "Center your face inside the oval",
-      );
+    setScanMessage("Center your face inside the oval");
 
-      startAutoCaptureSequence();
-    };
+    startAutoCaptureSequence();
+  };
 
   /* =======================================================
      RETAKE FACE
   ======================================================= */
 
-  const handleRetakeFace =
-    async () => {
-      if (
-        registeringFace ||
-        creatingStudent
-      ) {
-        return;
-      }
+  const handleRetakeFace = async () => {
+    if (registeringFace || creatingStudent) {
+      return;
+    }
 
-      clearCapturedFace();
+    clearCapturedFace();
 
-      setFaceError("");
+    setFaceError("");
 
-      setCameraError("");
+    setCameraError("");
 
-      autoCaptureStartedRef.current =
-        false;
+    autoCaptureStartedRef.current = false;
 
-      setScanPhase(
-        "preparing",
-      );
+    setScanPhase("preparing");
 
-      setScanMessage(
-        "Preparing camera...",
-      );
+    setScanMessage("Preparing camera...");
 
-      await startFaceCamera();
-    };
+    await startFaceCamera();
+  };
 
   /* =======================================================
      ADD STUDENT MODAL / WIZARD
   ======================================================= */
 
-  const resetAddStudentForm =
-    () => {
-      setStudentNumber("");
+  const resetAddStudentForm = () => {
+    setStudentNumber("");
 
-      setStudentName("");
+    setStudentName("");
 
-      setCreateError("");
+    setCreateError("");
 
-      setCreatedStudentRecord(
-        null,
-      );
+    setCreatedStudentRecord(null);
 
+    setEnrollmentStep(1);
+  };
+
+  const openAddStudentModal = () => {
+    resetCamera();
+
+    resetAddStudentForm();
+
+    setSelectedStudent(null);
+
+    setEditingStudent(null);
+
+    setSuccessMessage("");
+
+    setShowAddModal(true);
+
+    /*
+     * Camera intentionally does NOT start here.
+     * Step 1 is student details only so the enrollment
+     * screen stays focused and camera permission is
+     * requested only when the adviser reaches Step 2.
+     */
+  };
+
+  const resetAddStudentModal = () => {
+    resetCamera();
+
+    setEnrollmentStep(1);
+
+    setShowAddModal(false);
+
+    resetAddStudentForm();
+  };
+
+  const closeAddModal = () => {
+    if (creatingStudent) {
+      return;
+    }
+
+    resetAddStudentModal();
+  };
+
+  const validateEnrollmentDetails = () => {
+    const cleanStudentNumber = studentNumber.trim();
+
+    const cleanName = studentName.trim();
+
+    setCreateError("");
+
+    if (!cleanStudentNumber || !cleanName) {
+      setCreateError("Student number and student name are required.");
+
+      return false;
+    }
+
+    if (!section?.id) {
+      setCreateError("No assigned section is available.");
+
+      return false;
+    }
+
+    return true;
+  };
+
+  const goToEnrollmentDetails = () => {
+    if (creatingStudent) {
+      return;
+    }
+
+    stopFaceCamera();
+
+    setFaceError("");
+
+    setCameraError("");
+
+    setEnrollmentStep(1);
+  };
+
+  const goToEnrollmentFace = () => {
+    if (creatingStudent) {
+      return;
+    }
+
+    if (!validateEnrollmentDetails()) {
       setEnrollmentStep(1);
-    };
 
-  const openAddStudentModal =
-    () => {
-      resetCamera();
+      return;
+    }
 
-      resetAddStudentForm();
+    setFaceError("");
 
-      setSelectedStudent(
-        null,
-      );
+    setCameraError("");
 
-      setEditingStudent(
-        null,
-      );
+    setEnrollmentStep(2);
 
-      setSuccessMessage("");
+    if (!capturedFacePreview && !cameraActive) {
+      scheduleCameraStart();
+    }
+  };
 
-      setShowAddModal(
-        true,
-      );
+  const goToEnrollmentReview = () => {
+    if (creatingStudent) {
+      return;
+    }
 
-      /*
-       * Camera intentionally does NOT start here.
-       * Step 1 is student details only so the enrollment
-       * screen stays focused and camera permission is
-       * requested only when the adviser reaches Step 2.
-       */
-    };
+    if (!capturedFaceFile || !capturedFacePreview) {
+      setFaceError("Please capture the student's face before continuing.");
 
-  const resetAddStudentModal =
-    () => {
-      resetCamera();
+      return;
+    }
 
-      setEnrollmentStep(1);
+    stopFaceCamera();
 
-      setShowAddModal(
-        false,
-      );
+    setCreateError("");
 
-      resetAddStudentForm();
-    };
+    setFaceError("");
 
-  const closeAddModal =
-    () => {
-      if (
-        creatingStudent
-      ) {
-        return;
-      }
+    setEnrollmentStep(3);
+  };
 
-      resetAddStudentModal();
-    };
+  const returnToEnrollmentFace = () => {
+    if (creatingStudent) {
+      return;
+    }
 
-  const validateEnrollmentDetails =
-    () => {
-      const cleanStudentNumber =
-        studentNumber.trim();
+    setCreateError("");
 
-      const cleanName =
-        studentName.trim();
+    setFaceError("");
 
-      setCreateError("");
+    setEnrollmentStep(2);
 
-      if (
-        !cleanStudentNumber ||
-        !cleanName
-      ) {
-        setCreateError(
-          "Student number and student name are required.",
-        );
-
-        return false;
-      }
-
-      if (!section?.id) {
-        setCreateError(
-          "No assigned section is available.",
-        );
-
-        return false;
-      }
-
-      return true;
-    };
-
-  const goToEnrollmentDetails =
-    () => {
-      if (
-        creatingStudent
-      ) {
-        return;
-      }
-
-      stopFaceCamera();
-
-      setFaceError("");
-
-      setCameraError("");
-
-      setEnrollmentStep(1);
-    };
-
-  const goToEnrollmentFace =
-    () => {
-      if (
-        creatingStudent
-      ) {
-        return;
-      }
-
-      if (
-        !validateEnrollmentDetails()
-      ) {
-        setEnrollmentStep(1);
-
-        return;
-      }
-
-      setFaceError("");
-
-      setCameraError("");
-
-      setEnrollmentStep(2);
-
-      if (
-        !capturedFacePreview &&
-        !cameraActive
-      ) {
-        scheduleCameraStart();
-      }
-    };
-
-  const goToEnrollmentReview =
-    () => {
-      if (
-        creatingStudent
-      ) {
-        return;
-      }
-
-      if (
-        !capturedFaceFile ||
-        !capturedFacePreview
-      ) {
-        setFaceError(
-          "Please capture the student's face before continuing.",
-        );
-
-        return;
-      }
-
-      stopFaceCamera();
-
-      setCreateError("");
-
-      setFaceError("");
-
-      setEnrollmentStep(3);
-    };
-
-  const returnToEnrollmentFace =
-    () => {
-      if (
-        creatingStudent
-      ) {
-        return;
-      }
-
-      setCreateError("");
-
-      setFaceError("");
-
-      setEnrollmentStep(2);
-
-      if (
-        !capturedFacePreview &&
-        !cameraActive
-      ) {
-        scheduleCameraStart();
-      }
-    };
+    if (!capturedFacePreview && !cameraActive) {
+      scheduleCameraStart();
+    }
+  };
 
   /* =======================================================
      CREATE STUDENT + REGISTER FACE
   ======================================================= */
 
-  const handleCreateStudent =
-    async (event) => {
-      event.preventDefault();
+  const handleCreateStudent = async (event) => {
+    event.preventDefault();
 
-      const cleanStudentNumber =
-        studentNumber.trim();
+    const cleanStudentNumber = studentNumber.trim();
 
-      const cleanName =
-        studentName.trim();
+    const cleanName = studentName.trim();
 
-      if (
-        !cleanStudentNumber ||
-        !cleanName
-      ) {
-        setCreateError(
-          "Student number and student name are required.",
-        );
+    if (!cleanStudentNumber || !cleanName) {
+      setCreateError("Student number and student name are required.");
 
-        return;
-      }
+      return;
+    }
 
-      if (!section?.id) {
-        setCreateError(
-          "No assigned section is available.",
-        );
+    if (!section?.id) {
+      setCreateError("No assigned section is available.");
 
-        return;
-      }
+      return;
+    }
 
-      if (
-        !capturedFaceFile
-      ) {
-        setFaceError(
-          "Please capture the student's face before saving.",
-        );
+    if (!capturedFaceFile) {
+      setFaceError("Please capture the student's face before saving.");
 
-        return;
-      }
+      return;
+    }
 
-      let operationStage =
-        createdStudentRecord?.id
-          ? "face"
-          : "student";
+    let operationStage = createdStudentRecord?.id ? "face" : "student";
 
-      let studentRecord =
-        createdStudentRecord;
+    let studentRecord = createdStudentRecord;
 
-      try {
-        setCreatingStudent(
-          true,
-        );
+    try {
+      setCreatingStudent(true);
 
-        setCreateError("");
+      setCreateError("");
 
-        setFaceError("");
+      setFaceError("");
 
-        setSuccessMessage("");
+      setSuccessMessage("");
 
-        if (
-          !studentRecord?.id
-        ) {
-          operationStage =
-            "student";
+      if (!studentRecord?.id) {
+        operationStage = "student";
 
-          const createdStudent =
-            await adviserService.createStudent(
-              {
-                studentNumber:
-                  cleanStudentNumber,
+        const createdStudent = await adviserService.createStudent({
+          studentNumber: cleanStudentNumber,
 
-                name:
-                  cleanName,
+          name: cleanName,
 
-                sectionId:
-                  section.id,
-              },
+          sectionId: section.id,
+        });
+
+        if (createdStudent?.id) {
+          studentRecord = createdStudent;
+
+          setCreatedStudentRecord(createdStudent);
+
+          setStudents((currentStudents) => {
+            const alreadyExists = currentStudents.some(
+              (student) => student.id === createdStudent.id,
             );
 
-          if (
-            createdStudent?.id
-          ) {
-            studentRecord =
-              createdStudent;
-
-            setCreatedStudentRecord(
-              createdStudent,
-            );
-
-            setStudents(
-              (
-                currentStudents,
-              ) => {
-                const alreadyExists =
-                  currentStudents.some(
-                    (
-                      student,
-                    ) =>
-                      student.id ===
-                      createdStudent.id,
-                  );
-
-                if (
-                  alreadyExists
-                ) {
-                  return currentStudents;
-                }
-
-                return [
-                  ...currentStudents,
-                  createdStudent,
-                ];
-              },
-            );
-          } else {
-            const refreshed =
-              await refreshStudents();
-
-            studentRecord =
-              refreshed.find(
-                (student) =>
-                  String(
-                    student.studentNumber,
-                  ) ===
-                  cleanStudentNumber,
-              );
-
-            if (
-              !studentRecord?.id
-            ) {
-              throw new Error(
-                "Student was created, but the new student ID could not be resolved.",
-              );
+            if (alreadyExists) {
+              return currentStudents;
             }
 
-            setCreatedStudentRecord(
-              studentRecord,
+            return [...currentStudents, createdStudent];
+          });
+        } else {
+          const refreshed = await refreshStudents();
+
+          studentRecord = refreshed.find(
+            (student) => String(student.studentNumber) === cleanStudentNumber,
+          );
+
+          if (!studentRecord?.id) {
+            throw new Error(
+              "Student was created, but the new student ID could not be resolved.",
             );
           }
+
+          setCreatedStudentRecord(studentRecord);
         }
+      }
 
-        operationStage =
-          "face";
+      operationStage = "face";
 
-        await adviserService.registerStudentFace(
-          studentRecord.id,
-          capturedFaceFile,
+      await adviserService.registerStudentFace(
+        studentRecord.id,
+        capturedFaceFile,
+      );
+
+      setLocallyRegisteredFaceIds((currentIds) => {
+        const updatedIds = new Set(currentIds);
+
+        updatedIds.add(studentRecord.id);
+
+        return updatedIds;
+      });
+
+      try {
+        await refreshStudents();
+      } catch (refreshError) {
+        console.warn(
+          "Unable to refresh students after enrollment:",
+          refreshError,
         );
+      }
 
-        setLocallyRegisteredFaceIds(
-          (currentIds) => {
-            const updatedIds =
-              new Set(
-                currentIds,
-              );
+      setSuccessMessage(
+        `${cleanName} was added to ${sectionName} and the face photo was registered successfully.`,
+      );
 
-            updatedIds.add(
-              studentRecord.id,
-            );
+      resetAddStudentModal();
+    } catch (requestError) {
+      console.error("Student enrollment failed:", requestError);
 
-            return updatedIds;
-          },
-        );
-
-        try {
-          await refreshStudents();
-        } catch (
-          refreshError
-        ) {
-          console.warn(
-            "Unable to refresh students after enrollment:",
-            refreshError,
-          );
-        }
-
-        setSuccessMessage(
-          `${cleanName} was added to ${sectionName} and the face photo was registered successfully.`,
-        );
-
-        resetAddStudentModal();
-      } catch (
-        requestError
-      ) {
-        console.error(
-          "Student enrollment failed:",
-          requestError,
-        );
-
-        if (
-          operationStage ===
-          "student"
-        ) {
-          if (
-            requestError
-              ?.response
-              ?.status === 409
-          ) {
-            setCreateError(
-              "That student number already exists.",
-            );
-
-            return;
-          }
-
-          setCreateError(
-            getErrorMessage(
-              requestError,
-              requestError?.message ||
-                "Unable to create the student.",
-            ),
-          );
+      if (operationStage === "student") {
+        if (requestError?.response?.status === 409) {
+          setCreateError("That student number already exists.");
 
           return;
         }
 
-        setFaceError(
+        setCreateError(
           getErrorMessage(
             requestError,
-            "The student record was created, but face registration failed. You can retake the photo and try again without creating the student again.",
+            requestError?.message || "Unable to create the student.",
           ),
         );
-      } finally {
-        setCreatingStudent(
-          false,
-        );
+
+        return;
       }
-    };
+
+      setFaceError(
+        getErrorMessage(
+          requestError,
+          "The student record was created, but face registration failed. You can retake the photo and try again without creating the student again.",
+        ),
+      );
+    } finally {
+      setCreatingStudent(false);
+    }
+  };
 
   /* =======================================================
      EDIT STUDENT MODAL
   ======================================================= */
 
-  const openEditStudent =
-    (student) => {
-      if (
-        !student?.id ||
-        student.active ===
-          false
-      ) {
-        return;
-      }
+  const openEditStudent = (student) => {
+    if (!student?.id || student.active === false) {
+      return;
+    }
 
-      resetCamera();
+    resetCamera();
 
-      setShowAddModal(
-        false,
-      );
+    setShowAddModal(false);
 
-      setSelectedStudent(
-        null,
-      );
+    setSelectedStudent(null);
 
-      setEditingStudent(
-        student,
-      );
+    setEditingStudent(student);
 
-      setEditStudentNumber(
-        student.studentNumber ||
-          "",
-      );
+    setEditStudentNumber(student.studentNumber || "");
 
-      setEditStudentName(
-        student.name ||
-          "",
-      );
+    setEditStudentName(student.name || "");
 
-      setEditError("");
+    setEditError("");
 
-      setSuccessMessage("");
-    };
+    setSuccessMessage("");
+  };
 
-  const resetEditStudent =
-    () => {
-      setEditingStudent(
-        null,
-      );
+  const resetEditStudent = () => {
+    setEditingStudent(null);
 
-      setEditStudentNumber(
-        "",
-      );
+    setEditStudentNumber("");
 
-      setEditStudentName(
-        "",
-      );
+    setEditStudentName("");
 
-      setEditError("");
-    };
+    setEditError("");
+  };
 
-  const closeEditStudent =
-    () => {
-      if (
-        updatingStudent
-      ) {
-        return;
-      }
+  const closeEditStudent = () => {
+    if (updatingStudent) {
+      return;
+    }
 
-      resetEditStudent();
-    };
+    resetEditStudent();
+  };
 
   /* =======================================================
      UPDATE STUDENT
   ======================================================= */
 
-  const handleUpdateStudent =
-    async (event) => {
-      event.preventDefault();
+  const handleUpdateStudent = async (event) => {
+    event.preventDefault();
 
-      if (
-        !editingStudent?.id
-      ) {
-        setEditError(
-          "Student information is unavailable.",
+    if (!editingStudent?.id) {
+      setEditError("Student information is unavailable.");
+
+      return;
+    }
+
+    const cleanStudentNumber = editStudentNumber.trim();
+
+    const cleanName = editStudentName.trim();
+
+    if (!cleanStudentNumber || !cleanName) {
+      setEditError("Student number and student name are required.");
+
+      return;
+    }
+
+    try {
+      setUpdatingStudent(true);
+
+      setEditError("");
+
+      setSuccessMessage("");
+
+      const updatedStudent = await adviserService.updateStudent(
+        editingStudent.id,
+        {
+          studentNumber: cleanStudentNumber,
+
+          name: cleanName,
+        },
+      );
+
+      if (updatedStudent?.id) {
+        setStudents((currentStudents) =>
+          currentStudents.map((student) =>
+            student.id === updatedStudent.id
+              ? {
+                  ...student,
+                  ...updatedStudent,
+                }
+              : student,
+          ),
         );
-
-        return;
-      }
-
-      const cleanStudentNumber =
-        editStudentNumber.trim();
-
-      const cleanName =
-        editStudentName.trim();
-
-      if (
-        !cleanStudentNumber ||
-        !cleanName
-      ) {
-        setEditError(
-          "Student number and student name are required.",
-        );
-
-        return;
       }
 
       try {
-        setUpdatingStudent(
-          true,
-        );
-
-        setEditError("");
-
-        setSuccessMessage("");
-
-        const updatedStudent =
-          await adviserService.updateStudent(
-            editingStudent.id,
-            {
-              studentNumber:
-                cleanStudentNumber,
-
-              name:
-                cleanName,
-            },
-          );
-
-        if (
-          updatedStudent?.id
-        ) {
-          setStudents(
-            (
-              currentStudents,
-            ) =>
-              currentStudents.map(
-                (student) =>
-                  student.id ===
-                  updatedStudent.id
-                    ? {
-                        ...student,
-                        ...updatedStudent,
-                      }
-                    : student,
-              ),
-          );
-        }
-
-        try {
-          await refreshStudents();
-        } catch (
-          refreshError
-        ) {
-          console.warn(
-            "Unable to refresh students after update:",
-            refreshError,
-          );
-        }
-
-        setSuccessMessage(
-          `${cleanName}'s student information was updated successfully.`,
-        );
-
-        resetEditStudent();
-      } catch (
-        requestError
-      ) {
-        console.error(
-          "Unable to update student:",
-          requestError,
-        );
-
-        if (
-          requestError
-            ?.response
-            ?.status === 409
-        ) {
-          setEditError(
-            "That student number already belongs to another student.",
-          );
-
-          return;
-        }
-
-        setEditError(
-          getErrorMessage(
-            requestError,
-            "Unable to update the student record.",
-          ),
-        );
-      } finally {
-        setUpdatingStudent(
-          false,
-        );
+        await refreshStudents();
+      } catch (refreshError) {
+        console.warn("Unable to refresh students after update:", refreshError);
       }
-    };
+
+      setSuccessMessage(
+        `${cleanName}'s student information was updated successfully.`,
+      );
+
+      resetEditStudent();
+    } catch (requestError) {
+      console.error("Unable to update student:", requestError);
+
+      if (requestError?.response?.status === 409) {
+        setEditError("That student number already belongs to another student.");
+
+        return;
+      }
+
+      setEditError(
+        getErrorMessage(requestError, "Unable to update the student record."),
+      );
+    } finally {
+      setUpdatingStudent(false);
+    }
+  };
 
   /* =======================================================
      EXISTING STUDENT FACE MODAL
   ======================================================= */
 
-  const openFaceRegistration =
-    (student) => {
-      if (
-        !student?.id ||
-        student.active ===
-          false
-      ) {
-        return;
-      }
+  const openFaceRegistration = (student) => {
+    if (!student?.id || student.active === false) {
+      return;
+    }
 
-      resetCamera();
+    resetCamera();
 
-      setShowAddModal(
-        false,
-      );
+    setShowAddModal(false);
 
-      setEditingStudent(
-        null,
-      );
+    setEditingStudent(null);
 
-      setSelectedStudent(
-        student,
-      );
+    setSelectedStudent(student);
 
-      setSuccessMessage("");
+    setSuccessMessage("");
 
-      scheduleCameraStart();
-    };
+    scheduleCameraStart();
+  };
 
-  const resetFaceRegistration =
-    () => {
-      resetCamera();
+  const resetFaceRegistration = () => {
+    resetCamera();
 
-      setSelectedStudent(
-        null,
-      );
-    };
+    setSelectedStudent(null);
+  };
 
-  const closeFaceRegistration =
-    () => {
-      if (
-        registeringFace
-      ) {
-        return;
-      }
+  const closeFaceRegistration = () => {
+    if (registeringFace) {
+      return;
+    }
 
-      resetFaceRegistration();
-    };
+    resetFaceRegistration();
+  };
 
   /* =======================================================
      REGISTER / UPDATE EXISTING FACE
   ======================================================= */
 
-  const handleRegisterFace =
-    async (event) => {
-      event.preventDefault();
+  const handleRegisterFace = async (event) => {
+    event.preventDefault();
 
-      if (
-        !selectedStudent?.id
-      ) {
-        setFaceError(
-          "Student information is unavailable.",
-        );
+    if (!selectedStudent?.id) {
+      setFaceError("Student information is unavailable.");
 
-        return;
-      }
+      return;
+    }
 
-      if (
-        !capturedFaceFile
-      ) {
-        setFaceError(
-          "Please capture the student's face first.",
-        );
+    if (!capturedFaceFile) {
+      setFaceError("Please capture the student's face first.");
 
-        return;
-      }
+      return;
+    }
 
-      const studentId =
-        selectedStudent.id;
+    const studentId = selectedStudent.id;
 
-      const registeredName =
-        selectedStudent.name ||
-        "Student";
+    const registeredName = selectedStudent.name || "Student";
+
+    try {
+      setRegisteringFace(true);
+
+      setFaceError("");
+
+      await adviserService.registerStudentFace(studentId, capturedFaceFile);
+
+      setLocallyRegisteredFaceIds((currentIds) => {
+        const updatedIds = new Set(currentIds);
+
+        updatedIds.add(studentId);
+
+        return updatedIds;
+      });
 
       try {
-        setRegisteringFace(
-          true,
-        );
-
-        setFaceError("");
-
-        await adviserService.registerStudentFace(
-          studentId,
-          capturedFaceFile,
-        );
-
-        setLocallyRegisteredFaceIds(
-          (currentIds) => {
-            const updatedIds =
-              new Set(
-                currentIds,
-              );
-
-            updatedIds.add(
-              studentId,
-            );
-
-            return updatedIds;
-          },
-        );
-
-        try {
-          await refreshStudents();
-        } catch (
-          refreshError
-        ) {
-          console.warn(
-            "Student refresh failed after face registration:",
-            refreshError,
-          );
-        }
-
-        setSuccessMessage(
-          `Face registration completed for ${registeredName}.`,
-        );
-
-        resetFaceRegistration();
-      } catch (
-        requestError
-      ) {
-        console.error(
-          "Unable to register student face:",
-          requestError,
-        );
-
-        setFaceError(
-          getErrorMessage(
-            requestError,
-            "Unable to register the student's face.",
-          ),
-        );
-      } finally {
-        setRegisteringFace(
-          false,
+        await refreshStudents();
+      } catch (refreshError) {
+        console.warn(
+          "Student refresh failed after face registration:",
+          refreshError,
         );
       }
-    };
+
+      setSuccessMessage(`Face registration completed for ${registeredName}.`);
+
+      resetFaceRegistration();
+    } catch (requestError) {
+      console.error("Unable to register student face:", requestError);
+
+      setFaceError(
+        getErrorMessage(requestError, "Unable to register the student's face."),
+      );
+    } finally {
+      setRegisteringFace(false);
+    }
+  };
 
   /* =======================================================
      RENDER
@@ -2396,61 +1844,33 @@ function StudentManagement() {
         ================================================== */}
 
         {error && (
-          <div
-            className="adviser-alert adviser-alert-error"
-            role="alert"
-          >
-            <span
-              className="adviser-alert-icon"
-              aria-hidden="true"
-            >
+          <div className="adviser-alert adviser-alert-error" role="alert">
+            <span className="adviser-alert-icon" aria-hidden="true">
               !
             </span>
 
             <div>
-              <strong>
-                Student records
-                unavailable
-              </strong>
+              <strong>Student records unavailable</strong>
 
-              <p>
-                {error}
-              </p>
+              <p>{error}</p>
             </div>
           </div>
         )}
 
         {successMessage && (
-          <div
-            className="student-success-alert"
-            role="status"
-          >
-            <span
-              aria-hidden="true"
-            >
-              ✓
-            </span>
+          <div className="student-success-alert" role="status">
+            <span aria-hidden="true">✓</span>
 
             <div>
-              <strong>
-                Operation successful
-              </strong>
+              <strong>Operation successful</strong>
 
-              <p>
-                {
-                  successMessage
-                }
-              </p>
+              <p>{successMessage}</p>
             </div>
 
             <button
               type="button"
               aria-label="Dismiss notification"
-              onClick={() =>
-                setSuccessMessage(
-                  "",
-                )
-              }
+              onClick={() => setSuccessMessage("")}
             >
               ×
             </button>
@@ -2459,22 +1879,13 @@ function StudentManagement() {
 
         {faceRegistrationIntent && (
           <div className="student-face-intent">
-            <span
-              aria-hidden="true"
-            >
-              ◎
-            </span>
+            <span aria-hidden="true">◎</span>
 
             <div>
-              <strong>
-                Student Face
-                Enrollment
-              </strong>
+              <strong>Student Face Enrollment</strong>
 
               <p>
-                New students can now
-                be created together
-                with their ID-style
+                New students can now be created together with their ID-style
                 face photo.
               </p>
             </div>
@@ -2487,78 +1898,43 @@ function StudentManagement() {
 
         <section className="student-section-overview">
           <div className="student-section-heading">
-            <span>
-              ASSIGNED SECTION
-            </span>
+            <span>ASSIGNED SECTION</span>
 
-            <h2>
-              {loading
-                ? "Loading section..."
-                : sectionName}
-            </h2>
+            <h2>{loading ? "Loading section..." : sectionName}</h2>
 
             <p>
-              Adviser:{" "}
-              <strong>
-                {adviserName}
-              </strong>
+              Adviser: <strong>{adviserName}</strong>
             </p>
           </div>
 
           <div className="student-section-stats">
             <div>
-              <span>
-                TOTAL STUDENTS
-              </span>
+              <span>TOTAL STUDENTS</span>
 
-              <strong>
-                {loading
-                  ? "—"
-                  : students.length}
-              </strong>
+              <strong>{loading ? "—" : students.length}</strong>
             </div>
 
             <div>
-              <span>
-                FACE PENDING
-              </span>
+              <span>FACE PENDING</span>
 
-              <strong>
-                {loading
-                  ? "—"
-                  : facePendingCount}
-              </strong>
+              <strong>{loading ? "—" : facePendingCount}</strong>
             </div>
 
             <div>
-              <span>
-                FACE REGISTERED
-              </span>
+              <span>FACE REGISTERED</span>
 
-              <strong>
-                {loading
-                  ? "—"
-                  : faceRegisteredCount}
-              </strong>
+              <strong>{loading ? "—" : faceRegisteredCount}</strong>
             </div>
           </div>
 
           <span
             className={`student-section-badge ${
-              section?.active ===
-              false
-                ? "is-inactive"
-                : ""
+              section?.active === false ? "is-inactive" : ""
             }`}
           >
-            <span
-              aria-hidden="true"
-            />
+            <span aria-hidden="true" />
 
-            {section?.active ===
-            false
-              ? "INACTIVE"
-              : "ACTIVE"}
+            {section?.active === false ? "INACTIVE" : "ACTIVE"}
           </span>
         </section>
 
@@ -2569,94 +1945,222 @@ function StudentManagement() {
         <section className="student-panel">
           <header className="student-panel-header">
             <div>
-              <span>
-                CLASS ROSTER
-              </span>
+              <span>CLASS ROSTER</span>
 
-              <h2>
-                Students
-              </h2>
+              <h2>Students</h2>
 
-              <p>
-                Manage student
-                records and face
-                identities.
-              </p>
+              <p>Manage student records and face identities.</p>
             </div>
 
             <button
               type="button"
               className="adviser-primary-button"
-              disabled={
-                loading ||
-                !section?.id
-              }
-              onClick={
-                openAddStudentModal
-              }
+              disabled={loading || !section?.id}
+              onClick={openAddStudentModal}
             >
-              <span
-                aria-hidden="true"
-              >
-                +
-              </span>
-
+              <span aria-hidden="true">+</span>
               Add Student
             </button>
           </header>
 
-          {/* SEARCH */}
+          {/* SEARCH + FILTERS */}
 
           <div className="student-toolbar">
             <label className="student-search">
-              <span
-                className="student-search-icon"
-                aria-hidden="true"
-              >
+              <span className="student-search-icon" aria-hidden="true">
                 ⌕
               </span>
 
               <input
                 type="search"
-                value={
-                  searchQuery
-                }
+                value={searchQuery}
                 placeholder="Search by student name or student number..."
-                onChange={(
-                  event,
-                ) =>
-                  setSearchQuery(
-                    event.target
-                      .value,
-                  )
-                }
+                onChange={(event) => setSearchQuery(event.target.value)}
               />
 
               {searchQuery && (
                 <button
                   type="button"
                   aria-label="Clear search"
-                  onClick={() =>
-                    setSearchQuery(
-                      "",
-                    )
-                  }
+                  onClick={() => setSearchQuery("")}
                 >
                   ×
                 </button>
               )}
             </label>
 
-            <span className="student-result-count">
-              {
-                filteredStudents.length
-              }{" "}
-              student
-              {filteredStudents.length ===
-              1
-                ? ""
-                : "s"}
-            </span>
+            <div className="student-toolbar-actions">
+              <span className="student-result-count">
+                <strong>{filteredStudents.length}</strong> of{" "}
+                <strong>{students.length}</strong> student
+                {students.length === 1 ? "" : "s"}
+              </span>
+
+              <div className="student-filter-wrap" ref={filterMenuRef}>
+                <button
+                  type="button"
+                  className={`student-filter-button ${
+                    filterMenuOpen ? "is-open" : ""
+                  }`}
+                  aria-expanded={filterMenuOpen}
+                  aria-haspopup="dialog"
+                  onClick={() => setFilterMenuOpen((current) => !current)}
+                >
+                  <span
+                    className="student-filter-button-icon"
+                    aria-hidden="true"
+                  >
+                    ≡
+                  </span>
+                  Filters
+                  {activeFilterCount > 0 && (
+                    <span className="student-filter-count">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                  <span className="student-filter-chevron" aria-hidden="true">
+                    {filterMenuOpen ? "⌃" : "⌄"}
+                  </span>
+                </button>
+
+                {filterMenuOpen && (
+                  <div
+                    className="student-filter-menu"
+                    role="dialog"
+                    aria-label="Filter students"
+                  >
+                    <header className="student-filter-menu-header">
+                      <div>
+                        <strong>Filter students</strong>
+
+                        <span>Refine the class roster</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        aria-label="Close filters"
+                        onClick={() => setFilterMenuOpen(false)}
+                      >
+                        ×
+                      </button>
+                    </header>
+
+                    <div className="student-filter-menu-body">
+                      <label className="student-filter-row">
+                        <span className="student-filter-row-label">
+                          <i className="is-status" aria-hidden="true" />
+                          Status
+                        </span>
+
+                        <select
+                          value={statusFilter}
+                          onChange={(event) =>
+                            setStatusFilter(event.target.value)
+                          }
+                        >
+                          <option value="ALL">All statuses</option>
+
+                          <option value="ACTIVE">Active only</option>
+
+                          <option value="INACTIVE">Inactive only</option>
+                        </select>
+                      </label>
+
+                      <label className="student-filter-row">
+                        <span className="student-filter-row-label">
+                          <i className="is-face" aria-hidden="true" />
+                          Face
+                        </span>
+
+                        <select
+                          value={faceFilter}
+                          onChange={(event) =>
+                            setFaceFilter(event.target.value)
+                          }
+                        >
+                          <option value="ALL">All face records</option>
+
+                          <option value="REGISTERED">Registered</option>
+
+                          <option value="PENDING">Pending</option>
+                        </select>
+                      </label>
+
+                      <label className="student-filter-row">
+                        <span className="student-filter-row-label">
+                          <i className="is-sort" aria-hidden="true" />
+                          Sort by
+                        </span>
+
+                        <select
+                          value={sortOrder}
+                          onChange={(event) => setSortOrder(event.target.value)}
+                        >
+                          <option value="DEFAULT">Default</option>
+
+                          <option value="NAME_ASC">Name A–Z</option>
+
+                          <option value="NAME_DESC">Name Z–A</option>
+
+                          <option value="NUMBER_ASC">
+                            Student no. ascending
+                          </option>
+
+                          <option value="NUMBER_DESC">
+                            Student no. descending
+                          </option>
+                        </select>
+                      </label>
+
+                      <label className="student-filter-row">
+                        <span className="student-filter-row-label">
+                          <i className="is-rows" aria-hidden="true" />
+                          Rows
+                        </span>
+
+                        <select
+                          value={rowsPerPage}
+                          onChange={(event) =>
+                            setRowsPerPage(Number(event.target.value))
+                          }
+                        >
+                          <option value={5}>5 per page</option>
+
+                          <option value={10}>10 per page</option>
+
+                          <option value={20}>20 per page</option>
+
+                          <option value={50}>50 per page</option>
+                        </select>
+                      </label>
+                    </div>
+
+                    <footer className="student-filter-menu-footer">
+                      <button
+                        type="button"
+                        className="student-filter-reset"
+                        disabled={
+                          !searchQuery &&
+                          activeFilterCount === 0 &&
+                          rowsPerPage === 10
+                        }
+                        onClick={resetRosterView}
+                      >
+                        Reset
+                      </button>
+
+                      <button
+                        type="button"
+                        className="student-filter-done"
+                        onClick={() => setFilterMenuOpen(false)}
+                      >
+                        Done
+                      </button>
+                    </footer>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* TABLE */}
@@ -2666,89 +2170,63 @@ function StudentManagement() {
               <div className="student-loading-state">
                 <span className="student-loading-spinner" />
 
-                <strong>
-                  Loading students...
-                </strong>
+                <strong>Loading students...</strong>
 
-                <p>
-                  Retrieving your
-                  assigned section
-                  roster.
-                </p>
+                <p>Retrieving your assigned section roster.</p>
               </div>
             ) : !section ? (
               <div className="student-empty-state">
-                <span
-                  aria-hidden="true"
-                >
-                  ◇
-                </span>
+                <span aria-hidden="true">◇</span>
 
-                <h3>
-                  No assigned section
-                </h3>
+                <h3>No assigned section</h3>
 
                 <p>
-                  A Councilor must
-                  assign a section to
-                  your Adviser account
-                  before you can manage
-                  students.
+                  A Councilor must assign a section to your Adviser account
+                  before you can manage students.
                 </p>
               </div>
-            ) : students.length ===
-              0 ? (
+            ) : students.length === 0 ? (
               <div className="student-empty-state">
-                <span
-                  aria-hidden="true"
-                >
-                  ♙
-                </span>
+                <span aria-hidden="true">♙</span>
 
-                <h3>
-                  No students yet
-                </h3>
+                <h3>No students yet</h3>
 
                 <p>
-                  Add the first
-                  student to{" "}
-                  <strong>
-                    {sectionName}
-                  </strong>
-                  .
+                  Add the first student to <strong>{sectionName}</strong>.
                 </p>
 
                 <button
                   type="button"
                   className="adviser-primary-button"
-                  onClick={
-                    openAddStudentModal
-                  }
+                  onClick={openAddStudentModal}
                 >
                   + Add Student
                 </button>
               </div>
-            ) : filteredStudents.length ===
-              0 ? (
+            ) : filteredStudents.length === 0 ? (
               <div className="student-empty-state">
-                <span
-                  aria-hidden="true"
-                >
-                  ⌕
-                </span>
+                <span aria-hidden="true">⌕</span>
 
-                <h3>
-                  No matching students
-                </h3>
+                <h3>No matching students</h3>
 
                 <p>
-                  No student matched
-                  your search for{" "}
-                  <strong>
-                    “{searchQuery}”
-                  </strong>
-                  .
+                  {searchQuery ? (
+                    <>
+                      No student matched your search for{" "}
+                      <strong>“{searchQuery}”</strong>.
+                    </>
+                  ) : (
+                    <>No students match the selected filters.</>
+                  )}
                 </p>
+
+                <button
+                  type="button"
+                  className="adviser-secondary-button student-empty-reset"
+                  onClick={resetRosterView}
+                >
+                  Reset view
+                </button>
               </div>
             ) : (
               <table className="student-table">
@@ -2756,182 +2234,184 @@ function StudentManagement() {
                   <tr>
                     <th>#</th>
 
-                    <th>
-                      Student Number
-                    </th>
+                    <th>Student Number</th>
 
-                    <th>
-                      Student Name
-                    </th>
+                    <th>Student Name</th>
 
-                    <th>
-                      Status
-                    </th>
+                    <th>Status</th>
 
-                    <th>
-                      Face Registration
-                    </th>
+                    <th>Face Registration</th>
 
-                    <th>
-                      Actions
-                    </th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {filteredStudents.map(
-                    (
+                  {paginatedStudents.map((student, index) => {
+                    const faceRegistered = hasFaceRegistered(
                       student,
-                      index,
-                    ) => {
-                      const faceRegistered =
-                        hasFaceRegistered(
-                          student,
-                          locallyRegisteredFaceIds,
-                        );
+                      locallyRegisteredFaceIds,
+                    );
 
-                      const active =
-                        student.active !==
-                        false;
+                    const active = student.active !== false;
 
-                      return (
-                        <tr
-                          key={
-                            student.id ||
-                            student.studentNumber
-                          }
-                        >
-                          <td className="student-table-index">
-                            {String(
-                              index +
-                                1,
-                            ).padStart(
-                              2,
-                              "0",
-                            )}
-                          </td>
+                    return (
+                      <tr key={student.id || student.studentNumber}>
+                        <td className="student-table-index">
+                          {String(pageStartIndex + index + 1).padStart(2, "0")}
+                        </td>
 
-                          <td>
-                            <span className="student-number">
-                              {student.studentNumber ||
-                                "—"}
+                        <td>
+                          <span className="student-number">
+                            {student.studentNumber || "—"}
+                          </span>
+                        </td>
+
+                        <td>
+                          <div className="student-name-cell">
+                            <span className="student-avatar">
+                              {student.name?.charAt(0)?.toUpperCase() || "S"}
                             </span>
-                          </td>
 
-                          <td>
-                            <div className="student-name-cell">
-                              <span className="student-avatar">
-                                {student.name
-                                  ?.charAt(
-                                    0,
-                                  )
-                                  ?.toUpperCase() ||
-                                  "S"}
-                              </span>
+                            <div>
+                              <strong>
+                                {student.name || "Unnamed Student"}
+                              </strong>
 
-                              <div>
-                                <strong>
-                                  {student.name ||
-                                    "Unnamed Student"}
-                                </strong>
-
-                                <small>
-                                  {
-                                    sectionName
-                                  }
-                                </small>
-                              </div>
+                              <small>{sectionName}</small>
                             </div>
-                          </td>
+                          </div>
+                        </td>
 
-                          <td>
-                            <span
-                              className={`student-status-badge ${
-                                active
-                                  ? "is-active"
-                                  : "is-inactive"
-                              }`}
-                            >
-                              <span
-                                aria-hidden="true"
-                              />
+                        <td>
+                          <span
+                            className={`student-status-badge ${
+                              active ? "is-active" : "is-inactive"
+                            }`}
+                          >
+                            <span aria-hidden="true" />
 
-                              {active
-                                ? "Active"
-                                : "Inactive"}
+                            {active ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+
+                        <td>
+                          <span
+                            className={`student-face-badge ${
+                              faceRegistered ? "is-registered" : ""
+                            }`}
+                          >
+                            <span aria-hidden="true">
+                              {faceRegistered ? "✓" : "◎"}
                             </span>
-                          </td>
 
-                          <td>
-                            <span
-                              className={`student-face-badge ${
-                                faceRegistered
-                                  ? "is-registered"
-                                  : ""
-                              }`}
+                            {faceRegistered ? "Registered" : "Not Registered"}
+                          </span>
+                        </td>
+
+                        <td>
+                          <div className="student-row-actions">
+                            <button
+                              type="button"
+                              className="student-face-action is-edit"
+                              disabled={!active}
+                              onClick={() => openEditStudent(student)}
                             >
-                              <span
-                                aria-hidden="true"
-                              >
-                                {faceRegistered
-                                  ? "✓"
-                                  : "◎"}
-                              </span>
+                              Edit
+                            </button>
 
-                              {faceRegistered
-                                ? "Registered"
-                                : "Not Registered"}
-                            </span>
-                          </td>
-
-                          <td>
-                            <div className="student-row-actions">
-                              <button
-                                type="button"
-                                className="student-face-action is-edit"
-                                disabled={
-                                  !active
-                                }
-                                onClick={() =>
-                                  openEditStudent(
-                                    student,
-                                  )
-                                }
-                              >
-                                Edit
-                              </button>
-
-                              <button
-                                type="button"
-                                className={`student-face-action is-face ${
-                                  faceRegistered
-                                    ? "is-registered"
-                                    : ""
-                                }`}
-                                disabled={
-                                  !active
-                                }
-                                onClick={() =>
-                                  openFaceRegistration(
-                                    student,
-                                  )
-                                }
-                              >
-                                {faceRegistered
-                                  ? "Update Face"
-                                  : "Register Face"}
-                              </button>
-
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    },
-                  )}
+                            <button
+                              type="button"
+                              className={`student-face-action is-face ${
+                                faceRegistered ? "is-registered" : ""
+                              }`}
+                              disabled={!active}
+                              onClick={() => openFaceRegistration(student)}
+                            >
+                              {faceRegistered ? "Update Face" : "Register Face"}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
           </div>
+
+          {!loading &&
+            section &&
+            students.length > 0 &&
+            filteredStudents.length > 0 && (
+              <div className="student-pagination">
+                <div className="student-pagination-summary">
+                  Showing{" "}
+                  <strong>
+                    {visibleStart}–{visibleEnd}
+                  </strong>{" "}
+                  of <strong>{filteredStudents.length}</strong> student
+                  {filteredStudents.length === 1 ? "" : "s"}
+                </div>
+
+                <nav
+                  className="student-pagination-controls"
+                  aria-label="Student list pagination"
+                >
+                  <button
+                    type="button"
+                    className="student-pagination-nav"
+                    disabled={currentPage === 1}
+                    aria-label="Previous page"
+                    onClick={() =>
+                      setCurrentPage((page) => Math.max(1, page - 1))
+                    }
+                  >
+                    ‹
+                  </button>
+
+                  <div className="student-pagination-pages">
+                    {paginationItems.map((item, index) =>
+                      typeof item === "string" ? (
+                        <span
+                          key={`${item}-${index}`}
+                          className="student-pagination-ellipsis"
+                          aria-hidden="true"
+                        >
+                          …
+                        </span>
+                      ) : (
+                        <button
+                          key={item}
+                          type="button"
+                          className={`student-pagination-page ${
+                            currentPage === item ? "is-active" : ""
+                          }`}
+                          aria-current={
+                            currentPage === item ? "page" : undefined
+                          }
+                          onClick={() => setCurrentPage(item)}
+                        >
+                          {item}
+                        </button>
+                      ),
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="student-pagination-nav"
+                    disabled={currentPage === totalPages}
+                    aria-label="Next page"
+                    onClick={() =>
+                      setCurrentPage((page) => Math.min(totalPages, page + 1))
+                    }
+                  >
+                    ›
+                  </button>
+                </nav>
+              </div>
+            )}
         </section>
       </section>
 
@@ -2944,10 +2424,7 @@ function StudentManagement() {
           className="adviser-modal-backdrop student-modal-backdrop"
           role="presentation"
           onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
+            if (event.target === event.currentTarget) {
               closeAddModal();
             }
           }}
@@ -3060,7 +2537,7 @@ function StudentManagement() {
               </div>
             </nav>
 
-            <div className="student-wizard-body">
+            <div ref={enrollmentBodyRef} className="student-wizard-body">
               {enrollmentStep === 1 && (
                 <section className="student-wizard-step student-wizard-details-step">
                   <div className="student-wizard-step-intro">
@@ -3098,18 +2575,12 @@ function StudentManagement() {
                           type="text"
                           value={studentNumber}
                           disabled={
-                            creatingStudent ||
-                            Boolean(
-                              createdStudentRecord,
-                            )
+                            creatingStudent || Boolean(createdStudentRecord)
                           }
-                          autoFocus
                           autoComplete="off"
                           placeholder="e.g. 2026-0001"
                           onChange={(event) => {
-                            setStudentNumber(
-                              event.target.value,
-                            );
+                            setStudentNumber(event.target.value);
 
                             if (createError) {
                               setCreateError("");
@@ -3117,9 +2588,7 @@ function StudentManagement() {
                           }}
                         />
 
-                        <small>
-                          Use the official school student number.
-                        </small>
+                        <small>Use the official school student number.</small>
                       </label>
 
                       <label className="student-form-field">
@@ -3129,17 +2598,12 @@ function StudentManagement() {
                           type="text"
                           value={studentName}
                           disabled={
-                            creatingStudent ||
-                            Boolean(
-                              createdStudentRecord,
-                            )
+                            creatingStudent || Boolean(createdStudentRecord)
                           }
                           autoComplete="off"
                           placeholder="Enter complete student name"
                           onChange={(event) => {
-                            setStudentName(
-                              event.target.value,
-                            );
+                            setStudentName(event.target.value);
 
                             if (createError) {
                               setCreateError("");
@@ -3162,9 +2626,7 @@ function StudentManagement() {
                             <strong>{sectionName}</strong>
                           </div>
 
-                          <span className="student-locked-badge">
-                            ASSIGNED
-                          </span>
+                          <span className="student-locked-badge">ASSIGNED</span>
                         </div>
 
                         <small>
@@ -3204,23 +2666,16 @@ function StudentManagement() {
                 <section className="student-wizard-step student-wizard-camera-step">
                   <div className="student-wizard-student-bar">
                     <span className="student-face-student-avatar">
-                      {studentName
-                        ?.charAt(0)
-                        ?.toUpperCase() ||
-                        "S"}
+                      {studentName?.charAt(0)?.toUpperCase() || "S"}
                     </span>
 
                     <div>
                       <span>ENROLLING STUDENT</span>
 
-                      <strong>
-                        {studentName.trim() ||
-                          "Student"}
-                      </strong>
+                      <strong>{studentName.trim() || "Student"}</strong>
 
                       <small>
-                        {studentNumber.trim() ||
-                          "No student number"}
+                        {studentNumber.trim() || "No student number"}
                         {" • "}
                         {sectionName}
                       </small>
@@ -3228,58 +2683,35 @@ function StudentManagement() {
 
                     <FaceCameraStatus
                       cameraActive={cameraActive}
-                      capturedFacePreview={
-                        capturedFacePreview
-                      }
+                      capturedFacePreview={capturedFacePreview}
                       scanPhase={scanPhase}
                     />
                   </div>
 
                   <div className="student-wizard-camera-layout">
-                    <div className="student-wizard-camera-main">
+                    <div
+                      className={`student-wizard-camera-main ${
+                        capturedFacePreview ? "has-captured-face" : ""
+                      }`}
+                    >
                       <FaceCapturePanel
-                        subjectName={
-                          studentName.trim() ||
-                          "student"
-                        }
+                        subjectName={studentName.trim() || "student"}
                         videoRef={videoRef}
                         canvasRef={canvasRef}
-                        cameraActive={
-                          cameraActive
-                        }
-                        cameraReady={
-                          cameraReady
-                        }
-                        cameraError={
-                          cameraError
-                        }
-                        capturedFacePreview={
-                          capturedFacePreview
-                        }
+                        cameraActive={cameraActive}
+                        cameraReady={cameraReady}
+                        cameraError={cameraError}
+                        capturedFacePreview={capturedFacePreview}
                         faceError={faceError}
-                        registeringFace={
-                          creatingStudent
-                        }
-                        capturingFace={
-                          capturingFace
-                        }
+                        registeringFace={creatingStudent}
+                        capturingFace={capturingFace}
                         scanPhase={scanPhase}
-                        scanMessage={
-                          scanMessage
-                        }
+                        scanMessage={scanMessage}
                         countdown={countdown}
-                        flashActive={
-                          flashActive
-                        }
-                        onCameraReady={
-                          handleCameraReady
-                        }
-                        onEnableCamera={() =>
-                          void startFaceCamera()
-                        }
-                        onManualCapture={() =>
-                          void handleCaptureFace()
-                        }
+                        flashActive={flashActive}
+                        onCameraReady={handleCameraReady}
+                        onEnableCamera={() => void startFaceCamera()}
+                        onManualCapture={() => void handleCaptureFace()}
                       />
                     </div>
 
@@ -3288,49 +2720,54 @@ function StudentManagement() {
 
                       <h3>
                         {capturedFacePreview
-                          ? "Photo ready for review"
+                          ? "Review the captured photo"
                           : "One clear face is enough"}
                       </h3>
 
                       <p>
                         {capturedFacePreview
-                          ? "Check the captured image. You can retake it before continuing."
+                          ? "If the face is clear and properly framed, continue to the final review."
                           : "Keep the student centered, facing forward, and evenly lit."}
                       </p>
 
-                      <div className="student-wizard-guide-list">
-                        <div>
-                          <i aria-hidden="true">1</i>
-                          <span>
-                            <strong>Center the face</strong>
-                            Keep the full face inside the guide.
-                          </span>
-                        </div>
+                      {!capturedFacePreview && (
+                        <div className="student-wizard-guide-list">
+                          <div>
+                            <i aria-hidden="true">1</i>
+                            <span>
+                              <strong>Center the face</strong>
+                              Keep the full face inside the guide.
+                            </span>
+                          </div>
 
-                        <div>
-                          <i aria-hidden="true">2</i>
-                          <span>
-                            <strong>Look straight</strong>
-                            Avoid turning or tilting the head.
-                          </span>
-                        </div>
+                          <div>
+                            <i aria-hidden="true">2</i>
+                            <span>
+                              <strong>Look straight</strong>
+                              Avoid turning or tilting the head.
+                            </span>
+                          </div>
 
-                        <div>
-                          <i aria-hidden="true">3</i>
-                          <span>
-                            <strong>Use clear lighting</strong>
-                            Avoid strong backlight and deep shadows.
-                          </span>
+                          <div>
+                            <i aria-hidden="true">3</i>
+                            <span>
+                              <strong>Use clear lighting</strong>
+                              Avoid strong backlight and deep shadows.
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {capturedFacePreview && (
-                        <div className="student-wizard-ready-note">
+                        <div className="student-wizard-captured-review">
                           <span aria-hidden="true">✓</span>
 
                           <div>
-                            <strong>Face photo captured</strong>
-                            <p>You can continue to the final review.</p>
+                            <strong>Capture looks ready</strong>
+                            <p>
+                              Check the framing and clarity once. Use Retake
+                              Photo only if the image needs improvement.
+                            </p>
                           </div>
                         </div>
                       )}
@@ -3356,10 +2793,7 @@ function StudentManagement() {
                     <article className="student-wizard-review-card">
                       <div className="student-wizard-review-card-header">
                         <span className="student-face-student-avatar student-wizard-review-avatar">
-                          {studentName
-                            ?.charAt(0)
-                            ?.toUpperCase() ||
-                            "S"}
+                          {studentName?.charAt(0)?.toUpperCase() || "S"}
                         </span>
 
                         <div>
@@ -3528,10 +2962,7 @@ function StudentManagement() {
                     <button
                       type="button"
                       className="adviser-secondary-button"
-                      disabled={
-                        creatingStudent ||
-                        capturingFace
-                      }
+                      disabled={creatingStudent || capturingFace}
                       onClick={goToEnrollmentDetails}
                     >
                       ← Back to Details
@@ -3542,13 +2973,8 @@ function StudentManagement() {
                         <button
                           type="button"
                           className="adviser-secondary-button"
-                          disabled={
-                            creatingStudent ||
-                            capturingFace
-                          }
-                          onClick={() =>
-                            void handleRetakeFace()
-                          }
+                          disabled={creatingStudent || capturingFace}
+                          onClick={() => void handleRetakeFace()}
                         >
                           Retake Photo
                         </button>
@@ -3567,23 +2993,36 @@ function StudentManagement() {
                           <span aria-hidden="true">→</span>
                         </button>
                       </>
+                    ) : !cameraActive ? (
+                      <button
+                        type="button"
+                        className="adviser-primary-button student-enrollment-camera-cta"
+                        disabled={creatingStudent || capturingFace}
+                        onClick={() => void startFaceCamera()}
+                      >
+                        Enable Camera
+                        <span aria-hidden="true">◎</span>
+                      </button>
+                    ) : !cameraReady ? (
+                      <button
+                        type="button"
+                        className="adviser-primary-button student-enrollment-camera-cta"
+                        disabled
+                      >
+                        <span
+                          className="adviser-button-spinner"
+                          aria-hidden="true"
+                        />
+                        Preparing Camera...
+                      </button>
                     ) : (
                       <button
                         type="button"
-                        className="adviser-primary-button"
-                        disabled={
-                          creatingStudent ||
-                          capturingFace ||
-                          !cameraActive ||
-                          !cameraReady
-                        }
-                        onClick={() =>
-                          void handleCaptureFace()
-                        }
+                        className="adviser-primary-button student-enrollment-camera-cta"
+                        disabled={creatingStudent || capturingFace}
+                        onClick={() => void handleCaptureFace()}
                       >
-                        {capturingFace
-                          ? "Capturing..."
-                          : "Capture Now"}
+                        {capturingFace ? "Capturing..." : "Capture Now"}
                       </button>
                     )}
                   </>
@@ -3655,10 +3094,7 @@ function StudentManagement() {
           className="adviser-modal-backdrop student-modal-backdrop"
           role="presentation"
           onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
+            if (event.target === event.currentTarget) {
               closeEditStudent();
             }
           }}
@@ -3680,31 +3116,19 @@ function StudentManagement() {
                 </div>
 
                 <div>
-                  <span>
-                    STUDENT RECORD
-                  </span>
+                  <span>STUDENT RECORD</span>
 
-                  <h2 id="edit-student-title">
-                    Edit student
-                  </h2>
+                  <h2 id="edit-student-title">Edit student</h2>
 
-                  <p>
-                    Update the
-                    student's roster
-                    information.
-                  </p>
+                  <p>Update the student's roster information.</p>
                 </div>
               </div>
 
               <button
                 type="button"
                 className="student-modal-close"
-                onClick={
-                  closeEditStudent
-                }
-                disabled={
-                  updatingStudent
-                }
+                onClick={closeEditStudent}
+                disabled={updatingStudent}
                 aria-label="Close edit student"
               >
                 ×
@@ -3714,25 +3138,16 @@ function StudentManagement() {
             <div className="student-edit-body">
               <div className="student-edit-summary">
                 <span className="student-face-student-avatar">
-                  {editingStudent.name
-                    ?.charAt(0)
-                    ?.toUpperCase() ||
-                    "S"}
+                  {editingStudent.name?.charAt(0)?.toUpperCase() || "S"}
                 </span>
 
                 <div>
-                  <span>
-                    CURRENT RECORD
-                  </span>
+                  <span>CURRENT RECORD</span>
 
-                  <strong>
-                    {editingStudent.name ||
-                      "Student"}
-                  </strong>
+                  <strong>{editingStudent.name || "Student"}</strong>
 
                   <small>
-                    {editingStudent.studentNumber ||
-                      "No student number"}
+                    {editingStudent.studentNumber || "No student number"}
                     {" • "}
                     {sectionName}
                   </small>
@@ -3741,101 +3156,58 @@ function StudentManagement() {
 
               <div className="student-form student-edit-form">
                 <label className="student-form-field">
-                  <span>
-                    Student Number
-                  </span>
+                  <span>Student Number</span>
 
                   <input
                     type="text"
-                    value={
-                      editStudentNumber
-                    }
-                    disabled={
-                      updatingStudent
-                    }
+                    value={editStudentNumber}
+                    disabled={updatingStudent}
                     autoFocus
                     placeholder="Enter student number"
                     onChange={(event) =>
-                      setEditStudentNumber(
-                        event.target
-                          .value,
-                      )
+                      setEditStudentNumber(event.target.value)
                     }
                   />
 
-                  <small>
-                    Must remain unique
-                    across student
-                    records.
-                  </small>
+                  <small>Must remain unique across student records.</small>
                 </label>
 
                 <label className="student-form-field">
-                  <span>
-                    Complete Name
-                  </span>
+                  <span>Complete Name</span>
 
                   <input
                     type="text"
-                    value={
-                      editStudentName
-                    }
-                    disabled={
-                      updatingStudent
-                    }
+                    value={editStudentName}
+                    disabled={updatingStudent}
                     placeholder="Enter complete student name"
-                    onChange={(event) =>
-                      setEditStudentName(
-                        event.target
-                          .value,
-                      )
-                    }
+                    onChange={(event) => setEditStudentName(event.target.value)}
                   />
                 </label>
 
                 <div className="student-form-field">
-                  <span>
-                    Assigned Section
-                  </span>
+                  <span>Assigned Section</span>
 
                   <div className="student-locked-field">
                     <div>
-                      <small>
-                        SECTION
-                      </small>
+                      <small>SECTION</small>
 
-                      <strong>
-                        {sectionName}
-                      </strong>
+                      <strong>{sectionName}</strong>
                     </div>
 
-                    <span className="student-locked-badge">
-                      LOCKED
-                    </span>
+                    <span className="student-locked-badge">LOCKED</span>
                   </div>
 
                   <small>
-                    Section assignment
-                    cannot be changed
-                    from Student
+                    Section assignment cannot be changed from Student
                     Management.
                   </small>
                 </div>
 
                 {editError && (
-                  <div
-                    className="adviser-modal-error"
-                    role="alert"
-                  >
-                    <span
-                      aria-hidden="true"
-                    >
-                      !
-                    </span>
+                  <div className="adviser-modal-error" role="alert">
+                    <span aria-hidden="true">!</span>
 
-                    <p>
-                      {editError}
-                    </p>
+                    <p>{editError}</p>
                   </div>
                 )}
               </div>
@@ -3845,12 +3217,8 @@ function StudentManagement() {
               <button
                 type="button"
                 className="adviser-secondary-button"
-                disabled={
-                  updatingStudent
-                }
-                onClick={
-                  closeEditStudent
-                }
+                disabled={updatingStudent}
+                onClick={closeEditStudent}
               >
                 Cancel
               </button>
@@ -3865,15 +3233,10 @@ function StudentManagement() {
                 }
               >
                 {updatingStudent && (
-                  <span
-                    className="adviser-button-spinner"
-                    aria-hidden="true"
-                  />
+                  <span className="adviser-button-spinner" aria-hidden="true" />
                 )}
 
-                {updatingStudent
-                  ? "Saving..."
-                  : "Save Changes"}
+                {updatingStudent ? "Saving..." : "Save Changes"}
               </button>
             </footer>
           </form>
@@ -3889,10 +3252,7 @@ function StudentManagement() {
           className="adviser-modal-backdrop student-modal-backdrop"
           role="presentation"
           onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
+            if (event.target === event.currentTarget) {
               closeFaceRegistration();
             }
           }}
@@ -3914,9 +3274,7 @@ function StudentManagement() {
                 </div>
 
                 <div>
-                  <span>
-                    FACE IDENTITY
-                  </span>
+                  <span>FACE IDENTITY</span>
 
                   <h2 id="student-face-title">
                     {hasFaceRegistered(
@@ -3928,9 +3286,7 @@ function StudentManagement() {
                   </h2>
 
                   <p>
-                    Capture one clear,
-                    front-facing image
-                    for attendance
+                    Capture one clear, front-facing image for attendance
                     recognition.
                   </p>
                 </div>
@@ -3939,13 +3295,8 @@ function StudentManagement() {
               <button
                 type="button"
                 className="student-modal-close"
-                onClick={
-                  closeFaceRegistration
-                }
-                disabled={
-                  registeringFace ||
-                  capturingFace
-                }
+                onClick={closeFaceRegistration}
+                disabled={registeringFace || capturingFace}
                 aria-label="Close face registration"
               >
                 ×
@@ -3954,95 +3305,54 @@ function StudentManagement() {
 
             <div className="student-face-student">
               <span className="student-face-student-avatar">
-                {selectedStudent.name
-                  ?.charAt(0)
-                  ?.toUpperCase() ||
-                  "S"}
+                {selectedStudent.name?.charAt(0)?.toUpperCase() || "S"}
               </span>
 
               <div>
-                <span>
-                  STUDENT
-                </span>
+                <span>STUDENT</span>
 
-                <strong>
-                  {selectedStudent.name}
-                </strong>
+                <strong>{selectedStudent.name}</strong>
 
                 <small>
-                  {selectedStudent.studentNumber ||
-                    "No student number"}
+                  {selectedStudent.studentNumber || "No student number"}
                   {" • "}
                   {sectionName}
                 </small>
               </div>
 
               <FaceCameraStatus
-                cameraActive={
-                  cameraActive
-                }
-                capturedFacePreview={
-                  capturedFacePreview
-                }
-                scanPhase={
-                  scanPhase
-                }
+                cameraActive={cameraActive}
+                capturedFacePreview={capturedFacePreview}
+                scanPhase={scanPhase}
               />
             </div>
 
             <div className="student-identity-camera">
               <FaceCapturePanel
-                subjectName={
-                  selectedStudent.name ||
-                  "student"
-                }
+                subjectName={selectedStudent.name || "student"}
                 videoRef={videoRef}
                 canvasRef={canvasRef}
-                cameraActive={
-                  cameraActive
-                }
-                cameraReady={
-                  cameraReady
-                }
-                cameraError={
-                  cameraError
-                }
-                capturedFacePreview={
-                  capturedFacePreview
-                }
+                cameraActive={cameraActive}
+                cameraReady={cameraReady}
+                cameraError={cameraError}
+                capturedFacePreview={capturedFacePreview}
                 faceError={faceError}
-                registeringFace={
-                  registeringFace
-                }
-                capturingFace={
-                  capturingFace
-                }
+                registeringFace={registeringFace}
+                capturingFace={capturingFace}
                 scanPhase={scanPhase}
-                scanMessage={
-                  scanMessage
-                }
+                scanMessage={scanMessage}
                 countdown={countdown}
-                flashActive={
-                  flashActive
-                }
-                onCameraReady={
-                  handleCameraReady
-                }
-                onEnableCamera={() =>
-                  void startFaceCamera()
-                }
-                onManualCapture={() =>
-                  void handleCaptureFace()
-                }
+                flashActive={flashActive}
+                onCameraReady={handleCameraReady}
+                onEnableCamera={() => void startFaceCamera()}
+                onManualCapture={() => void handleCaptureFace()}
               />
             </div>
 
             <footer className="adviser-modal-actions student-face-modal-actions">
               <div className="student-face-footer-copy">
                 <strong>
-                  {capturedFacePreview
-                    ? "Photo ready"
-                    : "Position the student"}
+                  {capturedFacePreview ? "Photo ready" : "Position the student"}
                 </strong>
 
                 <span>
@@ -4056,13 +3366,8 @@ function StudentManagement() {
                 <button
                   type="button"
                   className="adviser-secondary-button"
-                  disabled={
-                    registeringFace ||
-                    capturingFace
-                  }
-                  onClick={
-                    closeFaceRegistration
-                  }
+                  disabled={registeringFace || capturingFace}
+                  onClick={closeFaceRegistration}
                 >
                   Cancel
                 </button>
@@ -4072,12 +3377,8 @@ function StudentManagement() {
                     <button
                       type="button"
                       className="adviser-secondary-button"
-                      disabled={
-                        registeringFace
-                      }
-                      onClick={() =>
-                        void handleRetakeFace()
-                      }
+                      disabled={registeringFace}
+                      onClick={() => void handleRetakeFace()}
                     >
                       Retake
                     </button>
@@ -4085,10 +3386,7 @@ function StudentManagement() {
                     <button
                       type="submit"
                       className="adviser-primary-button"
-                      disabled={
-                        registeringFace ||
-                        !capturedFaceFile
-                      }
+                      disabled={registeringFace || !capturedFaceFile}
                     >
                       {registeringFace && (
                         <span
@@ -4117,13 +3415,9 @@ function StudentManagement() {
                       capturingFace ||
                       registeringFace
                     }
-                    onClick={() =>
-                      void handleCaptureFace()
-                    }
+                    onClick={() => void handleCaptureFace()}
                   >
-                    {capturingFace
-                      ? "Capturing..."
-                      : "Capture Now"}
+                    {capturingFace ? "Capturing..." : "Capture Now"}
                   </button>
                 )}
               </div>

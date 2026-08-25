@@ -2042,3 +2042,1113 @@ html[data-theme="dark"] .adviser-dashboard-hero-context {
 }
 
 
+
+/* =========================================================
+   PRODUCTION TYPOGRAPHY / READABILITY OVERRIDES
+   Keeps the existing Adviser Portal font family and layout,
+   while replacing overly-small interface text with practical
+   desktop/mobile sizes.
+========================================================= */
+
+.adviser-dashboard,
+.adviser-dashboard button,
+.adviser-dashboard input,
+.adviser-dashboard select,
+.adviser-dashboard textarea,
+.adviser-modal,
+.adviser-modal button,
+.adviser-modal input,
+.adviser-modal select,
+.adviser-modal textarea {
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+.adviser-alert {
+  gap: 13px;
+  padding: 15px 17px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.adviser-alert-icon {
+  width: 28px;
+  height: 28px;
+  flex-basis: 28px;
+  font-size: 13px;
+}
+
+.adviser-alert strong {
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.adviser-dashboard-eyebrow {
+  margin-bottom: 8px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.adviser-dashboard-hero h2 {
+  font-size: clamp(30px, 3vw, 36px);
+  line-height: 1.12;
+}
+
+.adviser-dashboard-hero-copy > p {
+  margin-top: 11px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.adviser-dashboard-date {
+  margin-top: 18px;
+  font-size: 13px;
+}
+
+.adviser-dashboard-hero-context {
+  min-width: 235px;
+  padding: 20px 22px;
+}
+
+.adviser-dashboard-hero-context span {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.adviser-dashboard-hero-context strong {
+  margin-top: 7px;
+  font-size: 20px;
+}
+
+.adviser-dashboard-hero-context small {
+  margin-top: 7px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.adviser-summary-card {
+  min-height: 170px;
+  padding: 21px;
+}
+
+.adviser-summary-label {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.adviser-summary-value {
+  margin-top: 15px;
+  font-size: 32px;
+}
+
+.adviser-summary-session {
+  margin-top: 16px;
+  font-size: 20px;
+}
+
+.adviser-summary-card h3 {
+  margin-top: 9px;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.adviser-summary-card p {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   SHARED PANEL HEADINGS
+========================================================= */
+
+.adviser-panel-header {
+  min-height: 100px;
+  padding: 21px 22px;
+}
+
+.adviser-panel-eyebrow {
+  margin-bottom: 6px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.adviser-panel-header h2 {
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.adviser-panel-header p {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.adviser-section-status,
+.adviser-session-badge {
+  min-height: 31px;
+  gap: 7px;
+  padding: 0 11px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.adviser-section-status > span,
+.adviser-session-badge > span {
+  width: 7px;
+  height: 7px;
+}
+
+/* =========================================================
+   SECTION IDENTITY
+========================================================= */
+
+.adviser-section-mark span {
+  font-size: 10px;
+}
+
+.adviser-section-mark strong {
+  margin-top: 3px;
+  font-size: 28px;
+}
+
+.adviser-section-copy > span {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.adviser-section-copy h3 {
+  margin-top: 6px;
+  font-size: 22px;
+}
+
+.adviser-section-copy p {
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SECTION METRICS
+========================================================= */
+
+.adviser-section-metrics > div {
+  padding: 15px;
+}
+
+.adviser-section-metrics span {
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.adviser-section-metrics strong {
+  margin-top: 6px;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+/* =========================================================
+   PANEL FOOTER
+========================================================= */
+
+.adviser-panel-footer {
+  padding-top: 19px;
+}
+
+.adviser-panel-footer p {
+  max-width: 390px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   ACTIVE SESSION
+========================================================= */
+
+.adviser-active-session {
+  padding: 17px;
+}
+
+.adviser-active-session-indicator span {
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.adviser-active-session-indicator strong {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.adviser-session-start span {
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.adviser-session-start strong {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+/* =========================================================
+   SESSION METRICS
+========================================================= */
+
+.adviser-session-metrics > div {
+  padding: 14px;
+}
+
+.adviser-session-metrics span {
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.adviser-session-metrics strong {
+  margin-top: 5px;
+  font-size: 22px;
+}
+
+.adviser-session-metrics small {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   EMPTY SESSION
+========================================================= */
+
+.adviser-session-empty {
+  min-height: 280px;
+}
+
+.adviser-session-empty > div span {
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.adviser-session-empty h3 {
+  margin-top: 6px;
+  font-size: 18px;
+}
+
+.adviser-session-empty p {
+  max-width: 360px;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.adviser-primary-button,
+.adviser-secondary-button {
+  min-height: 42px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 780;
+}
+
+/* =========================================================
+   QUICK ACTIONS
+========================================================= */
+
+.adviser-quick-header {
+  padding: 21px 22px;
+}
+
+.adviser-quick-header > div > span {
+  margin-bottom: 5px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.adviser-quick-header h2 {
+  font-size: 20px;
+}
+
+.adviser-quick-header p {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.adviser-quick-section strong {
+  max-width: 250px;
+  font-size: 13px;
+}
+
+.adviser-quick-card {
+  min-height: 98px;
+  padding: 15px;
+}
+
+.adviser-quick-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+}
+
+.adviser-quick-copy strong {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.adviser-quick-copy small {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.adviser-quick-arrow {
+  font-size: 17px;
+}
+
+/* =========================================================
+   NO SECTION
+========================================================= */
+
+.adviser-no-section span {
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.adviser-no-section h2 {
+  margin-top: 6px;
+  font-size: 21px;
+}
+
+.adviser-no-section p {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.adviser-modal-header {
+  padding: 23px 24px 20px;
+}
+
+.adviser-modal-header span {
+  margin-bottom: 5px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.adviser-modal-header h2 {
+  font-size: 20px;
+}
+
+.adviser-modal-header p {
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.adviser-modal-section-summary > div {
+  padding: 14px;
+}
+
+.adviser-modal-section-summary span {
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.adviser-modal-section-summary strong {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.adviser-modal-note,
+.adviser-modal-error {
+  gap: 10px;
+  padding: 12px 13px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.adviser-modal-note > span,
+.adviser-modal-error > span {
+  width: 22px;
+  height: 22px;
+  flex-basis: 22px;
+  font-size: 10px;
+}
+
+/* =========================================================
+   LOADING / SKELETON
+========================================================= */
+
+.adviser-skeleton-stat {
+  height: 170px;
+}
+
+/* =========================================================
+   RESPONSIVE TYPOGRAPHY
+========================================================= */
+
+@media (max-width: 820px) {
+  .adviser-dashboard-hero-context {
+    min-width: 205px;
+  }
+
+  .adviser-dashboard-hero h2 {
+    font-size: clamp(28px, 5vw, 34px);
+  }
+}
+
+@media (max-width: 650px) {
+  .adviser-dashboard-hero {
+    min-height: 205px;
+  }
+
+  .adviser-dashboard-hero h2 {
+    font-size: 28px;
+  }
+
+  .adviser-dashboard-hero-copy > p {
+    font-size: 13px;
+  }
+
+  .adviser-dashboard-date {
+    font-size: 12px;
+  }
+
+  .adviser-summary-card {
+    min-height: 160px;
+  }
+
+  .adviser-summary-label,
+  .adviser-panel-eyebrow,
+  .adviser-quick-header > div > span,
+  .adviser-no-section span,
+  .adviser-modal-header span {
+    font-size: 10px;
+  }
+
+  .adviser-panel-header h2,
+  .adviser-quick-header h2 {
+    font-size: 19px;
+  }
+
+  .adviser-panel-header p,
+  .adviser-panel-footer p,
+  .adviser-quick-header p,
+  .adviser-section-copy p,
+  .adviser-session-empty p,
+  .adviser-modal-header p {
+    font-size: 12px;
+  }
+
+  .adviser-primary-button,
+  .adviser-secondary-button {
+    min-height: 44px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 440px) {
+  .adviser-dashboard-hero h2 {
+    font-size: 26px;
+  }
+
+  .adviser-dashboard-hero-context strong {
+    font-size: 19px;
+  }
+
+  .adviser-section-copy h3 {
+    font-size: 20px;
+  }
+
+  .adviser-summary-value {
+    font-size: 30px;
+  }
+}
+
+
+/* =========================================================
+   PRODUCTION VISUAL ORGANIZATION / SEMANTIC COLOR SYSTEM
+   CSS-only enhancement. Existing layout, classes, behavior,
+   responsive rules, and inherited font family are preserved.
+========================================================= */
+
+/* =========================================================
+   SUMMARY CARDS — VISUAL GROUPING
+========================================================= */
+
+.adviser-summary-card {
+  border-width: 1px;
+  border-style: solid;
+}
+
+.adviser-summary-card:nth-child(1) {
+  border-color: #bfd7f5;
+  background:
+    linear-gradient(180deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.98));
+  box-shadow:
+    0 12px 28px rgba(37, 99, 235, 0.07),
+    var(--c-card-shadow);
+}
+
+.adviser-summary-card:nth-child(1)::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #2563eb;
+}
+
+.adviser-summary-card:nth-child(1) .adviser-summary-icon {
+  border: 1px solid #bfdbfe;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.adviser-summary-card:nth-child(1) .adviser-summary-label {
+  color: #1d4ed8;
+}
+
+.adviser-summary-card:nth-child(2) {
+  border-color: #b9e5c7;
+  background:
+    linear-gradient(180deg, rgba(240, 253, 244, 0.96), rgba(255, 255, 255, 0.98));
+  box-shadow:
+    0 12px 28px rgba(22, 163, 74, 0.07),
+    var(--c-card-shadow);
+}
+
+.adviser-summary-card:nth-child(2)::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #22c55e;
+}
+
+.adviser-summary-card:nth-child(2) .adviser-summary-icon {
+  border: 1px solid #bbf7d0;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.adviser-summary-card:nth-child(2) .adviser-summary-label {
+  color: #15803d;
+}
+
+.adviser-summary-card:nth-child(3) {
+  border-color: #f1d89a;
+  background:
+    linear-gradient(180deg, rgba(255, 251, 235, 0.97), rgba(255, 255, 255, 0.98));
+  box-shadow:
+    0 12px 28px rgba(217, 119, 6, 0.07),
+    var(--c-card-shadow);
+}
+
+.adviser-summary-card:nth-child(3)::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #f59e0b;
+}
+
+.adviser-summary-card:nth-child(3) .adviser-summary-icon {
+  border: 1px solid #fde68a;
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.adviser-summary-card:nth-child(3) .adviser-summary-label {
+  color: #b45309;
+}
+
+/* Keep an explicitly active summary card clearly successful. */
+.adviser-summary-card-active {
+  border-color: #9fd8b1 !important;
+  background:
+    linear-gradient(180deg, rgba(236, 253, 245, 0.98), rgba(255, 255, 255, 0.98)) !important;
+}
+
+.adviser-summary-card-active::before {
+  background: #16a34a !important;
+}
+
+.adviser-summary-card:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   MAIN PANELS — SEPARATE PURPOSES
+========================================================= */
+
+.adviser-primary-grid > .adviser-panel:first-child {
+  border-color: #c7d9ef;
+  box-shadow:
+    0 16px 36px rgba(30, 64, 175, 0.06),
+    var(--c-panel-shadow);
+}
+
+.adviser-primary-grid > .adviser-panel:first-child .adviser-panel-header {
+  background:
+    linear-gradient(90deg, rgba(239, 246, 255, 0.9), rgba(255, 255, 255, 0));
+}
+
+.adviser-primary-grid > .adviser-panel:first-child .adviser-panel-eyebrow {
+  color: #1d4ed8;
+}
+
+.adviser-session-panel {
+  border-color: #d7c9f6;
+  box-shadow:
+    0 16px 36px rgba(109, 40, 217, 0.05),
+    var(--c-panel-shadow);
+}
+
+.adviser-session-panel .adviser-panel-header {
+  background:
+    linear-gradient(90deg, rgba(245, 243, 255, 0.92), rgba(255, 255, 255, 0));
+}
+
+.adviser-session-panel .adviser-panel-eyebrow {
+  color: #6d28d9;
+}
+
+.adviser-session-panel.is-active {
+  border-color: #a7ddb7;
+}
+
+.adviser-session-panel.is-active .adviser-panel-header {
+  background:
+    linear-gradient(90deg, rgba(240, 253, 244, 0.95), rgba(255, 255, 255, 0));
+}
+
+.adviser-session-panel.is-active .adviser-panel-eyebrow {
+  color: #15803d;
+}
+
+/* =========================================================
+   SECTION IDENTITY — INFORMATION BOX
+========================================================= */
+
+.adviser-section-identity {
+  margin: 18px 21px 0;
+  padding: 18px;
+  border: 1px solid #c9dcf2;
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(239, 246, 255, 0.9), rgba(248, 250, 252, 0.95));
+}
+
+.adviser-section-mark {
+  border-color: #b7d3f4;
+  background: #dbeafe;
+  color: #17427f;
+}
+
+.adviser-section-copy > span {
+  color: #335f98;
+}
+
+/* =========================================================
+   SECTION METRICS — EACH BOX HAS A ROLE
+========================================================= */
+
+.adviser-section-metrics {
+  gap: 9px;
+  margin-top: 14px;
+  border: 0;
+  background: transparent;
+}
+
+.adviser-section-metrics > div {
+  border: 1px solid;
+  border-radius: 10px;
+}
+
+.adviser-section-metrics > div + div {
+  border-left-width: 1px;
+}
+
+.adviser-section-metrics > div:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.adviser-section-metrics > div:nth-child(1) span {
+  color: #2563eb;
+}
+
+.adviser-section-metrics > div:nth-child(2) {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.adviser-section-metrics > div:nth-child(2) span {
+  color: #15803d;
+}
+
+.adviser-section-metrics > div:nth-child(3) {
+  border-color: #f1d89a;
+  background: #fffbeb;
+}
+
+.adviser-section-metrics > div:nth-child(3) span {
+  color: #b45309;
+}
+
+/* =========================================================
+   ACTIVE SESSION — STRONGER ORGANIZATION
+========================================================= */
+
+.adviser-active-session {
+  border-color: #a7ddb7;
+  background:
+    linear-gradient(135deg, #effbf3 0%, #f7fdf9 100%);
+  box-shadow: 0 8px 20px rgba(22, 163, 74, 0.06);
+}
+
+.adviser-session-metrics {
+  gap: 10px;
+}
+
+.adviser-session-metrics > div {
+  border-width: 1px;
+  border-style: solid;
+}
+
+.adviser-session-metrics > div:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.adviser-session-metrics > div:nth-child(1) span {
+  color: #2563eb;
+}
+
+.adviser-session-metrics > div:nth-child(2) {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.adviser-session-metrics > div:nth-child(2) span,
+.adviser-session-metrics > div:nth-child(2) strong {
+  color: #15803d;
+}
+
+.adviser-session-metrics > div:nth-child(3) {
+  border-color: #f1d89a;
+  background: #fffbeb;
+}
+
+.adviser-session-metrics > div:nth-child(3) span {
+  color: #b45309;
+}
+
+/* =========================================================
+   QUICK ACTIONS — ORGANIZED ACTION TYPES
+========================================================= */
+
+.adviser-quick-panel {
+  border-color: #d8e2ee;
+}
+
+.adviser-quick-header {
+  background:
+    linear-gradient(90deg, rgba(248, 250, 252, 0.95), rgba(239, 246, 255, 0.55));
+}
+
+.adviser-quick-grid {
+  gap: 12px;
+  padding: 16px;
+}
+
+.adviser-quick-card {
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.adviser-quick-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #2563eb;
+}
+
+.adviser-quick-card:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #f7fbff;
+}
+
+.adviser-quick-card:nth-child(1)::before {
+  background: #2563eb;
+}
+
+.adviser-quick-card:nth-child(1) .adviser-quick-icon {
+  border: 1px solid #bfdbfe;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.adviser-quick-card:nth-child(2) {
+  border-color: #d8c7f5;
+  background: #faf8ff;
+}
+
+.adviser-quick-card:nth-child(2)::before {
+  background: #7c3aed;
+}
+
+.adviser-quick-card:nth-child(2) .adviser-quick-icon {
+  border: 1px solid #ddd6fe;
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.adviser-quick-card:nth-child(3) {
+  border-color: #b9e5c7;
+  background: #f7fcf8;
+}
+
+.adviser-quick-card:nth-child(3)::before {
+  background: #16a34a;
+}
+
+.adviser-quick-card:nth-child(3) .adviser-quick-icon {
+  border: 1px solid #bbf7d0;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.adviser-quick-attendance.is-active {
+  border-color: #95d8aa !important;
+  background: #effbf3 !important;
+}
+
+.adviser-quick-attendance.is-active::before {
+  background: #16a34a !important;
+}
+
+.adviser-quick-card:hover {
+  box-shadow: 0 12px 26px rgba(15, 35, 70, 0.09);
+}
+
+/* =========================================================
+   MODAL — INFORMATION ORGANIZATION
+========================================================= */
+
+.adviser-modal-header {
+  background:
+    linear-gradient(90deg, rgba(239, 246, 255, 0.75), rgba(255, 255, 255, 0));
+}
+
+.adviser-modal-section-summary {
+  gap: 8px;
+  border: 0;
+  background: transparent;
+}
+
+.adviser-modal-section-summary > div {
+  border: 1px solid;
+  border-radius: 9px;
+}
+
+.adviser-modal-section-summary > div + div {
+  border-left-width: 1px;
+}
+
+.adviser-modal-section-summary > div:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.adviser-modal-section-summary > div:nth-child(1) span {
+  color: #2563eb;
+}
+
+.adviser-modal-section-summary > div:nth-child(2) {
+  border-color: #d8c7f5;
+  background: #f5f3ff;
+}
+
+.adviser-modal-section-summary > div:nth-child(2) span {
+  color: #6d28d9;
+}
+
+.adviser-modal-section-summary > div:nth-child(3) {
+  border-color: #f1d89a;
+  background: #fffbeb;
+}
+
+.adviser-modal-section-summary > div:nth-child(3) span {
+  color: #b45309;
+}
+
+/* =========================================================
+   DARK MODE — SEMANTIC COLORS
+========================================================= */
+
+html[data-theme="dark"] .adviser-summary-card:nth-child(1) {
+  border-color: #274a78;
+  background:
+    linear-gradient(180deg, rgba(30, 64, 175, 0.18), rgba(13, 23, 39, 0.98));
+}
+
+html[data-theme="dark"] .adviser-summary-card:nth-child(2),
+html[data-theme="dark"] .adviser-summary-card-active {
+  border-color: #28633d !important;
+  background:
+    linear-gradient(180deg, rgba(22, 101, 52, 0.2), rgba(13, 23, 39, 0.98)) !important;
+}
+
+html[data-theme="dark"] .adviser-summary-card:nth-child(3) {
+  border-color: #73541d;
+  background:
+    linear-gradient(180deg, rgba(146, 64, 14, 0.18), rgba(13, 23, 39, 0.98));
+}
+
+html[data-theme="dark"] .adviser-summary-card:nth-child(1) .adviser-summary-icon,
+html[data-theme="dark"] .adviser-quick-card:nth-child(1) .adviser-quick-icon {
+  border-color: #31588b;
+  background: #132d50;
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .adviser-summary-card:nth-child(2) .adviser-summary-icon,
+html[data-theme="dark"] .adviser-quick-card:nth-child(3) .adviser-quick-icon {
+  border-color: #2e6843;
+  background: #123521;
+  color: #86efac;
+}
+
+html[data-theme="dark"] .adviser-summary-card:nth-child(3) .adviser-summary-icon {
+  border-color: #72551e;
+  background: #3c2b0f;
+  color: #fcd34d;
+}
+
+html[data-theme="dark"] .adviser-primary-grid > .adviser-panel:first-child .adviser-panel-header,
+html[data-theme="dark"] .adviser-section-identity {
+  background:
+    linear-gradient(90deg, rgba(30, 64, 175, 0.14), rgba(13, 23, 39, 0.35));
+}
+
+html[data-theme="dark"] .adviser-session-panel .adviser-panel-header {
+  background:
+    linear-gradient(90deg, rgba(109, 40, 217, 0.13), rgba(13, 23, 39, 0.35));
+}
+
+html[data-theme="dark"] .adviser-session-panel.is-active .adviser-panel-header,
+html[data-theme="dark"] .adviser-active-session {
+  background:
+    linear-gradient(90deg, rgba(22, 101, 52, 0.18), rgba(13, 23, 39, 0.35));
+}
+
+html[data-theme="dark"] .adviser-section-metrics > div:nth-child(1),
+html[data-theme="dark"] .adviser-session-metrics > div:nth-child(1),
+html[data-theme="dark"] .adviser-modal-section-summary > div:nth-child(1) {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .adviser-section-metrics > div:nth-child(2),
+html[data-theme="dark"] .adviser-session-metrics > div:nth-child(2) {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.16);
+}
+
+html[data-theme="dark"] .adviser-section-metrics > div:nth-child(3),
+html[data-theme="dark"] .adviser-session-metrics > div:nth-child(3),
+html[data-theme="dark"] .adviser-modal-section-summary > div:nth-child(3) {
+  border-color: #72551e;
+  background: rgba(146, 64, 14, 0.14);
+}
+
+html[data-theme="dark"] .adviser-modal-section-summary > div:nth-child(2) {
+  border-color: #563a8a;
+  background: rgba(109, 40, 217, 0.14);
+}
+
+html[data-theme="dark"] .adviser-quick-panel,
+html[data-theme="dark"] .adviser-quick-header {
+  border-color: #2a3950;
+}
+
+html[data-theme="dark"] .adviser-quick-header {
+  background:
+    linear-gradient(90deg, rgba(15, 29, 49, 0.95), rgba(30, 64, 175, 0.08));
+}
+
+html[data-theme="dark"] .adviser-quick-card:nth-child(1) {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.10);
+}
+
+html[data-theme="dark"] .adviser-quick-card:nth-child(2) {
+  border-color: #563a8a;
+  background: rgba(109, 40, 217, 0.10);
+}
+
+html[data-theme="dark"] .adviser-quick-card:nth-child(2) .adviser-quick-icon {
+  border-color: #563a8a;
+  background: #29194a;
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"] .adviser-quick-card:nth-child(3),
+html[data-theme="dark"] .adviser-quick-attendance.is-active {
+  border-color: #2e6843 !important;
+  background: rgba(22, 101, 52, 0.13) !important;
+}
+
+/* =========================================================
+   RESPONSIVE — COLORED BOX ORGANIZATION
+========================================================= */
+
+@media (max-width: 650px) {
+  .adviser-section-identity {
+    margin-right: 17px;
+    margin-left: 17px;
+  }
+
+  .adviser-section-metrics {
+    gap: 8px;
+  }
+
+  .adviser-section-metrics > div + div {
+    border-top-width: 1px;
+  }
+
+  .adviser-modal-section-summary {
+    gap: 8px;
+  }
+
+  .adviser-modal-section-summary > div + div {
+    border-top-width: 1px;
+  }
+}
+

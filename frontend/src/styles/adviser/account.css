@@ -1,6 +1,7 @@
 /* =========================================================
    SVNHS ATTENDANCE MANAGEMENT SYSTEM
    ADVISER — ACCOUNT SECURITY
+   Production readability + semantic color organization
 ========================================================= */
 
 /* =========================================================
@@ -8,28 +9,23 @@
 ========================================================= */
 
 .adviser-password-nav-item {
+  position: relative;
   margin-top: 5px;
 }
 
 .adviser-password-nav-item::after {
   content: "";
-
   position: absolute;
-
   top: -3px;
   right: 13px;
   left: 13px;
-
   height: 1px;
-
   background: var(--c-border-soft);
-
   opacity: 0.7;
 }
 
 .adviser-password-nav-item:hover {
   background: var(--c-nav-hover-bg);
-
   color: var(--c-nav-hover-text);
 }
 
@@ -46,76 +42,90 @@
 ========================================================= */
 
 .adviser-password-modal {
-  width: min(100%, 520px);
+  width: min(100%, 540px);
 }
 
 .adviser-password-form {
-  gap: 15px;
+  gap: 17px;
+}
+
+/* Preserve the application's existing font family. */
+.adviser-password-modal,
+.adviser-password-modal button,
+.adviser-password-modal input,
+.adviser-password-modal select,
+.adviser-password-modal textarea {
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* =========================================================
-   ACCOUNT SUMMARY
+   ACCOUNT SUMMARY — BLUE INFORMATION BOX
 ========================================================= */
 
 .adviser-password-account {
+  position: relative;
+  overflow: hidden;
+
   display: flex;
   align-items: center;
+  gap: 14px;
 
-  gap: 13px;
+  padding: 16px 17px;
 
-  padding: 14px 15px;
+  border: 1px solid #bfd7f5;
+  border-radius: 12px;
 
-  border: 1px solid var(--c-border-soft);
-  border-radius: 11px;
+  background:
+    linear-gradient(
+      135deg,
+      #eff6ff 0%,
+      #f8fbff 58%,
+      #ffffff 100%
+    );
 
-  background: linear-gradient(
-    135deg,
-    var(--c-surface-soft),
-    var(--c-nav-hover-bg)
-  );
+  box-shadow:
+    inset 4px 0 0 #2563eb,
+    0 8px 20px rgba(37, 99, 235, 0.05);
 }
 
 .adviser-password-avatar {
-  width: 42px;
-  height: 42px;
-
-  flex: 0 0 42px;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
 
   display: grid;
   place-items: center;
 
-  border: 3px solid rgba(197, 31, 45, 0.11);
+  border: 1px solid #bfdbfe;
+  border-radius: 13px;
 
-  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
 
-  background: linear-gradient(135deg, var(--c-red-600), var(--c-red-700));
+  box-shadow: 0 5px 13px rgba(37, 99, 235, 0.1);
 
-  color: #ffffff;
-
-  box-shadow: 0 4px 11px rgba(197, 31, 45, 0.14);
-
-  font-size: 14px;
-  font-weight: 850;
+  font-size: 16px;
+  font-weight: 900;
 }
 
 .adviser-password-account-copy {
   min-width: 0;
-
   display: flex;
   flex-direction: column;
 }
 
 .adviser-password-account-copy > span {
   display: block;
+  margin-bottom: 4px;
 
-  margin-bottom: 3px;
+  color: #2563eb;
 
-  color: var(--c-text-muted);
-
-  font-size: 7px;
-  font-weight: 850;
-
-  letter-spacing: 0.13em;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: 0.09em;
 }
 
 .adviser-password-account-copy strong {
@@ -123,65 +133,71 @@
 
   color: var(--c-text-primary);
 
-  font-size: 12px;
-  font-weight: 780;
+  font-size: 14px;
+  font-weight: 820;
+  line-height: 1.35;
 
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .adviser-password-account-copy small {
-  margin-top: 3px;
-
+  margin-top: 4px;
   overflow: hidden;
 
   color: var(--c-text-muted);
 
-  font-size: 9px;
+  font-size: 11px;
+  line-height: 1.35;
 
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 /* =========================================================
-   PASSWORD RECOVERY HELP
+   PASSWORD RECOVERY HELP — AMBER GUIDANCE BOX
 ========================================================= */
 
 .adviser-password-help {
   display: flex;
   align-items: flex-start;
+  gap: 11px;
 
-  gap: 10px;
+  padding: 14px 15px;
 
-  padding: 12px 13px;
+  border: 1px solid #f1d89a;
+  border-radius: 11px;
 
-  border: 1px solid var(--c-brand-border);
-  border-radius: 10px;
+  background:
+    linear-gradient(
+      135deg,
+      #fffbeb 0%,
+      #fffdf5 100%
+    );
 
-  background: var(--c-icon-bg);
+  color: #704214;
 
-  color: var(--c-text-body);
+  box-shadow: inset 4px 0 0 #f59e0b;
 }
 
 .adviser-password-help-icon {
-  width: 21px;
-  height: 21px;
-
-  flex: 0 0 21px;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
 
   display: grid;
   place-items: center;
 
   margin-top: 1px;
 
-  border-radius: 50%;
+  border: 1px solid #fde68a;
+  border-radius: 9px;
 
-  background: var(--c-blue-900);
+  background: #fef3c7;
+  color: #b45309;
 
-  color: #ffffff;
-
-  font-size: 9px;
-  font-weight: 850;
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .adviser-password-help > div {
@@ -190,62 +206,66 @@
 
 .adviser-password-help strong {
   display: block;
+  margin-bottom: 4px;
 
-  margin-bottom: 3px;
+  color: #92400e;
 
-  color: var(--c-text-secondary);
-
-  font-size: 10px;
-  font-weight: 780;
+  font-size: 13px;
+  font-weight: 820;
+  line-height: 1.35;
 }
 
 .adviser-password-help p {
   margin: 0;
 
-  color: var(--c-text-body);
+  color: #78552e;
 
-  font-size: 8.5px;
-
+  font-size: 12px;
   line-height: 1.55;
 }
 
 /* =========================================================
-   PASSWORD SUCCESS
+   PASSWORD SUCCESS — GREEN CONFIRMATION BOX
 ========================================================= */
 
 .adviser-password-success {
   display: flex;
   align-items: flex-start;
+  gap: 11px;
 
-  gap: 10px;
+  padding: 14px 15px;
 
-  padding: 12px 14px;
+  border: 1px solid #b9e5c7;
+  border-radius: 11px;
 
-  border: 1px solid var(--c-success-border);
-  border-radius: 10px;
+  background:
+    linear-gradient(
+      135deg,
+      #f0fdf4 0%,
+      #f8fef9 100%
+    );
 
-  background: var(--c-success-bg);
+  color: #15803d;
 
-  color: var(--c-success-text);
+  box-shadow: inset 4px 0 0 #16a34a;
 }
 
 .adviser-password-success > span {
-  width: 23px;
-  height: 23px;
-
-  flex: 0 0 23px;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
 
   display: grid;
   place-items: center;
 
-  border-radius: 50%;
+  border: 1px solid #bbf7d0;
+  border-radius: 9px;
 
-  background: var(--c-success-text);
+  background: #dcfce7;
+  color: #15803d;
 
-  color: #ffffff;
-
-  font-size: 10px;
-  font-weight: 850;
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .adviser-password-success > div {
@@ -255,40 +275,167 @@
 .adviser-password-success strong {
   display: block;
 
-  color: var(--c-success-text);
+  color: #15803d;
 
-  font-size: 10px;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.35;
 }
 
 .adviser-password-success p {
-  margin: 3px 0 0;
+  margin: 4px 0 0;
 
-  color: var(--c-success-text);
+  color: #237a43;
 
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 550;
-
   line-height: 1.5;
-
-  opacity: 0.88;
 }
 
 /* =========================================================
-   FORM POLISH
+   FORM POLISH — VIOLET SECURITY IDENTITY
 ========================================================= */
 
+.adviser-password-form .councilor-modal-field {
+  position: relative;
+}
+
+.adviser-password-form .councilor-modal-field > span,
+.adviser-password-form .councilor-modal-field > label {
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .adviser-password-form .councilor-modal-field input {
+  min-height: 46px;
+
+  border-color: #d8c7f5;
+  border-radius: 10px;
+
+  background: #faf8ff;
+
+  font-size: 13px;
+
   transition:
     border-color 0.18s ease,
     box-shadow 0.18s ease,
     background 0.18s ease;
 }
 
-.adviser-password-form .councilor-modal-field input:focus {
-  border-color: var(--c-blue-800);
+.adviser-password-form .councilor-modal-field input:hover:not(:disabled) {
+  border-color: #c4afea;
+  background: #ffffff;
+}
 
-  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.09);
+.adviser-password-form .councilor-modal-field input:focus {
+  border-color: #7c3aed;
+  background: #ffffff;
+
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.09);
+}
+
+/* =========================================================
+   PASSWORD INPUT WITH VISIBILITY TOGGLE
+========================================================= */
+
+.adviser-password-input {
+  position: relative;
+  width: 100%;
+}
+
+.adviser-password-input input {
+  width: 100%;
+  padding-right: 48px !important;
+}
+
+/* =========================================================
+   SHOW / HIDE PASSWORD BUTTON
+========================================================= */
+
+.adviser-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+
+  width: 34px;
+  height: 34px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  background: transparent;
+  color: #71638b;
+
+  cursor: pointer;
+
+  transform: translateY(-50%);
+
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.adviser-password-toggle svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.adviser-password-toggle:hover:not(:disabled) {
+  border-color: #ddd6fe;
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.adviser-password-toggle:active:not(:disabled) {
+  background: #e4defa;
+}
+
+.adviser-password-toggle:focus-visible {
+  outline: 3px solid rgba(124, 58, 237, 0.16);
+  outline-offset: 1px;
+}
+
+.adviser-password-toggle:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.adviser-password-input:focus-within .adviser-password-toggle {
+  color: #6d28d9;
+}
+
+/* =========================================================
+   MODAL ACTION BUTTON ORGANIZATION
+========================================================= */
+
+.adviser-password-form .councilor-modal-actions {
+  gap: 9px;
+}
+
+.adviser-password-form .councilor-modal-actions button {
+  min-height: 42px;
+  font-size: 12px;
+}
+
+/* Neutral cancel/secondary action. */
+.adviser-password-form .councilor-modal-actions button:not(.is-primary):not(.is-danger) {
+  border-color: #d8e0ea;
+  background: #ffffff;
+  color: #52677f;
+}
+
+/* Primary password/security action. */
+.adviser-password-form .councilor-modal-actions .is-primary {
+  border-color: #6d28d9;
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: #ffffff;
 }
 
 /* =========================================================
@@ -296,11 +443,101 @@
 ========================================================= */
 
 html[data-theme="dark"] .adviser-password-account {
-  background: var(--c-surface-soft);
+  border-color: #31588b;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(30, 64, 175, 0.16),
+      rgba(15, 23, 42, 0.74)
+    );
+
+  box-shadow:
+    inset 4px 0 0 #60a5fa,
+    none;
+}
+
+html[data-theme="dark"] .adviser-password-avatar {
+  border-color: #31588b;
+  background: #132d50;
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .adviser-password-account-copy > span {
+  color: #93c5fd;
 }
 
 html[data-theme="dark"] .adviser-password-help {
-  background: var(--c-icon-bg);
+  border-color: #72551e;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(146, 64, 14, 0.17),
+      rgba(15, 23, 42, 0.74)
+    );
+
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .adviser-password-help-icon {
+  border-color: #72551e;
+  background: #3c2b0f;
+  color: #fcd34d;
+}
+
+html[data-theme="dark"] .adviser-password-help strong {
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .adviser-password-help p {
+  color: #d6bd89;
+}
+
+html[data-theme="dark"] .adviser-password-success {
+  border-color: #2e6843;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(22, 101, 52, 0.18),
+      rgba(15, 23, 42, 0.74)
+    );
+
+  color: #86efac;
+}
+
+html[data-theme="dark"] .adviser-password-success > span {
+  border-color: #2e6843;
+  background: #123521;
+  color: #86efac;
+}
+
+html[data-theme="dark"] .adviser-password-success strong,
+html[data-theme="dark"] .adviser-password-success p {
+  color: #86efac;
+}
+
+html[data-theme="dark"] .adviser-password-form .councilor-modal-field input {
+  border-color: #563a8a;
+  background: rgba(109, 40, 217, 0.12);
+  color: #eef2ff;
+}
+
+html[data-theme="dark"] .adviser-password-form .councilor-modal-field input:hover:not(:disabled),
+html[data-theme="dark"] .adviser-password-form .councilor-modal-field input:focus {
+  border-color: #7655b2;
+  background: #111c2e;
+}
+
+html[data-theme="dark"] .adviser-password-toggle {
+  color: #b7a8d4;
+}
+
+html[data-theme="dark"] .adviser-password-toggle:hover:not(:disabled) {
+  border-color: #563a8a;
+  background: rgba(109, 40, 217, 0.18);
+  color: #c4b5fd;
 }
 
 /* =========================================================
@@ -309,11 +546,10 @@ html[data-theme="dark"] .adviser-password-help {
 
 @media (max-width: 720px) {
   /*
-   * Change Password now lives inside .councilor-nav,
-   * so it remains available even though the sidebar
+   * Change Password lives inside .councilor-nav,
+   * so it remains available even when the sidebar
    * footer is hidden on smaller screens.
    */
-
   .adviser-password-nav-item {
     margin-top: 0;
   }
@@ -329,15 +565,27 @@ html[data-theme="dark"] .adviser-password-help {
   }
 
   .adviser-password-account {
-    padding: 13px;
+    padding: 14px;
   }
 
-  .adviser-password-help {
-    padding: 11px 12px;
+  .adviser-password-help,
+  .adviser-password-success {
+    padding: 13px;
   }
 
   .adviser-password-account-copy strong {
     max-width: 230px;
+  }
+
+  .adviser-password-avatar {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+  }
+
+  .adviser-password-help p,
+  .adviser-password-success p {
+    font-size: 11px;
   }
 }
 
@@ -347,8 +595,11 @@ html[data-theme="dark"] .adviser-password-help {
 
 .adviser-password-nav-item:focus-visible {
   outline: 3px solid var(--c-focus-ring);
-
   outline-offset: 2px;
+}
+
+.adviser-password-form .councilor-modal-field input:focus-visible {
+  outline: none;
 }
 
 /* =========================================================
@@ -356,107 +607,395 @@ html[data-theme="dark"] .adviser-password-help {
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .adviser-password-form .councilor-modal-field input {
+  .adviser-password-form .councilor-modal-field input,
+  .adviser-password-toggle {
     transition: none;
   }
 }
 
-/* =========================================================
-   PASSWORD INPUT WITH VISIBILITY TOGGLE
-========================================================= */
-
-.adviser-password-input {
-  position: relative;
-
-  width: 100%;
-}
-
-.adviser-password-input input {
-  width: 100%;
-
-  padding-right: 46px !important;
-}
 
 /* =========================================================
-   SHOW / HIDE PASSWORD BUTTON
+   CHANGE PASSWORD MODAL V2 — VIEWPORT OVERFLOW FIX
+   Keep this block LAST.
 ========================================================= */
 
-.adviser-password-toggle {
-  position: absolute;
+/* Backdrop always keeps breathing room around the modal. */
+.councilor-modal-backdrop {
+  padding: 18px;
+  overflow: hidden;
+}
 
-  top: 50%;
-  right: 8px;
+/* Keep the entire password modal inside the visible screen. */
+.adviser-password-modal {
+  width: min(100%, 520px);
+  max-height: calc(100dvh - 36px);
 
-  width: 32px;
-  height: 32px;
+  display: flex;
+  flex-direction: column;
 
-  display: grid;
-  place-items: center;
+  overflow: hidden;
+}
 
-  padding: 0;
+/* Header stays visible while form content scrolls. */
+.adviser-password-modal > .councilor-modal-header {
+  flex: 0 0 auto;
 
-  border: 0;
+  padding: 17px 19px;
+
+  background: var(--c-surface);
+
+  z-index: 3;
+}
+
+.adviser-password-modal > .councilor-modal-header > div > span {
+  font-size: 9px;
+}
+
+.adviser-password-modal > .councilor-modal-header h2 {
+  margin-top: 4px;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.adviser-password-modal > .councilor-modal-header p {
+  max-width: 390px;
+
+  margin-top: 5px;
+
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* The form becomes the scrollable portion, not the whole screen. */
+.adviser-password-modal .adviser-password-form {
+  min-height: 0;
+  flex: 1 1 auto;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  padding: 15px 18px 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+/* Compact information boxes so they do not consume most of the viewport. */
+.adviser-password-modal .adviser-password-account {
+  flex: 0 0 auto;
+
+  gap: 11px;
+
+  padding: 12px 13px;
+
+  border-radius: 10px;
+}
+
+.adviser-password-modal .adviser-password-avatar {
+  width: 39px;
+  height: 39px;
+  flex-basis: 39px;
+
+  border-radius: 10px;
+
+  font-size: 14px;
+}
+
+.adviser-password-modal .adviser-password-account-copy > span {
+  margin-bottom: 2px;
+
+  font-size: 8px;
+}
+
+.adviser-password-modal .adviser-password-account-copy strong {
+  font-size: 12px;
+}
+
+.adviser-password-modal .adviser-password-account-copy small {
+  margin-top: 2px;
+
+  font-size: 10px;
+}
+
+/* Help stays useful but no longer dominates the form. */
+.adviser-password-modal .adviser-password-help {
+  gap: 9px;
+
+  padding: 11px 12px;
+
+  border-radius: 9px;
+}
+
+.adviser-password-modal .adviser-password-help-icon {
+  width: 24px;
+  height: 24px;
+  flex-basis: 24px;
+
   border-radius: 7px;
 
+  font-size: 10px;
+}
+
+.adviser-password-modal .adviser-password-help strong {
+  margin-bottom: 2px;
+
+  font-size: 11px;
+}
+
+.adviser-password-modal .adviser-password-help p {
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+/* Compact fields while keeping them comfortably clickable. */
+.adviser-password-modal .councilor-modal-field {
+  gap: 5px;
+}
+
+.adviser-password-modal .councilor-modal-field > label {
+  font-size: 11px;
+}
+
+.adviser-password-modal .councilor-modal-field input {
+  min-height: 42px;
+
+  font-size: 12px;
+}
+
+.adviser-password-modal .councilor-field-hint {
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.adviser-password-modal .adviser-password-toggle {
+  width: 31px;
+  height: 31px;
+
+  right: 7px;
+}
+
+/* Error and success states remain readable but compact. */
+.adviser-password-modal .councilor-modal-error,
+.adviser-password-modal .adviser-password-success {
+  flex: 0 0 auto;
+
+  padding: 10px 11px;
+
+  border-radius: 9px;
+}
+
+.adviser-password-modal .councilor-modal-error p,
+.adviser-password-modal .adviser-password-success p {
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.adviser-password-modal .adviser-password-success strong {
+  font-size: 11px;
+}
+
+/* Sticky footer keeps the important actions on-screen at all times. */
+.adviser-password-modal .councilor-modal-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+
+  flex: 0 0 auto;
+
+  margin: 3px -18px 0;
+
+  padding: 12px 18px 14px;
+
+  border-top: 1px solid var(--c-border-soft);
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--c-surface) 92%, transparent),
+      var(--c-surface) 30%
+    );
+
+  backdrop-filter: blur(10px);
+}
+
+.adviser-password-modal .councilor-modal-actions button {
+  min-height: 40px;
+
+  font-size: 11px;
+}
+
+/* Small visual indication that the middle content can scroll. */
+.adviser-password-modal .adviser-password-form {
+  scrollbar-width: thin;
+  scrollbar-color:
+    color-mix(in srgb, var(--c-text-muted) 36%, transparent)
+    transparent;
+}
+
+.adviser-password-modal .adviser-password-form::-webkit-scrollbar {
+  width: 6px;
+}
+
+.adviser-password-modal .adviser-password-form::-webkit-scrollbar-track {
   background: transparent;
-
-  color: var(--c-text-muted);
-
-  cursor: pointer;
-
-  transform: translateY(-50%);
-
-  transition:
-    background 0.16s ease,
-    color 0.16s ease;
 }
 
-.adviser-password-toggle svg {
-  width: 17px;
-  height: 17px;
+.adviser-password-modal .adviser-password-form::-webkit-scrollbar-thumb {
+  border-radius: 999px;
 
-  display: block;
-}
-
-.adviser-password-toggle:hover:not(:disabled) {
-  background: var(--c-nav-hover-bg);
-
-  color: var(--c-blue-800);
-}
-
-.adviser-password-toggle:active:not(:disabled) {
-  background: var(--c-icon-bg);
-}
-
-.adviser-password-toggle:focus-visible {
-  outline: 3px solid var(--c-focus-ring);
-  outline-offset: 1px;
-}
-
-.adviser-password-toggle:disabled {
-  opacity: 0.45;
-
-  cursor: not-allowed;
-}
-
-.adviser-password-input:focus-within .adviser-password-toggle {
-  color: var(--c-blue-800);
+  background:
+    color-mix(in srgb, var(--c-text-muted) 30%, transparent);
 }
 
 /* =========================================================
    DARK MODE
 ========================================================= */
 
-html[data-theme="dark"] .adviser-password-toggle:hover:not(:disabled) {
-  background: var(--c-nav-hover-bg);
+html[data-theme="dark"]
+  .adviser-password-modal
+  > .councilor-modal-header {
+  background: #0d1727;
+}
+
+html[data-theme="dark"]
+  .adviser-password-modal
+  .councilor-modal-actions {
+  border-top-color: #293a51;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(13, 23, 39, 0.9),
+      #0d1727 35%
+    );
 }
 
 /* =========================================================
-   REDUCED MOTION
+   SHORT VIEWPORTS / LAPTOP SCREENS
 ========================================================= */
 
-@media (prefers-reduced-motion: reduce) {
-  .adviser-password-toggle {
-    transition: none;
+@media (max-height: 760px) and (min-width: 521px) {
+  .councilor-modal-backdrop {
+    padding: 12px;
+  }
+
+  .adviser-password-modal {
+    max-height: calc(100dvh - 24px);
+  }
+
+  .adviser-password-modal > .councilor-modal-header {
+    padding: 13px 17px;
+  }
+
+  .adviser-password-modal > .councilor-modal-header p {
+    display: none;
+  }
+
+  .adviser-password-modal .adviser-password-form {
+    gap: 10px;
+
+    padding: 12px 16px 0;
+  }
+
+  .adviser-password-modal .adviser-password-help {
+    padding: 9px 10px;
+  }
+
+  .adviser-password-modal .adviser-password-help p {
+    line-height: 1.35;
+  }
+
+  .adviser-password-modal .councilor-modal-actions {
+    margin-right: -16px;
+    margin-left: -16px;
+
+    padding: 10px 16px 12px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 520px) {
+  .councilor-modal-backdrop {
+    align-items: center;
+
+    padding: 10px;
+  }
+
+  .adviser-password-modal {
+    width: 100%;
+    max-height: calc(100dvh - 20px);
+
+    border-radius: 15px;
+  }
+
+  .adviser-password-modal > .councilor-modal-header {
+    padding: 14px 15px;
+  }
+
+  .adviser-password-modal > .councilor-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .adviser-password-modal > .councilor-modal-header p {
+    display: none;
+  }
+
+  .adviser-password-modal .adviser-password-form {
+    gap: 10px;
+
+    padding: 12px 14px 0;
+  }
+
+  .adviser-password-modal .adviser-password-account {
+    padding: 10px 11px;
+  }
+
+  .adviser-password-modal .adviser-password-help {
+    padding: 10px 11px;
+  }
+
+  .adviser-password-modal .adviser-password-help p {
+    font-size: 9px;
+  }
+
+  .adviser-password-modal .councilor-modal-actions {
+    margin-right: -14px;
+    margin-left: -14px;
+
+    padding: 10px 14px 12px;
+  }
+}
+
+/* =========================================================
+   VERY SHORT MOBILE / LANDSCAPE
+========================================================= */
+
+@media (max-height: 560px) {
+  .adviser-password-modal > .councilor-modal-header {
+    padding-block: 10px;
+  }
+
+  .adviser-password-modal > .councilor-modal-header p {
+    display: none;
+  }
+
+  .adviser-password-modal .adviser-password-account {
+    display: none;
+  }
+
+  .adviser-password-modal .adviser-password-help p {
+    display: none;
+  }
+
+  .adviser-password-modal .adviser-password-help strong {
+    margin: 0;
   }
 }

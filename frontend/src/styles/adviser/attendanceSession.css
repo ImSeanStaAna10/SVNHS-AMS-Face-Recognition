@@ -4008,3 +4008,719 @@ html[data-theme="dark"]
     padding-left: 2px;
   }
 }
+
+
+/* =========================================================
+   ATTENDANCE SESSION V4 — SEMANTIC COLOR ORGANIZATION
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Goals:
+   - Preserve existing readable typography and compact filters.
+   - Add subtle semantic color grouping.
+   - Preserve scanner, recognition, pagination, filters, and logic.
+========================================================= */
+
+/* =========================================================
+   TOP BAR — PURPOSEFUL ACTION COLORS
+========================================================= */
+
+.attendance-live-topbar {
+  border-bottom-color: #d6e1ee;
+}
+
+.attendance-live-topbar-button {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.attendance-live-topbar-button:hover:not(:disabled) {
+  border-color: #93bce9;
+  background: #e7f1fd;
+}
+
+.attendance-live-end-button {
+  border-color: #b91c1c;
+  background: #b91c1c;
+}
+
+.attendance-live-end-button:hover:not(:disabled) {
+  border-color: #991b1b;
+  background: #991b1b;
+}
+
+/* =========================================================
+   CAMERA HEADER / ACTIONS
+========================================================= */
+
+.attendance-live-camera-column {
+  position: relative;
+}
+
+.attendance-auto-toggle {
+  border-color: #d8c7f5;
+  background: #faf8ff;
+  color: #6d28d9;
+}
+
+.attendance-auto-toggle:hover:not(:disabled) {
+  border-color: #bda7ec;
+  background: #f3efff;
+}
+
+.attendance-auto-toggle.is-on {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.attendance-scan-now-button {
+  border-color: #2563eb;
+  background: #2563eb;
+}
+
+.attendance-scan-now-button:hover:not(:disabled) {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+}
+
+/* =========================================================
+   CAMERA QUICK STATS — ORGANIZED GLASS CARDS
+========================================================= */
+
+.attendance-camera-stats {
+  gap: 6px;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.attendance-camera-stats > div {
+  min-width: 108px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  background: rgba(7, 18, 38, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.attendance-camera-stats > div + div {
+  border-left-width: 1px;
+}
+
+.attendance-camera-stats > div.is-present {
+  border-color: rgba(134, 239, 172, 0.28);
+  background: rgba(20, 83, 45, 0.58);
+}
+
+.attendance-camera-stats > div.is-remaining {
+  border-color: rgba(253, 230, 138, 0.28);
+  background: rgba(120, 53, 15, 0.54);
+}
+
+.attendance-camera-stats > div.is-completion {
+  border-color: rgba(199, 210, 254, 0.28);
+  background: rgba(49, 46, 129, 0.56);
+}
+
+.attendance-camera-stats > div.is-present span {
+  color: #bbf7d0;
+}
+
+.attendance-camera-stats > div.is-remaining span {
+  color: #fde68a;
+}
+
+.attendance-camera-stats > div.is-completion span {
+  color: #c7d2fe;
+}
+
+/* =========================================================
+   SCANNER MESSAGE — STATE COLOR LANGUAGE
+========================================================= */
+
+.attendance-scanner-message {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.attendance-live-camera-shell.scanner-success .attendance-scanner-message {
+  border-color: rgba(134, 239, 172, 0.25);
+  background: rgba(20, 83, 45, 0.72);
+}
+
+.attendance-live-camera-shell.scanner-warning .attendance-scanner-message {
+  border-color: rgba(253, 224, 71, 0.28);
+  background: rgba(113, 63, 18, 0.72);
+}
+
+.attendance-live-camera-shell.scanner-error .attendance-scanner-message {
+  border-color: rgba(251, 113, 133, 0.28);
+  background: rgba(127, 29, 29, 0.72);
+}
+
+/* =========================================================
+   RESULT PANEL — CLEAR STATUS IDENTITY
+========================================================= */
+
+.attendance-live-result-panel {
+  border-color: #bfd7f5;
+  background:
+    linear-gradient(180deg, rgba(239, 246, 255, 0.52), #ffffff 24%);
+}
+
+.attendance-live-result-panel.is-success {
+  border-color: #b9e5c7;
+  background:
+    linear-gradient(180deg, rgba(240, 253, 244, 0.72), #ffffff 24%);
+}
+
+.attendance-live-result-panel.is-warning {
+  border-color: #f1d89a;
+  background:
+    linear-gradient(180deg, rgba(255, 251, 235, 0.78), #ffffff 24%);
+}
+
+.attendance-live-result-panel.is-error {
+  border-color: #fecaca;
+  background:
+    linear-gradient(180deg, rgba(255, 241, 242, 0.78), #ffffff 24%);
+}
+
+.attendance-result-panel-header {
+  background: #eff6ff;
+}
+
+.attendance-live-result-panel.is-success .attendance-result-panel-header {
+  background: #f0fdf4;
+}
+
+.attendance-live-result-panel.is-warning .attendance-result-panel-header {
+  background: #fffbeb;
+}
+
+.attendance-live-result-panel.is-error .attendance-result-panel-header {
+  background: #fff1f2;
+}
+
+/* Empty result identity */
+.attendance-result-empty-avatar {
+  border-color: #bfdbfe;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* =========================================================
+   EMPTY RESULT STEPS — BLUE / GREEN / AMBER
+========================================================= */
+
+.attendance-result-empty-steps {
+  display: grid;
+  gap: 7px;
+  overflow: visible;
+  border: 0;
+}
+
+.attendance-result-empty-steps > div {
+  border: 1px solid;
+  border-radius: 9px;
+}
+
+.attendance-result-empty-steps > div + div {
+  border-top-width: 1px;
+}
+
+.attendance-result-empty-steps > div:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.attendance-result-empty-steps > div:nth-child(1) span {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.attendance-result-empty-steps > div:nth-child(2) {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.attendance-result-empty-steps > div:nth-child(2) span {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.attendance-result-empty-steps > div:nth-child(3) {
+  border-color: #f1d89a;
+  background: #fffbeb;
+}
+
+.attendance-result-empty-steps > div:nth-child(3) span {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* =========================================================
+   STUDENT RESULT DETAILS — ORGANIZED BOXES
+========================================================= */
+
+.attendance-result-number {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.attendance-result-details {
+  gap: 7px;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+.attendance-result-details > div {
+  border: 1px solid;
+  border-radius: 9px;
+}
+
+.attendance-result-details > div:nth-child(even) {
+  border-left-width: 1px;
+}
+
+.attendance-result-details > div:nth-child(n + 3) {
+  border-top-width: 1px;
+}
+
+.attendance-result-details > div:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.attendance-result-details > div:nth-child(1) span {
+  color: #2563eb;
+}
+
+.attendance-result-details > div:nth-child(2) {
+  border-color: #d8c7f5;
+  background: #f5f3ff;
+}
+
+.attendance-result-details > div:nth-child(2) span {
+  color: #6d28d9;
+}
+
+.attendance-result-details > div:nth-child(3) {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.attendance-result-details > div:nth-child(3) span {
+  color: #15803d;
+}
+
+.attendance-result-details > div:nth-child(4) {
+  border-color: #f1d89a;
+  background: #fffbeb;
+}
+
+.attendance-result-details > div:nth-child(4) span {
+  color: #b45309;
+}
+
+/* =========================================================
+   SESSION MINI SUMMARY
+========================================================= */
+
+.attendance-session-mini-summary {
+  gap: 0;
+  background: #ffffff;
+}
+
+.attendance-session-mini-summary > div {
+  position: relative;
+}
+
+.attendance-session-mini-summary > div:nth-child(1) {
+  background: #f3f8ff;
+}
+
+.attendance-session-mini-summary > div:nth-child(2) {
+  background: #f1fbf4;
+}
+
+.attendance-session-mini-summary > div:nth-child(1) span {
+  color: #2563eb;
+}
+
+.attendance-session-mini-summary > div:nth-child(2) span {
+  color: #15803d;
+}
+
+/* =========================================================
+   REPORT SUMMARY — STRONGER SEMANTIC BOXES
+========================================================= */
+
+.attendance-report-summary {
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom-color: #dce4ed;
+}
+
+.attendance-summary-card {
+  border: 1px solid;
+  border-top-width: 3px;
+  border-radius: 10px;
+}
+
+.attendance-summary-card.is-students {
+  border-color: #bfd7f5;
+  border-top-color: #2563eb;
+  background: #eff6ff;
+}
+
+.attendance-summary-card.is-present {
+  border-color: #b9e5c7;
+  border-top-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.attendance-summary-card.is-remaining {
+  border-color: #f1d89a;
+  border-top-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.attendance-summary-card.is-completion {
+  border-color: #d8c7f5;
+  border-top-color: #7c3aed;
+  background: #faf8ff;
+  color: #6d28d9;
+}
+
+/* =========================================================
+   SEARCH / FILTER TOOLBAR
+========================================================= */
+
+.attendance-report-toolbar {
+  border-top: 1px solid #e8eef4;
+  background:
+    linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
+}
+
+.attendance-report-toolbar .attendance-report-search {
+  border-color: #bfd7f5;
+  background: #ffffff;
+}
+
+.attendance-report-result-copy {
+  border-color: #d8e2ee;
+  background: #ffffff;
+}
+
+.attendance-filter-trigger {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.attendance-filter-trigger:hover,
+.attendance-filter-trigger.is-open {
+  border-color: #93bce9;
+  background: #e7f1fd;
+}
+
+/* =========================================================
+   METHOD BADGES
+========================================================= */
+
+.attendance-live-method.is-face {
+  border-color: #b9def0;
+  background: #eef9fe;
+  color: #0f668e;
+}
+
+.attendance-live-method.is-manual {
+  border-color: #d8c7f5;
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.attendance-live-method.is-generic {
+  border-color: #d8e0ea;
+  background: #f8fafc;
+  color: #52677f;
+}
+
+/* =========================================================
+   TABLE — ORGANIZED ROWS
+========================================================= */
+
+.attendance-live-table thead {
+  background: #f4f8fc;
+}
+
+.attendance-live-table tbody tr.is-present {
+  background:
+    linear-gradient(90deg, rgba(240, 253, 244, 0.95), #ffffff 36%);
+}
+
+.attendance-live-student-number {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+  color: #244d7d;
+}
+
+.attendance-live-student > span {
+  border-color: #bfd7f5;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.attendance-live-mark {
+  border-color: #d8c7f5;
+  background: #f5f3ff;
+  color: #6d28d9;
+}
+
+.attendance-live-mark:hover:not(:disabled) {
+  border-color: #bda7ec;
+  background: #ede9fe;
+}
+
+.attendance-live-remove {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.attendance-pagination-bar {
+  background:
+    linear-gradient(180deg, #fbfdff 0%, #f8fafc 100%);
+}
+
+.attendance-pagination-pages button.is-active {
+  border-color: #2563eb;
+  background: #2563eb;
+}
+
+/* =========================================================
+   END SESSION MODAL — DESTRUCTIVE ACTION CLARITY
+========================================================= */
+
+.attendance-live-end-modal {
+  border-color: #fecaca;
+  background:
+    linear-gradient(180deg, #fff7f8 0%, #ffffff 26%);
+}
+
+.attendance-live-end-modal-icon {
+  border: 1px solid #fecaca;
+  background: #ffe4e6;
+  color: #b91c1c;
+}
+
+.attendance-live-end-summary {
+  gap: 8px;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+.attendance-live-end-summary > div {
+  border: 1px solid;
+  border-radius: 9px;
+}
+
+.attendance-live-end-summary > div + div {
+  border-left-width: 1px;
+}
+
+.attendance-live-end-summary > div:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.attendance-live-end-summary > div:nth-child(1) span {
+  color: #2563eb;
+}
+
+.attendance-live-end-summary > div:nth-child(2) {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.attendance-live-end-summary > div:nth-child(2) span {
+  color: #15803d;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .attendance-live-topbar-button,
+html[data-theme="dark"] .attendance-filter-trigger {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.14);
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"] .attendance-auto-toggle {
+  border-color: #563a8a;
+  background: rgba(109, 40, 217, 0.13);
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"] .attendance-auto-toggle.is-on {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.16);
+  color: #86efac;
+}
+
+html[data-theme="dark"] .attendance-live-result-panel {
+  border-color: #31588b;
+  background:
+    linear-gradient(180deg, rgba(30, 64, 175, 0.12), #0d1727 24%);
+}
+
+html[data-theme="dark"] .attendance-live-result-panel.is-success {
+  border-color: #2e6843;
+  background:
+    linear-gradient(180deg, rgba(22, 101, 52, 0.15), #0d1727 24%);
+}
+
+html[data-theme="dark"] .attendance-live-result-panel.is-warning {
+  border-color: #72551e;
+  background:
+    linear-gradient(180deg, rgba(146, 64, 14, 0.14), #0d1727 24%);
+}
+
+html[data-theme="dark"] .attendance-live-result-panel.is-error {
+  border-color: #7f1d1d;
+  background:
+    linear-gradient(180deg, rgba(127, 29, 29, 0.16), #0d1727 24%);
+}
+
+html[data-theme="dark"] .attendance-result-empty-steps > div:nth-child(1),
+html[data-theme="dark"] .attendance-result-details > div:nth-child(1),
+html[data-theme="dark"] .attendance-summary-card.is-students {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .attendance-result-empty-steps > div:nth-child(2),
+html[data-theme="dark"] .attendance-result-details > div:nth-child(3),
+html[data-theme="dark"] .attendance-summary-card.is-present {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.15);
+}
+
+html[data-theme="dark"] .attendance-result-empty-steps > div:nth-child(3),
+html[data-theme="dark"] .attendance-result-details > div:nth-child(4),
+html[data-theme="dark"] .attendance-summary-card.is-remaining {
+  border-color: #72551e;
+  background: rgba(146, 64, 14, 0.14);
+}
+
+html[data-theme="dark"] .attendance-result-details > div:nth-child(2),
+html[data-theme="dark"] .attendance-summary-card.is-completion {
+  border-color: #563a8a;
+  background: rgba(109, 40, 217, 0.14);
+}
+
+html[data-theme="dark"] .attendance-live-mark,
+html[data-theme="dark"] .attendance-live-method.is-manual {
+  border-color: #563a8a;
+  background: rgba(109, 40, 217, 0.14);
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"] .attendance-live-student-number,
+html[data-theme="dark"] .attendance-live-student > span {
+  border-color: #31588b;
+  background: #132d50;
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .attendance-live-end-modal {
+  border-color: #7f1d1d;
+  background:
+    linear-gradient(180deg, rgba(127, 29, 29, 0.14), #0d1727 28%);
+}
+
+html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(1) {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(2) {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.15);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+  .attendance-report-summary {
+    gap: 7px;
+  }
+
+  .attendance-camera-stats {
+    gap: 5px;
+  }
+}
+
+@media (max-width: 650px) {
+  .attendance-camera-stats {
+    right: 10px;
+    left: 10px;
+    gap: 4px;
+  }
+
+  .attendance-camera-stats > div {
+    min-width: 0;
+    padding: 9px 7px;
+  }
+
+  .attendance-report-summary {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .attendance-summary-card {
+    min-height: 88px;
+  }
+
+  .attendance-result-details {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-result-details > div + div {
+    border-top-width: 1px;
+  }
+
+  .attendance-live-end-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-live-end-summary > div + div {
+    border-top-width: 1px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-summary-card,
+  .attendance-live-result-panel,
+  .attendance-result-details > div,
+  .attendance-camera-stats > div {
+    transition: none;
+  }
+}

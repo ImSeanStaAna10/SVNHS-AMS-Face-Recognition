@@ -1297,3 +1297,741 @@ html[data-theme="dark"] .adviser-attendance-hero {
     transition: none;
   }
 }
+
+
+/* =========================================================
+   ADVISER ATTENDANCE V2 — READABILITY + SEMANTIC COLOR ORGANIZATION
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Goals:
+   - Preserve the inherited application font.
+   - Increase practical UI text sizes.
+   - Add restrained semantic color organization.
+   - Preserve current JSX, routes, services, and behavior.
+========================================================= */
+
+.adviser-attendance,
+.adviser-attendance button,
+.adviser-attendance input,
+.adviser-attendance select,
+.adviser-attendance textarea {
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.adviser-attendance button:focus-visible,
+.adviser-attendance input:focus-visible,
+.adviser-attendance select:focus-visible,
+.adviser-attendance textarea:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.16);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   HERO — READABILITY
+========================================================= */
+
+.adviser-attendance-hero {
+  min-height: 165px;
+  padding: 30px 32px;
+}
+
+.adviser-attendance-hero-copy > span {
+  margin-bottom: 8px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.adviser-attendance-hero-copy h2 {
+  font-size: clamp(30px, 3vw, 36px);
+  line-height: 1.12;
+}
+
+.adviser-attendance-hero-copy p {
+  max-width: 640px;
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.adviser-attendance-adviser {
+  min-width: 190px;
+  padding: 13px 15px;
+}
+
+.adviser-attendance-adviser span {
+  font-size: 10px;
+}
+
+.adviser-attendance-adviser strong {
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.adviser-attendance-session-badge {
+  min-height: 33px;
+  padding: 0 12px;
+  font-size: 11px;
+}
+
+/* =========================================================
+   SUMMARY CARDS — COLOR ORGANIZATION
+========================================================= */
+
+.adviser-attendance-summary-card {
+  position: relative;
+  overflow: hidden;
+  gap: 15px;
+  padding: 19px 20px;
+  border-radius: 12px;
+}
+
+.adviser-attendance-summary-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+}
+
+/* 1 — section / roster / general info */
+.adviser-attendance-summary-card:nth-child(1) {
+  border-color: #bfd7f5;
+  background:
+    linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+  box-shadow:
+    0 12px 28px rgba(37, 99, 235, 0.06),
+    var(--c-card-shadow);
+}
+
+.adviser-attendance-summary-card:nth-child(1)::before {
+  background: #2563eb;
+}
+
+.adviser-attendance-summary-card:nth-child(1) .adviser-attendance-summary-icon {
+  border: 1px solid #bfdbfe;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.adviser-attendance-summary-card:nth-child(1) span {
+  color: #1d4ed8;
+}
+
+/* 2 — face readiness / active */
+.adviser-attendance-summary-card:nth-child(2),
+.adviser-attendance-summary-card.is-face {
+  border-color: #b9e5c7;
+  background:
+    linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+  box-shadow:
+    0 12px 28px rgba(22, 163, 74, 0.06),
+    var(--c-card-shadow);
+}
+
+.adviser-attendance-summary-card:nth-child(2)::before,
+.adviser-attendance-summary-card.is-face::before {
+  background: #16a34a;
+}
+
+.adviser-attendance-summary-card:nth-child(2) .adviser-attendance-summary-icon,
+.adviser-attendance-summary-card.is-face .adviser-attendance-summary-icon {
+  border: 1px solid #bbf7d0;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.adviser-attendance-summary-card:nth-child(2) span,
+.adviser-attendance-summary-card.is-face span {
+  color: #15803d;
+}
+
+/* 3 — secondary / pending / operational */
+.adviser-attendance-summary-card:nth-child(3) {
+  border-color: #f1d89a;
+  background:
+    linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+  box-shadow:
+    0 12px 28px rgba(217, 119, 6, 0.06),
+    var(--c-card-shadow);
+}
+
+.adviser-attendance-summary-card:nth-child(3)::before {
+  background: #f59e0b;
+}
+
+.adviser-attendance-summary-card:nth-child(3) .adviser-attendance-summary-icon {
+  border: 1px solid #fde68a;
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.adviser-attendance-summary-card:nth-child(3) span {
+  color: #b45309;
+}
+
+.adviser-attendance-summary-icon {
+  width: 46px;
+  height: 46px;
+  flex-basis: 46px;
+  font-size: 19px;
+}
+
+.adviser-attendance-summary-card span {
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.adviser-attendance-summary-card strong {
+  margin-top: 5px;
+  font-size: 27px;
+}
+
+.adviser-attendance-summary-card p {
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   MAIN SESSION CARD — BLUE / GREEN ORGANIZATION
+========================================================= */
+
+.adviser-attendance-session-card {
+  padding: 26px;
+  border-color: #c8dcef;
+  background:
+    linear-gradient(135deg, rgba(239, 246, 255, 0.58), #ffffff 42%);
+  box-shadow:
+    0 16px 36px rgba(30, 64, 175, 0.06),
+    var(--c-panel-shadow);
+}
+
+.adviser-attendance-session-card::before {
+  width: 5px;
+  background: #2563eb;
+}
+
+.adviser-attendance-session-card.is-active {
+  border-color: #a7ddb7;
+  background:
+    linear-gradient(135deg, rgba(240, 253, 244, 0.78), #ffffff 45%);
+}
+
+.adviser-attendance-session-card.is-active::before {
+  background: #16a34a;
+}
+
+.adviser-attendance-session-icon {
+  border-color: #bfd7f5;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.adviser-attendance-session-card.is-active .adviser-attendance-session-icon {
+  border-color: #b9e5c7;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.adviser-attendance-session-copy > span {
+  margin-bottom: 7px;
+  font-size: 11px;
+}
+
+.adviser-attendance-session-copy h2 {
+  font-size: 21px;
+  line-height: 1.25;
+}
+
+.adviser-attendance-session-copy > p {
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   SESSION META — INDIVIDUAL PURPOSE BOXES
+========================================================= */
+
+.adviser-attendance-session-meta {
+  gap: 8px;
+  margin-top: 17px;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+.adviser-attendance-session-meta > div {
+  min-width: 105px;
+  padding: 11px 12px;
+  border: 1px solid;
+  border-radius: 9px;
+}
+
+.adviser-attendance-session-meta > div + div {
+  border-left-width: 1px;
+}
+
+.adviser-attendance-session-meta > div:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.adviser-attendance-session-meta > div:nth-child(1) span {
+  color: #2563eb;
+}
+
+.adviser-attendance-session-meta > div:nth-child(2) {
+  border-color: #d8c7f5;
+  background: #f5f3ff;
+}
+
+.adviser-attendance-session-meta > div:nth-child(2) span {
+  color: #6d28d9;
+}
+
+.adviser-attendance-session-meta > div:nth-child(3) {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.adviser-attendance-session-meta > div:nth-child(3) span {
+  color: #15803d;
+}
+
+.adviser-attendance-session-meta span {
+  font-size: 10px;
+}
+
+.adviser-attendance-session-meta strong {
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+/* =========================================================
+   PRIMARY SESSION ACTION
+========================================================= */
+
+.adviser-attendance-session-action {
+  width: 220px;
+}
+
+.adviser-attendance-primary-action {
+  min-height: 48px;
+}
+
+.adviser-attendance-primary-action > span {
+  font-size: 13px;
+}
+
+.adviser-attendance-primary-action > strong {
+  font-size: 17px;
+}
+
+.adviser-attendance-session-action small {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   READINESS PANEL — STATUS ORGANIZATION
+========================================================= */
+
+.adviser-attendance-readiness {
+  padding: 22px;
+  border-color: #d8c7f5;
+  background:
+    linear-gradient(180deg, #faf8ff 0%, #ffffff 48%);
+  box-shadow:
+    0 16px 36px rgba(109, 40, 217, 0.05),
+    var(--c-panel-shadow);
+}
+
+.adviser-attendance-readiness > header span {
+  font-size: 10px;
+  color: #6d28d9;
+}
+
+.adviser-attendance-readiness > header h2 {
+  margin-top: 5px;
+  font-size: 18px;
+}
+
+.adviser-attendance-readiness > header > strong {
+  font-size: 23px;
+  color: #6d28d9;
+}
+
+.adviser-attendance-readiness-progress {
+  height: 8px;
+  margin-top: 17px;
+}
+
+.adviser-attendance-readiness-list {
+  display: grid;
+  gap: 7px;
+  margin-top: 17px;
+  overflow: visible;
+  border: 0;
+}
+
+.adviser-attendance-readiness-list > div {
+  padding: 11px 12px;
+  border: 1px solid;
+  border-radius: 9px;
+}
+
+.adviser-attendance-readiness-list > div + div {
+  border-top-width: 1px;
+}
+
+.adviser-attendance-readiness-list > div:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.adviser-attendance-readiness-list > div:nth-child(2) {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.adviser-attendance-readiness-list > div:nth-child(3) {
+  border-color: #f1d89a;
+  background: #fffbeb;
+}
+
+.adviser-attendance-readiness-list span {
+  font-size: 12px;
+}
+
+.adviser-attendance-readiness-list strong {
+  font-size: 12px;
+}
+
+.adviser-attendance-readiness-note {
+  padding: 11px 12px;
+  border-radius: 9px;
+}
+
+.adviser-attendance-readiness-note > span {
+  width: 22px;
+  height: 22px;
+  flex-basis: 22px;
+  font-size: 9px;
+}
+
+.adviser-attendance-readiness-note p {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.adviser-attendance-manage-button {
+  min-height: 40px;
+  padding: 0 13px;
+  border-color: #d8c7f5;
+  background: #f5f3ff;
+  color: #6d28d9;
+  font-size: 12px;
+}
+
+.adviser-attendance-manage-button:hover {
+  border-color: #bda7ec;
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+/* =========================================================
+   ATTENDANCE METHODS PANEL
+========================================================= */
+
+.adviser-attendance-methods {
+  border-color: #d4e0ed;
+  border-radius: 15px;
+}
+
+.adviser-attendance-section-header {
+  padding: 21px 22px;
+  background:
+    linear-gradient(90deg, rgba(239, 246, 255, 0.72), rgba(255, 255, 255, 0));
+}
+
+.adviser-attendance-section-header span {
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+
+.adviser-attendance-section-header h2 {
+  font-size: 20px;
+}
+
+.adviser-attendance-section-header p {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   METHOD CARDS — BLUE / GREEN / VIOLET
+========================================================= */
+
+.adviser-attendance-method-grid {
+  gap: 10px;
+  padding: 12px;
+}
+
+.adviser-attendance-method-card {
+  gap: 13px;
+  padding: 18px;
+  border: 1px solid;
+  border-radius: 11px;
+}
+
+.adviser-attendance-method-card + .adviser-attendance-method-card {
+  border-left-width: 1px;
+}
+
+.adviser-attendance-method-card:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.adviser-attendance-method-card:nth-child(1) .adviser-attendance-method-icon {
+  border-color: #bfdbfe;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.adviser-attendance-method-card:nth-child(1) > div:nth-child(2) > span {
+  color: #2563eb;
+}
+
+.adviser-attendance-method-card:nth-child(2),
+.adviser-attendance-method-card.is-face {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.adviser-attendance-method-card:nth-child(2) .adviser-attendance-method-icon,
+.adviser-attendance-method-card.is-face .adviser-attendance-method-icon {
+  border-color: #bbf7d0;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.adviser-attendance-method-card:nth-child(2) > div:nth-child(2) > span,
+.adviser-attendance-method-card.is-face > div:nth-child(2) > span {
+  color: #15803d;
+}
+
+.adviser-attendance-method-card:nth-child(3) {
+  border-color: #d8c7f5;
+  background: #faf8ff;
+}
+
+.adviser-attendance-method-card:nth-child(3) .adviser-attendance-method-icon {
+  border-color: #ddd6fe;
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.adviser-attendance-method-card:nth-child(3) > div:nth-child(2) > span {
+  color: #6d28d9;
+}
+
+.adviser-attendance-method-icon {
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
+}
+
+.adviser-attendance-method-card > div:nth-child(2) > span {
+  font-size: 10px;
+}
+
+.adviser-attendance-method-card h3 {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.adviser-attendance-method-card p {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.adviser-attendance-method-status {
+  min-height: 27px;
+  padding: 0 9px;
+  font-size: 10px;
+}
+
+/* =========================================================
+   DARK MODE — SEMANTIC COLORS
+========================================================= */
+
+html[data-theme="dark"] .adviser-attendance-summary-card:nth-child(1),
+html[data-theme="dark"] .adviser-attendance-method-card:nth-child(1),
+html[data-theme="dark"] .adviser-attendance-session-meta > div:nth-child(1) {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .adviser-attendance-summary-card:nth-child(2),
+html[data-theme="dark"] .adviser-attendance-summary-card.is-face,
+html[data-theme="dark"] .adviser-attendance-method-card:nth-child(2),
+html[data-theme="dark"] .adviser-attendance-method-card.is-face,
+html[data-theme="dark"] .adviser-attendance-session-meta > div:nth-child(3),
+html[data-theme="dark"] .adviser-attendance-readiness-list > div:nth-child(2) {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.15);
+}
+
+html[data-theme="dark"] .adviser-attendance-summary-card:nth-child(3),
+html[data-theme="dark"] .adviser-attendance-readiness-list > div:nth-child(3) {
+  border-color: #72551e;
+  background: rgba(146, 64, 14, 0.14);
+}
+
+html[data-theme="dark"] .adviser-attendance-session-meta > div:nth-child(2),
+html[data-theme="dark"] .adviser-attendance-method-card:nth-child(3),
+html[data-theme="dark"] .adviser-attendance-readiness {
+  border-color: #563a8a;
+  background:
+    linear-gradient(180deg, rgba(109, 40, 217, 0.11), rgba(15, 23, 42, 0.68));
+}
+
+html[data-theme="dark"] .adviser-attendance-session-card {
+  border-color: #31588b;
+  background:
+    linear-gradient(135deg, rgba(30, 64, 175, 0.11), rgba(15, 23, 42, 0.68));
+}
+
+html[data-theme="dark"] .adviser-attendance-session-card.is-active {
+  border-color: #2e6843;
+  background:
+    linear-gradient(135deg, rgba(22, 101, 52, 0.14), rgba(15, 23, 42, 0.68));
+}
+
+html[data-theme="dark"] .adviser-attendance-section-header {
+  background:
+    linear-gradient(90deg, rgba(30, 64, 175, 0.13), rgba(15, 23, 42, 0.2));
+}
+
+html[data-theme="dark"] .adviser-attendance-readiness-list > div:nth-child(1) {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .adviser-attendance-manage-button {
+  border-color: #563a8a;
+  background: rgba(109, 40, 217, 0.14);
+  color: #c4b5fd;
+}
+
+/* =========================================================
+   RESPONSIVE READABILITY / COLOR BOXES
+========================================================= */
+
+@media (max-width: 850px) {
+  .adviser-attendance-summary-card {
+    min-height: 115px;
+  }
+
+  .adviser-attendance-method-grid {
+    padding: 10px;
+  }
+
+  .adviser-attendance-method-card + .adviser-attendance-method-card {
+    border-top-width: 1px;
+  }
+}
+
+@media (max-width: 650px) {
+  .adviser-attendance-hero {
+    min-height: 0;
+    padding: 24px 20px;
+  }
+
+  .adviser-attendance-hero-copy h2 {
+    font-size: 28px;
+  }
+
+  .adviser-attendance-hero-copy p {
+    font-size: 13px;
+  }
+
+  .adviser-attendance-summary-card {
+    padding: 17px;
+  }
+
+  .adviser-attendance-summary-card strong {
+    font-size: 24px;
+  }
+
+  .adviser-attendance-session-card {
+    padding: 20px 18px;
+  }
+
+  .adviser-attendance-session-copy h2 {
+    font-size: 19px;
+  }
+
+  .adviser-attendance-session-copy > p {
+    font-size: 12px;
+  }
+
+  .adviser-attendance-session-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .adviser-attendance-session-meta > div {
+    min-width: 0;
+  }
+
+  .adviser-attendance-session-meta > div + div {
+    border-top-width: 1px;
+  }
+
+  .adviser-attendance-readiness {
+    padding: 18px;
+  }
+
+  .adviser-attendance-method-card {
+    padding: 16px;
+  }
+
+  .adviser-attendance-method-card p {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 440px) {
+  .adviser-attendance-hero-copy h2 {
+    font-size: 25px;
+  }
+
+  .adviser-attendance-summary-card span,
+  .adviser-attendance-session-copy > span,
+  .adviser-attendance-section-header span {
+    font-size: 10px;
+  }
+
+  .adviser-attendance-section-header h2 {
+    font-size: 18px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .adviser-attendance-summary-card,
+  .adviser-attendance-method-card,
+  .adviser-attendance-session-card {
+    transition: none;
+  }
+}

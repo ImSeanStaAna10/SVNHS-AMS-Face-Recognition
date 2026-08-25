@@ -7217,7 +7217,6 @@ html[data-theme="dark"] .student-face-camera-loading {
   }
 }
 
-
 /* =========================================================
    STUDENT ENROLLMENT V7
    TRUE STEP-BY-STEP WIZARD
@@ -7397,12 +7396,11 @@ html[data-theme="dark"] .student-face-camera-loading {
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background:
-    linear-gradient(
-      180deg,
-      var(--c-surface) 0%,
-      color-mix(in srgb, var(--c-surface-soft) 46%, var(--c-surface)) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    var(--c-surface) 0%,
+    color-mix(in srgb, var(--c-surface-soft) 46%, var(--c-surface)) 100%
+  );
   scrollbar-width: thin;
 }
 
@@ -8045,12 +8043,11 @@ html[data-theme="dark"] .student-face-camera-loading {
 ========================================================= */
 
 html[data-theme="dark"] .student-wizard-body {
-  background:
-    linear-gradient(
-      180deg,
-      var(--c-surface) 0%,
-      rgba(15, 23, 42, 0.72) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    var(--c-surface) 0%,
+    rgba(15, 23, 42, 0.72) 100%
+  );
 }
 
 html[data-theme="dark"] .student-wizard-form-card,
@@ -8063,11 +8060,7 @@ html[data-theme="dark"] .student-wizard-review-photo-card {
 
 html[data-theme="dark"] .student-wizard-header {
   background:
-    radial-gradient(
-      circle at 0 0,
-      rgba(30, 64, 175, 0.18),
-      transparent 45%
-    ),
+    radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.18), transparent 45%),
     var(--c-surface);
 }
 
@@ -8338,5 +8331,2982 @@ html[data-theme="dark"] .student-wizard-header {
 
   .student-wizard-progress-item.is-current {
     transform: none;
+  }
+}
+
+/* =========================================================
+   STUDENT MANAGEMENT — READABLE UI + FILTER + PAGINATION
+   Safe final override layer.
+   Existing enrollment / face camera design and logic remain.
+========================================================= */
+
+/* =========================================================
+   MAIN PAGE TYPOGRAPHY — LARGER / MORE READABLE
+========================================================= */
+
+.student-management,
+.student-management button,
+.student-management input,
+.student-management select {
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.student-section-overview {
+  min-height: 150px;
+  padding: 24px 27px;
+}
+
+.student-section-heading > span {
+  font-size: 11px;
+}
+
+.student-section-heading h2 {
+  margin-top: 7px;
+  font-size: 27px;
+}
+
+.student-section-heading p {
+  margin-top: 7px;
+  font-size: 13px;
+}
+
+.student-section-stats {
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  border-radius: 12px;
+}
+
+.student-section-stats > div {
+  padding: 16px 18px;
+}
+
+.student-section-stats span {
+  font-size: 10px;
+}
+
+.student-section-stats strong {
+  margin-top: 7px;
+  font-size: 26px;
+}
+
+.student-section-badge {
+  min-height: 34px;
+  padding-inline: 13px;
+  font-size: 11px;
+}
+
+.student-section-badge > span {
+  width: 7px;
+  height: 7px;
+}
+
+/* =========================================================
+   PANEL HEADER
+========================================================= */
+
+.student-panel {
+  overflow: visible;
+}
+
+.student-panel-header {
+  min-height: 108px;
+  padding: 22px 24px;
+}
+
+.student-panel-header > div > span {
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+
+.student-panel-header h2 {
+  font-size: 23px;
+}
+
+.student-panel-header p {
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.student-panel-header .adviser-primary-button {
+  min-height: 44px;
+  padding-inline: 17px;
+  font-size: 13px;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.student-toolbar {
+  position: relative;
+  z-index: 40;
+  overflow: visible;
+  gap: 14px;
+  padding: 15px 18px;
+}
+
+.student-search {
+  width: min(100%, 620px);
+  min-height: 46px;
+  gap: 10px;
+  padding-inline: 13px;
+  border-radius: 10px;
+}
+
+.student-search-icon {
+  font-size: 18px;
+}
+
+.student-search input {
+  font-size: 13px;
+}
+
+.student-search > button {
+  width: 29px;
+  height: 29px;
+  font-size: 19px;
+}
+
+.student-toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+
+.student-result-count {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 13px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.student-result-count strong {
+  color: var(--c-text-secondary);
+  font-weight: 850;
+}
+
+/* =========================================================
+   FILTER BUTTON + DROPDOWN
+========================================================= */
+
+.student-filter-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.student-filter-button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  background: var(--c-surface);
+  color: var(--c-text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    color 0.16s ease;
+}
+
+.student-filter-button:hover,
+.student-filter-button.is-open {
+  border-color: #93b9ef;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.student-filter-button.is-open {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.student-filter-button-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: #e8f1ff;
+  color: #2563eb;
+  font-size: 13px;
+}
+
+.student-filter-count {
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 5px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.student-filter-chevron {
+  color: var(--c-text-muted);
+  font-size: 10px;
+}
+
+.student-filter-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 300;
+  width: 380px;
+  overflow: hidden;
+  border: 1px solid var(--c-border);
+  border-radius: 13px;
+  background: var(--c-surface);
+  box-shadow:
+    0 22px 54px rgba(2, 8, 23, 0.18),
+    0 7px 18px rgba(2, 8, 23, 0.08);
+}
+
+.student-filter-menu-header {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: linear-gradient(
+    90deg,
+    rgba(239, 246, 255, 0.92),
+    var(--c-surface)
+  );
+}
+
+.student-filter-menu-header strong {
+  display: block;
+  color: var(--c-text-primary);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.student-filter-menu-header span {
+  display: block;
+  margin-top: 2px;
+  color: var(--c-text-muted);
+  font-size: 11px;
+}
+
+.student-filter-menu-header > button {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 8px;
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+  font-family: inherit;
+  font-size: 19px;
+  cursor: pointer;
+}
+
+.student-filter-menu-body {
+  padding: 5px 14px;
+}
+
+.student-filter-row {
+  min-height: 60px;
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.student-filter-row:last-child {
+  border-bottom: 0;
+}
+
+.student-filter-row-label {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.student-filter-row-label i {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+}
+
+.student-filter-row-label i.is-status {
+  border-color: #bbf7d0;
+  background: #22c55e;
+}
+
+.student-filter-row-label i.is-face {
+  border-color: #bae6fd;
+  background: #0ea5e9;
+}
+
+.student-filter-row-label i.is-sort {
+  border-color: #e9d5ff;
+  background: #8b5cf6;
+}
+
+.student-filter-row-label i.is-rows {
+  border-color: #fde68a;
+  background: #f59e0b;
+}
+
+.student-filter-row select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--c-border);
+  border-radius: 9px;
+  outline: 0;
+  background: var(--c-surface);
+  color: var(--c-text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.student-filter-row select:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.student-filter-menu-footer {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--c-border-soft);
+  background: var(--c-surface-soft);
+}
+
+.student-filter-reset,
+.student-filter-done {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.student-filter-reset {
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text-secondary);
+}
+
+.student-filter-reset:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.student-filter-done {
+  border: 1px solid #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+/* =========================================================
+   TABLE — LARGER READABILITY
+========================================================= */
+
+.student-table-shell {
+  position: relative;
+  z-index: 1;
+}
+
+.student-table {
+  min-width: 1040px;
+}
+
+.student-table th {
+  padding: 14px 16px;
+  font-size: 11px;
+}
+
+.student-table td {
+  padding: 15px 16px;
+  font-size: 12px;
+}
+
+.student-table-index {
+  font-size: 11px !important;
+}
+
+.student-number {
+  min-height: 31px;
+  padding-inline: 10px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.student-name-cell {
+  min-width: 220px;
+  gap: 12px;
+}
+
+.student-avatar {
+  width: 40px;
+  height: 40px;
+  flex-basis: 40px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.student-name-cell strong {
+  font-size: 13px;
+}
+
+.student-name-cell small {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.student-status-badge,
+.student-face-badge {
+  min-height: 31px;
+  padding-inline: 10px;
+  font-size: 10px;
+}
+
+.student-face-action {
+  min-height: 37px;
+  padding-inline: 13px;
+  font-size: 11px;
+}
+
+/* =========================================================
+   EMPTY / LOADING
+========================================================= */
+
+.student-loading-state,
+.student-empty-state {
+  min-height: 310px;
+}
+
+.student-loading-state > strong,
+.student-empty-state h3 {
+  font-size: 17px;
+}
+
+.student-loading-state p,
+.student-empty-state p {
+  font-size: 12px;
+}
+
+.student-empty-reset {
+  margin-top: 15px;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.student-pagination {
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--c-border-soft);
+  border-radius: 0 0 13px 13px;
+  background: var(--c-surface);
+}
+
+.student-pagination-summary {
+  color: var(--c-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.student-pagination-summary strong {
+  color: var(--c-text-secondary);
+  font-weight: 850;
+}
+
+.student-pagination-controls,
+.student-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.student-pagination-nav,
+.student-pagination-page {
+  min-width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0 8px;
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  background: var(--c-surface);
+  color: var(--c-text-secondary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.student-pagination-nav {
+  font-size: 19px;
+}
+
+.student-pagination-nav:hover:not(:disabled),
+.student-pagination-page:hover:not(.is-active) {
+  border-color: #93b9ef;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.student-pagination-page.is-active {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+.student-pagination-nav:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.student-pagination-ellipsis {
+  min-width: 24px;
+  color: var(--c-text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-filter-button,
+html[data-theme="dark"] .student-result-count,
+html[data-theme="dark"] .student-filter-menu,
+html[data-theme="dark"] .student-filter-menu-header > button,
+html[data-theme="dark"] .student-filter-row select,
+html[data-theme="dark"] .student-filter-reset,
+html[data-theme="dark"] .student-pagination {
+  border-color: #2d405b;
+  background: #0d1727;
+}
+
+html[data-theme="dark"] .student-filter-button:hover,
+html[data-theme="dark"] .student-filter-button.is-open,
+html[data-theme="dark"] .student-pagination-nav:hover:not(:disabled),
+html[data-theme="dark"] .student-pagination-page:hover:not(.is-active) {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.18);
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"] .student-filter-button-icon {
+  background: rgba(30, 64, 175, 0.26);
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .student-filter-menu-header {
+  background: linear-gradient(90deg, rgba(30, 64, 175, 0.16), #0d1727);
+}
+
+html[data-theme="dark"] .student-filter-menu-footer {
+  background: #101c2e;
+}
+
+html[data-theme="dark"] .student-pagination-nav,
+html[data-theme="dark"] .student-pagination-page {
+  border-color: #2d405b;
+  background: #0d1727;
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .student-pagination-page.is-active {
+  border-color: #3b82f6;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+  .student-section-stats {
+    grid-template-columns: repeat(3, minmax(105px, 1fr));
+  }
+
+  .student-section-heading h2 {
+    font-size: 25px;
+  }
+}
+
+@media (max-width: 820px) {
+  .student-toolbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .student-result-count {
+    align-self: auto;
+  }
+
+  .student-filter-menu {
+    width: min(380px, calc(100vw - 40px));
+  }
+
+  .student-section-heading h2 {
+    font-size: 23px;
+  }
+}
+
+@media (max-width: 650px) {
+  .student-section-overview {
+    min-height: 0;
+  }
+
+  .student-section-heading > span {
+    font-size: 10px;
+  }
+
+  .student-section-heading h2 {
+    font-size: 22px;
+  }
+
+  .student-section-heading p {
+    font-size: 12px;
+  }
+
+  .student-section-stats span {
+    font-size: 10px;
+  }
+
+  .student-section-stats strong {
+    font-size: 22px;
+  }
+
+  .student-panel-header h2 {
+    font-size: 21px;
+  }
+
+  .student-panel-header p {
+    font-size: 12px;
+  }
+
+  .student-toolbar-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-result-count,
+  .student-filter-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .student-filter-wrap {
+    width: 100%;
+  }
+
+  .student-filter-menu {
+    right: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .student-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-pagination-summary {
+    text-align: center;
+  }
+
+  .student-pagination-controls {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 440px) {
+  .student-filter-row {
+    grid-template-columns: 95px minmax(0, 1fr);
+  }
+
+  .student-filter-menu-body {
+    padding-inline: 10px;
+  }
+
+  .student-filter-row select {
+    font-size: 11px;
+  }
+
+  .student-pagination-pages {
+    gap: 3px;
+  }
+
+  .student-pagination-nav,
+  .student-pagination-page {
+    min-width: 32px;
+    height: 32px;
+  }
+}
+
+/* =========================================================
+   STUDENT MANAGEMENT FINAL — COMPLETE UI UX
+   Final safe override layer.
+
+   Includes:
+   - Existing roster filters + pagination
+   - Larger / readable Student Management page
+   - Larger / readable enrollment wizard
+   - Proper floating / viewport-safe modals
+   - Step scroll reset support
+   - Camera workspace fills available Step 2 height
+   - Responsive + dark mode
+   - Existing API/camera logic untouched
+========================================================= */
+
+/* =========================================================
+   GENERAL READABILITY
+========================================================= */
+
+.student-management,
+.student-management button,
+.student-management input,
+.student-management select,
+.student-management textarea,
+.student-modal-backdrop,
+.student-modal-backdrop button,
+.student-modal-backdrop input,
+.student-modal-backdrop select,
+.student-modal-backdrop textarea {
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* =========================================================
+   MODAL BACKDROP / FLOATING BEHAVIOR
+========================================================= */
+
+.student-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+
+  display: grid;
+  place-items: center;
+
+  padding: 16px;
+
+  overflow: hidden;
+
+  background: rgba(8, 18, 34, 0.5);
+
+  backdrop-filter: blur(4px);
+}
+
+/*
+ * All student modals remain centered and inside the viewport.
+ * This does not change their functionality.
+ */
+.student-modal-backdrop > .adviser-modal {
+  margin: 0;
+
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+}
+
+/* =========================================================
+   ENROLLMENT MODAL — STRUCTURAL LAYOUT
+========================================================= */
+
+.student-enrollment-modal {
+  width: min(1120px, calc(100vw - 32px));
+
+  height: min(820px, calc(100dvh - 32px));
+
+  max-height: calc(100dvh - 32px);
+
+  display: grid;
+
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: var(--c-surface);
+
+  box-shadow:
+    0 30px 90px rgba(2, 8, 23, 0.28),
+    0 10px 28px rgba(2, 8, 23, 0.1);
+}
+
+/* =========================================================
+   ENROLLMENT HEADER — SAME DESIGN, LARGER READABILITY
+========================================================= */
+
+.student-enrollment-modal .student-modal-header {
+  flex: 0 0 auto;
+
+  min-height: 82px;
+
+  padding: 17px 20px;
+
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.student-enrollment-modal .student-modal-heading {
+  gap: 13px;
+}
+
+.student-enrollment-modal .student-modal-icon {
+  width: 44px;
+  height: 44px;
+
+  flex-basis: 44px;
+
+  border-radius: 12px;
+}
+
+.student-enrollment-modal .student-modal-heading > div:last-child > span {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+}
+
+.student-enrollment-modal .student-modal-heading h2 {
+  margin-top: 4px;
+
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.student-enrollment-modal .student-modal-heading p {
+  max-width: 660px;
+
+  margin-top: 5px;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.student-enrollment-modal .student-modal-close {
+  width: 38px;
+  height: 38px;
+
+  flex-basis: 38px;
+
+  font-size: 21px;
+}
+
+/* =========================================================
+   ENROLLMENT PROGRESS
+========================================================= */
+
+.student-enrollment-modal .student-wizard-progress {
+  flex: 0 0 auto;
+
+  min-height: 68px;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    44px
+    minmax(0, 1fr)
+    44px
+    minmax(0, 1fr);
+
+  padding: 10px 22px;
+
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.student-enrollment-modal .student-wizard-progress-item {
+  gap: 9px;
+}
+
+.student-enrollment-modal .student-wizard-progress-item > span {
+  width: 32px;
+  height: 32px;
+
+  font-size: 11px;
+}
+
+.student-enrollment-modal .student-wizard-progress-item strong {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.student-enrollment-modal .student-wizard-progress-item small {
+  margin-top: 2px;
+
+  font-size: 10px;
+}
+
+.student-enrollment-modal .student-wizard-progress > i {
+  margin-inline: 7px;
+}
+
+/* =========================================================
+   WIZARD BODY
+========================================================= */
+
+.student-enrollment-modal .student-wizard-body {
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  overscroll-behavior: contain;
+
+  scroll-behavior: auto;
+
+  background: var(--c-surface);
+
+  scrollbar-width: thin;
+}
+
+.student-enrollment-modal .student-wizard-body::-webkit-scrollbar {
+  width: 7px;
+}
+
+.student-enrollment-modal .student-wizard-body::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+
+  background: color-mix(in srgb, var(--c-text-muted) 32%, transparent);
+
+  background-clip: padding-box;
+}
+
+/* =========================================================
+   STEP 1 — DETAILS
+========================================================= */
+
+.student-enrollment-modal .student-wizard-details-step {
+  gap: 17px;
+
+  padding: 22px 24px 24px;
+}
+
+.student-enrollment-modal .student-wizard-step-intro > span {
+  font-size: 10px;
+}
+
+.student-enrollment-modal .student-wizard-step-intro h3 {
+  margin-top: 6px;
+
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.student-enrollment-modal .student-wizard-step-intro p {
+  max-width: 700px;
+
+  margin-top: 7px;
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.student-enrollment-modal .student-wizard-form-card {
+  padding: 19px;
+
+  border-radius: 13px;
+}
+
+.student-enrollment-modal .student-enrollment-form {
+  gap: 16px;
+}
+
+.student-enrollment-modal .student-form-field {
+  gap: 7px;
+}
+
+.student-enrollment-modal .student-form-field > span {
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.student-enrollment-modal .student-form-field input {
+  min-height: 48px;
+
+  padding-inline: 14px;
+
+  border-radius: 10px;
+
+  font-size: 13px;
+}
+
+.student-enrollment-modal .student-form-field > small {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.student-enrollment-modal .student-locked-field {
+  min-height: 52px;
+
+  padding: 9px 11px 9px 13px;
+}
+
+.student-enrollment-modal .student-locked-field > div > small {
+  font-size: 9px !important;
+}
+
+.student-enrollment-modal .student-locked-field strong {
+  margin-top: 3px;
+
+  font-size: 13px;
+}
+
+.student-enrollment-modal .student-locked-badge {
+  min-height: 26px;
+
+  padding-inline: 9px;
+
+  font-size: 9px;
+}
+
+.student-enrollment-modal .student-wizard-info-note,
+.student-enrollment-modal .student-created-notice {
+  padding: 12px 13px;
+
+  border-radius: 10px;
+}
+
+.student-enrollment-modal .student-wizard-info-note strong,
+.student-enrollment-modal .student-created-notice strong {
+  font-size: 12px;
+}
+
+.student-enrollment-modal .student-wizard-info-note p,
+.student-enrollment-modal .student-created-notice p {
+  margin-top: 3px;
+
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   STEP 2 — CAMERA
+========================================================= */
+
+/*
+ * Desktop Step 2 uses the full body height.
+ * The camera shell stretches vertically instead of leaving
+ * a large blank region underneath.
+ */
+@media (min-width: 981px) {
+  .student-enrollment-step-2 .student-wizard-body {
+    overflow: hidden;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-step {
+    min-height: 0;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    padding: 14px 18px 16px;
+  }
+
+  .student-enrollment-step-2 .student-wizard-student-bar {
+    flex: 0 0 auto;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-layout {
+    min-height: 0;
+
+    flex: 1 1 0;
+
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1.55fr)
+      minmax(270px, 0.62fr);
+
+    align-items: stretch;
+
+    gap: 14px;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-main {
+    min-height: 0;
+    height: 100%;
+
+    display: flex;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    > .student-face-camera-content {
+    min-height: 0;
+    height: 100%;
+
+    flex: 1 1 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    width: 100%;
+
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+
+    flex: 1 1 0;
+
+    aspect-ratio: auto !important;
+
+    margin: 0;
+  }
+
+  /*
+   * The right-hand guide already carries the face-position
+   * instructions, so the duplicate bottom tip chips are
+   * hidden on desktop to give more vertical space to camera.
+   */
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-capture-tips {
+    display: none;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-guide {
+    min-height: 0;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-y: auto;
+  }
+
+  .student-enrollment-step-2 .student-wizard-ready-note {
+    margin-top: auto;
+  }
+}
+
+/* Student context bar */
+.student-enrollment-modal .student-wizard-student-bar {
+  min-height: 60px;
+
+  padding: 10px 12px;
+
+  border-radius: 11px;
+}
+
+.student-enrollment-modal
+  .student-wizard-student-bar
+  .student-face-student-avatar {
+  width: 42px;
+  height: 42px;
+
+  flex-basis: 42px;
+
+  font-size: 15px;
+}
+
+.student-enrollment-modal .student-wizard-student-bar > div > span {
+  font-size: 9px;
+}
+
+.student-enrollment-modal .student-wizard-student-bar strong {
+  margin-top: 3px;
+
+  font-size: 13px;
+}
+
+.student-enrollment-modal .student-wizard-student-bar small {
+  margin-top: 3px;
+
+  font-size: 10px;
+}
+
+.student-enrollment-modal .student-face-camera-status {
+  min-height: 30px;
+
+  padding-inline: 10px;
+
+  font-size: 10px;
+}
+
+/* Camera shell and placeholder */
+.student-enrollment-modal .student-face-camera-shell {
+  border-radius: 15px;
+}
+
+.student-enrollment-modal .student-face-camera-placeholder {
+  padding: 24px;
+}
+
+.student-enrollment-modal .student-face-placeholder-icon {
+  width: 62px;
+  height: 62px;
+
+  margin-bottom: 12px;
+}
+
+.student-enrollment-modal
+  .student-face-camera-placeholder
+  .student-face-placeholder-kicker {
+  font-size: 10px;
+}
+
+.student-enrollment-modal .student-face-camera-placeholder strong {
+  font-size: 21px;
+}
+
+.student-enrollment-modal .student-face-camera-placeholder p {
+  max-width: 430px;
+
+  margin-top: 7px;
+
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.student-enrollment-modal
+  .student-face-camera-placeholder
+  .adviser-primary-button {
+  min-height: 42px;
+
+  margin-top: 5px;
+
+  padding-inline: 17px;
+
+  font-size: 12px;
+}
+
+/* Scanner overlay readability */
+.student-enrollment-modal .student-face-live-badge,
+.student-enrollment-modal .student-face-auto-badge,
+.student-enrollment-modal .student-face-manual-capture {
+  font-size: 10px;
+}
+
+.student-enrollment-modal .student-face-scanner-message > span {
+  font-size: 9px;
+}
+
+.student-enrollment-modal .student-face-scanner-message strong {
+  margin-top: 5px;
+
+  font-size: 17px;
+}
+
+.student-enrollment-modal .student-face-scanner-message small {
+  margin-top: 5px;
+
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.student-enrollment-modal .student-face-processing-overlay strong {
+  font-size: 17px;
+}
+
+.student-enrollment-modal .student-face-processing-overlay span {
+  font-size: 11px;
+}
+
+.student-enrollment-modal .student-face-camera-loading {
+  font-size: 11px;
+}
+
+.student-enrollment-modal .student-face-feedback strong {
+  font-size: 12px;
+}
+
+.student-enrollment-modal .student-face-feedback p {
+  font-size: 11px;
+}
+
+/* Compact privacy note below camera */
+.student-enrollment-step-2
+  .student-wizard-camera-main
+  .student-face-privacy-note {
+  flex: 0 0 auto;
+
+  padding: 8px 10px;
+}
+
+.student-enrollment-step-2
+  .student-wizard-camera-main
+  .student-face-privacy-note
+  strong {
+  font-size: 10px;
+}
+
+.student-enrollment-step-2
+  .student-wizard-camera-main
+  .student-face-privacy-note
+  p {
+  font-size: 9px;
+}
+
+/* Right guide */
+.student-enrollment-modal .student-wizard-camera-guide {
+  padding: 17px;
+
+  border-radius: 13px;
+}
+
+.student-enrollment-modal .student-wizard-camera-guide > span {
+  font-size: 10px;
+}
+
+.student-enrollment-modal .student-wizard-camera-guide h3 {
+  margin-top: 6px;
+
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+.student-enrollment-modal .student-wizard-camera-guide > p {
+  margin-top: 6px;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.student-enrollment-modal .student-wizard-guide-list {
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+.student-enrollment-modal .student-wizard-guide-list > div {
+  padding: 10px;
+
+  border-radius: 9px;
+}
+
+.student-enrollment-modal .student-wizard-guide-list i {
+  width: 27px;
+  height: 27px;
+
+  font-size: 9px;
+}
+
+.student-enrollment-modal .student-wizard-guide-list strong {
+  font-size: 11px;
+}
+
+.student-enrollment-modal .student-wizard-guide-list span {
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.student-enrollment-modal .student-wizard-ready-note {
+  padding: 11px;
+
+  border-radius: 9px;
+}
+
+.student-enrollment-modal .student-wizard-ready-note strong {
+  font-size: 11px;
+}
+
+.student-enrollment-modal .student-wizard-ready-note p {
+  font-size: 10px;
+}
+
+/* =========================================================
+   STEP 3 — REVIEW
+========================================================= */
+
+.student-enrollment-modal .student-wizard-review-step {
+  gap: 17px;
+
+  padding: 20px 22px 24px;
+}
+
+.student-enrollment-modal .student-wizard-review-grid {
+  gap: 14px;
+}
+
+.student-enrollment-modal .student-wizard-review-card,
+.student-enrollment-modal .student-wizard-review-photo-card {
+  padding: 16px;
+
+  border-radius: 12px;
+}
+
+.student-enrollment-modal .student-wizard-review-card-header > div > span,
+.student-enrollment-modal .student-wizard-review-photo-header > div > span {
+  font-size: 9px;
+}
+
+.student-enrollment-modal .student-wizard-review-card-header strong,
+.student-enrollment-modal .student-wizard-review-photo-header strong {
+  font-size: 13px;
+}
+
+.student-enrollment-modal .student-wizard-review-card-header small {
+  font-size: 10px;
+}
+
+.student-enrollment-modal .student-wizard-review-details dt {
+  font-size: 11px;
+}
+
+.student-enrollment-modal .student-wizard-review-details dd {
+  font-size: 12px;
+}
+
+.student-enrollment-modal .student-wizard-review-ready {
+  min-height: 27px;
+
+  padding-inline: 9px;
+
+  font-size: 9px;
+}
+
+.student-enrollment-modal .student-wizard-review-photo {
+  min-height: 290px;
+
+  border-radius: 11px;
+}
+
+.student-enrollment-modal .student-wizard-final-note {
+  padding: 12px 13px;
+}
+
+.student-enrollment-modal .student-wizard-final-note strong {
+  font-size: 12px;
+}
+
+.student-enrollment-modal .student-wizard-final-note p {
+  margin-top: 3px;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   ENROLLMENT FOOTER
+========================================================= */
+
+.student-enrollment-modal .student-wizard-actions {
+  flex: 0 0 auto;
+
+  min-height: 72px;
+
+  padding: 11px 18px;
+
+  border-top: 1px solid var(--c-border-soft);
+
+  background: color-mix(in srgb, var(--c-surface) 96%, var(--c-surface-soft));
+}
+
+.student-enrollment-modal .student-wizard-footer-copy strong {
+  font-size: 12px;
+}
+
+.student-enrollment-modal .student-wizard-footer-copy span {
+  margin-top: 3px;
+
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.student-enrollment-modal .student-wizard-action-group {
+  gap: 8px;
+}
+
+.student-enrollment-modal .student-wizard-action-group button {
+  min-height: 42px;
+
+  padding-inline: 15px;
+
+  font-size: 12px;
+
+  white-space: nowrap;
+}
+
+.student-enrollment-camera-cta {
+  min-width: 145px;
+
+  gap: 7px;
+}
+
+.student-enrollment-modal .student-enrollment-submit {
+  min-width: 175px;
+}
+
+/* =========================================================
+   EDIT / FACE UPDATE MODALS — FLOAT SAFETY + READABILITY
+========================================================= */
+
+.student-edit-modal,
+.student-face-modal {
+  max-height: calc(100dvh - 32px);
+
+  overflow: hidden;
+}
+
+.student-edit-modal .student-edit-form,
+.student-face-modal .student-face-modal-body {
+  min-height: 0;
+
+  overflow-y: auto;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-modal-backdrop {
+  background: rgba(2, 8, 23, 0.7);
+}
+
+html[data-theme="dark"] .student-enrollment-modal .student-wizard-actions {
+  border-top-color: #293b52;
+
+  background: rgba(13, 23, 39, 0.98);
+}
+
+/* =========================================================
+   LAPTOP / SHORT VIEWPORT
+========================================================= */
+
+@media (max-height: 760px) and (min-width: 821px) {
+  .student-modal-backdrop {
+    padding: 8px;
+  }
+
+  .student-enrollment-modal {
+    width: min(1100px, calc(100vw - 16px));
+
+    height: calc(100dvh - 16px);
+
+    max-height: calc(100dvh - 16px);
+  }
+
+  .student-enrollment-modal .student-modal-header {
+    min-height: 66px;
+
+    padding-block: 11px;
+  }
+
+  .student-enrollment-modal .student-modal-heading p {
+    display: none;
+  }
+
+  .student-enrollment-modal .student-wizard-progress {
+    min-height: 54px;
+
+    padding-block: 7px;
+  }
+
+  .student-enrollment-modal .student-wizard-progress-item small {
+    display: none;
+  }
+
+  .student-enrollment-modal .student-wizard-actions {
+    min-height: 60px;
+
+    padding-block: 8px;
+  }
+
+  .student-enrollment-modal .student-wizard-camera-step {
+    padding-block: 10px;
+  }
+
+  .student-enrollment-modal .student-wizard-student-bar {
+    min-height: 52px;
+
+    padding-block: 7px;
+  }
+
+  .student-enrollment-modal .student-wizard-camera-guide {
+    padding: 13px;
+  }
+
+  .student-enrollment-modal .student-wizard-guide-list > div {
+    padding-block: 7px;
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 980px) {
+  .student-modal-backdrop {
+    padding: 10px;
+  }
+
+  .student-enrollment-modal {
+    width: calc(100vw - 20px);
+
+    height: calc(100dvh - 20px);
+
+    max-height: calc(100dvh - 20px);
+  }
+
+  .student-enrollment-modal .student-wizard-body {
+    overflow-y: auto;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-step {
+    min-height: auto;
+
+    display: block;
+
+    padding: 15px;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-layout {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 13px;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-main {
+    display: block;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    > .student-face-camera-content {
+    display: grid;
+
+    height: auto;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    width: min(100%, 680px);
+
+    min-height: 390px !important;
+    height: auto !important;
+
+    aspect-ratio: 4 / 3 !important;
+
+    margin-inline: auto;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-capture-tips {
+    display: grid;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-guide {
+    height: auto;
+
+    overflow: visible;
+  }
+
+  .student-enrollment-modal .student-wizard-review-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+  .student-modal-backdrop {
+    padding: 4px;
+  }
+
+  .student-enrollment-modal {
+    width: calc(100vw - 8px);
+
+    height: calc(100dvh - 8px);
+
+    max-height: calc(100dvh - 8px);
+
+    border-radius: 13px;
+  }
+
+  .student-enrollment-modal .student-modal-header {
+    min-height: 0;
+
+    padding: 12px;
+  }
+
+  .student-enrollment-modal .student-modal-icon {
+    width: 37px;
+    height: 37px;
+
+    flex-basis: 37px;
+  }
+
+  .student-enrollment-modal .student-modal-heading > div:last-child > span {
+    font-size: 8px;
+  }
+
+  .student-enrollment-modal .student-modal-heading h2 {
+    font-size: 17px;
+  }
+
+  .student-enrollment-modal .student-modal-heading p {
+    display: none;
+  }
+
+  .student-enrollment-modal .student-wizard-progress {
+    min-height: 58px;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      18px
+      minmax(0, 1fr)
+      18px
+      minmax(0, 1fr);
+
+    padding: 7px 9px;
+  }
+
+  .student-enrollment-modal .student-wizard-progress-item {
+    grid-template-columns: 1fr;
+
+    justify-items: center;
+
+    gap: 4px;
+
+    text-align: center;
+  }
+
+  .student-enrollment-modal .student-wizard-progress-item > span {
+    width: 26px;
+    height: 26px;
+
+    font-size: 9px;
+  }
+
+  .student-enrollment-modal .student-wizard-progress-item strong {
+    max-width: 78px;
+
+    font-size: 9px;
+  }
+
+  .student-enrollment-modal .student-wizard-progress-item small {
+    display: none;
+  }
+
+  .student-enrollment-modal .student-wizard-details-step,
+  .student-enrollment-modal .student-wizard-review-step {
+    gap: 13px;
+
+    padding: 14px;
+  }
+
+  .student-enrollment-modal .student-wizard-step-intro h3 {
+    font-size: 20px;
+  }
+
+  .student-enrollment-modal .student-wizard-step-intro p {
+    font-size: 11px;
+  }
+
+  .student-enrollment-modal .student-wizard-form-card {
+    padding: 14px;
+  }
+
+  .student-enrollment-modal .student-form-field > span {
+    font-size: 11px;
+  }
+
+  .student-enrollment-modal .student-form-field input {
+    min-height: 46px;
+
+    font-size: 12px;
+  }
+
+  .student-enrollment-modal .student-wizard-camera-step {
+    padding: 11px;
+  }
+
+  .student-enrollment-modal .student-wizard-student-bar {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+
+    padding: 9px;
+  }
+
+  .student-enrollment-modal
+    .student-wizard-student-bar
+    .student-face-camera-status {
+    grid-column: 1 / -1;
+
+    justify-self: start;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    min-height: 285px !important;
+  }
+
+  .student-enrollment-modal .student-wizard-camera-guide {
+    padding: 13px;
+  }
+
+  .student-enrollment-modal .student-wizard-actions {
+    min-height: 0;
+
+    grid-template-columns: 1fr;
+
+    gap: 8px;
+
+    padding: 9px 10px;
+  }
+
+  .student-enrollment-modal .student-wizard-footer-copy {
+    display: none;
+  }
+
+  .student-enrollment-modal .student-wizard-action-group {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 6px;
+  }
+
+  .student-enrollment-modal .student-wizard-action-group button {
+    width: 100%;
+  }
+
+  .student-enrollment-modal .student-enrollment-submit {
+    min-width: 0;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 430px) {
+  .student-enrollment-modal .student-modal-header {
+    padding: 10px;
+  }
+
+  .student-enrollment-modal .student-modal-heading {
+    gap: 9px;
+  }
+
+  .student-enrollment-modal .student-modal-heading h2 {
+    font-size: 15px;
+  }
+
+  .student-enrollment-modal .student-wizard-progress-item strong {
+    max-width: 64px;
+
+    font-size: 8px;
+  }
+
+  .student-enrollment-modal .student-wizard-details-step,
+  .student-enrollment-modal .student-wizard-review-step,
+  .student-enrollment-modal .student-wizard-camera-step {
+    padding: 10px;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    min-height: 255px !important;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY / REDUCED MOTION
+========================================================= */
+
+.student-enrollment-modal button:focus-visible,
+.student-enrollment-modal input:focus-visible,
+.student-enrollment-modal select:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.16);
+
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-enrollment-modal *,
+  .student-enrollment-modal *::before,
+  .student-enrollment-modal *::after {
+    scroll-behavior: auto;
+  }
+}
+
+/* =========================================================
+   STUDENT MANAGEMENT FINAL CAMERA STABILITY FIX
+   ---------------------------------------------------------
+   Fixes ONLY the enrollment Step 2 camera layout.
+   Filters, pagination, Step 1, Step 3, modal design,
+   API logic and camera handlers remain unchanged.
+
+   Previous full-height flex rules could over-stretch or
+   squeeze the camera depending on viewport height.
+========================================================= */
+
+@media (min-width: 981px) {
+  .student-enrollment-step-2 .student-wizard-body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-step {
+    display: block !important;
+
+    width: 100%;
+
+    min-height: 100% !important;
+    height: auto !important;
+
+    padding: 14px 18px 16px !important;
+
+    overflow: visible !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-student-bar {
+    margin-bottom: 12px !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-layout {
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      275px !important;
+
+    align-items: stretch !important;
+
+    gap: 14px !important;
+
+    width: 100%;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    overflow: visible !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-main {
+    display: block !important;
+
+    min-width: 0;
+    min-height: 0 !important;
+
+    height: auto !important;
+
+    overflow: visible !important;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    > .student-face-camera-content {
+    display: grid !important;
+
+    width: 100%;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    gap: 8px !important;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    width: 100% !important;
+
+    height: clamp(390px, calc(100dvh - 355px), 575px) !important;
+
+    min-height: 390px !important;
+    max-height: 575px !important;
+
+    flex: none !important;
+
+    aspect-ratio: auto !important;
+
+    margin: 0 !important;
+
+    overflow: hidden !important;
+
+    border-radius: 18px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-target {
+    width: clamp(205px, 24vw, 300px) !important;
+
+    height: clamp(275px, 34vw, 390px) !important;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-capture-tips,
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-privacy-note {
+    display: none !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-guide {
+    position: sticky !important;
+    top: 0 !important;
+
+    display: block !important;
+
+    height: fit-content !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+
+    align-self: start !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-ready-note {
+    margin-top: 12px !important;
+  }
+}
+
+@media (min-width: 981px) and (max-height: 760px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    height: clamp(315px, calc(100dvh - 330px), 410px) !important;
+
+    min-height: 315px !important;
+    max-height: 410px !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-guide {
+    padding: 13px !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-guide-list {
+    gap: 6px !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-guide-list > div {
+    padding: 8px !important;
+  }
+}
+
+@media (min-width: 981px) and (min-height: 900px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    height: clamp(500px, calc(100dvh - 365px), 620px) !important;
+
+    min-height: 500px !important;
+    max-height: 620px !important;
+  }
+}
+
+@media (min-width: 651px) and (max-width: 980px) {
+  .student-enrollment-step-2 .student-wizard-camera-layout {
+    grid-template-columns: 1fr !important;
+
+    align-items: start !important;
+  }
+
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    width: min(100%, 680px) !important;
+
+    height: auto !important;
+
+    min-height: 390px !important;
+    max-height: none !important;
+
+    aspect-ratio: 4 / 3 !important;
+
+    margin-inline: auto !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-guide {
+    position: static !important;
+
+    height: auto !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    width: 100% !important;
+
+    height: auto !important;
+
+    min-height: 285px !important;
+    max-height: none !important;
+
+    aspect-ratio: 4 / 3 !important;
+  }
+
+  .student-enrollment-step-2 .student-wizard-camera-guide {
+    position: static !important;
+
+    height: auto !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    min-height: 255px !important;
+  }
+}
+
+/* =========================================================
+   STUDENT MANAGEMENT CAMERA UI CLEAN FINAL
+   ---------------------------------------------------------
+   CAMERA STEP 2 ONLY.
+   Removes repeated captured-state UI and guarantees that
+   the camera column shows one clean captured-photo surface.
+   No roster, modal, API, filter or pagination changes.
+========================================================= */
+
+/* =========================================================
+   CAPTURED STATE — ONE VISUAL SURFACE ONLY
+========================================================= */
+
+/*
+ * Once a face has been captured, the camera area should
+ * contain ONE preview shell only. Any supporting elements
+ * after the shell are intentionally hidden in Step 2.
+ */
+.student-enrollment-step-2
+  .student-wizard-camera-main.has-captured-face
+  > .student-face-camera-content {
+  display: block !important;
+
+  width: 100%;
+
+  overflow: hidden !important;
+}
+
+/*
+ * Hide everything after the camera shell for captured state.
+ * This also prevents any stray canvas/support element from
+ * visually appearing below the captured preview.
+ */
+.student-enrollment-step-2
+  .student-wizard-camera-main.has-captured-face
+  > .student-face-camera-content
+  > .student-face-camera-shell
+  ~ * {
+  display: none !important;
+}
+
+/* Keep only the preview itself inside the camera shell. */
+.student-enrollment-step-2
+  .student-wizard-camera-main.has-captured-face
+  .student-face-camera-shell {
+  position: relative;
+
+  overflow: hidden !important;
+
+  margin: 0 !important;
+}
+
+/*
+ * The old large bottom "Capture complete" overlay repeated
+ * the same information shown in the guide/footer.
+ * Keep the small top status pill and remove this large card.
+ */
+.student-enrollment-step-2
+  .student-wizard-camera-main.has-captured-face
+  .student-face-captured-summary {
+  display: none !important;
+}
+
+/* Captured image always fills exactly one camera shell. */
+.student-enrollment-step-2
+  .student-wizard-camera-main.has-captured-face
+  .student-face-captured-image {
+  position: absolute !important;
+
+  inset: 0 !important;
+
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  object-fit: cover !important;
+
+  margin: 0 !important;
+}
+
+/*
+ * Keep the image shade subtle now that the large bottom card
+ * has been removed.
+ */
+.student-enrollment-step-2
+  .student-wizard-camera-main.has-captured-face
+  .student-face-captured-shade {
+  background: linear-gradient(
+    180deg,
+    transparent 58%,
+    rgba(2, 8, 23, 0.22) 100%
+  ) !important;
+}
+
+/* Small, clear success badge only. */
+.student-enrollment-step-2
+  .student-wizard-camera-main.has-captured-face
+  .student-face-captured-label {
+  top: 14px;
+  left: 14px;
+
+  min-height: 31px;
+
+  padding: 0 11px;
+
+  border: 1px solid rgba(187, 247, 208, 0.28);
+
+  border-radius: 999px;
+
+  background: rgba(21, 128, 61, 0.88);
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 850;
+
+  backdrop-filter: blur(8px);
+}
+
+/* =========================================================
+   RIGHT GUIDE — CAPTURED MODE
+========================================================= */
+
+.student-wizard-captured-review {
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr);
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  margin-top: 16px;
+
+  padding: 12px;
+
+  border: 1px solid var(--c-success-border);
+
+  border-radius: 10px;
+
+  background: var(--c-success-bg);
+
+  color: var(--c-success-text);
+}
+
+.student-wizard-captured-review > span {
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--c-success-text);
+
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.student-wizard-captured-review strong {
+  display: block;
+
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.student-wizard-captured-review p {
+  margin: 3px 0 0;
+
+  color: inherit;
+
+  font-size: 10px;
+  line-height: 1.45;
+
+  opacity: 0.82;
+}
+
+/* =========================================================
+   CAMERA GUIDE — LESS REPETITION AFTER CAPTURE
+========================================================= */
+
+.student-enrollment-step-2
+  .student-wizard-camera-main.has-captured-face
+  + .student-wizard-camera-guide {
+  align-self: start;
+}
+
+.student-enrollment-step-2
+  .student-wizard-camera-main.has-captured-face
+  + .student-wizard-camera-guide
+  > span {
+  color: var(--c-success-text);
+}
+
+/* =========================================================
+   DESKTOP CAMERA PREVIEW HEIGHT
+   Keep the stable viewport-aware sizing from the previous fix.
+========================================================= */
+
+@media (min-width: 981px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main.has-captured-face
+    .student-face-camera-shell {
+    height: clamp(390px, calc(100dvh - 355px), 575px) !important;
+
+    min-height: 390px !important;
+    max-height: 575px !important;
+  }
+}
+
+/* Short laptop */
+@media (min-width: 981px) and (max-height: 760px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main.has-captured-face
+    .student-face-camera-shell {
+    height: clamp(315px, calc(100dvh - 330px), 410px) !important;
+
+    min-height: 315px !important;
+    max-height: 410px !important;
+  }
+}
+
+/* Tablet */
+@media (min-width: 651px) and (max-width: 980px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main.has-captured-face
+    .student-face-camera-shell {
+    height: auto !important;
+
+    min-height: 390px !important;
+
+    aspect-ratio: 4 / 3 !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 650px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main.has-captured-face
+    .student-face-camera-shell {
+    height: auto !important;
+
+    min-height: 285px !important;
+
+    aspect-ratio: 4 / 3 !important;
+  }
+
+  .student-wizard-captured-review {
+    margin-top: 12px;
+
+    padding: 10px;
+  }
+}
+
+@media (max-width: 430px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main.has-captured-face
+    .student-face-camera-shell {
+    min-height: 255px !important;
+  }
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-wizard-captured-review {
+  border-color: rgba(74, 222, 128, 0.24);
+
+  background: rgba(22, 101, 52, 0.18);
+
+  color: #bbf7d0;
+}
+
+/* =========================================================
+   STUDENT MANAGEMENT CAMERA — UNOBSTRUCTED FACE HUD
+   ---------------------------------------------------------
+   STEP 2 CAMERA ONLY.
+
+   Goal:
+   - One big camera
+   - Keep the subject's face unobstructed
+   - Move status/countdown/capturing UI to camera edges
+   - Preserve auto-capture and all existing camera logic
+========================================================= */
+
+/* =========================================================
+   ACTIVE CAMERA — CENTER IS RESERVED FOR FACE
+========================================================= */
+
+.student-enrollment-step-2
+  .student-wizard-camera-main
+  .student-face-camera-shell {
+  isolation: isolate;
+}
+
+/*
+ * Slightly soften the shade.
+ * The target remains readable without dimming the face.
+ */
+.student-enrollment-step-2 .student-face-camera-shade {
+  background: linear-gradient(
+    180deg,
+    rgba(3, 8, 18, 0.25) 0%,
+    transparent 18%,
+    transparent 72%,
+    rgba(3, 8, 18, 0.42) 100%
+  ) !important;
+}
+
+/* =========================================================
+   FACE TARGET — ONLY THING AT CENTER
+========================================================= */
+
+.student-enrollment-step-2 .student-face-target {
+  z-index: 5;
+
+  top: 50% !important;
+
+  width: clamp(220px, 25vw, 300px) !important;
+
+  height: clamp(300px, 35vw, 400px) !important;
+}
+
+/*
+ * Make the giant dark outside-mask much lighter.
+ * The student remains clearly visible around the guide.
+ */
+.student-enrollment-step-2 .student-face-target-oval {
+  box-shadow:
+    0 0 0 999px rgba(5, 10, 22, 0.035),
+    0 0 34px rgba(255, 255, 255, 0.07) !important;
+}
+
+.student-enrollment-step-2
+  .student-face-target.scanner-holding
+  .student-face-target-oval,
+.student-enrollment-step-2
+  .student-face-target.scanner-countdown
+  .student-face-target-oval {
+  box-shadow:
+    0 0 0 999px rgba(5, 10, 22, 0.025),
+    0 0 38px rgba(74, 222, 128, 0.24) !important;
+}
+
+/* =========================================================
+   LIVE / AUTO CAPTURE — TOP EDGES
+========================================================= */
+
+.student-enrollment-step-2 .student-face-live-badge,
+.student-enrollment-step-2 .student-face-auto-badge {
+  top: 14px !important;
+
+  min-height: 30px !important;
+
+  padding: 0 11px !important;
+
+  font-size: 9px !important;
+
+  backdrop-filter: blur(10px);
+}
+
+.student-enrollment-step-2 .student-face-live-badge {
+  left: 14px !important;
+}
+
+.student-enrollment-step-2 .student-face-auto-badge {
+  right: 14px !important;
+}
+
+.student-enrollment-step-2 .student-face-manual-capture {
+  top: 52px !important;
+  right: 14px !important;
+
+  min-height: 31px !important;
+
+  padding: 0 11px !important;
+
+  font-size: 9px !important;
+}
+
+/* =========================================================
+   COUNTDOWN — MOVE AWAY FROM FACE
+   Desktop: left-middle edge
+========================================================= */
+
+.student-enrollment-step-2 .student-face-countdown {
+  top: 50% !important;
+  left: 16px !important;
+
+  width: 76px !important;
+  min-height: 78px !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  gap: 1px;
+
+  padding: 9px 8px !important;
+
+  transform: translateY(-50%) !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+
+  border-radius: 13px !important;
+
+  background: rgba(4, 12, 27, 0.74) !important;
+
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2) !important;
+
+  backdrop-filter: blur(10px) !important;
+
+  filter: none !important;
+
+  text-align: center;
+}
+
+.student-enrollment-step-2 .student-face-countdown small {
+  margin: 0 !important;
+
+  color: rgba(255, 255, 255, 0.72) !important;
+
+  font-size: 7px !important;
+  font-weight: 900 !important;
+
+  line-height: 1.1;
+
+  letter-spacing: 0.11em !important;
+}
+
+.student-enrollment-step-2 .student-face-countdown span {
+  margin: 1px 0 0 !important;
+
+  color: #ffffff;
+
+  font-size: 42px !important;
+  font-weight: 950;
+
+  line-height: 0.95 !important;
+
+  letter-spacing: -2px !important;
+}
+
+/* =========================================================
+   SCANNER MESSAGE — COMPACT EDGE CARD
+   No more wide card across the face.
+========================================================= */
+
+.student-enrollment-step-2 .student-face-scanner-message {
+  right: auto !important;
+  bottom: 14px !important;
+  left: 14px !important;
+
+  width: min(390px, calc(100% - 150px)) !important;
+
+  min-height: 0;
+
+  padding: 9px 11px !important;
+
+  border-radius: 10px !important;
+
+  background: rgba(4, 12, 27, 0.72) !important;
+
+  text-align: left !important;
+
+  backdrop-filter: blur(10px) !important;
+}
+
+.student-enrollment-step-2 .student-face-scanner-message > span {
+  font-size: 7px !important;
+
+  letter-spacing: 0.09em !important;
+}
+
+.student-enrollment-step-2 .student-face-scanner-message strong {
+  margin-top: 2px !important;
+
+  font-size: 12px !important;
+
+  line-height: 1.2;
+}
+
+.student-enrollment-step-2 .student-face-scanner-message small {
+  margin-top: 2px !important;
+
+  font-size: 9px !important;
+
+  line-height: 1.35 !important;
+}
+
+/* =========================================================
+   CAPTURING STATE — SMALL EDGE PILL
+   No full-screen dark overlay over the face.
+========================================================= */
+
+.student-enrollment-step-2 .student-face-processing-overlay {
+  inset: auto 14px 14px auto !important;
+
+  width: auto !important;
+  height: auto !important;
+
+  min-width: 185px;
+
+  display: grid !important;
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr);
+
+  align-items: center;
+  justify-content: initial;
+
+  column-gap: 9px;
+
+  padding: 9px 11px !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  border-radius: 10px;
+
+  background: rgba(4, 12, 27, 0.78) !important;
+
+  color: #ffffff;
+
+  backdrop-filter: blur(10px) !important;
+}
+
+.student-enrollment-step-2 .student-face-processing-spinner {
+  grid-row: 1 / 3;
+
+  width: 27px !important;
+  height: 27px !important;
+
+  margin: 0 !important;
+
+  border-width: 3px !important;
+}
+
+.student-enrollment-step-2 .student-face-processing-overlay strong {
+  align-self: end;
+
+  font-size: 10px !important;
+
+  line-height: 1.2;
+}
+
+.student-enrollment-step-2 .student-face-processing-overlay span {
+  align-self: start;
+
+  margin-top: 2px;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 8px !important;
+
+  line-height: 1.25;
+}
+
+/*
+ * While actually capturing, hide the regular scanner status
+ * so only one compact state card is visible at the bottom.
+ */
+.student-enrollment-step-2
+  .student-face-camera-shell.is-capturing
+  .student-face-scanner-message {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* =========================================================
+   CAMERA FLASH
+========================================================= */
+
+.student-enrollment-step-2 .student-face-camera-flash {
+  z-index: 20;
+}
+
+/* =========================================================
+   DESKTOP — KEEP THE CAMERA LARGE
+========================================================= */
+
+@media (min-width: 981px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    height: clamp(410px, calc(100dvh - 345px), 590px) !important;
+
+    min-height: 410px !important;
+
+    max-height: 590px !important;
+  }
+}
+
+/* =========================================================
+   SHORT LAPTOP
+========================================================= */
+
+@media (min-width: 981px) and (max-height: 760px) {
+  .student-enrollment-step-2
+    .student-wizard-camera-main
+    .student-face-camera-shell {
+    height: clamp(330px, calc(100dvh - 315px), 430px) !important;
+
+    min-height: 330px !important;
+
+    max-height: 430px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-target {
+    width: clamp(190px, 21vw, 250px) !important;
+
+    height: clamp(255px, 29vw, 330px) !important;
+  }
+
+  .student-enrollment-step-2 .student-face-countdown {
+    width: 66px !important;
+
+    min-height: 68px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-countdown span {
+    font-size: 35px !important;
+  }
+}
+
+/* =========================================================
+   TABLET — EDGE HUD, SMALLER
+========================================================= */
+
+@media (min-width: 651px) and (max-width: 980px) {
+  .student-enrollment-step-2 .student-face-countdown {
+    top: auto !important;
+    bottom: 14px !important;
+    left: 14px !important;
+
+    transform: none !important;
+
+    width: 70px !important;
+
+    min-height: 66px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-scanner-message {
+    left: 96px !important;
+
+    width: calc(100% - 110px) !important;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   Keep center clear; stack edge HUD along bottom.
+========================================================= */
+
+@media (max-width: 650px) {
+  .student-enrollment-step-2 .student-face-live-badge,
+  .student-enrollment-step-2 .student-face-auto-badge {
+    top: 9px !important;
+
+    min-height: 26px !important;
+
+    padding-inline: 8px !important;
+
+    font-size: 7px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-live-badge {
+    left: 9px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-auto-badge {
+    right: 9px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-manual-capture {
+    top: 42px !important;
+    right: 9px !important;
+
+    min-height: 28px !important;
+
+    font-size: 7px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-countdown {
+    top: auto !important;
+    bottom: 10px !important;
+    left: 10px !important;
+
+    width: 60px !important;
+
+    min-height: 58px !important;
+
+    padding: 6px !important;
+
+    transform: none !important;
+
+    border-radius: 10px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-countdown small {
+    font-size: 6px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-countdown span {
+    font-size: 31px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-scanner-message {
+    right: 10px !important;
+    bottom: 10px !important;
+    left: 78px !important;
+
+    width: auto !important;
+
+    padding: 7px 9px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-scanner-message > span {
+    font-size: 6px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-scanner-message strong {
+    font-size: 10px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-scanner-message small {
+    display: none;
+  }
+
+  .student-enrollment-step-2 .student-face-processing-overlay {
+    right: 10px !important;
+    bottom: 10px !important;
+
+    min-width: 155px;
+
+    padding: 7px 9px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-processing-overlay span {
+    display: none;
+  }
+
+  .student-enrollment-step-2 .student-face-target {
+    width: clamp(155px, 52vw, 220px) !important;
+
+    height: clamp(210px, 69vw, 290px) !important;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 430px) {
+  .student-enrollment-step-2 .student-face-countdown {
+    width: 54px !important;
+
+    min-height: 54px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-countdown span {
+    font-size: 28px !important;
+  }
+
+  .student-enrollment-step-2 .student-face-scanner-message {
+    left: 70px !important;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .student-enrollment-step-2 .student-face-countdown,
+  .student-enrollment-step-2 .student-face-processing-overlay {
+    transition: none;
   }
 }
