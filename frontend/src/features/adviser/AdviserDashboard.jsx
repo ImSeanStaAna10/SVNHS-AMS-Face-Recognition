@@ -150,11 +150,6 @@ function AdviserDashboard() {
     setLoading,
   ] = useState(true);
 
-  const [
-    startingSession,
-    setStartingSession,
-  ] = useState(false);
-
   /* =======================================================
      FEEDBACK STATE
   ======================================================= */
@@ -163,20 +158,6 @@ function AdviserDashboard() {
     error,
     setError,
   ] = useState("");
-
-  const [
-    actionError,
-    setActionError,
-  ] = useState("");
-
-  /* =======================================================
-     MODAL STATE
-  ======================================================= */
-
-  const [
-    showStartModal,
-    setShowStartModal,
-  ] = useState(false);
 
   /* =======================================================
      LOAD DASHBOARD
@@ -346,58 +327,6 @@ function AdviserDashboard() {
   }, []);
 
   /* =======================================================
-     MODAL SIDE EFFECTS
-  ======================================================= */
-
-  useEffect(() => {
-    if (!showStartModal) {
-      return undefined;
-    }
-
-    const previousOverflow =
-      document.body.style
-        .overflow;
-
-    document.body.style.overflow =
-      "hidden";
-
-    const handleKeyDown =
-      (event) => {
-        if (
-          event.key ===
-            "Escape" &&
-          !startingSession
-        ) {
-          setShowStartModal(
-            false,
-          );
-
-          setActionError(
-            "",
-          );
-        }
-      };
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
-
-    return () => {
-      document.body.style.overflow =
-        previousOverflow;
-
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
-    };
-  }, [
-    showStartModal,
-    startingSession,
-  ]);
-
-  /* =======================================================
      DERIVED DATA
   ======================================================= */
 
@@ -412,23 +341,54 @@ function AdviserDashboard() {
       [students],
     );
 
-  const presentCount =
-    useMemo(
-      () =>
-        sessionRecords.filter(
-          (record) =>
+  const attendanceCounts =
+    useMemo(() => {
+      return sessionRecords.reduce(
+        (counts, record) => {
+          const status =
             String(
-              record.status || "",
-            ).toUpperCase() ===
-            "PRESENT",
-        ).length,
-      [sessionRecords],
-    );
+              record?.status || "",
+            )
+              .trim()
+              .toUpperCase();
+
+          if (
+            status ===
+            "PRESENT"
+          ) {
+            counts.present += 1;
+            counts.attended += 1;
+          } else if (
+            status ===
+            "LATE"
+          ) {
+            counts.late += 1;
+            counts.attended += 1;
+          }
+
+          return counts;
+        },
+        {
+          present: 0,
+          late: 0,
+          attended: 0,
+        },
+      );
+    }, [sessionRecords]);
+
+  const presentCount =
+    attendanceCounts.present;
+
+  const lateCount =
+    attendanceCounts.late;
+
+  const attendedCount =
+    attendanceCounts.attended;
 
   const remainingCount =
     Math.max(
       activeStudents.length -
-        presentCount,
+        attendedCount,
       0,
     );
 
@@ -503,152 +463,15 @@ function AdviserDashboard() {
         return;
       }
 
-      setActionError("");
-      setShowStartModal(
-        true,
+      /*
+       * Session creation and policy configuration now live
+       * in the Adviser Attendance page. This keeps one
+       * source of truth for late allowance and optional
+       * automatic session ending.
+       */
+      navigate(
+        "/adviser/attendance",
       );
-    };
-
-  /* =======================================================
-     START SESSION
-  ======================================================= */
-
-  const handleStartSession =
-    async () => {
-      if (
-        !section?.id ||
-        startingSession
-      ) {
-        return;
-      }
-
-      try {
-        setStartingSession(
-          true,
-        );
-
-        setActionError("");
-
-        const newSession =
-          await adviserService.startAttendanceSession(
-            section.id,
-          );
-
-        const newSessionId =
-          getSessionId(
-            newSession,
-          );
-
-        setActiveSession(
-          newSession,
-        );
-
-        /*
-         * A newly created session normally has zero
-         * attendance records.
-         *
-         * Still fetch them so the dashboard stays
-         * backend-driven.
-         */
-        if (newSessionId) {
-          const records =
-            await adviserService.getSessionRecords(
-              newSessionId,
-            );
-
-          setSessionRecords(
-            normalizeArray(
-              records,
-            ),
-          );
-        } else {
-          setSessionRecords(
-            [],
-          );
-        }
-
-        setShowStartModal(
-          false,
-        );
-      } catch (requestError) {
-        console.error(
-          "Unable to start attendance session:",
-          requestError,
-        );
-
-        /*
-         * Another active session may already exist.
-         *
-         * In that case, recover the actual active
-         * session from the backend instead of leaving
-         * the dashboard stale.
-         */
-        if (
-          requestError?.response
-            ?.status === 409
-        ) {
-          try {
-            const currentSession =
-              await adviserService.getActiveSession(
-                section.id,
-              );
-
-            if (
-              currentSession
-            ) {
-              const currentSessionId =
-                getSessionId(
-                  currentSession,
-                );
-
-              setActiveSession(
-                currentSession,
-              );
-
-              if (
-                currentSessionId
-              ) {
-                const records =
-                  await adviserService.getSessionRecords(
-                    currentSessionId,
-                  );
-
-                setSessionRecords(
-                  normalizeArray(
-                    records,
-                  ),
-                );
-              }
-
-              setShowStartModal(
-                false,
-              );
-
-              return;
-            }
-          } catch {
-            /*
-             * A 409 can also mean attendance was already
-             * recorded earlier today and no ACTIVE
-             * session currently exists.
-             *
-             * In that case, preserve the original
-             * backend message below.
-             */
-          }
-        }
-
-        setActionError(
-          getErrorMessage(
-            requestError,
-            "Unable to start the attendance session.",
-          ),
-        );
-      } finally {
-        setStartingSession(
-          false,
-        );
-      }
     };
 
   /* =======================================================
@@ -908,12 +731,11 @@ function AdviserDashboard() {
 
                 <p>
                   {hasActiveSession
-                    ? `${presentCount} student${
-                        presentCount ===
-                        1
-                          ? ""
-                          : "s"
-                      } currently marked present.`
+                    ? `${presentCount} present${
+                        lateCount > 0
+                          ? ` • ${lateCount} late`
+                          : ""
+                      } recorded.`
                     : "No attendance session is currently active."}
                 </p>
               </article>
@@ -1243,15 +1065,9 @@ function AdviserDashboard() {
                     <button
                       type="button"
                       className="adviser-primary-button"
-                      onClick={() => {
-                        setActionError(
-                          "",
-                        );
-
-                        setShowStartModal(
-                          true,
-                        );
-                      }}
+                      onClick={
+                        openAttendance
+                      }
                     >
                       <span
                         aria-hidden="true"
@@ -1404,7 +1220,11 @@ function AdviserDashboard() {
 
                     <small>
                       {hasActiveSession
-                        ? `${presentCount} present • ${remainingCount} remaining`
+                        ? `${presentCount} present${
+                            lateCount > 0
+                              ? ` • ${lateCount} late`
+                              : ""
+                          } • ${remainingCount} remaining`
                         : "Begin today's attendance session."}
                     </small>
                   </span>
@@ -1422,171 +1242,6 @@ function AdviserDashboard() {
         )}
       </section>
 
-      {/* ===================================================
-          START SESSION MODAL
-      ==================================================== */}
-
-      {showStartModal && (
-        <div
-          className="adviser-modal-backdrop"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (
-              event.target ===
-                event.currentTarget &&
-              !startingSession
-            ) {
-              setShowStartModal(
-                false,
-              );
-
-              setActionError(
-                "",
-              );
-            }
-          }}
-        >
-          <section
-            className="adviser-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="start-attendance-title"
-          >
-            <header className="adviser-modal-header">
-              <div className="adviser-modal-icon">
-                ◷
-              </div>
-
-              <div>
-                <span>
-                  ATTENDANCE SESSION
-                </span>
-
-                <h2 id="start-attendance-title">
-                  Start attendance
-                  session?
-                </h2>
-
-                <p>
-                  This will open
-                  attendance recording
-                  for your assigned
-                  section.
-                </p>
-              </div>
-            </header>
-
-            <div className="adviser-modal-section-summary">
-              <div>
-                <span>
-                  SECTION
-                </span>
-
-                <strong>
-                  {sectionName}
-                </strong>
-              </div>
-
-              <div>
-                <span>
-                  ACTIVE STUDENTS
-                </span>
-
-                <strong>
-                  {
-                    activeStudents.length
-                  }
-                </strong>
-              </div>
-
-              <div>
-                <span>
-                  STATUS
-                </span>
-
-                <strong>
-                  Ready
-                </strong>
-              </div>
-            </div>
-
-            <div className="adviser-modal-note">
-              <span
-                aria-hidden="true"
-              >
-                i
-              </span>
-
-              <p>
-                Only one active
-                attendance session can
-                exist for this section
-                at a time.
-              </p>
-            </div>
-
-            {actionError && (
-              <div
-                className="adviser-modal-error"
-                role="alert"
-              >
-                <span
-                  aria-hidden="true"
-                >
-                  !
-                </span>
-
-                <p>
-                  {actionError}
-                </p>
-              </div>
-            )}
-
-            <footer className="adviser-modal-actions">
-              <button
-                type="button"
-                className="adviser-secondary-button"
-                disabled={
-                  startingSession
-                }
-                onClick={() => {
-                  setShowStartModal(
-                    false,
-                  );
-
-                  setActionError(
-                    "",
-                  );
-                }}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                className="adviser-primary-button"
-                disabled={
-                  startingSession
-                }
-                onClick={
-                  handleStartSession
-                }
-              >
-                {startingSession && (
-                  <span
-                    className="adviser-button-spinner"
-                    aria-hidden="true"
-                  />
-                )}
-
-                {startingSession
-                  ? "Starting..."
-                  : "Start Session"}
-              </button>
-            </footer>
-          </section>
-        </div>
-      )}
     </AdviserLayout>
   );
 }

@@ -2855,3 +2855,22 @@ html[data-theme="dark"] .attendance-history-detail-student > span {
     transform: none !important;
   }
 }
+
+
+/* =========================================================
+   DAILY ATTENDANCE FILTER WIDTH FIX
+   KEEP EXISTING CURRENT RECORD
+========================================================= */
+
+@media (max-width: 1500px) {
+  .attendance-record-filters-daily {
+    grid-template-columns:
+      minmax(260px, 1fr)
+      minmax(180px, 220px)
+      minmax(180px, 220px);
+  }
+
+  .attendance-record-filter-context {
+    grid-column: 1 / -1;
+  }
+}
