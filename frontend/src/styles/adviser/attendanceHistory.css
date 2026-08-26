@@ -988,7 +988,6 @@
   }
 }
 
-
 /* =========================================================
    ATTENDANCE HISTORY V2 — READABILITY + SEMANTIC COLOR ORGANIZATION
    FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
@@ -1338,8 +1337,7 @@
 
 .attendance-history-date-block {
   border-right-color: #bfd7f5;
-  background:
-    linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+  background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
 }
 
 .attendance-history-date-block span {
@@ -1360,8 +1358,7 @@
 ========================================================= */
 
 .attendance-history-card-main {
-  background:
-    linear-gradient(90deg, rgba(239, 246, 255, 0.24), transparent);
+  background: linear-gradient(90deg, rgba(239, 246, 255, 0.24), transparent);
 }
 
 .attendance-history-card-title > div > span {
@@ -1489,8 +1486,7 @@
 ========================================================= */
 
 .attendance-history-rate {
-  background:
-    linear-gradient(180deg, rgba(248, 250, 252, 0.42), transparent);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.42), transparent);
 }
 
 .attendance-history-rate-head strong {
@@ -1592,8 +1588,11 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) {
 
 html[data-theme="dark"] .attendance-history-filter-head,
 html[data-theme="dark"] .attendance-history-records-head {
-  background:
-    linear-gradient(90deg, rgba(30, 64, 175, 0.12), rgba(15, 23, 42, 0.16));
+  background: linear-gradient(
+    90deg,
+    rgba(30, 64, 175, 0.12),
+    rgba(15, 23, 42, 0.16)
+  );
 }
 
 html[data-theme="dark"] .attendance-history-filter-controls,
@@ -1615,8 +1614,11 @@ html[data-theme="dark"] .attendance-history-record-count {
 
 html[data-theme="dark"] .attendance-history-date-block {
   border-color: #31588b;
-  background:
-    linear-gradient(180deg, rgba(30, 64, 175, 0.15), rgba(15, 23, 42, 0.45));
+  background: linear-gradient(
+    180deg,
+    rgba(30, 64, 175, 0.15),
+    rgba(15, 23, 42, 0.45)
+  );
 }
 
 html[data-theme="dark"] .attendance-history-card,
@@ -1724,7 +1726,6 @@ html[data-theme="dark"] .attendance-history-session-times div:nth-child(3) {
     transition: none;
   }
 }
-
 
 /* =========================================================
    ATTENDANCE HISTORY V3 — COMPACT SESSION STATS
@@ -1920,3 +1921,697 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   }
 }
 
+/* =========================================================
+   ATTENDANCE HISTORY V4 — SUBTLE PRODUCTION ANIMATION
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Motion language aligned with Councilor + Adviser pages.
+   Existing filters, pagination, loading spinner, history
+   logic, and compact Students/Present/Absent stats remain
+   untouched.
+========================================================= */
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.attendance-history-hero {
+  animation: attendance-history-hero-enter-v4 0.56s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-history-hero-copy {
+  animation: attendance-history-hero-copy-enter-v4 0.5s 0.05s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-history-hero-meta {
+  animation: attendance-history-hero-meta-enter-v4 0.5s 0.11s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-history-hero::after {
+  animation: attendance-history-hero-orbit-v4 13s ease-in-out infinite alternate;
+}
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.attendance-history-summary article {
+  animation: attendance-history-summary-enter-v4 0.42s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    border-color var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-history-summary article:nth-child(1) {
+  animation-delay: 0.08s;
+}
+
+.attendance-history-summary article:nth-child(2) {
+  animation-delay: 0.13s;
+}
+
+.attendance-history-summary article:nth-child(3) {
+  animation-delay: 0.18s;
+}
+
+.attendance-history-summary article:nth-child(4) {
+  animation-delay: 0.23s;
+}
+
+@media (hover: hover) {
+  .attendance-history-summary article:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 12px 26px rgba(15, 35, 70, 0.075);
+  }
+}
+
+/* =========================================================
+   FILTER PANEL
+========================================================= */
+
+.attendance-history-filter-panel {
+  animation: attendance-history-filter-enter-v4 0.48s 0.18s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-history-filter-head {
+  animation: attendance-history-content-enter-v4 0.36s 0.23s ease-out both;
+}
+
+.attendance-history-filter-controls {
+  animation: attendance-history-content-enter-v4 0.36s 0.27s ease-out both;
+}
+
+/* =========================================================
+   FILTER PRESETS
+========================================================= */
+
+.attendance-history-presets button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-history-presets button:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.attendance-history-presets button:active {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   FILTER INPUT MICRO-INTERACTION
+========================================================= */
+
+.attendance-history-filter-controls input[type="date"],
+.attendance-history-search {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-history-filter-controls input[type="date"]:focus,
+.attendance-history-search:focus-within {
+  transform: translateY(-1px);
+}
+
+.attendance-history-search > span {
+  transition:
+    color var(--c-motion-fast, 140ms) ease,
+    transform var(--c-motion-fast, 140ms) ease;
+}
+
+.attendance-history-search:focus-within > span {
+  color: var(--c-blue-800);
+
+  transform: scale(1.06);
+}
+
+/* =========================================================
+   APPLY BUTTON
+========================================================= */
+
+.attendance-history-apply-button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    filter var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-history-apply-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    filter: brightness(1.03);
+
+    box-shadow: 0 8px 17px rgba(18, 61, 126, 0.14);
+  }
+}
+
+.attendance-history-apply-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+.attendance-history-alert {
+  animation: attendance-history-alert-enter-v4 0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   RECORDS PANEL
+========================================================= */
+
+.attendance-history-records {
+  animation: attendance-history-records-enter-v4 0.48s 0.25s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-history-records-head {
+  animation: attendance-history-content-enter-v4 0.36s 0.3s ease-out both;
+}
+
+.attendance-history-record-count {
+  animation: attendance-history-badge-enter-v4 0.32s 0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   SESSION HISTORY CARDS
+========================================================= */
+
+.attendance-history-card {
+  animation: attendance-history-card-enter-v4 0.38s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+
+  transition:
+    background var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-history-card:nth-child(1) {
+  animation-delay: 0.31s;
+}
+
+.attendance-history-card:nth-child(2) {
+  animation-delay: 0.35s;
+}
+
+.attendance-history-card:nth-child(3) {
+  animation-delay: 0.39s;
+}
+
+.attendance-history-card:nth-child(4) {
+  animation-delay: 0.43s;
+}
+
+.attendance-history-card:nth-child(5) {
+  animation-delay: 0.47s;
+}
+
+@media (hover: hover) {
+  .attendance-history-card:hover {
+    box-shadow: inset 3px 0 0
+      color-mix(in srgb, var(--c-blue-800) 48%, transparent);
+  }
+}
+
+/* =========================================================
+   DATE BLOCK
+========================================================= */
+
+.attendance-history-date-block {
+  animation: attendance-history-date-enter-v4 0.36s 0.04s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   SESSION TIMES
+========================================================= */
+
+.attendance-history-session-times div {
+  animation: attendance-history-mini-card-enter-v4 0.32s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-history-session-times div:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.attendance-history-session-times div:nth-child(2) {
+  animation-delay: 0.09s;
+}
+
+.attendance-history-session-times div:nth-child(3) {
+  animation-delay: 0.13s;
+}
+
+/* =========================================================
+   COMPACT SESSION STATS
+========================================================= */
+
+.attendance-history-card-stats {
+  animation: attendance-history-mini-card-enter-v4 0.34s 0.08s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-history-card-stats div {
+  transition:
+    background var(--c-motion-fast, 140ms) ease,
+    transform var(--c-motion-fast, 140ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-history-card-stats div:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* =========================================================
+   ATTENDANCE RATE
+========================================================= */
+
+.attendance-history-rate {
+  animation: attendance-history-content-enter-v4 0.34s 0.1s ease-out both;
+}
+
+.attendance-history-rate-track span {
+  transform-origin: left center;
+
+  animation: attendance-history-progress-enter-v4 0.68s 0.14s ease-out both;
+}
+
+/* =========================================================
+   RECORD ACTION
+========================================================= */
+
+.attendance-history-card-action {
+  animation: attendance-history-action-enter-v4 0.34s 0.12s ease-out both;
+}
+
+.attendance-history-card-action button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    filter var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-history-card-action button:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    filter: brightness(1.03);
+
+    box-shadow: 0 8px 17px rgba(18, 61, 126, 0.14);
+  }
+}
+
+.attendance-history-card-action button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.attendance-history-pagination {
+  animation: attendance-history-pagination-enter-v4 0.38s 0.34s ease-out both;
+}
+
+.attendance-history-pagination-actions button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-history-pagination-actions button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.attendance-history-pagination-actions button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.attendance-history-empty {
+  animation: attendance-history-empty-enter-v4 0.42s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-history-empty > div {
+  animation: attendance-history-icon-pop-v4 0.38s 0.07s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   KEYFRAMES
+========================================================= */
+
+@keyframes attendance-history-hero-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-history-hero-copy-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateX(-14px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes attendance-history-hero-meta-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateX(14px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes attendance-history-hero-orbit-v4 {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(-10px, 8px, 0) scale(1.025);
+  }
+}
+
+@keyframes attendance-history-summary-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(8px) scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-history-filter-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-history-content-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-history-alert-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(-5px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-history-records-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-history-badge-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+@keyframes attendance-history-card-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-history-date-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateX(-6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes attendance-history-mini-card-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(5px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-history-progress-enter-v4 {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes attendance-history-action-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateX(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes attendance-history-pagination-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-history-empty-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-history-icon-pop-v4 {
+  from {
+    opacity: 0;
+
+    transform: scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+/* =========================================================
+   MOBILE — CALMER / QUICKER
+========================================================= */
+
+@media (max-width: 620px) {
+  .attendance-history-hero,
+  .attendance-history-hero-copy,
+  .attendance-history-hero-meta,
+  .attendance-history-summary article,
+  .attendance-history-filter-panel,
+  .attendance-history-records,
+  .attendance-history-card,
+  .attendance-history-empty {
+    animation-duration: 0.31s;
+  }
+
+  .attendance-history-hero::after {
+    animation-duration: 16s;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-history-hero,
+  .attendance-history-hero-copy,
+  .attendance-history-hero-meta,
+  .attendance-history-hero::after,
+  .attendance-history-summary article,
+  .attendance-history-filter-panel,
+  .attendance-history-filter-head,
+  .attendance-history-filter-controls,
+  .attendance-history-alert,
+  .attendance-history-records,
+  .attendance-history-records-head,
+  .attendance-history-record-count,
+  .attendance-history-card,
+  .attendance-history-date-block,
+  .attendance-history-session-times div,
+  .attendance-history-card-stats,
+  .attendance-history-rate,
+  .attendance-history-rate-track span,
+  .attendance-history-card-action,
+  .attendance-history-pagination,
+  .attendance-history-empty,
+  .attendance-history-empty > div {
+    animation: none !important;
+  }
+
+  .attendance-history-summary article,
+  .attendance-history-presets button,
+  .attendance-history-filter-controls input[type="date"],
+  .attendance-history-search,
+  .attendance-history-search > span,
+  .attendance-history-apply-button,
+  .attendance-history-card,
+  .attendance-history-card-stats div,
+  .attendance-history-card-action button,
+  .attendance-history-pagination-actions button {
+    transition: none !important;
+  }
+
+  .attendance-history-summary article:hover,
+  .attendance-history-presets button:hover,
+  .attendance-history-filter-controls input[type="date"]:focus,
+  .attendance-history-search:focus-within,
+  .attendance-history-search:focus-within > span,
+  .attendance-history-apply-button:hover:not(:disabled),
+  .attendance-history-apply-button:active:not(:disabled),
+  .attendance-history-card-stats div:hover,
+  .attendance-history-card-action button:hover:not(:disabled),
+  .attendance-history-card-action button:active:not(:disabled),
+  .attendance-history-pagination-actions button:hover:not(:disabled),
+  .attendance-history-pagination-actions button:active:not(:disabled) {
+    transform: none !important;
+  }
+}

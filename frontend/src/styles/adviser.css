@@ -3152,3 +3152,748 @@ html[data-theme="dark"] .adviser-quick-attendance.is-active {
   }
 }
 
+
+/* =========================================================
+   ADVISER DASHBOARD V4 — SUBTLE PRODUCTION ANIMATION
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Same restrained motion language used by the Councilor
+   portal. Existing session pulse, skeleton shimmer, button
+   spinner, modal functionality, and dashboard logic remain
+   untouched.
+========================================================= */
+
+/* =========================================================
+   HERO ENTRANCE
+========================================================= */
+
+.adviser-dashboard-hero {
+  animation:
+    adviser-dashboard-hero-enter-v4
+    0.56s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-dashboard-hero-copy {
+  animation:
+    adviser-dashboard-hero-copy-enter-v4
+    0.5s
+    0.06s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-dashboard-hero-context {
+  animation:
+    adviser-dashboard-context-enter-v4
+    0.5s
+    0.12s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* Soft decorative motion only. */
+.adviser-dashboard-hero::after {
+  animation:
+    adviser-dashboard-orbit-drift-v4
+    12s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+.adviser-alert {
+  animation:
+    adviser-dashboard-alert-enter-v4
+    0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   SUMMARY CARDS — STAGGERED
+========================================================= */
+
+.adviser-summary-card {
+  animation:
+    adviser-dashboard-card-enter-v4
+    0.44s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-summary-card:nth-child(1) {
+  animation-delay: 0.08s;
+}
+
+.adviser-summary-card:nth-child(2) {
+  animation-delay: 0.13s;
+}
+
+.adviser-summary-card:nth-child(3) {
+  animation-delay: 0.18s;
+}
+
+.adviser-summary-icon {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-summary-card:hover
+  .adviser-summary-icon {
+    transform:
+      translateY(-1px)
+      scale(1.045);
+
+    box-shadow:
+      0 6px 16px
+      rgba(18, 61, 126, 0.08);
+  }
+}
+
+/* =========================================================
+   MAIN PANELS
+========================================================= */
+
+.adviser-primary-grid
+> .adviser-panel:first-child {
+  animation:
+    adviser-dashboard-panel-left-enter-v4
+    0.48s
+    0.19s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-session-panel {
+  animation:
+    adviser-dashboard-panel-right-enter-v4
+    0.48s
+    0.24s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   SECTION IDENTITY / METRICS
+========================================================= */
+
+.adviser-section-identity {
+  animation:
+    adviser-dashboard-content-enter-v4
+    0.38s
+    0.25s
+    ease-out
+    both;
+}
+
+.adviser-section-metrics > div {
+  animation:
+    adviser-dashboard-metric-enter-v4
+    0.36s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-section-metrics > div:nth-child(1) {
+  animation-delay: 0.28s;
+}
+
+.adviser-section-metrics > div:nth-child(2) {
+  animation-delay: 0.32s;
+}
+
+.adviser-section-metrics > div:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+/* =========================================================
+   ACTIVE SESSION CONTENT
+========================================================= */
+
+.adviser-active-session {
+  animation:
+    adviser-dashboard-success-enter-v4
+    0.38s
+    0.28s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-session-metrics > div {
+  animation:
+    adviser-dashboard-metric-enter-v4
+    0.36s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-session-metrics > div:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.adviser-session-metrics > div:nth-child(2) {
+  animation-delay: 0.34s;
+}
+
+.adviser-session-metrics > div:nth-child(3) {
+  animation-delay: 0.38s;
+}
+
+/* Empty session also receives a calm entrance. */
+.adviser-session-empty {
+  animation:
+    adviser-dashboard-content-enter-v4
+    0.4s
+    0.28s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   BUTTON MICRO-MOTION
+========================================================= */
+
+.adviser-primary-button,
+.adviser-secondary-button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease;
+}
+
+.adviser-primary-button:active:not(:disabled),
+.adviser-secondary-button:active:not(:disabled) {
+  transform:
+    translateY(0)
+    scale(0.985);
+}
+
+/* =========================================================
+   QUICK ACTIONS
+========================================================= */
+
+.adviser-quick-panel {
+  animation:
+    adviser-dashboard-quick-panel-enter-v4
+    0.48s
+    0.28s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-quick-card {
+  animation:
+    adviser-dashboard-quick-card-enter-v4
+    0.38s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-quick-card:nth-child(1) {
+  animation-delay: 0.32s;
+}
+
+.adviser-quick-card:nth-child(2) {
+  animation-delay: 0.37s;
+}
+
+.adviser-quick-card:nth-child(3) {
+  animation-delay: 0.42s;
+}
+
+.adviser-quick-icon {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-quick-card:hover
+  .adviser-quick-icon {
+    transform:
+      translateY(-1px)
+      scale(1.04);
+
+    box-shadow:
+      0 6px 15px
+      rgba(18, 61, 126, 0.08);
+  }
+}
+
+.adviser-quick-card:active {
+  transform:
+    translateY(0)
+    scale(0.992);
+}
+
+/* =========================================================
+   NO SECTION
+========================================================= */
+
+.adviser-no-section {
+  animation:
+    adviser-dashboard-card-enter-v4
+    0.46s
+    0.12s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-no-section-icon {
+  animation:
+    adviser-dashboard-icon-pop-v4
+    0.4s
+    0.18s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   MODAL
+   Existing adviser-modal-enter remains valid; this final
+   override gives it the same Councilor-style easing.
+========================================================= */
+
+.adviser-modal-backdrop {
+  animation:
+    adviser-dashboard-backdrop-enter-v4
+    0.2s
+    ease-out
+    both;
+}
+
+.adviser-modal {
+  animation:
+    adviser-dashboard-modal-enter-v4
+    0.28s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.adviser-modal-header {
+  animation:
+    adviser-dashboard-modal-content-enter-v4
+    0.36s
+    0.04s
+    ease-out
+    both;
+}
+
+.adviser-modal-section-summary {
+  animation:
+    adviser-dashboard-content-enter-v4
+    0.36s
+    0.08s
+    ease-out
+    both;
+}
+
+.adviser-modal-note,
+.adviser-modal-error {
+  animation:
+    adviser-dashboard-alert-enter-v4
+    0.3s
+    0.1s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   LOADING SKELETON ENTRANCE
+   Shimmer itself remains exactly as-is.
+========================================================= */
+
+.adviser-skeleton {
+  animation:
+    adviser-dashboard-skeleton-enter-v4
+    0.32s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   KEYFRAMES
+========================================================= */
+
+@keyframes adviser-dashboard-hero-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes adviser-dashboard-hero-copy-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-14px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes adviser-dashboard-context-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(14px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0)
+      scale(1);
+  }
+}
+
+@keyframes adviser-dashboard-orbit-drift-v4 {
+  from {
+    transform:
+      translate3d(
+        0,
+        0,
+        0
+      )
+      scale(1);
+  }
+
+  to {
+    transform:
+      translate3d(
+        -10px,
+        8px,
+        0
+      )
+      scale(1.025);
+  }
+}
+
+@keyframes adviser-dashboard-alert-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px)
+      scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes adviser-dashboard-card-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(9px)
+      scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes adviser-dashboard-panel-left-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes adviser-dashboard-panel-right-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes adviser-dashboard-content-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes adviser-dashboard-metric-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(6px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes adviser-dashboard-success-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(5px)
+      scale(0.985);
+  }
+
+  70% {
+    transform:
+      translateY(0)
+      scale(1.008);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes adviser-dashboard-quick-panel-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes adviser-dashboard-quick-card-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes adviser-dashboard-icon-pop-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+}
+
+@keyframes adviser-dashboard-backdrop-enter-v4 {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes adviser-dashboard-modal-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(12px)
+      scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes adviser-dashboard-modal-content-enter-v4 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes adviser-dashboard-skeleton-enter-v4 {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   MOBILE — CALMER / FASTER
+========================================================= */
+
+@media (max-width: 650px) {
+  .adviser-dashboard-hero,
+  .adviser-dashboard-hero-copy,
+  .adviser-dashboard-hero-context,
+  .adviser-summary-card,
+  .adviser-primary-grid > .adviser-panel:first-child,
+  .adviser-session-panel,
+  .adviser-quick-panel,
+  .adviser-quick-card,
+  .adviser-no-section,
+  .adviser-modal {
+    animation-duration: 0.32s;
+  }
+
+  .adviser-dashboard-hero::after {
+    animation-duration: 16s;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .adviser-dashboard-hero,
+  .adviser-dashboard-hero-copy,
+  .adviser-dashboard-hero-context,
+  .adviser-dashboard-hero::after,
+  .adviser-alert,
+  .adviser-summary-card,
+  .adviser-primary-grid > .adviser-panel:first-child,
+  .adviser-session-panel,
+  .adviser-section-identity,
+  .adviser-section-metrics > div,
+  .adviser-active-session,
+  .adviser-session-metrics > div,
+  .adviser-session-empty,
+  .adviser-quick-panel,
+  .adviser-quick-card,
+  .adviser-no-section,
+  .adviser-no-section-icon,
+  .adviser-modal-backdrop,
+  .adviser-modal,
+  .adviser-modal-header,
+  .adviser-modal-section-summary,
+  .adviser-modal-note,
+  .adviser-modal-error,
+  .adviser-skeleton {
+    animation: none !important;
+  }
+
+  .adviser-summary-icon,
+  .adviser-quick-icon,
+  .adviser-primary-button,
+  .adviser-secondary-button {
+    transition: none !important;
+  }
+
+  .adviser-summary-card:hover
+  .adviser-summary-icon,
+  .adviser-quick-card:hover
+  .adviser-quick-icon,
+  .adviser-primary-button:active:not(:disabled),
+  .adviser-secondary-button:active:not(:disabled),
+  .adviser-quick-card:active {
+    transform: none !important;
+  }
+}

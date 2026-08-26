@@ -1298,7 +1298,6 @@ html[data-theme="dark"] .adviser-attendance-hero {
   }
 }
 
-
 /* =========================================================
    ADVISER ATTENDANCE V2 — READABILITY + SEMANTIC COLOR ORGANIZATION
    FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
@@ -1397,8 +1396,7 @@ html[data-theme="dark"] .adviser-attendance-hero {
 /* 1 — section / roster / general info */
 .adviser-attendance-summary-card:nth-child(1) {
   border-color: #bfd7f5;
-  background:
-    linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
   box-shadow:
     0 12px 28px rgba(37, 99, 235, 0.06),
     var(--c-card-shadow);
@@ -1422,8 +1420,7 @@ html[data-theme="dark"] .adviser-attendance-hero {
 .adviser-attendance-summary-card:nth-child(2),
 .adviser-attendance-summary-card.is-face {
   border-color: #b9e5c7;
-  background:
-    linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
   box-shadow:
     0 12px 28px rgba(22, 163, 74, 0.06),
     var(--c-card-shadow);
@@ -1449,8 +1446,7 @@ html[data-theme="dark"] .adviser-attendance-hero {
 /* 3 — secondary / pending / operational */
 .adviser-attendance-summary-card:nth-child(3) {
   border-color: #f1d89a;
-  background:
-    linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
   box-shadow:
     0 12px 28px rgba(217, 119, 6, 0.06),
     var(--c-card-shadow);
@@ -1500,8 +1496,7 @@ html[data-theme="dark"] .adviser-attendance-hero {
 .adviser-attendance-session-card {
   padding: 26px;
   border-color: #c8dcef;
-  background:
-    linear-gradient(135deg, rgba(239, 246, 255, 0.58), #ffffff 42%);
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.58), #ffffff 42%);
   box-shadow:
     0 16px 36px rgba(30, 64, 175, 0.06),
     var(--c-panel-shadow);
@@ -1514,8 +1509,7 @@ html[data-theme="dark"] .adviser-attendance-hero {
 
 .adviser-attendance-session-card.is-active {
   border-color: #a7ddb7;
-  background:
-    linear-gradient(135deg, rgba(240, 253, 244, 0.78), #ffffff 45%);
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.78), #ffffff 45%);
 }
 
 .adviser-attendance-session-card.is-active::before {
@@ -1641,8 +1635,7 @@ html[data-theme="dark"] .adviser-attendance-hero {
 .adviser-attendance-readiness {
   padding: 22px;
   border-color: #d8c7f5;
-  background:
-    linear-gradient(180deg, #faf8ff 0%, #ffffff 48%);
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 48%);
   box-shadow:
     0 16px 36px rgba(109, 40, 217, 0.05),
     var(--c-panel-shadow);
@@ -1753,8 +1746,11 @@ html[data-theme="dark"] .adviser-attendance-hero {
 
 .adviser-attendance-section-header {
   padding: 21px 22px;
-  background:
-    linear-gradient(90deg, rgba(239, 246, 255, 0.72), rgba(255, 255, 255, 0));
+  background: linear-gradient(
+    90deg,
+    rgba(239, 246, 255, 0.72),
+    rgba(255, 255, 255, 0)
+  );
 }
 
 .adviser-attendance-section-header span {
@@ -1898,25 +1894,37 @@ html[data-theme="dark"] .adviser-attendance-session-meta > div:nth-child(2),
 html[data-theme="dark"] .adviser-attendance-method-card:nth-child(3),
 html[data-theme="dark"] .adviser-attendance-readiness {
   border-color: #563a8a;
-  background:
-    linear-gradient(180deg, rgba(109, 40, 217, 0.11), rgba(15, 23, 42, 0.68));
+  background: linear-gradient(
+    180deg,
+    rgba(109, 40, 217, 0.11),
+    rgba(15, 23, 42, 0.68)
+  );
 }
 
 html[data-theme="dark"] .adviser-attendance-session-card {
   border-color: #31588b;
-  background:
-    linear-gradient(135deg, rgba(30, 64, 175, 0.11), rgba(15, 23, 42, 0.68));
+  background: linear-gradient(
+    135deg,
+    rgba(30, 64, 175, 0.11),
+    rgba(15, 23, 42, 0.68)
+  );
 }
 
 html[data-theme="dark"] .adviser-attendance-session-card.is-active {
   border-color: #2e6843;
-  background:
-    linear-gradient(135deg, rgba(22, 101, 52, 0.14), rgba(15, 23, 42, 0.68));
+  background: linear-gradient(
+    135deg,
+    rgba(22, 101, 52, 0.14),
+    rgba(15, 23, 42, 0.68)
+  );
 }
 
 html[data-theme="dark"] .adviser-attendance-section-header {
-  background:
-    linear-gradient(90deg, rgba(30, 64, 175, 0.13), rgba(15, 23, 42, 0.2));
+  background: linear-gradient(
+    90deg,
+    rgba(30, 64, 175, 0.13),
+    rgba(15, 23, 42, 0.2)
+  );
 }
 
 html[data-theme="dark"] .adviser-attendance-readiness-list > div:nth-child(1) {
@@ -2033,5 +2041,575 @@ html[data-theme="dark"] .adviser-attendance-manage-button {
   .adviser-attendance-method-card,
   .adviser-attendance-session-card {
     transition: none;
+  }
+}
+
+/* =========================================================
+   ADVISER ATTENDANCE V3 — SUBTLE PRODUCTION ANIMATION
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Motion language aligned with the Councilor portal and
+   Adviser Dashboard. Existing session pulse and functional
+   behavior remain untouched.
+========================================================= */
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.adviser-attendance-hero {
+  animation: adviser-attendance-hero-enter-v3 0.56s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-hero-copy {
+  animation: adviser-attendance-hero-copy-enter-v3 0.5s 0.05s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-hero-side {
+  animation: adviser-attendance-hero-side-enter-v3 0.5s 0.11s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-hero::after {
+  animation: adviser-attendance-hero-orbit-v3 13s ease-in-out infinite alternate;
+}
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.adviser-attendance-summary-card {
+  animation: adviser-attendance-card-enter-v3 0.42s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-summary-card:nth-child(1) {
+  animation-delay: 0.08s;
+}
+
+.adviser-attendance-summary-card:nth-child(2) {
+  animation-delay: 0.13s;
+}
+
+.adviser-attendance-summary-card:nth-child(3) {
+  animation-delay: 0.18s;
+}
+
+.adviser-attendance-summary-icon {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-attendance-summary-card:hover .adviser-attendance-summary-icon {
+    transform: translateY(-1px) scale(1.045);
+
+    box-shadow: 0 6px 16px rgba(18, 61, 126, 0.08);
+  }
+}
+
+/* =========================================================
+   SESSION CARD
+========================================================= */
+
+.adviser-attendance-session-card {
+  animation: adviser-attendance-session-enter-v3 0.48s 0.18s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-session-visual {
+  animation: adviser-attendance-icon-pop-v3 0.4s 0.24s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-session-copy {
+  animation: adviser-attendance-content-enter-v3 0.38s 0.25s ease-out both;
+}
+
+.adviser-attendance-session-action {
+  animation: adviser-attendance-action-enter-v3 0.4s 0.28s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   SESSION META — STAGGERED
+========================================================= */
+
+.adviser-attendance-session-meta > div {
+  animation: adviser-attendance-metric-enter-v3 0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-session-meta > div:nth-child(1) {
+  animation-delay: 0.28s;
+}
+
+.adviser-attendance-session-meta > div:nth-child(2) {
+  animation-delay: 0.32s;
+}
+
+.adviser-attendance-session-meta > div:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+/* =========================================================
+   PRIMARY ACTION
+========================================================= */
+
+.adviser-attendance-primary-action {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    opacity var(--c-motion-base, 180ms) ease,
+    filter var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-attendance-primary-action:hover:not(:disabled) {
+    filter: brightness(1.03);
+  }
+}
+
+.adviser-attendance-primary-action:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   READINESS PANEL
+========================================================= */
+
+.adviser-attendance-readiness {
+  animation: adviser-attendance-readiness-enter-v3 0.48s 0.23s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-readiness > header {
+  animation: adviser-attendance-content-enter-v3 0.36s 0.28s ease-out both;
+}
+
+.adviser-attendance-readiness-progress {
+  animation: adviser-attendance-content-enter-v3 0.34s 0.31s ease-out both;
+}
+
+.adviser-attendance-readiness-progress > span {
+  transform-origin: left center;
+
+  animation: adviser-attendance-progress-enter-v3 0.68s 0.32s ease-out both;
+}
+
+/* =========================================================
+   READINESS LIST
+========================================================= */
+
+.adviser-attendance-readiness-list > div {
+  animation: adviser-attendance-metric-enter-v3 0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-readiness-list > div:nth-child(1) {
+  animation-delay: 0.34s;
+}
+
+.adviser-attendance-readiness-list > div:nth-child(2) {
+  animation-delay: 0.38s;
+}
+
+.adviser-attendance-readiness-list > div:nth-child(3) {
+  animation-delay: 0.42s;
+}
+
+.adviser-attendance-readiness-note {
+  animation: adviser-attendance-status-enter-v3 0.34s 0.4s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   MANAGE BUTTON
+========================================================= */
+
+.adviser-attendance-manage-button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-attendance-manage-button:hover {
+    box-shadow: 0 7px 16px rgba(109, 40, 217, 0.08);
+  }
+}
+
+.adviser-attendance-manage-button:active {
+  transform: translateY(0) scale(0.988);
+}
+
+/* =========================================================
+   ATTENDANCE METHODS PANEL
+========================================================= */
+
+.adviser-attendance-methods {
+  animation: adviser-attendance-methods-enter-v3 0.48s 0.3s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-attendance-section-header {
+  animation: adviser-attendance-content-enter-v3 0.36s 0.33s ease-out both;
+}
+
+/* =========================================================
+   METHOD CARDS — STAGGERED
+========================================================= */
+
+.adviser-attendance-method-card {
+  animation: adviser-attendance-method-card-enter-v3 0.38s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease;
+}
+
+.adviser-attendance-method-card:nth-child(1) {
+  animation-delay: 0.36s;
+}
+
+.adviser-attendance-method-card:nth-child(2) {
+  animation-delay: 0.41s;
+}
+
+.adviser-attendance-method-card:nth-child(3) {
+  animation-delay: 0.46s;
+}
+
+.adviser-attendance-method-icon {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-attendance-method-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 10px 22px rgba(15, 35, 70, 0.07);
+  }
+
+  .adviser-attendance-method-card:hover .adviser-attendance-method-icon {
+    transform: translateY(-1px) scale(1.04);
+
+    box-shadow: 0 6px 15px rgba(18, 61, 126, 0.08);
+  }
+}
+
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+.adviser-attendance-method-status {
+  animation: adviser-attendance-badge-enter-v3 0.3s 0.46s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   KEYFRAMES
+========================================================= */
+
+@keyframes adviser-attendance-hero-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes adviser-attendance-hero-copy-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateX(-14px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes adviser-attendance-hero-side-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateX(14px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes adviser-attendance-hero-orbit-v3 {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(-10px, 8px, 0) scale(1.025);
+  }
+}
+
+@keyframes adviser-attendance-card-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(8px) scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adviser-attendance-session-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes adviser-attendance-readiness-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateX(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes adviser-attendance-content-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes adviser-attendance-action-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateX(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes adviser-attendance-icon-pop-v3 {
+  from {
+    opacity: 0;
+
+    transform: scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+@keyframes adviser-attendance-metric-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(6px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adviser-attendance-progress-enter-v3 {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes adviser-attendance-status-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(5px) scale(0.985);
+  }
+
+  70% {
+    transform: translateY(0) scale(1.008);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adviser-attendance-methods-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes adviser-attendance-method-card-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes adviser-attendance-badge-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+/* =========================================================
+   MOBILE — CALMER / QUICKER
+========================================================= */
+
+@media (max-width: 650px) {
+  .adviser-attendance-hero,
+  .adviser-attendance-hero-copy,
+  .adviser-attendance-hero-side,
+  .adviser-attendance-summary-card,
+  .adviser-attendance-session-card,
+  .adviser-attendance-readiness,
+  .adviser-attendance-methods,
+  .adviser-attendance-method-card {
+    animation-duration: 0.31s;
+  }
+
+  .adviser-attendance-hero::after {
+    animation-duration: 16s;
+  }
+
+  @media (hover: hover) {
+    .adviser-attendance-method-card:hover {
+      transform: none;
+    }
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .adviser-attendance-hero,
+  .adviser-attendance-hero-copy,
+  .adviser-attendance-hero-side,
+  .adviser-attendance-hero::after,
+  .adviser-attendance-summary-card,
+  .adviser-attendance-session-card,
+  .adviser-attendance-session-visual,
+  .adviser-attendance-session-copy,
+  .adviser-attendance-session-action,
+  .adviser-attendance-session-meta > div,
+  .adviser-attendance-readiness,
+  .adviser-attendance-readiness > header,
+  .adviser-attendance-readiness-progress,
+  .adviser-attendance-readiness-progress > span,
+  .adviser-attendance-readiness-list > div,
+  .adviser-attendance-readiness-note,
+  .adviser-attendance-methods,
+  .adviser-attendance-section-header,
+  .adviser-attendance-method-card,
+  .adviser-attendance-method-status {
+    animation: none !important;
+  }
+
+  .adviser-attendance-summary-icon,
+  .adviser-attendance-primary-action,
+  .adviser-attendance-manage-button,
+  .adviser-attendance-method-card,
+  .adviser-attendance-method-icon {
+    transition: none !important;
+  }
+
+  .adviser-attendance-summary-card:hover .adviser-attendance-summary-icon,
+  .adviser-attendance-primary-action:active:not(:disabled),
+  .adviser-attendance-manage-button:active,
+  .adviser-attendance-method-card:hover,
+  .adviser-attendance-method-card:hover .adviser-attendance-method-icon {
+    transform: none !important;
   }
 }

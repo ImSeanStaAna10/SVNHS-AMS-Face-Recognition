@@ -2045,3 +2045,813 @@ html[data-theme="dark"] .attendance-history-detail-student > span {
     transition: none;
   }
 }
+
+
+/* =========================================================
+   ATTENDANCE HISTORY DETAIL V3 — SUBTLE PRODUCTION ANIMATION
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Designed for an official attendance record page:
+   restrained screen motion only. Existing print/PDF rules,
+   filters, status logic, signatures, and data behavior are
+   intentionally preserved.
+========================================================= */
+
+/* =========================================================
+   TOP NAVIGATION
+========================================================= */
+
+.attendance-history-detail-nav {
+  animation:
+    attendance-detail-nav-enter-v3
+    0.34s
+    ease-out
+    both;
+}
+
+.attendance-history-detail-nav > button,
+.attendance-history-detail-nav > div > button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-history-detail-nav > button:hover:not(:disabled),
+  .attendance-history-detail-nav > div > button:hover:not(:disabled) {
+    transform:
+      translateY(-1px);
+  }
+
+  .attendance-history-detail-nav > div > button:hover:not(:disabled) {
+    box-shadow:
+      0 6px 15px
+      rgba(18, 61, 126, 0.07);
+  }
+}
+
+.attendance-history-detail-nav > button:active:not(:disabled),
+.attendance-history-detail-nav > div > button:active:not(:disabled) {
+  transform:
+    translateY(0)
+    scale(0.985);
+}
+
+/* =========================================================
+   OFFICIAL HERO
+========================================================= */
+
+.attendance-history-detail-hero {
+  animation:
+    attendance-detail-hero-enter-v3
+    0.5s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.attendance-history-detail-identity {
+  animation:
+    attendance-detail-identity-enter-v3
+    0.46s
+    0.05s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.attendance-history-detail-record-label {
+  animation:
+    attendance-detail-record-label-enter-v3
+    0.46s
+    0.1s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.attendance-history-detail-logos img {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    filter var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-history-detail-logos img:hover {
+    transform:
+      translateY(-2px)
+      scale(1.025);
+  }
+}
+
+/* =========================================================
+   SESSION TITLE
+========================================================= */
+
+.attendance-history-detail-title {
+  animation:
+    attendance-detail-title-enter-v3
+    0.44s
+    0.12s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.attendance-history-detail-session-id {
+  animation:
+    attendance-detail-badge-enter-v3
+    0.34s
+    0.18s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   SESSION META — STAGGER
+========================================================= */
+
+.attendance-history-detail-meta {
+  animation:
+    attendance-detail-panel-enter-v3
+    0.42s
+    0.15s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.attendance-history-detail-meta article {
+  animation:
+    attendance-detail-mini-card-enter-v3
+    0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-history-detail-meta article:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.attendance-history-detail-meta article:nth-child(2) {
+  animation-delay: 0.24s;
+}
+
+.attendance-history-detail-meta article:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+.attendance-history-detail-meta article:nth-child(4) {
+  animation-delay: 0.32s;
+}
+
+.attendance-history-detail-meta article:nth-child(5) {
+  animation-delay: 0.36s;
+}
+
+@media (hover: hover) {
+  .attendance-history-detail-meta article:hover {
+    transform:
+      translateY(-1px);
+
+    box-shadow:
+      0 6px 15px
+      rgba(15, 35, 70, 0.055);
+  }
+}
+
+/* =========================================================
+   SUMMARY — STAGGER
+========================================================= */
+
+.attendance-history-detail-summary article {
+  animation:
+    attendance-detail-summary-enter-v3
+    0.38s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-history-detail-summary article:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.attendance-history-detail-summary article:nth-child(2) {
+  animation-delay: 0.24s;
+}
+
+.attendance-history-detail-summary article:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+.attendance-history-detail-summary article:nth-child(4) {
+  animation-delay: 0.32s;
+}
+
+.attendance-history-detail-summary article:nth-child(5) {
+  animation-delay: 0.36s;
+}
+
+@media (hover: hover) {
+  .attendance-history-detail-summary article:hover {
+    transform:
+      translateY(-2px);
+
+    box-shadow:
+      0 10px 22px
+      rgba(15, 35, 70, 0.065);
+  }
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.attendance-history-detail-error {
+  animation:
+    attendance-detail-error-enter-v3
+    0.32s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   REGISTER PANEL
+========================================================= */
+
+.attendance-history-detail-register {
+  animation:
+    attendance-detail-register-enter-v3
+    0.46s
+    0.24s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.attendance-history-detail-register > header {
+  animation:
+    attendance-detail-content-enter-v3
+    0.34s
+    0.28s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+.attendance-history-detail-filters {
+  animation:
+    attendance-detail-content-enter-v3
+    0.34s
+    0.31s
+    ease-out
+    both;
+}
+
+.attendance-history-detail-filters label,
+.attendance-history-detail-filters select,
+.adviser-attendance-status-filter select {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-history-detail-filters label:focus-within,
+.attendance-history-detail-filters select:focus,
+.adviser-attendance-status-filter select:focus {
+  transform:
+    translateY(-1px);
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.attendance-history-detail-table-shell {
+  animation:
+    attendance-detail-table-enter-v3
+    0.4s
+    0.31s
+    ease-out
+    both;
+}
+
+.attendance-history-detail-table tbody tr,
+.adviser-attendance-record-row {
+  transition:
+    background var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-fast, 140ms) ease;
+}
+
+.attendance-history-detail-student > span {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-history-detail-table tbody tr:hover
+  .attendance-history-detail-student > span {
+    transform:
+      translateY(-1px)
+      scale(1.03);
+
+    box-shadow:
+      0 5px 13px
+      rgba(18, 61, 126, 0.07);
+  }
+}
+
+/* =========================================================
+   STATUS PILLS
+========================================================= */
+
+.attendance-history-detail-status,
+.attendance-session-status-pill {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-history-detail-status:hover,
+  .attendance-session-status-pill:hover {
+    transform:
+      translateY(-1px);
+  }
+}
+
+/* =========================================================
+   REGISTER FOOTER
+========================================================= */
+
+.attendance-history-detail-register > footer {
+  animation:
+    attendance-detail-footer-enter-v3
+    0.34s
+    0.35s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.attendance-history-detail-empty {
+  animation:
+    attendance-detail-empty-enter-v3
+    0.4s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   SIGNATURES
+========================================================= */
+
+.attendance-history-detail-signatures,
+.adviser-attendance-record-signatures {
+  animation:
+    attendance-detail-signatures-enter-v3
+    0.42s
+    0.32s
+    ease-out
+    both;
+}
+
+.attendance-history-detail-signatures > div,
+.adviser-attendance-record-signatures > div {
+  animation:
+    attendance-detail-signature-enter-v3
+    0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.attendance-history-detail-signatures > div:nth-child(1),
+.adviser-attendance-record-signatures > div:nth-child(1) {
+  animation-delay: 0.36s;
+}
+
+.attendance-history-detail-signatures > div:nth-child(2),
+.adviser-attendance-record-signatures > div:nth-child(2) {
+  animation-delay: 0.41s;
+}
+
+/* =========================================================
+   ADVISER SHARED RECORD FILTER
+========================================================= */
+
+.adviser-attendance-status-filter {
+  animation:
+    attendance-detail-content-enter-v3
+    0.34s
+    0.31s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   KEYFRAMES
+========================================================= */
+
+@keyframes attendance-detail-nav-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes attendance-detail-hero-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes attendance-detail-identity-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes attendance-detail-record-label-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(10px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0)
+      scale(1);
+  }
+}
+
+@keyframes attendance-detail-title-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes attendance-detail-badge-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+}
+
+@keyframes attendance-detail-panel-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes attendance-detail-mini-card-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(5px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes attendance-detail-summary-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(7px)
+      scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes attendance-detail-error-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px)
+      scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes attendance-detail-register-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes attendance-detail-content-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes attendance-detail-table-enter-v3 {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes attendance-detail-footer-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes attendance-detail-empty-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes attendance-detail-signatures-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes attendance-detail-signature-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+/* =========================================================
+   MOBILE — CALMER / QUICKER
+========================================================= */
+
+@media (max-width: 700px) {
+  .attendance-history-detail-nav,
+  .attendance-history-detail-hero,
+  .attendance-history-detail-identity,
+  .attendance-history-detail-record-label,
+  .attendance-history-detail-title,
+  .attendance-history-detail-meta,
+  .attendance-history-detail-summary article,
+  .attendance-history-detail-register,
+  .attendance-history-detail-signatures,
+  .adviser-attendance-record-signatures {
+    animation-duration: 0.3s;
+  }
+}
+
+/* =========================================================
+   PRINT / PDF — FORCE STATIC
+   Prevent screen animation properties from affecting print.
+========================================================= */
+
+@media print {
+  .attendance-history-detail-nav,
+  .attendance-history-detail-hero,
+  .attendance-history-detail-identity,
+  .attendance-history-detail-record-label,
+  .attendance-history-detail-title,
+  .attendance-history-detail-session-id,
+  .attendance-history-detail-meta,
+  .attendance-history-detail-meta article,
+  .attendance-history-detail-summary article,
+  .attendance-history-detail-error,
+  .attendance-history-detail-register,
+  .attendance-history-detail-register > header,
+  .attendance-history-detail-filters,
+  .attendance-history-detail-table-shell,
+  .attendance-history-detail-register > footer,
+  .attendance-history-detail-empty,
+  .attendance-history-detail-signatures,
+  .attendance-history-detail-signatures > div,
+  .adviser-attendance-record-signatures,
+  .adviser-attendance-record-signatures > div,
+  .adviser-attendance-status-filter {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-history-detail-nav,
+  .attendance-history-detail-hero,
+  .attendance-history-detail-identity,
+  .attendance-history-detail-record-label,
+  .attendance-history-detail-title,
+  .attendance-history-detail-session-id,
+  .attendance-history-detail-meta,
+  .attendance-history-detail-meta article,
+  .attendance-history-detail-summary article,
+  .attendance-history-detail-error,
+  .attendance-history-detail-register,
+  .attendance-history-detail-register > header,
+  .attendance-history-detail-filters,
+  .attendance-history-detail-table-shell,
+  .attendance-history-detail-register > footer,
+  .attendance-history-detail-empty,
+  .attendance-history-detail-signatures,
+  .attendance-history-detail-signatures > div,
+  .adviser-attendance-record-signatures,
+  .adviser-attendance-record-signatures > div,
+  .adviser-attendance-status-filter {
+    animation: none !important;
+  }
+
+  .attendance-history-detail-nav > button,
+  .attendance-history-detail-nav > div > button,
+  .attendance-history-detail-logos img,
+  .attendance-history-detail-meta article,
+  .attendance-history-detail-summary article,
+  .attendance-history-detail-filters label,
+  .attendance-history-detail-filters select,
+  .adviser-attendance-status-filter select,
+  .attendance-history-detail-table tbody tr,
+  .adviser-attendance-record-row,
+  .attendance-history-detail-student > span,
+  .attendance-history-detail-status,
+  .attendance-session-status-pill {
+    transition: none !important;
+  }
+
+  .attendance-history-detail-nav > button:hover:not(:disabled),
+  .attendance-history-detail-nav > div > button:hover:not(:disabled),
+  .attendance-history-detail-nav > button:active:not(:disabled),
+  .attendance-history-detail-nav > div > button:active:not(:disabled),
+  .attendance-history-detail-logos img:hover,
+  .attendance-history-detail-meta article:hover,
+  .attendance-history-detail-summary article:hover,
+  .attendance-history-detail-filters label:focus-within,
+  .attendance-history-detail-filters select:focus,
+  .adviser-attendance-status-filter select:focus,
+  .attendance-history-detail-table tbody tr:hover
+  .attendance-history-detail-student > span,
+  .attendance-history-detail-status:hover,
+  .attendance-session-status-pill:hover {
+    transform: none !important;
+  }
+}

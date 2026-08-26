@@ -11310,3 +11310,911 @@ html[data-theme="dark"] .student-wizard-captured-review {
     transition: none;
   }
 }
+
+
+/* =========================================================
+   STUDENT MANAGEMENT V15 — SUBTLE PRODUCTION ANIMATION
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Councilor-style motion language for Adviser Student
+   Management. Existing camera / scanner / countdown /
+   flash animations are intentionally left untouched.
+========================================================= */
+
+/* =========================================================
+   PAGE ENTRANCE
+========================================================= */
+
+.student-section-overview {
+  animation:
+    student-ui-overview-enter
+    0.5s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-panel {
+  animation:
+    student-ui-panel-enter
+    0.48s
+    0.08s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-success-alert {
+  animation:
+    student-ui-alert-enter
+    0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   SECTION STATS
+========================================================= */
+
+.student-section-stats > div {
+  animation:
+    student-ui-stat-enter
+    0.4s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-section-stats > div:nth-child(1) {
+  animation-delay: 0.08s;
+}
+
+.student-section-stats > div:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.student-section-stats > div:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+/* =========================================================
+   PANEL HEADER / TOOLBAR
+========================================================= */
+
+.student-panel-header {
+  animation:
+    student-ui-content-enter
+    0.4s
+    0.12s
+    ease-out
+    both;
+}
+
+.student-toolbar {
+  animation:
+    student-ui-content-enter
+    0.4s
+    0.16s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   SEARCH / FILTER MICRO-INTERACTION
+========================================================= */
+
+.student-search {
+  transition:
+    border-color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    transform var(--c-motion-base, 180ms) ease;
+}
+
+.student-search:focus-within {
+  transform:
+    translateY(-1px);
+}
+
+.student-search-icon {
+  transition:
+    color var(--c-motion-fast, 140ms) ease,
+    transform var(--c-motion-fast, 140ms) ease;
+}
+
+.student-search:focus-within
+.student-search-icon {
+  color: var(--c-blue-800);
+
+  transform:
+    scale(1.06);
+}
+
+/* =========================================================
+   ROSTER ROWS
+========================================================= */
+
+.student-table tbody tr {
+  transition:
+    background var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-fast, 140ms) ease;
+}
+
+@media (hover: hover) {
+  .student-table tbody tr:hover {
+    box-shadow:
+      inset 3px 0 0
+      color-mix(
+        in srgb,
+        var(--c-blue-800) 42%,
+        transparent
+      );
+  }
+
+  .student-avatar {
+    transition:
+      transform var(--c-motion-base, 180ms) ease,
+      box-shadow var(--c-motion-base, 180ms) ease;
+  }
+
+  .student-table tbody tr:hover
+  .student-avatar {
+    transform:
+      translateY(-1px)
+      scale(1.025);
+
+    box-shadow:
+      0 5px 13px
+      rgba(18, 61, 126, 0.08);
+  }
+}
+
+/* =========================================================
+   ACTION BUTTON MICRO-MOTION
+========================================================= */
+
+.student-face-action,
+.student-toolbar button,
+.student-wizard-action-group button,
+.student-enrollment-action-group button,
+.student-edit-actions button,
+.student-face-action-group button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .student-face-action:hover:not(:disabled),
+  .student-toolbar button:hover:not(:disabled),
+  .student-wizard-action-group button:hover:not(:disabled),
+  .student-enrollment-action-group button:hover:not(:disabled),
+  .student-edit-actions button:hover:not(:disabled),
+  .student-face-action-group button:hover:not(:disabled) {
+    transform:
+      translateY(-1px);
+  }
+}
+
+.student-face-action:active:not(:disabled),
+.student-toolbar button:active:not(:disabled),
+.student-wizard-action-group button:active:not(:disabled),
+.student-enrollment-action-group button:active:not(:disabled),
+.student-edit-actions button:active:not(:disabled),
+.student-face-action-group button:active:not(:disabled) {
+  transform:
+    translateY(0)
+    scale(0.985);
+}
+
+/* =========================================================
+   MODAL BACKDROP
+========================================================= */
+
+.student-modal-backdrop {
+  animation:
+    student-ui-backdrop-enter
+    0.2s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   MODAL ENTRANCE
+========================================================= */
+
+.student-enrollment-modal,
+.student-edit-modal,
+.student-identity-modal,
+.student-face-modal {
+  transform-origin: center;
+
+  animation:
+    student-ui-modal-enter
+    0.28s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.student-modal-heading {
+  animation:
+    student-ui-modal-content-enter
+    0.38s
+    0.04s
+    ease-out
+    both;
+}
+
+.student-modal-close {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .student-modal-close:hover:not(:disabled) {
+    transform:
+      translateY(-1px)
+      rotate(2deg);
+  }
+}
+
+/* =========================================================
+   WIZARD PROGRESS
+========================================================= */
+
+.student-wizard-progress {
+  animation:
+    student-ui-progress-strip-enter
+    0.4s
+    0.06s
+    ease-out
+    both;
+}
+
+.student-wizard-progress-item {
+  transition:
+    opacity var(--c-motion-base, 180ms) ease,
+    transform var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease;
+}
+
+.student-wizard-progress-item.is-current > span {
+  animation:
+    student-ui-current-step-pop
+    0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-wizard-progress-item.is-complete > span {
+  animation:
+    student-ui-complete-step-pop
+    0.3s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   WIZARD STEP TRANSITION
+========================================================= */
+
+.student-wizard-step {
+  animation:
+    student-ui-step-enter
+    0.38s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   STEP 1 — FORM
+========================================================= */
+
+.student-wizard-step-intro {
+  animation:
+    student-ui-content-enter
+    0.35s
+    0.03s
+    ease-out
+    both;
+}
+
+.student-wizard-form-card {
+  animation:
+    student-ui-card-enter
+    0.4s
+    0.07s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-wizard-info-note,
+.student-created-notice {
+  animation:
+    student-ui-content-enter
+    0.36s
+    0.11s
+    ease-out
+    both;
+}
+
+.student-wizard-form-card
+.student-form-field {
+  animation:
+    student-ui-field-enter
+    0.32s
+    ease-out
+    both;
+}
+
+.student-wizard-form-card
+.student-form-field:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.student-wizard-form-card
+.student-form-field:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.student-wizard-form-card
+.student-form-field:nth-child(3) {
+  animation-delay: 0.18s;
+}
+
+/* =========================================================
+   STEP 2 — CAMERA WORKSPACE
+   Only container entrance. Scanner motion remains unchanged.
+========================================================= */
+
+.student-wizard-student-bar {
+  animation:
+    student-ui-content-enter
+    0.34s
+    ease-out
+    both;
+}
+
+.student-wizard-camera-main {
+  animation:
+    student-ui-camera-enter
+    0.44s
+    0.05s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-wizard-camera-guide {
+  animation:
+    student-ui-guide-enter
+    0.42s
+    0.1s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-wizard-guide-list > div {
+  transition:
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    transform var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .student-wizard-guide-list > div:hover {
+    transform:
+      translateX(2px);
+
+    border-color:
+      color-mix(
+        in srgb,
+        var(--c-blue-800) 24%,
+        var(--c-border-soft)
+      );
+  }
+}
+
+/* =========================================================
+   CAPTURED REVIEW STATE
+========================================================= */
+
+.student-wizard-captured-review,
+.student-wizard-ready-note,
+.student-wizard-final-note {
+  animation:
+    student-ui-success-enter
+    0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   STEP 3 — REVIEW
+========================================================= */
+
+.student-wizard-review-card {
+  animation:
+    student-ui-review-left-enter
+    0.42s
+    0.04s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-wizard-review-photo-card {
+  animation:
+    student-ui-review-right-enter
+    0.42s
+    0.09s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-wizard-review-ready {
+  animation:
+    student-ui-badge-enter
+    0.32s
+    0.14s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+/* =========================================================
+   EDIT / IDENTITY MODAL INNER CONTENT
+========================================================= */
+
+.student-edit-summary,
+.student-face-student {
+  animation:
+    student-ui-card-enter
+    0.36s
+    0.05s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
+}
+
+.student-edit-form,
+.student-identity-camera {
+  animation:
+    student-ui-content-enter
+    0.36s
+    0.09s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   KEYFRAMES
+========================================================= */
+
+@keyframes student-ui-overview-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes student-ui-panel-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(11px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes student-ui-alert-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-6px)
+      scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes student-ui-stat-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes student-ui-content-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes student-ui-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes student-ui-modal-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(12px)
+      scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes student-ui-modal-content-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes student-ui-progress-strip-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes student-ui-current-step-pop {
+  from {
+    opacity: 0.65;
+
+    transform:
+      scale(0.86);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+}
+
+@keyframes student-ui-complete-step-pop {
+  from {
+    transform:
+      scale(0.88);
+  }
+
+  65% {
+    transform:
+      scale(1.06);
+  }
+
+  to {
+    transform:
+      scale(1);
+  }
+}
+
+@keyframes student-ui-step-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes student-ui-card-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px)
+      scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes student-ui-field-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes student-ui-camera-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(9px)
+      scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes student-ui-guide-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes student-ui-success-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(5px)
+      scale(0.985);
+  }
+
+  70% {
+    transform:
+      translateY(0)
+      scale(1.01);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes student-ui-review-left-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(-9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes student-ui-review-right-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateX(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateX(0);
+  }
+}
+
+@keyframes student-ui-badge-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+}
+
+/* =========================================================
+   MOBILE
+   Keep motion shorter and calmer.
+========================================================= */
+
+@media (max-width: 650px) {
+  .student-section-overview,
+  .student-panel,
+  .student-enrollment-modal,
+  .student-edit-modal,
+  .student-identity-modal,
+  .student-face-modal,
+  .student-wizard-step,
+  .student-wizard-form-card,
+  .student-wizard-camera-main,
+  .student-wizard-camera-guide,
+  .student-wizard-review-card,
+  .student-wizard-review-photo-card {
+    animation-duration: 0.3s;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .student-section-overview,
+  .student-panel,
+  .student-success-alert,
+  .student-section-stats > div,
+  .student-panel-header,
+  .student-toolbar,
+  .student-modal-backdrop,
+  .student-enrollment-modal,
+  .student-edit-modal,
+  .student-identity-modal,
+  .student-face-modal,
+  .student-modal-heading,
+  .student-wizard-progress,
+  .student-wizard-progress-item.is-current > span,
+  .student-wizard-progress-item.is-complete > span,
+  .student-wizard-step,
+  .student-wizard-step-intro,
+  .student-wizard-form-card,
+  .student-wizard-info-note,
+  .student-created-notice,
+  .student-wizard-form-card .student-form-field,
+  .student-wizard-student-bar,
+  .student-wizard-camera-main,
+  .student-wizard-camera-guide,
+  .student-wizard-captured-review,
+  .student-wizard-ready-note,
+  .student-wizard-final-note,
+  .student-wizard-review-card,
+  .student-wizard-review-photo-card,
+  .student-wizard-review-ready,
+  .student-edit-summary,
+  .student-face-student,
+  .student-edit-form,
+  .student-identity-camera {
+    animation: none !important;
+  }
+
+  .student-search,
+  .student-search-icon,
+  .student-avatar,
+  .student-face-action,
+  .student-toolbar button,
+  .student-wizard-action-group button,
+  .student-enrollment-action-group button,
+  .student-edit-actions button,
+  .student-face-action-group button,
+  .student-modal-close,
+  .student-wizard-guide-list > div {
+    transition: none !important;
+  }
+
+  .student-search:focus-within,
+  .student-search:focus-within
+  .student-search-icon,
+  .student-table tbody tr:hover
+  .student-avatar,
+  .student-face-action:hover:not(:disabled),
+  .student-toolbar button:hover:not(:disabled),
+  .student-wizard-action-group button:hover:not(:disabled),
+  .student-enrollment-action-group button:hover:not(:disabled),
+  .student-edit-actions button:hover:not(:disabled),
+  .student-face-action-group button:hover:not(:disabled),
+  .student-modal-close:hover:not(:disabled),
+  .student-wizard-guide-list > div:hover {
+    transform: none !important;
+  }
+}

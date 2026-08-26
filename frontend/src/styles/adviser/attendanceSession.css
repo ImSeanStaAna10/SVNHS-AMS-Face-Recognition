@@ -1,4 +1,3 @@
-
 /* =========================================================
    SVNHS ATTENDANCE MANAGEMENT SYSTEM
    CAMERA-FIRST ACTIVE ATTENDANCE SESSION
@@ -2727,17 +2726,25 @@ html[data-theme="dark"] .attendance-live-method {
   color: #d7e2f0;
 }
 
-html[data-theme="dark"] .attendance-report-toolbar .attendance-report-search input {
+html[data-theme="dark"]
+  .attendance-report-toolbar
+  .attendance-report-search
+  input {
   color: #eef4fb;
 }
 
-html[data-theme="dark"] .attendance-report-toolbar .attendance-report-search input::placeholder {
+html[data-theme="dark"]
+  .attendance-report-toolbar
+  .attendance-report-search
+  input::placeholder {
   color: #71839a;
 }
 
 html[data-theme="dark"] .attendance-report-search button:hover,
 html[data-theme="dark"] .attendance-clear-filters:hover,
-html[data-theme="dark"] .attendance-pagination-controls button:hover:not(:disabled) {
+html[data-theme="dark"]
+  .attendance-pagination-controls
+  button:hover:not(:disabled) {
   background: #152338;
   color: #f1f5fb;
 }
@@ -2925,7 +2932,6 @@ html[data-theme="dark"] .attendance-pagination-pages button.is-active {
     flex-wrap: wrap;
   }
 }
-
 
 /* =========================================================
    FINAL ATTENDANCE SESSION REFINEMENT
@@ -3254,20 +3260,29 @@ html[data-theme="dark"] .attendance-pagination-pages button.is-active {
   background: #fafcfe;
 }
 
-.attendance-report-toolbar .attendance-filter-popover .attendance-filter-field > span {
+.attendance-report-toolbar
+  .attendance-filter-popover
+  .attendance-filter-field
+  > span {
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0;
 }
 
-.attendance-report-toolbar .attendance-filter-popover .attendance-filter-field > small {
+.attendance-report-toolbar
+  .attendance-filter-popover
+  .attendance-filter-field
+  > small {
   min-height: 30px;
   color: #7a8b9f;
   font-size: 10px;
   line-height: 1.35;
 }
 
-.attendance-report-toolbar .attendance-filter-popover .attendance-filter-field select {
+.attendance-report-toolbar
+  .attendance-filter-popover
+  .attendance-filter-field
+  select {
   min-height: 40px;
   margin-top: 4px;
   padding: 0 34px 0 10px;
@@ -3504,36 +3519,55 @@ html[data-theme="dark"] .attendance-report-result-copy strong {
   color: #eef5fc;
 }
 
-html[data-theme="dark"] .attendance-report-toolbar .attendance-filter-popover .attendance-filter-field {
+html[data-theme="dark"]
+  .attendance-report-toolbar
+  .attendance-filter-popover
+  .attendance-filter-field {
   border-color: #2d3e55;
   background: #101d2e;
 }
 
-html[data-theme="dark"] .attendance-report-toolbar .attendance-filter-popover .attendance-filter-field > small {
+html[data-theme="dark"]
+  .attendance-report-toolbar
+  .attendance-filter-popover
+  .attendance-filter-field
+  > small {
   color: #8fa0b6;
 }
 
-html[data-theme="dark"] .attendance-report-toolbar .attendance-filter-field.is-status {
+html[data-theme="dark"]
+  .attendance-report-toolbar
+  .attendance-filter-field.is-status {
   border-color: #245b39;
   background: rgba(22, 101, 52, 0.16);
 }
 
-html[data-theme="dark"] .attendance-report-toolbar .attendance-filter-field.is-method {
+html[data-theme="dark"]
+  .attendance-report-toolbar
+  .attendance-filter-field.is-method {
   border-color: #24536b;
   background: rgba(14, 102, 143, 0.14);
 }
 
-html[data-theme="dark"] .attendance-report-toolbar .attendance-filter-field.is-sort {
+html[data-theme="dark"]
+  .attendance-report-toolbar
+  .attendance-filter-field.is-sort {
   border-color: #4a4275;
   background: rgba(91, 74, 182, 0.13);
 }
 
-html[data-theme="dark"] .attendance-report-toolbar .attendance-filter-field.is-rows {
+html[data-theme="dark"]
+  .attendance-report-toolbar
+  .attendance-filter-field.is-rows {
   border-color: #34455a;
   background: #111e30;
 }
 
-html[data-theme="dark"] .attendance-report-toolbar .attendance-filter-popover .attendance-filter-field select {
+html[data-theme="dark"]
+  .attendance-report-toolbar
+  .attendance-filter-popover
+  .attendance-filter-field
+  select {
   border-color: #34475f;
   background: #0b1727;
   color: #e4edf7;
@@ -3621,7 +3655,10 @@ html[data-theme="dark"] .attendance-live-method.is-manual {
     grid-template-columns: 1fr;
   }
 
-  .attendance-report-toolbar .attendance-filter-popover .attendance-filter-field > small {
+  .attendance-report-toolbar
+    .attendance-filter-popover
+    .attendance-filter-field
+    > small {
     min-height: 0;
   }
 
@@ -4009,7 +4046,6 @@ html[data-theme="dark"]
   }
 }
 
-
 /* =========================================================
    ATTENDANCE SESSION V4 — SEMANTIC COLOR ORGANIZATION
    FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
@@ -4165,26 +4201,22 @@ html[data-theme="dark"]
 
 .attendance-live-result-panel {
   border-color: #bfd7f5;
-  background:
-    linear-gradient(180deg, rgba(239, 246, 255, 0.52), #ffffff 24%);
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.52), #ffffff 24%);
 }
 
 .attendance-live-result-panel.is-success {
   border-color: #b9e5c7;
-  background:
-    linear-gradient(180deg, rgba(240, 253, 244, 0.72), #ffffff 24%);
+  background: linear-gradient(180deg, rgba(240, 253, 244, 0.72), #ffffff 24%);
 }
 
 .attendance-live-result-panel.is-warning {
   border-color: #f1d89a;
-  background:
-    linear-gradient(180deg, rgba(255, 251, 235, 0.78), #ffffff 24%);
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.78), #ffffff 24%);
 }
 
 .attendance-live-result-panel.is-error {
   border-color: #fecaca;
-  background:
-    linear-gradient(180deg, rgba(255, 241, 242, 0.78), #ffffff 24%);
+  background: linear-gradient(180deg, rgba(255, 241, 242, 0.78), #ffffff 24%);
 }
 
 .attendance-result-panel-header {
@@ -4402,8 +4434,7 @@ html[data-theme="dark"]
 
 .attendance-report-toolbar {
   border-top: 1px solid #e8eef4;
-  background:
-    linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
+  background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
 }
 
 .attendance-report-toolbar .attendance-report-search {
@@ -4459,8 +4490,7 @@ html[data-theme="dark"]
 }
 
 .attendance-live-table tbody tr.is-present {
-  background:
-    linear-gradient(90deg, rgba(240, 253, 244, 0.95), #ffffff 36%);
+  background: linear-gradient(90deg, rgba(240, 253, 244, 0.95), #ffffff 36%);
 }
 
 .attendance-live-student-number {
@@ -4497,8 +4527,7 @@ html[data-theme="dark"]
 ========================================================= */
 
 .attendance-pagination-bar {
-  background:
-    linear-gradient(180deg, #fbfdff 0%, #f8fafc 100%);
+  background: linear-gradient(180deg, #fbfdff 0%, #f8fafc 100%);
 }
 
 .attendance-pagination-pages button.is-active {
@@ -4512,8 +4541,7 @@ html[data-theme="dark"]
 
 .attendance-live-end-modal {
   border-color: #fecaca;
-  background:
-    linear-gradient(180deg, #fff7f8 0%, #ffffff 26%);
+  background: linear-gradient(180deg, #fff7f8 0%, #ffffff 26%);
 }
 
 .attendance-live-end-modal-icon {
@@ -4581,26 +4609,22 @@ html[data-theme="dark"] .attendance-auto-toggle.is-on {
 
 html[data-theme="dark"] .attendance-live-result-panel {
   border-color: #31588b;
-  background:
-    linear-gradient(180deg, rgba(30, 64, 175, 0.12), #0d1727 24%);
+  background: linear-gradient(180deg, rgba(30, 64, 175, 0.12), #0d1727 24%);
 }
 
 html[data-theme="dark"] .attendance-live-result-panel.is-success {
   border-color: #2e6843;
-  background:
-    linear-gradient(180deg, rgba(22, 101, 52, 0.15), #0d1727 24%);
+  background: linear-gradient(180deg, rgba(22, 101, 52, 0.15), #0d1727 24%);
 }
 
 html[data-theme="dark"] .attendance-live-result-panel.is-warning {
   border-color: #72551e;
-  background:
-    linear-gradient(180deg, rgba(146, 64, 14, 0.14), #0d1727 24%);
+  background: linear-gradient(180deg, rgba(146, 64, 14, 0.14), #0d1727 24%);
 }
 
 html[data-theme="dark"] .attendance-live-result-panel.is-error {
   border-color: #7f1d1d;
-  background:
-    linear-gradient(180deg, rgba(127, 29, 29, 0.16), #0d1727 24%);
+  background: linear-gradient(180deg, rgba(127, 29, 29, 0.16), #0d1727 24%);
 }
 
 html[data-theme="dark"] .attendance-result-empty-steps > div:nth-child(1),
@@ -4646,8 +4670,7 @@ html[data-theme="dark"] .attendance-live-student > span {
 
 html[data-theme="dark"] .attendance-live-end-modal {
   border-color: #7f1d1d;
-  background:
-    linear-gradient(180deg, rgba(127, 29, 29, 0.14), #0d1727 28%);
+  background: linear-gradient(180deg, rgba(127, 29, 29, 0.14), #0d1727 28%);
 }
 
 html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(1) {
@@ -4722,5 +4745,1185 @@ html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(2) {
   .attendance-result-details > div,
   .attendance-camera-stats > div {
     transition: none;
+  }
+}
+
+/* =========================================================
+   ATTENDANCE SESSION V5 — SUBTLE PRODUCTION ANIMATION
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Motion language aligned with the Councilor portal and
+   other Adviser pages.
+
+   IMPORTANT:
+   Existing scanner line, countdown, LIVE pulse, processing
+   spinner, camera flash, filter popover animation, camera
+   logic, attendance actions, and pagination remain intact.
+========================================================= */
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.attendance-live-topbar {
+  animation: attendance-session-topbar-enter-v5 0.42s ease-out both;
+}
+
+.attendance-live-brand {
+  animation: attendance-session-brand-enter-v5 0.4s 0.04s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-session-meta {
+  animation: attendance-session-meta-enter-v5 0.4s 0.08s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   TOPBAR BUTTON MICRO-INTERACTION
+========================================================= */
+
+.attendance-live-topbar-button,
+.attendance-live-end-button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-live-topbar-button:hover:not(:disabled),
+  .attendance-live-end-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .attendance-live-topbar-button:hover:not(:disabled) {
+    box-shadow: 0 6px 15px rgba(18, 61, 126, 0.07);
+  }
+
+  .attendance-live-end-button:hover:not(:disabled) {
+    box-shadow: 0 7px 16px rgba(185, 28, 28, 0.13);
+  }
+}
+
+.attendance-live-topbar-button:active:not(:disabled),
+.attendance-live-end-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   PAGE ERROR
+========================================================= */
+
+.attendance-live-page-error {
+  animation: attendance-session-error-enter-v5 0.32s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   CAMERA HEADER
+========================================================= */
+
+.attendance-live-camera-header {
+  animation: attendance-session-camera-header-enter-v5 0.46s 0.06s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-camera-header > div:first-child {
+  animation: attendance-session-camera-copy-enter-v5 0.42s 0.09s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-header-actions {
+  animation: attendance-session-camera-actions-enter-v5 0.42s 0.13s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   AUTO / SCAN CONTROLS
+========================================================= */
+
+.attendance-auto-toggle,
+.attendance-scan-now-button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-auto-toggle:hover:not(:disabled),
+  .attendance-scan-now-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .attendance-scan-now-button:hover:not(:disabled) {
+    box-shadow: 0 7px 17px rgba(37, 99, 235, 0.14);
+  }
+}
+
+.attendance-auto-toggle:active:not(:disabled),
+.attendance-scan-now-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   CAMERA WORKSPACE ENTRANCE
+   Do NOT animate face target/scanner overlays themselves.
+========================================================= */
+
+.attendance-live-camera-shell {
+  animation: attendance-session-camera-enter-v5 0.5s 0.13s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-camera-placeholder {
+  animation: attendance-session-placeholder-enter-v5 0.4s 0.18s ease-out both;
+}
+
+.attendance-live-camera-placeholder-icon {
+  animation: attendance-session-icon-pop-v5 0.38s 0.22s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-camera-placeholder button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-live-camera-placeholder button:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    box-shadow: 0 8px 18px rgba(255, 255, 255, 0.08);
+  }
+}
+
+.attendance-live-camera-placeholder button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   CAMERA EDGE HUD
+   Entry only; scanner animation remains untouched.
+========================================================= */
+
+.attendance-live-badge,
+.attendance-camera-stats {
+  animation: attendance-session-hud-enter-v5 0.36s 0.2s ease-out both;
+}
+
+.attendance-camera-stats > div {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-camera-stats > div:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* =========================================================
+   CAMERA FEEDBACK
+========================================================= */
+
+.attendance-live-camera-error {
+  animation: attendance-session-error-enter-v5 0.32s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-camera-footer {
+  animation: attendance-session-content-enter-v5 0.34s 0.18s ease-out both;
+}
+
+/* =========================================================
+   RESULT PANEL — BASE ENTRY
+========================================================= */
+
+.attendance-live-result-panel {
+  animation: attendance-session-result-panel-enter-v5 0.48s 0.17s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+
+  transition:
+    border-color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-result-panel-header {
+  animation: attendance-session-content-enter-v5 0.34s 0.22s ease-out both;
+}
+
+/* =========================================================
+   RESULT EMPTY STATE
+========================================================= */
+
+.attendance-result-empty {
+  animation: attendance-session-result-content-enter-v5 0.4s 0.23s ease-out both;
+}
+
+.attendance-result-empty-avatar {
+  animation: attendance-session-icon-pop-v5 0.38s 0.27s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-result-empty-steps > div {
+  animation: attendance-session-mini-card-enter-v5 0.32s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-result-empty-steps > div:nth-child(1) {
+  animation-delay: 0.29s;
+}
+
+.attendance-result-empty-steps > div:nth-child(2) {
+  animation-delay: 0.34s;
+}
+
+.attendance-result-empty-steps > div:nth-child(3) {
+  animation-delay: 0.39s;
+}
+
+/* =========================================================
+   RECOGNITION RESULT STATE
+   Separate animation names help status-class changes feel
+   responsive without touching recognition logic.
+========================================================= */
+
+.attendance-live-result-panel.is-success .attendance-result-student {
+  animation: attendance-session-result-success-v5 0.4s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-result-panel.is-warning .attendance-result-student {
+  animation: attendance-session-result-warning-v5 0.36s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-result-panel.is-error .attendance-result-student {
+  animation: attendance-session-result-error-v5 0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-result-icon {
+  animation: attendance-session-result-icon-pop-v5 0.38s 0.04s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-result-number {
+  animation: attendance-session-badge-enter-v5 0.3s 0.08s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-result-details > div {
+  animation: attendance-session-mini-card-enter-v5 0.3s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-result-details > div:nth-child(1) {
+  animation-delay: 0.09s;
+}
+
+.attendance-result-details > div:nth-child(2) {
+  animation-delay: 0.13s;
+}
+
+.attendance-result-details > div:nth-child(3) {
+  animation-delay: 0.17s;
+}
+
+.attendance-result-details > div:nth-child(4) {
+  animation-delay: 0.21s;
+}
+
+@media (hover: hover) {
+  .attendance-result-details > div:hover {
+    transform: translateY(-1px);
+
+    box-shadow: 0 5px 13px rgba(15, 35, 70, 0.055);
+  }
+}
+
+.attendance-result-student > button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-result-student > button:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    box-shadow: 0 7px 16px rgba(18, 61, 126, 0.13);
+  }
+}
+
+.attendance-result-student > button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   SESSION MINI SUMMARY
+========================================================= */
+
+.attendance-session-mini-summary > div {
+  animation: attendance-session-mini-card-enter-v5 0.32s ease-out both;
+}
+
+.attendance-session-mini-summary > div:nth-child(1) {
+  animation-delay: 0.19s;
+}
+
+.attendance-session-mini-summary > div:nth-child(2) {
+  animation-delay: 0.23s;
+}
+
+/* =========================================================
+   REPORT SECTION
+========================================================= */
+
+.attendance-live-report-section {
+  animation: attendance-session-report-enter-v5 0.48s 0.24s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-report-header {
+  animation: attendance-session-content-enter-v5 0.35s 0.28s ease-out both;
+}
+
+/* =========================================================
+   REPORT SUMMARY
+========================================================= */
+
+.attendance-summary-card {
+  animation: attendance-session-summary-card-enter-v5 0.36s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-summary-card:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.attendance-summary-card:nth-child(2) {
+  animation-delay: 0.34s;
+}
+
+.attendance-summary-card:nth-child(3) {
+  animation-delay: 0.38s;
+}
+
+.attendance-summary-card:nth-child(4) {
+  animation-delay: 0.42s;
+}
+
+@media (hover: hover) {
+  .attendance-summary-card {
+    transition:
+      transform var(--c-motion-base, 180ms) ease,
+      box-shadow var(--c-motion-base, 180ms) ease,
+      background var(--c-motion-base, 180ms) ease,
+      border-color var(--c-motion-base, 180ms) ease;
+  }
+
+  .attendance-summary-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 18px rgba(15, 35, 70, 0.06);
+  }
+}
+
+/* =========================================================
+   REPORT TOOLBAR
+========================================================= */
+
+.attendance-report-toolbar {
+  animation: attendance-session-content-enter-v5 0.36s 0.34s ease-out both;
+}
+
+.attendance-report-toolbar .attendance-report-search {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-report-toolbar .attendance-report-search:focus-within {
+  transform: translateY(-1px);
+}
+
+.attendance-report-toolbar .attendance-report-search > span {
+  transition:
+    color var(--c-motion-fast, 140ms) ease,
+    transform var(--c-motion-fast, 140ms) ease;
+}
+
+.attendance-report-toolbar .attendance-report-search:focus-within > span {
+  color: var(--c-blue-800, #24559a);
+
+  transform: scale(1.06);
+}
+
+/* =========================================================
+   FILTER TRIGGER
+   Existing popover animation remains untouched.
+========================================================= */
+
+.attendance-filter-trigger,
+.attendance-view-reset-button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-filter-trigger:hover,
+  .attendance-view-reset-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.attendance-filter-trigger:active,
+.attendance-view-reset-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   TABLE ROWS
+========================================================= */
+
+.attendance-live-table tbody tr {
+  transition:
+    background var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-fast, 140ms) ease;
+}
+
+.attendance-live-student > span {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-live-table tbody tr:hover {
+    box-shadow: inset 3px 0 0 rgba(37, 99, 235, 0.42);
+  }
+
+  .attendance-live-table tbody tr:hover .attendance-live-student > span {
+    transform: translateY(-1px) scale(1.025);
+
+    box-shadow: 0 5px 13px rgba(18, 61, 126, 0.07);
+  }
+}
+
+/* =========================================================
+   STATUS / METHOD BADGES
+========================================================= */
+
+.attendance-live-status,
+.attendance-live-method {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-live-status:hover,
+  .attendance-live-method:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* =========================================================
+   MARK / REMOVE ACTIONS
+========================================================= */
+
+.attendance-live-mark,
+.attendance-live-remove {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-live-mark:hover:not(:disabled),
+  .attendance-live-remove:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.attendance-live-mark:active:not(:disabled),
+.attendance-live-remove:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   EMPTY TABLE
+========================================================= */
+
+.attendance-table-empty-state {
+  animation: attendance-session-empty-enter-v5 0.4s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-table-empty-state > span {
+  animation: attendance-session-icon-pop-v5 0.36s 0.05s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.attendance-pagination-bar {
+  animation: attendance-session-pagination-enter-v5 0.36s 0.38s ease-out both;
+}
+
+.attendance-pagination-controls button,
+.attendance-pagination-pages button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-pagination-controls button:hover:not(:disabled),
+  .attendance-pagination-pages button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.attendance-pagination-controls button:active:not(:disabled),
+.attendance-pagination-pages button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   INLINE FEEDBACK
+========================================================= */
+
+.attendance-inline-feedback {
+  animation: attendance-session-feedback-enter-v5 0.32s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   END SESSION MODAL
+========================================================= */
+
+.attendance-live-modal-backdrop {
+  animation: attendance-session-backdrop-enter-v5 0.2s ease-out both;
+}
+
+.attendance-live-end-modal {
+  animation: attendance-session-modal-enter-v5 0.28s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-end-modal-icon {
+  animation: attendance-session-danger-icon-enter-v5 0.36s 0.04s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-live-end-summary > div {
+  animation: attendance-session-mini-card-enter-v5 0.32s ease-out both;
+}
+
+.attendance-live-end-summary > div:nth-child(1) {
+  animation-delay: 0.08s;
+}
+
+.attendance-live-end-summary > div:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.attendance-live-end-error {
+  animation: attendance-session-error-enter-v5 0.3s ease-out both;
+}
+
+.attendance-live-end-actions button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .attendance-live-end-actions button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .attendance-live-end-actions button.is-danger:hover:not(:disabled) {
+    box-shadow: 0 7px 16px rgba(185, 28, 28, 0.14);
+  }
+}
+
+.attendance-live-end-actions button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   KEYFRAMES
+========================================================= */
+
+@keyframes attendance-session-topbar-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-session-brand-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateX(-8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes attendance-session-meta-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes attendance-session-error-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(-5px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-session-camera-header-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-session-camera-copy-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateX(-9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes attendance-session-camera-actions-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateX(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes attendance-session-camera-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(9px) scale(0.993);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-session-placeholder-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-session-icon-pop-v5 {
+  from {
+    opacity: 0;
+
+    transform: scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+@keyframes attendance-session-hud-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-session-content-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-session-result-panel-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateX(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes attendance-session-result-content-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-session-result-success-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(5px) scale(0.985);
+  }
+
+  70% {
+    transform: translateY(0) scale(1.008);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-session-result-warning-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(5px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-session-result-error-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateX(5px);
+  }
+
+  45% {
+    transform: translateX(-2px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes attendance-session-result-icon-pop-v5 {
+  from {
+    opacity: 0;
+
+    transform: scale(0.88);
+  }
+
+  70% {
+    transform: scale(1.035);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+@keyframes attendance-session-badge-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+@keyframes attendance-session-mini-card-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(5px) scale(0.988);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-session-report-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-session-summary-card-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(7px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-session-empty-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-session-pagination-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes attendance-session-feedback-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(-4px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-session-backdrop-enter-v5 {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes attendance-session-modal-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: translateY(12px) scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes attendance-session-danger-icon-enter-v5 {
+  from {
+    opacity: 0;
+
+    transform: scale(0.86);
+  }
+
+  70% {
+    transform: scale(1.04);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+/* =========================================================
+   MOBILE — CALMER / QUICKER
+========================================================= */
+
+@media (max-width: 650px) {
+  .attendance-live-topbar,
+  .attendance-live-camera-header,
+  .attendance-live-camera-shell,
+  .attendance-live-result-panel,
+  .attendance-live-report-section,
+  .attendance-live-end-modal,
+  .attendance-summary-card {
+    animation-duration: 0.3s;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   Existing scanner reduced-motion rules above stay valid.
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-live-topbar,
+  .attendance-live-brand,
+  .attendance-live-session-meta,
+  .attendance-live-page-error,
+  .attendance-live-camera-header,
+  .attendance-live-camera-header > div:first-child,
+  .attendance-live-header-actions,
+  .attendance-live-camera-shell,
+  .attendance-live-camera-placeholder,
+  .attendance-live-camera-placeholder-icon,
+  .attendance-live-badge,
+  .attendance-camera-stats,
+  .attendance-live-camera-error,
+  .attendance-camera-footer,
+  .attendance-live-result-panel,
+  .attendance-result-panel-header,
+  .attendance-result-empty,
+  .attendance-result-empty-avatar,
+  .attendance-result-empty-steps > div,
+  .attendance-live-result-panel.is-success .attendance-result-student,
+  .attendance-live-result-panel.is-warning .attendance-result-student,
+  .attendance-live-result-panel.is-error .attendance-result-student,
+  .attendance-result-icon,
+  .attendance-result-number,
+  .attendance-result-details > div,
+  .attendance-session-mini-summary > div,
+  .attendance-live-report-section,
+  .attendance-live-report-header,
+  .attendance-summary-card,
+  .attendance-report-toolbar,
+  .attendance-table-empty-state,
+  .attendance-table-empty-state > span,
+  .attendance-pagination-bar,
+  .attendance-inline-feedback,
+  .attendance-live-modal-backdrop,
+  .attendance-live-end-modal,
+  .attendance-live-end-modal-icon,
+  .attendance-live-end-summary > div,
+  .attendance-live-end-error {
+    animation: none !important;
+  }
+
+  .attendance-live-topbar-button,
+  .attendance-live-end-button,
+  .attendance-auto-toggle,
+  .attendance-scan-now-button,
+  .attendance-live-camera-placeholder button,
+  .attendance-camera-stats > div,
+  .attendance-live-result-panel,
+  .attendance-result-empty-avatar,
+  .attendance-result-details > div,
+  .attendance-result-student > button,
+  .attendance-summary-card,
+  .attendance-report-toolbar .attendance-report-search,
+  .attendance-report-toolbar .attendance-report-search > span,
+  .attendance-filter-trigger,
+  .attendance-view-reset-button,
+  .attendance-live-table tbody tr,
+  .attendance-live-student > span,
+  .attendance-live-status,
+  .attendance-live-method,
+  .attendance-live-mark,
+  .attendance-live-remove,
+  .attendance-pagination-controls button,
+  .attendance-pagination-pages button,
+  .attendance-live-end-actions button {
+    transition: none !important;
+  }
+
+  .attendance-live-topbar-button:hover:not(:disabled),
+  .attendance-live-end-button:hover:not(:disabled),
+  .attendance-live-topbar-button:active:not(:disabled),
+  .attendance-live-end-button:active:not(:disabled),
+  .attendance-auto-toggle:hover:not(:disabled),
+  .attendance-scan-now-button:hover:not(:disabled),
+  .attendance-auto-toggle:active:not(:disabled),
+  .attendance-scan-now-button:active:not(:disabled),
+  .attendance-live-camera-placeholder button:hover:not(:disabled),
+  .attendance-live-camera-placeholder button:active:not(:disabled),
+  .attendance-camera-stats > div:hover,
+  .attendance-result-details > div:hover,
+  .attendance-result-student > button:hover:not(:disabled),
+  .attendance-result-student > button:active:not(:disabled),
+  .attendance-summary-card:hover,
+  .attendance-report-toolbar .attendance-report-search:focus-within,
+  .attendance-report-toolbar .attendance-report-search:focus-within > span,
+  .attendance-filter-trigger:hover,
+  .attendance-view-reset-button:hover:not(:disabled),
+  .attendance-filter-trigger:active,
+  .attendance-view-reset-button:active:not(:disabled),
+  .attendance-live-table tbody tr:hover .attendance-live-student > span,
+  .attendance-live-status:hover,
+  .attendance-live-method:hover,
+  .attendance-live-mark:hover:not(:disabled),
+  .attendance-live-remove:hover:not(:disabled),
+  .attendance-live-mark:active:not(:disabled),
+  .attendance-live-remove:active:not(:disabled),
+  .attendance-pagination-controls button:hover:not(:disabled),
+  .attendance-pagination-pages button:hover:not(:disabled),
+  .attendance-pagination-controls button:active:not(:disabled),
+  .attendance-pagination-pages button:active:not(:disabled),
+  .attendance-live-end-actions button:hover:not(:disabled),
+  .attendance-live-end-actions button:active:not(:disabled) {
+    transform: none !important;
   }
 }
