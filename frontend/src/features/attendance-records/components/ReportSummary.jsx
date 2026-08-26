@@ -8,17 +8,31 @@ function ReportSummary({
 }) {
   const totals = reports.reduce(
     (summary, report) => {
-      summary.present +=
-        Number(report.presentCount) || 0;
+      const present =
+        Number(report?.presentCount) || 0;
 
-      summary.late +=
-        Number(report.lateCount) || 0;
+      const late =
+        Number(report?.lateCount) || 0;
 
-      summary.absent +=
-        Number(report.absentCount) || 0;
+      const absent =
+        Number(report?.absentCount) || 0;
 
-      summary.attendanceRate +=
-        Number(report.attendanceRate) || 0;
+      const studentCount =
+        Number(report?.studentCount) || 0;
+
+      summary.present += present;
+      summary.late += late;
+      summary.absent += absent;
+
+      /*
+       * Prefer backend studentCount.
+       * If unavailable, derive it from
+       * PRESENT + LATE + ABSENT.
+       */
+      summary.students +=
+        studentCount > 0
+          ? studentCount
+          : present + late + absent;
 
       return summary;
     },
@@ -26,14 +40,26 @@ function ReportSummary({
       present: 0,
       late: 0,
       absent: 0,
-      attendanceRate: 0,
-    }
+      students: 0,
+    },
   );
 
+  /* =======================================================
+     ATTENDED = PRESENT + LATE
+  ======================================================= */
+
+  const attendedCount =
+    totals.present + totals.late;
+
+  /* =======================================================
+     WEIGHTED ATTENDANCE RATE
+  ======================================================= */
+
   const averageRate =
-    reports.length > 0
-      ? totals.attendanceRate /
-        reports.length
+    totals.students > 0
+      ? (attendedCount /
+          totals.students) *
+        100
       : 0;
 
   const items = [
@@ -43,26 +69,32 @@ function ReportSummary({
       hint: "Matching current filters",
       type: "default",
     },
+
     {
       label: "Average Attendance",
-      value: formatPercentage(
-        averageRate
-      ),
-      hint: "Reports shown on this page",
+      value:
+        formatPercentage(
+          averageRate,
+        ),
+      hint:
+        "Present + late on this page",
       type: "rate",
     },
+
     {
       label: "Present Records",
       value: totals.present,
       hint: "Current page totals",
       type: "present",
     },
+
     {
       label: "Late Records",
       value: totals.late,
       hint: "Current page totals",
       type: "late",
     },
+
     {
       label: "Absent Records",
       value: totals.absent,

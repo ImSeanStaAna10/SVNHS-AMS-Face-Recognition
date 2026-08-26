@@ -113,30 +113,6 @@ const getRecordStatus = (record) =>
     .trim()
     .toUpperCase();
 
-/*
- * ABSENT records may have a backend finalization timestamp,
- * but that timestamp is not a student check-in time.
- * Keep the official register semantically correct by showing
- * a recorded time only for PRESENT / LATE attendance.
- */
-const getRecordCheckInTime = (record) => {
-  const status =
-    getRecordStatus(
-      record,
-    );
-
-  if (
-    status ===
-    "ABSENT"
-  ) {
-    return "";
-  }
-
-  return getRecordTime(
-    record,
-  );
-};
-
 const safeNumber = (value) => {
   const parsed = Number(value);
 
@@ -1067,132 +1043,6 @@ const drawPdfSummary = ({
 };
 
 /* =========================================================
-   PDF SESSION POLICY
-========================================================= */
-
-const drawPdfPolicy = ({
-  document,
-  latePolicyLabel,
-  sessionEndPolicyLabel,
-}) => {
-  const pageWidth =
-    document.internal.pageSize.getWidth();
-
-  const left = 10;
-  const right = 10;
-  const gap = 2;
-
-  const items = [
-    {
-      label: "LATE POLICY",
-      value:
-        latePolicyLabel ||
-        "Not available",
-      color:
-        PDF_COLORS.amber,
-    },
-    {
-      label: "SESSION END",
-      value:
-        sessionEndPolicyLabel ||
-        "Not available",
-      color:
-        PDF_COLORS.blue,
-    },
-  ];
-
-  const availableWidth =
-    pageWidth -
-    left -
-    right -
-    gap;
-
-  const width =
-    availableWidth / 2;
-
-  items.forEach(
-    (item, index) => {
-      const x =
-        left +
-        index *
-          (width + gap);
-
-      document.setFillColor(
-        250,
-        252,
-        254,
-      );
-
-      document.setDrawColor(
-        ...PDF_COLORS.border,
-      );
-
-      document.roundedRect(
-        x,
-        55,
-        width,
-        9,
-        1.2,
-        1.2,
-        "FD",
-      );
-
-      document.setFillColor(
-        ...item.color,
-      );
-
-      document.rect(
-        x,
-        55,
-        1.4,
-        9,
-        "F",
-      );
-
-      document.setTextColor(
-        ...item.color,
-      );
-
-      document.setFont(
-        "helvetica",
-        "bold",
-      );
-
-      document.setFontSize(
-        5.1,
-      );
-
-      document.text(
-        item.label,
-        x + 4,
-        58.4,
-      );
-
-      document.setTextColor(
-        ...PDF_COLORS.text,
-      );
-
-      document.setFont(
-        "helvetica",
-        "normal",
-      );
-
-      document.setFontSize(
-        6.1,
-      );
-
-      document.text(
-        String(
-          item.value,
-        ),
-        x + 4,
-        61.8,
-      );
-    },
-  );
-};
-
-/* =========================================================
    PDF SIGNATURES
 ========================================================= */
 
@@ -1770,22 +1620,12 @@ function AttendanceHistoryDetail() {
   const absentCount =
     statusCounts.absent;
 
-  const sessionStudentCount =
+  const totalStudents =
     session?.studentCount != null
       ? safeNumber(
           session.studentCount,
         )
-      : 0;
-
-  /*
-   * Never allow incomplete legacy metadata to report fewer
-   * students than the records actually loaded for the session.
-   */
-  const totalStudents =
-    Math.max(
-      sessionStudentCount,
-      records.length,
-    );
+      : records.length;
 
   const attendedCount =
     presentCount +
@@ -1843,74 +1683,10 @@ function AttendanceHistoryDetail() {
     session?.attendanceDate ||
     "";
 
-  /*
-   * For historical records, prefer the adviser stored with the
-   * completed session before falling back to the current account.
-   */
   const adviserName =
-    session?.adviserName ||
     user?.name?.trim() ||
+    session?.adviserName ||
     "Class Adviser";
-
-  const hasLatePolicyMetadata =
-    Boolean(session) &&
-    (
-      Object.prototype.hasOwnProperty.call(
-        session,
-        "lateAfterMinutes",
-      ) ||
-      Object.prototype.hasOwnProperty.call(
-        session,
-        "lateCutoffAt",
-      )
-    );
-
-  const hasSessionEndPolicyMetadata =
-    Boolean(session) &&
-    Object.prototype.hasOwnProperty.call(
-      session,
-      "scheduledEndAt",
-    );
-
-  const lateAfterMinutes =
-    session?.lateAfterMinutes != null
-      ? safeNumber(
-          session.lateAfterMinutes,
-        )
-      : null;
-
-  const lateCutoffAt =
-    session?.lateCutoffAt ||
-    "";
-
-  const scheduledEndAt =
-    session?.scheduledEndAt ||
-    "";
-
-  const latePolicyLabel =
-    !hasLatePolicyMetadata
-      ? "Not available"
-      : lateAfterMinutes != null &&
-          lateAfterMinutes > 0
-        ? lateCutoffAt
-          ? `${lateAfterMinutes} min · cutoff ${formatTime(
-              lateCutoffAt,
-            )}`
-          : `${lateAfterMinutes} min`
-        : lateCutoffAt
-          ? `Cutoff ${formatTime(
-              lateCutoffAt,
-            )}`
-          : "Legacy / not configured";
-
-  const sessionEndPolicyLabel =
-    !hasSessionEndPolicyMetadata
-      ? "Not available"
-      : scheduledEndAt
-        ? `Automatic · ${formatTime(
-            scheduledEndAt,
-          )}`
-        : "Manual end";
 
   const overallHealth =
     getAttendanceHealth(
@@ -2007,11 +1783,11 @@ function AttendanceHistoryDetail() {
               ),
 
             "Recorded At":
-              getRecordCheckInTime(
+              getRecordTime(
                 record,
               )
                 ? formatTime(
-                    getRecordCheckInTime(
+                    getRecordTime(
                       record,
                     ),
                     true,
@@ -2154,14 +1930,6 @@ function AttendanceHistoryDetail() {
           attendanceRate,
         });
 
-        drawPdfPolicy({
-          document,
-
-          latePolicyLabel,
-
-          sessionEndPolicyLabel,
-        });
-
         /* ===============================================
            TABLE DATA
         =============================================== */
@@ -2173,7 +1941,7 @@ function AttendanceHistoryDetail() {
               index,
             ) => {
               const time =
-                getRecordCheckInTime(
+                getRecordTime(
                   record,
                 );
 
@@ -2209,7 +1977,7 @@ function AttendanceHistoryDetail() {
         autoTable(
           document,
           {
-            startY: 68,
+            startY: 58,
 
             margin: {
               top: 27,
@@ -2703,46 +2471,6 @@ function AttendanceHistoryDetail() {
             ),
           ],
 
-          [
-            "Late After (Minutes)",
-
-            !hasLatePolicyMetadata
-              ? "Not available"
-              : lateAfterMinutes != null
-                ? lateAfterMinutes
-                : "Not configured",
-          ],
-
-          [
-            "Late Cutoff",
-
-            !hasLatePolicyMetadata
-              ? "Not available"
-              : lateCutoffAt
-                ? formatTime(
-                    lateCutoffAt,
-                  )
-                : "Not configured",
-          ],
-
-          [
-            "Scheduled End",
-
-            !hasSessionEndPolicyMetadata
-              ? "Not available"
-              : scheduledEndAt
-                ? formatTime(
-                    scheduledEndAt,
-                  )
-                : "Manual",
-          ],
-
-          [
-            "Session End Policy",
-
-            sessionEndPolicyLabel,
-          ],
-
           [],
 
           [
@@ -2826,8 +2554,8 @@ function AttendanceHistoryDetail() {
         ];
 
         for (
-          let rowIndex = 18;
-          rowIndex <= 21;
+          let rowIndex = 14;
+          rowIndex <= 17;
           rowIndex += 1
         ) {
           const address =
@@ -3140,26 +2868,6 @@ function AttendanceHistoryDetail() {
                   {formatTime(
                     session?.endedAt,
                   )}
-                </strong>
-              </span>
-
-              <span className="attendance-record-policy-meta is-late-policy">
-                Late Policy
-
-                <strong>
-                  {
-                    latePolicyLabel
-                  }
-                </strong>
-              </span>
-
-              <span className="attendance-record-policy-meta is-end-policy">
-                Session End
-
-                <strong>
-                  {
-                    sessionEndPolicyLabel
-                  }
                 </strong>
               </span>
             </div>
@@ -3568,41 +3276,12 @@ function AttendanceHistoryDetail() {
             )}
 
           {/* ===============================================
-              FILTERED EMPTY STATE
-          ================================================ */}
-
-          {!loading &&
-            !error &&
-            records.length >
-              0 &&
-            filteredRecords.length ===
-              0 && (
-              <div className="attendance-record-empty attendance-record-filter-empty">
-                <div
-                  aria-hidden="true"
-                >
-                  ⌕
-                </div>
-
-                <strong>
-                  No matching attendance records
-                </strong>
-
-                <p>
-                  Try a different student search or attendance status filter.
-                </p>
-              </div>
-            )}
-
-          {/* ===============================================
               TABLE
           ================================================ */}
 
           {!loading &&
             !error &&
             records.length >
-              0 &&
-            filteredRecords.length >
               0 && (
               <>
                 <div className="attendance-record-table-wrap">
@@ -3724,11 +3403,11 @@ function AttendanceHistoryDetail() {
                               {/* TIME */}
 
                               <td className="adviser-attendance-record-time">
-                                {getRecordCheckInTime(
+                                {getRecordTime(
                                   record,
                                 )
                                   ? formatTime(
-                                      getRecordCheckInTime(
+                                      getRecordTime(
                                         record,
                                       ),
                                       true,
