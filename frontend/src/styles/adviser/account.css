@@ -77,13 +77,7 @@
   border: 1px solid #bfd7f5;
   border-radius: 12px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #eff6ff 0%,
-      #f8fbff 58%,
-      #ffffff 100%
-    );
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 58%, #ffffff 100%);
 
   box-shadow:
     inset 4px 0 0 #2563eb,
@@ -168,12 +162,7 @@
   border: 1px solid #f1d89a;
   border-radius: 11px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #fffbeb 0%,
-      #fffdf5 100%
-    );
+  background: linear-gradient(135deg, #fffbeb 0%, #fffdf5 100%);
 
   color: #704214;
 
@@ -238,12 +227,7 @@
   border: 1px solid #b9e5c7;
   border-radius: 11px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #f0fdf4 0%,
-      #f8fef9 100%
-    );
+  background: linear-gradient(135deg, #f0fdf4 0%, #f8fef9 100%);
 
   color: #15803d;
 
@@ -425,7 +409,9 @@
 }
 
 /* Neutral cancel/secondary action. */
-.adviser-password-form .councilor-modal-actions button:not(.is-primary):not(.is-danger) {
+.adviser-password-form
+  .councilor-modal-actions
+  button:not(.is-primary):not(.is-danger) {
   border-color: #d8e0ea;
   background: #ffffff;
   color: #52677f;
@@ -445,12 +431,11 @@
 html[data-theme="dark"] .adviser-password-account {
   border-color: #31588b;
 
-  background:
-    linear-gradient(
-      135deg,
-      rgba(30, 64, 175, 0.16),
-      rgba(15, 23, 42, 0.74)
-    );
+  background: linear-gradient(
+    135deg,
+    rgba(30, 64, 175, 0.16),
+    rgba(15, 23, 42, 0.74)
+  );
 
   box-shadow:
     inset 4px 0 0 #60a5fa,
@@ -470,12 +455,11 @@ html[data-theme="dark"] .adviser-password-account-copy > span {
 html[data-theme="dark"] .adviser-password-help {
   border-color: #72551e;
 
-  background:
-    linear-gradient(
-      135deg,
-      rgba(146, 64, 14, 0.17),
-      rgba(15, 23, 42, 0.74)
-    );
+  background: linear-gradient(
+    135deg,
+    rgba(146, 64, 14, 0.17),
+    rgba(15, 23, 42, 0.74)
+  );
 
   color: #fde68a;
 }
@@ -497,12 +481,11 @@ html[data-theme="dark"] .adviser-password-help p {
 html[data-theme="dark"] .adviser-password-success {
   border-color: #2e6843;
 
-  background:
-    linear-gradient(
-      135deg,
-      rgba(22, 101, 52, 0.18),
-      rgba(15, 23, 42, 0.74)
-    );
+  background: linear-gradient(
+    135deg,
+    rgba(22, 101, 52, 0.18),
+    rgba(15, 23, 42, 0.74)
+  );
 
   color: #86efac;
 }
@@ -524,8 +507,14 @@ html[data-theme="dark"] .adviser-password-form .councilor-modal-field input {
   color: #eef2ff;
 }
 
-html[data-theme="dark"] .adviser-password-form .councilor-modal-field input:hover:not(:disabled),
-html[data-theme="dark"] .adviser-password-form .councilor-modal-field input:focus {
+html[data-theme="dark"]
+  .adviser-password-form
+  .councilor-modal-field
+  input:hover:not(:disabled),
+html[data-theme="dark"]
+  .adviser-password-form
+  .councilor-modal-field
+  input:focus {
   border-color: #7655b2;
   background: #111c2e;
 }
@@ -612,7 +601,6 @@ html[data-theme="dark"] .adviser-password-toggle:hover:not(:disabled) {
     transition: none;
   }
 }
-
 
 /* =========================================================
    CHANGE PASSWORD MODAL V2 — VIEWPORT OVERFLOW FIX
@@ -813,12 +801,11 @@ html[data-theme="dark"] .adviser-password-toggle:hover:not(:disabled) {
 
   border-top: 1px solid var(--c-border-soft);
 
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--c-surface) 92%, transparent),
-      var(--c-surface) 30%
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--c-surface) 92%, transparent),
+    var(--c-surface) 30%
+  );
 
   backdrop-filter: blur(10px);
 }
@@ -832,8 +819,7 @@ html[data-theme="dark"] .adviser-password-toggle:hover:not(:disabled) {
 /* Small visual indication that the middle content can scroll. */
 .adviser-password-modal .adviser-password-form {
   scrollbar-width: thin;
-  scrollbar-color:
-    color-mix(in srgb, var(--c-text-muted) 36%, transparent)
+  scrollbar-color: color-mix(in srgb, var(--c-text-muted) 36%, transparent)
     transparent;
 }
 
@@ -848,31 +834,21 @@ html[data-theme="dark"] .adviser-password-toggle:hover:not(:disabled) {
 .adviser-password-modal .adviser-password-form::-webkit-scrollbar-thumb {
   border-radius: 999px;
 
-  background:
-    color-mix(in srgb, var(--c-text-muted) 30%, transparent);
+  background: color-mix(in srgb, var(--c-text-muted) 30%, transparent);
 }
 
 /* =========================================================
    DARK MODE
 ========================================================= */
 
-html[data-theme="dark"]
-  .adviser-password-modal
-  > .councilor-modal-header {
+html[data-theme="dark"] .adviser-password-modal > .councilor-modal-header {
   background: #0d1727;
 }
 
-html[data-theme="dark"]
-  .adviser-password-modal
-  .councilor-modal-actions {
+html[data-theme="dark"] .adviser-password-modal .councilor-modal-actions {
   border-top-color: #293a51;
 
-  background:
-    linear-gradient(
-      180deg,
-      rgba(13, 23, 39, 0.9),
-      #0d1727 35%
-    );
+  background: linear-gradient(180deg, rgba(13, 23, 39, 0.9), #0d1727 35%);
 }
 
 /* =========================================================
@@ -997,5 +973,457 @@ html[data-theme="dark"]
 
   .adviser-password-modal .adviser-password-help strong {
     margin: 0;
+  }
+}
+
+/* =========================================================
+   ADVISER ACCOUNT SECURITY V3 — SUBTLE PRODUCTION ANIMATION
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Preserves:
+   - viewport-safe modal
+   - internal form scrolling
+   - sticky action footer
+   - password visibility controls
+   - validation/change-password behavior
+========================================================= */
+
+/* =========================================================
+   NAV ITEM
+========================================================= */
+
+.adviser-password-nav-item {
+  transition:
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    transform var(--c-motion-base, 180ms) ease;
+}
+
+.adviser-password-nav-icon {
+  transition:
+    color var(--c-motion-base, 180ms) ease,
+    transform var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-password-nav-item:hover {
+    transform: translateX(2px);
+  }
+
+  .adviser-password-nav-item:hover .adviser-password-nav-icon {
+    transform: scale(1.06);
+  }
+}
+
+/* =========================================================
+   MODAL BACKDROP
+========================================================= */
+
+.councilor-modal-backdrop {
+  animation: adviser-security-backdrop-enter-v3 0.2s ease-out both;
+}
+
+/* =========================================================
+   MODAL ENTRANCE
+========================================================= */
+
+.adviser-password-modal {
+  transform-origin: center;
+
+  animation: adviser-security-modal-enter-v3 0.28s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.adviser-password-modal > .councilor-modal-header {
+  animation: adviser-security-header-enter-v3 0.34s 0.03s ease-out both;
+}
+
+/* =========================================================
+   ACCOUNT SUMMARY
+========================================================= */
+
+.adviser-password-account {
+  animation: adviser-security-card-enter-v3 0.36s 0.06s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-password-avatar {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-password-account:hover .adviser-password-avatar {
+    transform: translateY(-1px) scale(1.035);
+
+    box-shadow: 0 7px 17px rgba(37, 99, 235, 0.12);
+  }
+}
+
+/* =========================================================
+   RECOVERY HELP
+========================================================= */
+
+.adviser-password-help {
+  animation: adviser-security-help-enter-v3 0.36s 0.1s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-password-help-icon {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-password-help:hover .adviser-password-help-icon {
+    transform: translateY(-1px) scale(1.04);
+
+    box-shadow: 0 5px 13px rgba(245, 158, 11, 0.09);
+  }
+}
+
+/* =========================================================
+   SUCCESS STATE
+========================================================= */
+
+.adviser-password-success {
+  animation: adviser-security-success-enter-v3 0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.adviser-password-success > span {
+  animation: adviser-security-success-icon-v3 0.34s 0.03s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+/* =========================================================
+   ERROR STATE
+========================================================= */
+
+.adviser-password-modal .councilor-modal-error {
+  animation: adviser-security-error-enter-v3 0.3s ease-out both;
+}
+
+/* =========================================================
+   FORM FIELDS — STAGGER
+========================================================= */
+
+.adviser-password-form .councilor-modal-field {
+  animation: adviser-security-field-enter-v3 0.3s ease-out both;
+}
+
+.adviser-password-form .councilor-modal-field:nth-of-type(1) {
+  animation-delay: 0.12s;
+}
+
+.adviser-password-form .councilor-modal-field:nth-of-type(2) {
+  animation-delay: 0.16s;
+}
+
+.adviser-password-form .councilor-modal-field:nth-of-type(3) {
+  animation-delay: 0.2s;
+}
+
+/* =========================================================
+   INPUT MICRO-INTERACTION
+========================================================= */
+
+.adviser-password-form .councilor-modal-field input {
+  transition:
+    transform var(--c-motion-base, 180ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease;
+}
+
+.adviser-password-form .councilor-modal-field input:focus {
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   PASSWORD TOGGLE
+========================================================= */
+
+.adviser-password-toggle {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease;
+}
+
+.adviser-password-toggle svg {
+  transition: transform var(--c-motion-fast, 140ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-password-toggle:hover:not(:disabled) {
+    transform: translateY(-50%) scale(1.04);
+  }
+
+  .adviser-password-toggle:hover:not(:disabled) svg {
+    transform: scale(1.06);
+  }
+}
+
+.adviser-password-toggle:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.96);
+}
+
+/* =========================================================
+   STICKY ACTION FOOTER
+========================================================= */
+
+.adviser-password-modal .councilor-modal-actions {
+  animation: adviser-security-actions-enter-v3 0.34s 0.2s ease-out both;
+}
+
+.adviser-password-modal .councilor-modal-actions button {
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+@media (hover: hover) {
+  .adviser-password-modal .councilor-modal-actions button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .adviser-password-modal
+    .councilor-modal-actions
+    .is-primary:hover:not(:disabled) {
+    box-shadow: 0 8px 18px rgba(109, 40, 217, 0.16);
+  }
+}
+
+.adviser-password-modal .councilor-modal-actions button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   KEYFRAMES
+========================================================= */
+
+@keyframes adviser-security-backdrop-enter-v3 {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes adviser-security-modal-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(12px) scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adviser-security-header-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+@keyframes adviser-security-card-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(7px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adviser-security-help-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateX(-6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes adviser-security-success-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(-5px) scale(0.985);
+  }
+
+  70% {
+    transform: translateY(0) scale(1.008);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adviser-security-success-icon-v3 {
+  from {
+    opacity: 0;
+
+    transform: scale(0.86);
+  }
+
+  70% {
+    transform: scale(1.05);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+}
+
+@keyframes adviser-security-error-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(-4px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adviser-security-field-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateX(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateX(0);
+  }
+}
+
+@keyframes adviser-security-actions-enter-v3 {
+  from {
+    opacity: 0;
+
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   MOBILE — CALMER / QUICKER
+========================================================= */
+
+@media (max-width: 520px) {
+  .adviser-password-modal,
+  .adviser-password-account,
+  .adviser-password-help,
+  .adviser-password-success,
+  .adviser-password-form .councilor-modal-field {
+    animation-duration: 0.28s;
+  }
+}
+
+/* =========================================================
+   VERY SHORT VIEWPORT
+   Keep animation light when vertical space is constrained.
+========================================================= */
+
+@media (max-height: 560px) {
+  .adviser-password-account,
+  .adviser-password-help {
+    animation: none;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .councilor-modal-backdrop,
+  .adviser-password-modal,
+  .adviser-password-modal > .councilor-modal-header,
+  .adviser-password-account,
+  .adviser-password-help,
+  .adviser-password-success,
+  .adviser-password-success > span,
+  .adviser-password-modal .councilor-modal-error,
+  .adviser-password-form .councilor-modal-field,
+  .adviser-password-modal .councilor-modal-actions {
+    animation: none !important;
+  }
+
+  .adviser-password-nav-item,
+  .adviser-password-nav-icon,
+  .adviser-password-avatar,
+  .adviser-password-help-icon,
+  .adviser-password-form .councilor-modal-field input,
+  .adviser-password-toggle,
+  .adviser-password-toggle svg,
+  .adviser-password-modal .councilor-modal-actions button {
+    transition: none !important;
+  }
+
+  .adviser-password-nav-item:hover,
+  .adviser-password-nav-item:hover .adviser-password-nav-icon,
+  .adviser-password-account:hover .adviser-password-avatar,
+  .adviser-password-help:hover .adviser-password-help-icon,
+  .adviser-password-form .councilor-modal-field input:focus,
+  .adviser-password-toggle:hover:not(:disabled),
+  .adviser-password-toggle:hover:not(:disabled) svg,
+  .adviser-password-toggle:active:not(:disabled),
+  .adviser-password-modal .councilor-modal-actions button:hover:not(:disabled),
+  .adviser-password-modal
+    .councilor-modal-actions
+    button:active:not(:disabled) {
+    transform: none !important;
   }
 }
