@@ -14,6 +14,7 @@ import com.example.attendancemanagementbackend.repository.AttendanceRecordReposi
 import com.example.attendancemanagementbackend.repository.AttendanceSessionRepository;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
 import com.example.attendancemanagementbackend.repository.StudentRepository;
+import com.example.attendancemanagementbackend.util.AppTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,8 +82,16 @@ public class AttendanceRecordService {
     ========================================================= */
 
     /**
-     * Marks a student as PRESENT
-     * for an active attendance session.
+     * Records attendance manually.
+     *
+     * The backend automatically determines
+     * whether the student is:
+     *
+     * PRESENT
+     * or
+     * LATE
+     *
+     * based on the session's late cutoff.
      */
     @Transactional
     public AttendanceRecord markPresent(
@@ -117,8 +127,11 @@ public class AttendanceRecordService {
     ========================================================= */
 
     /**
-     * Recognizes a student's face and
-     * marks the matched student as PRESENT.
+     * Recognizes a student's face and records
+     * attendance.
+     *
+     * The backend automatically determines
+     * PRESENT or LATE.
      */
     @Transactional
     public AttendanceRecord markPresentByFace(
@@ -176,6 +189,7 @@ public class AttendanceRecordService {
                         );
 
         if (match == null) {
+
             throw new ApiException(
                     HttpStatus.UNAUTHORIZED,
                     "Face not recognized"
@@ -218,8 +232,14 @@ public class AttendanceRecordService {
     ========================================================= */
 
     /**
-     * Gets and validates an active
+     * Loads and validates the requested
      * attendance session.
+     *
+     * A session must:
+     *
+     * 1. Exist
+     * 2. Have ACTIVE database status
+     * 3. Not have reached its scheduled end time
      */
     private AttendanceSession getActiveSession(
             String sessionId
@@ -237,6 +257,10 @@ public class AttendanceRecordService {
                                 )
                         );
 
+        /* =====================================================
+           VERIFY DATABASE STATUS
+        ===================================================== */
+
         if (session.getStatus() !=
                 AttendanceSessionStatus.ACTIVE) {
 
@@ -246,7 +270,74 @@ public class AttendanceRecordService {
             );
         }
 
+        /* =====================================================
+           VERIFY SCHEDULED END
+
+           This protects the session even if the
+           automatic scheduler has not yet updated
+           the database status.
+
+           Example:
+
+           scheduledEndAt = 09:00:00
+           request time   = 09:00:02
+
+           Attendance is rejected.
+        ===================================================== */
+
+        LocalDateTime currentTime =
+                AppTime.now();
+
+        validateSessionNotExpired(
+                session,
+                currentTime
+        );
+
         return session;
+    }
+
+    /* =========================================================
+       VALIDATE SESSION TIME
+    ========================================================= */
+
+    /**
+     * Prevents attendance from being recorded
+     * once the configured automatic end time
+     * has been reached.
+     *
+     * Exact boundary:
+     *
+     * attendanceTime < scheduledEndAt
+     *     allowed
+     *
+     * attendanceTime >= scheduledEndAt
+     *     rejected
+     */
+    private void validateSessionNotExpired(
+            AttendanceSession session,
+            LocalDateTime attendanceTime
+    ) {
+
+        LocalDateTime scheduledEndAt =
+                session.getScheduledEndAt();
+
+        /*
+         * null means this session uses
+         * manual ending only.
+         */
+        if (scheduledEndAt == null) {
+            return;
+        }
+
+        if (!attendanceTime.isBefore(
+                scheduledEndAt
+        )) {
+
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "Attendance session has reached its scheduled end time"
+            );
+        }
     }
 
     /* =========================================================
@@ -254,13 +345,18 @@ public class AttendanceRecordService {
     ========================================================= */
 
     /**
-     * Creates a PRESENT attendance record
-     * after validating:
+     * Creates an attendance record after validating:
      *
-     * 1. Student belongs to the session's section.
+     * 1. Student belongs to the session section.
      * 2. Student is active.
-     * 3. Student does not already have an
-     *    attendance record for this session.
+     * 3. Student has not already been recorded.
+     * 4. Session has not reached scheduled end.
+     *
+     * The status is automatically determined:
+     *
+     * PRESENT
+     * or
+     * LATE.
      */
     private AttendanceRecord createAttendanceRecord(
             AttendanceSession session,
@@ -291,6 +387,7 @@ public class AttendanceRecordService {
         ===================================================== */
 
         if (!student.isActive()) {
+
             throw new ApiException(
                     HttpStatus.CONFLICT,
                     "Student is inactive"
@@ -314,16 +411,54 @@ public class AttendanceRecordService {
         }
 
         /* =====================================================
-           CREATE PRESENT RECORD
+           CAPTURE ATTENDANCE TIME ONCE
 
-           recordedAt is generated inside
-           AttendanceRecord using AppTime.now().
+           This timestamp will be used for BOTH:
+
+           - checking session expiration
+           - determining PRESENT/LATE
+           - saved recordedAt value
+
+           This prevents boundary inconsistencies.
+        ===================================================== */
+
+        LocalDateTime attendanceTime =
+                AppTime.now();
+
+        /* =====================================================
+           RE-CHECK SCHEDULED END
+
+           We already checked when loading the session,
+           but we check again here because time may have
+           crossed the scheduled boundary while processing
+           the request.
+        ===================================================== */
+
+        validateSessionNotExpired(
+                session,
+                attendanceTime
+        );
+
+        /* =====================================================
+           DETERMINE ATTENDANCE STATUS
+        ===================================================== */
+
+        AttendanceStatus attendanceStatus =
+                determineAttendanceStatus(
+                        session,
+                        attendanceTime
+                );
+
+        /* =====================================================
+           CREATE ATTENDANCE RECORD
         ===================================================== */
 
         AttendanceRecord record =
                 new AttendanceRecord(
                         session,
-                        student
+                        student,
+                        attendanceStatus,
+                        attendanceTime
                 );
 
         return attendanceRecordRepository
@@ -333,12 +468,82 @@ public class AttendanceRecordService {
     }
 
     /* =========================================================
+       DETERMINE ATTENDANCE STATUS
+    ========================================================= */
+
+    /**
+     * Determines PRESENT or LATE.
+     *
+     * Example:
+     *
+     * Session started:
+     * 07:30
+     *
+     * Late cutoff:
+     * 07:45
+     *
+     *
+     * 07:44:59 -> PRESENT
+     *
+     * 07:45:00 -> LATE
+     *
+     * 07:45:01 -> LATE
+     *
+     *
+     * Legacy sessions that do not have
+     * lateCutoffAt remain PRESENT.
+     */
+    private AttendanceStatus determineAttendanceStatus(
+            AttendanceSession session,
+            LocalDateTime attendanceTime
+    ) {
+
+        LocalDateTime lateCutoffAt =
+                session.getLateCutoffAt();
+
+        /* =====================================================
+           LEGACY SESSION SUPPORT
+
+           Older sessions may not have a late cutoff.
+           Preserve their original behavior.
+        ===================================================== */
+
+        if (lateCutoffAt == null) {
+
+            return AttendanceStatus.PRESENT;
+        }
+
+        /* =====================================================
+           BEFORE CUTOFF
+        ===================================================== */
+
+        if (attendanceTime.isBefore(
+                lateCutoffAt
+        )) {
+
+            return AttendanceStatus.PRESENT;
+        }
+
+        /* =====================================================
+           AT OR AFTER CUTOFF
+        ===================================================== */
+
+        return AttendanceStatus.LATE;
+    }
+
+    /* =========================================================
        GET SESSION ATTENDANCE
     ========================================================= */
 
     /**
      * Returns all attendance records
      * for a specific session.
+     *
+     * Status may now be:
+     *
+     * PRESENT
+     * LATE
+     * ABSENT
      */
     @Transactional(readOnly = true)
     public List<AttendanceRecordResponse> getSessionRecords(
@@ -386,17 +591,14 @@ public class AttendanceRecordService {
 
     /**
      * Returns attendance summaries
-     * for all sections and their sessions.
+     * for all sections and sessions.
      *
-     * Includes:
+     * PRESENT and LATE are both considered
+     * attended when calculating:
      *
-     * - Total students
-     * - Present
-     * - Absent
-     * - Attendance rate
-     * - Section
-     * - Adviser
-     * - Attendance date
+     * - attended students
+     * - absent students
+     * - attendance rate
      */
     @Transactional(readOnly = true)
     public List<AttendanceOverviewResponse>
@@ -448,12 +650,6 @@ public class AttendanceRecordService {
 
                 /* =============================================
                    PRESENT
-
-                   IMPORTANT:
-                   Only PRESENT records are counted as present.
-
-                   ABSENT records created when ending a session
-                   must NOT be counted here.
                 ============================================= */
 
                 int present =
@@ -467,24 +663,52 @@ public class AttendanceRecordService {
                                 .count();
 
                 /* =============================================
+                   LATE
+                ============================================= */
+
+                int late =
+                        (int) records.stream()
+                                .filter(record ->
+                                        record.getStudent() != null &&
+                                                record.getStudent().isActive() &&
+                                                record.getStatus() ==
+                                                        AttendanceStatus.LATE
+                                )
+                                .count();
+
+                /* =============================================
+                   ATTENDED
+
+                   Both PRESENT and LATE count
+                   as attendance.
+                ============================================= */
+
+                int attended =
+                        present +
+                                late;
+
+                /* =============================================
                    ABSENT
                 ============================================= */
 
                 int absent =
                         Math.max(
                                 totalStudents -
-                                        present,
+                                        attended,
                                 0
                         );
 
                 /* =============================================
                    ATTENDANCE RATE
+
+                   PRESENT + LATE are both
+                   considered attended.
                 ============================================= */
 
                 double attendanceRate =
                         totalStudents == 0
                                 ? 0.0
-                                : ((double) present /
+                                : ((double) attended /
                                 totalStudents) * 100.0;
 
                 /* =============================================
@@ -510,6 +734,19 @@ public class AttendanceRecordService {
 
                 /* =============================================
                    BUILD RESPONSE
+
+                   AttendanceOverviewResponse currently has
+                   one attendance-count field called present.
+
+                   To preserve the existing response structure
+                   and prevent breaking the frontend, we send
+                   total attended students here:
+
+                   PRESENT + LATE
+
+                   Later, if we add a dedicated late field to
+                   AttendanceOverviewResponse, we can expose
+                   PRESENT and LATE separately.
                 ============================================= */
 
                 overview.add(
@@ -522,7 +759,7 @@ public class AttendanceRecordService {
                                 session.getAttendanceDate()
                                         .toString(),
                                 totalStudents,
-                                present,
+                                attended,
                                 absent,
                                 attendanceRate
                         )

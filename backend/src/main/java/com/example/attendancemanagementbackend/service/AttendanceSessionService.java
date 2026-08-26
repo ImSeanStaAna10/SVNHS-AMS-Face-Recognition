@@ -23,8 +23,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AttendanceSessionService {
@@ -62,17 +65,107 @@ public class AttendanceSessionService {
 
     /* =========================================================
        START ATTENDANCE SESSION
+       LEGACY / CURRENT FRONTEND COMPATIBILITY
     ========================================================= */
 
+    /**
+     * Keeps the existing frontend/controller flow working.
+     *
+     * Old behavior:
+     *
+     * - no late cutoff
+     * - no scheduled automatic end
+     * - manual ending only
+     */
     @Transactional
     public AttendanceSession startSession(
             String sectionId,
             String adviserId
     ) {
 
+        return createSession(
+                sectionId,
+                adviserId,
+                null,
+                null,
+                false
+        );
+    }
+
+    /* =========================================================
+       START ATTENDANCE SESSION
+       WITH LATE + AUTO-END POLICY
+    ========================================================= */
+
+    /**
+     * Starts a configured attendance session.
+     *
+     * lateAfterMinutes:
+     * Required.
+     *
+     * scheduledEndTime:
+     * Optional.
+     *
+     * null:
+     * Manual ending only.
+     *
+     * non-null:
+     * Automatic ending is configured.
+     */
+    @Transactional
+    public AttendanceSession startSession(
+            String sectionId,
+            Integer lateAfterMinutes,
+            LocalTime scheduledEndTime,
+            String adviserId
+    ) {
+
+        /* =====================================================
+           VALIDATE LATE ALLOWANCE
+        ===================================================== */
+
+        if (lateAfterMinutes == null) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Late allowance is required"
+            );
+        }
+
+        if (lateAfterMinutes < 1) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Late allowance must be at least 1 minute"
+            );
+        }
+
+        return createSession(
+                sectionId,
+                adviserId,
+                lateAfterMinutes,
+                scheduledEndTime,
+                true
+        );
+    }
+
+    /* =========================================================
+       CREATE SESSION
+    ========================================================= */
+
+    private AttendanceSession createSession(
+            String sectionId,
+            String adviserId,
+            Integer lateAfterMinutes,
+            LocalTime scheduledEndTime,
+            boolean configurePolicy
+    ) {
+
         Section section =
                 sectionRepository
-                        .findById(sectionId)
+                        .findById(
+                                sectionId
+                        )
                         .orElseThrow(() ->
                                 new ApiException(
                                         HttpStatus.NOT_FOUND,
@@ -100,6 +193,7 @@ public class AttendanceSessionService {
         ===================================================== */
 
         if (!section.isActive()) {
+
             throw new ApiException(
                     HttpStatus.CONFLICT,
                     "Section is inactive"
@@ -107,20 +201,57 @@ public class AttendanceSessionService {
         }
 
         /* =====================================================
-           PREVENT MULTIPLE ACTIVE SESSIONS
+           CHECK EXISTING ACTIVE SESSION
         ===================================================== */
 
-        attendanceSessionRepository
-                .findBySectionIdAndStatus(
-                        sectionId,
-                        AttendanceSessionStatus.ACTIVE
-                )
-                .ifPresent(session -> {
-                    throw new ApiException(
-                            HttpStatus.CONFLICT,
-                            "This section already has an active attendance session"
-                    );
-                });
+        Optional<AttendanceSession>
+                existingActiveSession =
+                attendanceSessionRepository
+                        .findBySectionIdAndStatus(
+                                sectionId,
+                                AttendanceSessionStatus.ACTIVE
+                        );
+
+        if (existingActiveSession.isPresent()) {
+
+            AttendanceSession activeSession =
+                    existingActiveSession.get();
+
+            LocalDateTime now =
+                    AppTime.now();
+
+            /*
+             * If an old ACTIVE session has already
+             * reached its configured automatic end,
+             * finalize it before continuing.
+             *
+             * This also protects the system after
+             * a backend restart where the scheduler
+             * may not have run yet.
+             */
+            if (isSessionExpired(
+                    activeSession,
+                    now
+            )) {
+
+                finalizeSession(
+                        activeSession,
+                        activeSession.getScheduledEndAt()
+                );
+            }
+
+            /*
+             * Otherwise there is genuinely still
+             * an active attendance session.
+             */
+            else {
+
+                throw new ApiException(
+                        HttpStatus.CONFLICT,
+                        "This section already has an active attendance session"
+                );
+            }
+        }
 
         /* =====================================================
            PREVENT MULTIPLE DAILY SESSIONS
@@ -142,7 +273,7 @@ public class AttendanceSessionService {
         }
 
         /* =====================================================
-           CREATE SESSION
+           CREATE BASE SESSION
         ===================================================== */
 
         AttendanceSession session =
@@ -150,12 +281,113 @@ public class AttendanceSessionService {
                         section
                 );
 
+        /* =====================================================
+           CONFIGURE NEW SESSION POLICY
+        ===================================================== */
+
+        if (configurePolicy) {
+
+            configureSessionPolicy(
+                    session,
+                    lateAfterMinutes,
+                    scheduledEndTime
+            );
+        }
+
         return attendanceSessionRepository
-                .save(session);
+                .save(
+                        session
+                );
     }
 
     /* =========================================================
-       END ATTENDANCE SESSION
+       CONFIGURE SESSION POLICY
+    ========================================================= */
+
+    private void configureSessionPolicy(
+            AttendanceSession session,
+            Integer lateAfterMinutes,
+            LocalTime scheduledEndTime
+    ) {
+
+        LocalDateTime startedAt =
+                session.getStartedAt();
+
+        /* =====================================================
+           CALCULATE LATE CUTOFF
+        ===================================================== */
+
+        LocalDateTime lateCutoffAt =
+                startedAt.plusMinutes(
+                        lateAfterMinutes
+                );
+
+        session.setLateAfterMinutes(
+                lateAfterMinutes
+        );
+
+        session.setLateCutoffAt(
+                lateCutoffAt
+        );
+
+        /* =====================================================
+           MANUAL END ONLY
+        ===================================================== */
+
+        if (scheduledEndTime == null) {
+
+            session.setScheduledEndAt(
+                    null
+            );
+
+            return;
+        }
+
+        /* =====================================================
+           RESOLVE AUTOMATIC END DATETIME
+        ===================================================== */
+
+        LocalDateTime scheduledEndAt =
+                LocalDateTime.of(
+                        session.getAttendanceDate(),
+                        scheduledEndTime
+                );
+
+        /* =====================================================
+           VALIDATE END TIME
+        ===================================================== */
+
+        if (!scheduledEndAt.isAfter(
+                startedAt
+        )) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Scheduled end time must be after the session start time"
+            );
+        }
+
+        /* =====================================================
+           VALIDATE LATE CUTOFF
+        ===================================================== */
+
+        if (!lateCutoffAt.isBefore(
+                scheduledEndAt
+        )) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Late cutoff must be before the scheduled session end"
+            );
+        }
+
+        session.setScheduledEndAt(
+                scheduledEndAt
+        );
+    }
+
+    /* =========================================================
+       MANUALLY END ATTENDANCE SESSION
     ========================================================= */
 
     @Transactional
@@ -166,7 +398,9 @@ public class AttendanceSessionService {
 
         AttendanceSession session =
                 attendanceSessionRepository
-                        .findById(sessionId)
+                        .findById(
+                                sessionId
+                        )
                         .orElseThrow(() ->
                                 new ApiException(
                                         HttpStatus.NOT_FOUND,
@@ -206,12 +440,177 @@ public class AttendanceSessionService {
             );
         }
 
+        LocalDateTime now =
+                AppTime.now();
+
+        /* =====================================================
+           AUTO-END ALREADY REACHED
+        ===================================================== */
+
+        /*
+         * Example:
+         *
+         * scheduledEndAt = 9:00 AM
+         *
+         * Adviser presses manual End at 9:02 AM
+         * before the scheduler happened to execute.
+         *
+         * Official endedAt should still be 9:00 AM,
+         * not 9:02 AM.
+         */
+        if (isSessionExpired(
+                session,
+                now
+        )) {
+
+            return finalizeSession(
+                    session,
+                    session.getScheduledEndAt()
+            );
+        }
+
+        /* =====================================================
+           NORMAL MANUAL END
+        ===================================================== */
+
+        return finalizeSession(
+                session,
+                now
+        );
+    }
+
+    /* =========================================================
+       AUTOMATICALLY FINALIZE EXPIRED SESSIONS
+    ========================================================= */
+
+    /**
+     * Finds all ACTIVE sessions whose scheduled
+     * automatic end time has already been reached
+     * and finalizes them.
+     *
+     * This method will be called by the scheduler.
+     *
+     * Returns the number of sessions finalized.
+     */
+    @Transactional
+    public int finalizeExpiredSessions() {
+
+        LocalDateTime now =
+                AppTime.now();
+
+        List<AttendanceSession> expiredSessions =
+                attendanceSessionRepository
+                        .findByStatusAndScheduledEndAtIsNotNullAndScheduledEndAtLessThanEqual(
+                                AttendanceSessionStatus.ACTIVE,
+                                now
+                        );
+
+        int finalizedCount =
+                0;
+
+        for (AttendanceSession session :
+                expiredSessions) {
+
+            /*
+             * Defensive checks in case a session
+             * changed state after the repository
+             * query.
+             */
+            if (session.getStatus() !=
+                    AttendanceSessionStatus.ACTIVE) {
+
+                continue;
+            }
+
+            if (!isSessionExpired(
+                    session,
+                    now
+            )) {
+
+                continue;
+            }
+
+            /*
+             * Use the configured scheduled end
+             * as the official end timestamp.
+             */
+            finalizeSession(
+                    session,
+                    session.getScheduledEndAt()
+            );
+
+            finalizedCount++;
+        }
+
+        return finalizedCount;
+    }
+
+    /* =========================================================
+       CHECK WHETHER SESSION IS EXPIRED
+    ========================================================= */
+
+    private boolean isSessionExpired(
+            AttendanceSession session,
+            LocalDateTime currentTime
+    ) {
+
+        if (session == null) {
+            return false;
+        }
+
+        if (session.getStatus() !=
+                AttendanceSessionStatus.ACTIVE) {
+
+            return false;
+        }
+
+        LocalDateTime scheduledEndAt =
+                session.getScheduledEndAt();
+
+        /*
+         * null means manual ending only.
+         */
+        if (scheduledEndAt == null) {
+            return false;
+        }
+
+        /*
+         * currentTime >= scheduledEndAt
+         */
+        return !currentTime.isBefore(
+                scheduledEndAt
+        );
+    }
+
+    /* =========================================================
+       FINALIZE SESSION
+       SHARED BY MANUAL + AUTOMATIC END
+    ========================================================= */
+
+    private AttendanceSession finalizeSession(
+            AttendanceSession session,
+            LocalDateTime endedAt
+    ) {
+
+        /*
+         * Defensive idempotency protection.
+         *
+         * If the session was already finalized,
+         * don't create duplicate ABSENT records.
+         */
+        if (session.getStatus() ==
+                AttendanceSessionStatus.ENDED) {
+
+            return session;
+        }
+
         /* =====================================================
            FINALIZE ABSENT STUDENTS
         ===================================================== */
 
         finalizeAbsentStudents(
-                session
+                session,
+                endedAt
         );
 
         /* =====================================================
@@ -223,11 +622,13 @@ public class AttendanceSessionService {
         );
 
         session.setEndedAt(
-                AppTime.now()
+                endedAt
         );
 
         return attendanceSessionRepository
-                .save(session);
+                .save(
+                        session
+                );
     }
 
     /* =========================================================
@@ -235,7 +636,8 @@ public class AttendanceSessionService {
     ========================================================= */
 
     private void finalizeAbsentStudents(
-            AttendanceSession session
+            AttendanceSession session,
+            LocalDateTime finalizationTime
     ) {
 
         String sectionId =
@@ -270,6 +672,9 @@ public class AttendanceSessionService {
                                     student.getId()
                             );
 
+            /*
+             * PRESENT or LATE already exists.
+             */
             if (alreadyRecorded) {
                 continue;
             }
@@ -278,7 +683,8 @@ public class AttendanceSessionService {
                     new AttendanceRecord(
                             session,
                             student,
-                            AttendanceStatus.ABSENT
+                            AttendanceStatus.ABSENT,
+                            finalizationTime
                     );
 
             absentRecords.add(
@@ -287,6 +693,7 @@ public class AttendanceSessionService {
         }
 
         if (!absentRecords.isEmpty()) {
+
             attendanceRecordRepository
                     .saveAll(
                             absentRecords
@@ -303,17 +710,38 @@ public class AttendanceSessionService {
             String sectionId
     ) {
 
-        return attendanceSessionRepository
-                .findBySectionIdAndStatus(
-                        sectionId,
-                        AttendanceSessionStatus.ACTIVE
-                )
-                .orElseThrow(() ->
-                        new ApiException(
-                                HttpStatus.NOT_FOUND,
-                                "No active attendance session found"
+        AttendanceSession session =
+                attendanceSessionRepository
+                        .findBySectionIdAndStatus(
+                                sectionId,
+                                AttendanceSessionStatus.ACTIVE
                         )
-                );
+                        .orElseThrow(() ->
+                                new ApiException(
+                                        HttpStatus.NOT_FOUND,
+                                        "No active attendance session found"
+                                )
+                        );
+
+        /*
+         * The database may still say ACTIVE for a few
+         * seconds while waiting for the scheduler.
+         *
+         * Do not expose an already-expired session
+         * as usable to the frontend.
+         */
+        if (isSessionExpired(
+                session,
+                AppTime.now()
+        )) {
+
+            throw new ApiException(
+                    HttpStatus.NOT_FOUND,
+                    "No active attendance session found"
+            );
+        }
+
+        return session;
     }
 
     /* =========================================================
@@ -334,7 +762,7 @@ public class AttendanceSessionService {
            RESOLVE DATE RANGE
 
            Default:
-           Current month until today
+           Current month until today.
         ===================================================== */
 
         LocalDate today =
@@ -343,7 +771,9 @@ public class AttendanceSessionService {
         LocalDate resolvedFromDate =
                 fromDate != null
                         ? fromDate
-                        : today.withDayOfMonth(1);
+                        : today.withDayOfMonth(
+                        1
+                );
 
         LocalDate resolvedToDate =
                 toDate != null
@@ -369,6 +799,7 @@ public class AttendanceSessionService {
         ===================================================== */
 
         if (page < 0) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Page cannot be negative"
@@ -448,8 +879,7 @@ public class AttendanceSessionService {
                 );
 
         /*
-         * Attendance rate considers PRESENT
-         * and LATE as attended.
+         * PRESENT + LATE are considered attended.
          */
         long attendedCount =
                 presentCount +
@@ -461,9 +891,6 @@ public class AttendanceSessionService {
                         : ((double) attendedCount /
                         studentCount) * 100.0;
 
-        /*
-         * Keep API values clean for the frontend.
-         */
         attendanceRate =
                 Math.round(
                         attendanceRate * 100.0
@@ -492,6 +919,7 @@ public class AttendanceSessionService {
     private long safeLong(
             Long value
     ) {
+
         return value != null
                 ? value
                 : 0L;
