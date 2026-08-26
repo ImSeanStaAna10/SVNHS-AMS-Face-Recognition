@@ -988,6 +988,7 @@
   }
 }
 
+
 /* =========================================================
    ATTENDANCE HISTORY V2 — READABILITY + SEMANTIC COLOR ORGANIZATION
    FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
@@ -1337,7 +1338,8 @@
 
 .attendance-history-date-block {
   border-right-color: #bfd7f5;
-  background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+  background:
+    linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
 }
 
 .attendance-history-date-block span {
@@ -1358,7 +1360,8 @@
 ========================================================= */
 
 .attendance-history-card-main {
-  background: linear-gradient(90deg, rgba(239, 246, 255, 0.24), transparent);
+  background:
+    linear-gradient(90deg, rgba(239, 246, 255, 0.24), transparent);
 }
 
 .attendance-history-card-title > div > span {
@@ -1486,7 +1489,8 @@
 ========================================================= */
 
 .attendance-history-rate {
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.42), transparent);
+  background:
+    linear-gradient(180deg, rgba(248, 250, 252, 0.42), transparent);
 }
 
 .attendance-history-rate-head strong {
@@ -1588,11 +1592,8 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) {
 
 html[data-theme="dark"] .attendance-history-filter-head,
 html[data-theme="dark"] .attendance-history-records-head {
-  background: linear-gradient(
-    90deg,
-    rgba(30, 64, 175, 0.12),
-    rgba(15, 23, 42, 0.16)
-  );
+  background:
+    linear-gradient(90deg, rgba(30, 64, 175, 0.12), rgba(15, 23, 42, 0.16));
 }
 
 html[data-theme="dark"] .attendance-history-filter-controls,
@@ -1614,11 +1615,8 @@ html[data-theme="dark"] .attendance-history-record-count {
 
 html[data-theme="dark"] .attendance-history-date-block {
   border-color: #31588b;
-  background: linear-gradient(
-    180deg,
-    rgba(30, 64, 175, 0.15),
-    rgba(15, 23, 42, 0.45)
-  );
+  background:
+    linear-gradient(180deg, rgba(30, 64, 175, 0.15), rgba(15, 23, 42, 0.45));
 }
 
 html[data-theme="dark"] .attendance-history-card,
@@ -1726,6 +1724,7 @@ html[data-theme="dark"] .attendance-history-session-times div:nth-child(3) {
     transition: none;
   }
 }
+
 
 /* =========================================================
    ATTENDANCE HISTORY V3 — COMPACT SESSION STATS
@@ -1921,6 +1920,7 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   }
 }
 
+
 /* =========================================================
    ATTENDANCE HISTORY V4 — SUBTLE PRODUCTION ANIMATION
    FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
@@ -1936,22 +1936,38 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-hero {
-  animation: attendance-history-hero-enter-v4 0.56s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-hero-enter-v4
+    0.56s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 .attendance-history-hero-copy {
-  animation: attendance-history-hero-copy-enter-v4 0.5s 0.05s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-hero-copy-enter-v4
+    0.5s
+    0.05s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 .attendance-history-hero-meta {
-  animation: attendance-history-hero-meta-enter-v4 0.5s 0.11s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-hero-meta-enter-v4
+    0.5s
+    0.11s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 .attendance-history-hero::after {
-  animation: attendance-history-hero-orbit-v4 13s ease-in-out infinite alternate;
+  animation:
+    attendance-history-hero-orbit-v4
+    13s
+    ease-in-out
+    infinite
+    alternate;
 }
 
 /* =========================================================
@@ -1959,8 +1975,11 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-summary article {
-  animation: attendance-history-summary-enter-v4 0.42s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-summary-enter-v4
+    0.42s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 
   transition:
     transform var(--c-motion-base, 180ms) ease,
@@ -1986,9 +2005,12 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 
 @media (hover: hover) {
   .attendance-history-summary article:hover {
-    transform: translateY(-2px);
+    transform:
+      translateY(-2px);
 
-    box-shadow: 0 12px 26px rgba(15, 35, 70, 0.075);
+    box-shadow:
+      0 12px 26px
+      rgba(15, 35, 70, 0.075);
   }
 }
 
@@ -1997,16 +2019,30 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-filter-panel {
-  animation: attendance-history-filter-enter-v4 0.48s 0.18s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-filter-enter-v4
+    0.48s
+    0.18s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 .attendance-history-filter-head {
-  animation: attendance-history-content-enter-v4 0.36s 0.23s ease-out both;
+  animation:
+    attendance-history-content-enter-v4
+    0.36s
+    0.23s
+    ease-out
+    both;
 }
 
 .attendance-history-filter-controls {
-  animation: attendance-history-content-enter-v4 0.36s 0.27s ease-out both;
+  animation:
+    attendance-history-content-enter-v4
+    0.36s
+    0.27s
+    ease-out
+    both;
 }
 
 /* =========================================================
@@ -2024,12 +2060,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 
 @media (hover: hover) {
   .attendance-history-presets button:hover {
-    transform: translateY(-1px);
+    transform:
+      translateY(-1px);
   }
 }
 
 .attendance-history-presets button:active {
-  transform: translateY(0) scale(0.985);
+  transform:
+    translateY(0)
+    scale(0.985);
 }
 
 /* =========================================================
@@ -2047,7 +2086,8 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 
 .attendance-history-filter-controls input[type="date"]:focus,
 .attendance-history-search:focus-within {
-  transform: translateY(-1px);
+  transform:
+    translateY(-1px);
 }
 
 .attendance-history-search > span {
@@ -2057,9 +2097,11 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 }
 
 .attendance-history-search:focus-within > span {
-  color: var(--c-blue-800);
+  color:
+    var(--c-blue-800);
 
-  transform: scale(1.06);
+  transform:
+    scale(1.06);
 }
 
 /* =========================================================
@@ -2075,16 +2117,22 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 
 @media (hover: hover) {
   .attendance-history-apply-button:hover:not(:disabled) {
-    transform: translateY(-1px);
+    transform:
+      translateY(-1px);
 
-    filter: brightness(1.03);
+    filter:
+      brightness(1.03);
 
-    box-shadow: 0 8px 17px rgba(18, 61, 126, 0.14);
+    box-shadow:
+      0 8px 17px
+      rgba(18, 61, 126, 0.14);
   }
 }
 
 .attendance-history-apply-button:active:not(:disabled) {
-  transform: translateY(0) scale(0.985);
+  transform:
+    translateY(0)
+    scale(0.985);
 }
 
 /* =========================================================
@@ -2092,8 +2140,11 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-alert {
-  animation: attendance-history-alert-enter-v4 0.34s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-alert-enter-v4
+    0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 /* =========================================================
@@ -2101,17 +2152,30 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-records {
-  animation: attendance-history-records-enter-v4 0.48s 0.25s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-records-enter-v4
+    0.48s
+    0.25s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 .attendance-history-records-head {
-  animation: attendance-history-content-enter-v4 0.36s 0.3s ease-out both;
+  animation:
+    attendance-history-content-enter-v4
+    0.36s
+    0.3s
+    ease-out
+    both;
 }
 
 .attendance-history-record-count {
-  animation: attendance-history-badge-enter-v4 0.32s 0.34s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-badge-enter-v4
+    0.32s
+    0.34s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 /* =========================================================
@@ -2119,8 +2183,11 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-card {
-  animation: attendance-history-card-enter-v4 0.38s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-card-enter-v4
+    0.38s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 
   transition:
     background var(--c-motion-base, 180ms) ease,
@@ -2149,8 +2216,13 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 
 @media (hover: hover) {
   .attendance-history-card:hover {
-    box-shadow: inset 3px 0 0
-      color-mix(in srgb, var(--c-blue-800) 48%, transparent);
+    box-shadow:
+      inset 3px 0 0
+      color-mix(
+        in srgb,
+        var(--c-blue-800) 48%,
+        transparent
+      );
   }
 }
 
@@ -2159,8 +2231,12 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-date-block {
-  animation: attendance-history-date-enter-v4 0.36s 0.04s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-date-enter-v4
+    0.36s
+    0.04s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 /* =========================================================
@@ -2168,8 +2244,11 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-session-times div {
-  animation: attendance-history-mini-card-enter-v4 0.32s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-mini-card-enter-v4
+    0.32s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 .attendance-history-session-times div:nth-child(1) {
@@ -2189,8 +2268,12 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-card-stats {
-  animation: attendance-history-mini-card-enter-v4 0.34s 0.08s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-mini-card-enter-v4
+    0.34s
+    0.08s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 .attendance-history-card-stats div {
@@ -2201,7 +2284,8 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 
 @media (hover: hover) {
   .attendance-history-card-stats div:hover {
-    transform: translateY(-1px);
+    transform:
+      translateY(-1px);
   }
 }
 
@@ -2210,13 +2294,24 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-rate {
-  animation: attendance-history-content-enter-v4 0.34s 0.1s ease-out both;
+  animation:
+    attendance-history-content-enter-v4
+    0.34s
+    0.1s
+    ease-out
+    both;
 }
 
 .attendance-history-rate-track span {
-  transform-origin: left center;
+  transform-origin:
+    left center;
 
-  animation: attendance-history-progress-enter-v4 0.68s 0.14s ease-out both;
+  animation:
+    attendance-history-progress-enter-v4
+    0.68s
+    0.14s
+    ease-out
+    both;
 }
 
 /* =========================================================
@@ -2224,7 +2319,12 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-card-action {
-  animation: attendance-history-action-enter-v4 0.34s 0.12s ease-out both;
+  animation:
+    attendance-history-action-enter-v4
+    0.34s
+    0.12s
+    ease-out
+    both;
 }
 
 .attendance-history-card-action button {
@@ -2236,16 +2336,22 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 
 @media (hover: hover) {
   .attendance-history-card-action button:hover:not(:disabled) {
-    transform: translateY(-1px);
+    transform:
+      translateY(-1px);
 
-    filter: brightness(1.03);
+    filter:
+      brightness(1.03);
 
-    box-shadow: 0 8px 17px rgba(18, 61, 126, 0.14);
+    box-shadow:
+      0 8px 17px
+      rgba(18, 61, 126, 0.14);
   }
 }
 
 .attendance-history-card-action button:active:not(:disabled) {
-  transform: translateY(0) scale(0.985);
+  transform:
+    translateY(0)
+    scale(0.985);
 }
 
 /* =========================================================
@@ -2253,7 +2359,12 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-pagination {
-  animation: attendance-history-pagination-enter-v4 0.38s 0.34s ease-out both;
+  animation:
+    attendance-history-pagination-enter-v4
+    0.38s
+    0.34s
+    ease-out
+    both;
 }
 
 .attendance-history-pagination-actions button {
@@ -2265,13 +2376,18 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 }
 
 @media (hover: hover) {
-  .attendance-history-pagination-actions button:hover:not(:disabled) {
-    transform: translateY(-1px);
+  .attendance-history-pagination-actions
+  button:hover:not(:disabled) {
+    transform:
+      translateY(-1px);
   }
 }
 
-.attendance-history-pagination-actions button:active:not(:disabled) {
-  transform: translateY(0) scale(0.985);
+.attendance-history-pagination-actions
+button:active:not(:disabled) {
+  transform:
+    translateY(0)
+    scale(0.985);
 }
 
 /* =========================================================
@@ -2279,13 +2395,20 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 ========================================================= */
 
 .attendance-history-empty {
-  animation: attendance-history-empty-enter-v4 0.42s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-empty-enter-v4
+    0.42s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 .attendance-history-empty > div {
-  animation: attendance-history-icon-pop-v4 0.38s 0.07s
-    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  animation:
+    attendance-history-icon-pop-v4
+    0.38s
+    0.07s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1))
+    both;
 }
 
 /* =========================================================
@@ -2296,13 +2419,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(10px);
+    transform:
+      translateY(10px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0);
+    transform:
+      translateY(0);
   }
 }
 
@@ -2310,13 +2435,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateX(-14px);
+    transform:
+      translateX(-14px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateX(0);
+    transform:
+      translateX(0);
   }
 }
 
@@ -2324,23 +2451,31 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateX(14px) scale(0.985);
+    transform:
+      translateX(14px)
+      scale(0.985);
   }
 
   to {
     opacity: 1;
 
-    transform: translateX(0) scale(1);
+    transform:
+      translateX(0)
+      scale(1);
   }
 }
 
 @keyframes attendance-history-hero-orbit-v4 {
   from {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform:
+      translate3d(0, 0, 0)
+      scale(1);
   }
 
   to {
-    transform: translate3d(-10px, 8px, 0) scale(1.025);
+    transform:
+      translate3d(-10px, 8px, 0)
+      scale(1.025);
   }
 }
 
@@ -2348,13 +2483,17 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(8px) scale(0.992);
+    transform:
+      translateY(8px)
+      scale(0.992);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0) scale(1);
+    transform:
+      translateY(0)
+      scale(1);
   }
 }
 
@@ -2362,13 +2501,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(9px);
+    transform:
+      translateY(9px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0);
+    transform:
+      translateY(0);
   }
 }
 
@@ -2376,13 +2517,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(6px);
+    transform:
+      translateY(6px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0);
+    transform:
+      translateY(0);
   }
 }
 
@@ -2390,13 +2533,17 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(-5px) scale(0.99);
+    transform:
+      translateY(-5px)
+      scale(0.99);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0) scale(1);
+    transform:
+      translateY(0)
+      scale(1);
   }
 }
 
@@ -2404,13 +2551,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(10px);
+    transform:
+      translateY(10px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0);
+    transform:
+      translateY(0);
   }
 }
 
@@ -2418,13 +2567,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: scale(0.9);
+    transform:
+      scale(0.9);
   }
 
   to {
     opacity: 1;
 
-    transform: scale(1);
+    transform:
+      scale(1);
   }
 }
 
@@ -2432,13 +2583,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(7px);
+    transform:
+      translateY(7px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0);
+    transform:
+      translateY(0);
   }
 }
 
@@ -2446,13 +2599,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateX(-6px);
+    transform:
+      translateX(-6px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateX(0);
+    transform:
+      translateX(0);
   }
 }
 
@@ -2460,23 +2615,29 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(5px) scale(0.985);
+    transform:
+      translateY(5px)
+      scale(0.985);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0) scale(1);
+    transform:
+      translateY(0)
+      scale(1);
   }
 }
 
 @keyframes attendance-history-progress-enter-v4 {
   from {
-    transform: scaleX(0);
+    transform:
+      scaleX(0);
   }
 
   to {
-    transform: scaleX(1);
+    transform:
+      scaleX(1);
   }
 }
 
@@ -2484,13 +2645,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateX(6px);
+    transform:
+      translateX(6px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateX(0);
+    transform:
+      translateX(0);
   }
 }
 
@@ -2498,13 +2661,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(5px);
+    transform:
+      translateY(5px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0);
+    transform:
+      translateY(0);
   }
 }
 
@@ -2512,13 +2677,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: translateY(8px);
+    transform:
+      translateY(8px);
   }
 
   to {
     opacity: 1;
 
-    transform: translateY(0);
+    transform:
+      translateY(0);
   }
 }
 
@@ -2526,13 +2693,15 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   from {
     opacity: 0;
 
-    transform: scale(0.88);
+    transform:
+      scale(0.88);
   }
 
   to {
     opacity: 1;
 
-    transform: scale(1);
+    transform:
+      scale(1);
   }
 }
 
@@ -2616,6 +2785,7 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   }
 }
 
+
 /* =========================================================
    ATTENDANCE HISTORY V5 — DARK MODE SURFACE FIX
    FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
@@ -2634,19 +2804,21 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
 
 html[data-theme="dark"] .attendance-history-card,
 html[data-theme="dark"] .attendance-history-card:nth-child(even) {
-  background: linear-gradient(
-    90deg,
-    rgba(15, 34, 59, 0.98),
-    rgba(13, 29, 50, 0.98)
-  );
+  background:
+    linear-gradient(
+      90deg,
+      rgba(15, 34, 59, 0.98),
+      rgba(13, 29, 50, 0.98)
+    );
 }
 
 html[data-theme="dark"] .attendance-history-card:hover {
-  background: linear-gradient(
-    90deg,
-    rgba(22, 48, 79, 0.98),
-    rgba(15, 35, 60, 0.98)
-  );
+  background:
+    linear-gradient(
+      90deg,
+      rgba(22, 48, 79, 0.98),
+      rgba(15, 35, 60, 0.98)
+    );
 }
 
 /* =========================================================
@@ -2654,13 +2826,15 @@ html[data-theme="dark"] .attendance-history-card:hover {
 ========================================================= */
 
 html[data-theme="dark"] .attendance-history-date-block {
-  border-right-color: rgba(96, 165, 250, 0.2);
+  border-right-color:
+    rgba(96, 165, 250, 0.2);
 
-  background: linear-gradient(
-    180deg,
-    rgba(30, 64, 175, 0.16),
-    rgba(11, 30, 53, 0.72)
-  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(30, 64, 175, 0.16),
+      rgba(11, 30, 53, 0.72)
+    );
 }
 
 /* =========================================================
@@ -2669,33 +2843,43 @@ html[data-theme="dark"] .attendance-history-date-block {
 ========================================================= */
 
 html[data-theme="dark"] .attendance-history-card-main {
-  background: linear-gradient(
-    90deg,
-    rgba(59, 130, 246, 0.055),
-    transparent 62%
-  );
+  background:
+    linear-gradient(
+      90deg,
+      rgba(59, 130, 246, 0.055),
+      transparent 62%
+    );
 }
 
 /* =========================================================
    DARK MODE — SESSION TIME BOXES
 ========================================================= */
 
-html[data-theme="dark"] .attendance-history-session-times div:nth-child(1) {
-  border-color: rgba(96, 165, 250, 0.24);
+html[data-theme="dark"]
+.attendance-history-session-times div:nth-child(1) {
+  border-color:
+    rgba(96, 165, 250, 0.24);
 
-  background: rgba(37, 99, 235, 0.1);
+  background:
+    rgba(37, 99, 235, 0.1);
 }
 
-html[data-theme="dark"] .attendance-history-session-times div:nth-child(2) {
-  border-color: rgba(167, 139, 250, 0.24);
+html[data-theme="dark"]
+.attendance-history-session-times div:nth-child(2) {
+  border-color:
+    rgba(167, 139, 250, 0.24);
 
-  background: rgba(109, 40, 217, 0.1);
+  background:
+    rgba(109, 40, 217, 0.1);
 }
 
-html[data-theme="dark"] .attendance-history-session-times div:nth-child(3) {
-  border-color: rgba(148, 163, 184, 0.16);
+html[data-theme="dark"]
+.attendance-history-session-times div:nth-child(3) {
+  border-color:
+    rgba(148, 163, 184, 0.16);
 
-  background: rgba(51, 65, 85, 0.15);
+  background:
+    rgba(51, 65, 85, 0.15);
 }
 
 /* =========================================================
@@ -2703,13 +2887,17 @@ html[data-theme="dark"] .attendance-history-session-times div:nth-child(3) {
 ========================================================= */
 
 html[data-theme="dark"] .attendance-history-card-stats {
-  border-color: rgba(128, 166, 207, 0.18);
+  border-color:
+    rgba(128, 166, 207, 0.18);
 
-  background: rgba(8, 24, 43, 0.48);
+  background:
+    rgba(8, 24, 43, 0.48);
 }
 
-html[data-theme="dark"] .attendance-history-card-stats div + div {
-  border-left-color: rgba(128, 166, 207, 0.14) !important;
+html[data-theme="dark"]
+.attendance-history-card-stats div + div {
+  border-left-color:
+    rgba(128, 166, 207, 0.14) !important;
 }
 
 /* =========================================================
@@ -2719,11 +2907,12 @@ html[data-theme="dark"] .attendance-history-card-stats div + div {
 ========================================================= */
 
 html[data-theme="dark"] .attendance-history-rate {
-  background: linear-gradient(
-    180deg,
-    rgba(17, 39, 66, 0.72),
-    rgba(11, 29, 50, 0.44)
-  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(17, 39, 66, 0.72),
+      rgba(11, 29, 50, 0.44)
+    );
 }
 
 html[data-theme="dark"] .attendance-history-rate-head span {
@@ -2731,7 +2920,8 @@ html[data-theme="dark"] .attendance-history-rate-head span {
 }
 
 html[data-theme="dark"] .attendance-history-rate-track {
-  background: rgba(128, 166, 207, 0.16);
+  background:
+    rgba(128, 166, 207, 0.16);
 }
 
 html[data-theme="dark"] .attendance-history-rate small {
@@ -2740,27 +2930,33 @@ html[data-theme="dark"] .attendance-history-rate small {
 
 /* Keep semantic rate colors vivid against the navy surface. */
 
-html[data-theme="dark"] .attendance-history-rate-head strong.is-excellent {
+html[data-theme="dark"]
+.attendance-history-rate-head strong.is-excellent {
   color: #86efac;
 }
 
-html[data-theme="dark"] .attendance-history-rate-head strong.is-good {
+html[data-theme="dark"]
+.attendance-history-rate-head strong.is-good {
   color: #93c5fd;
 }
 
-html[data-theme="dark"] .attendance-history-rate-head strong.is-attention {
+html[data-theme="dark"]
+.attendance-history-rate-head strong.is-attention {
   color: #fda4af;
 }
 
-html[data-theme="dark"] .attendance-history-rate-track span.is-excellent {
+html[data-theme="dark"]
+.attendance-history-rate-track span.is-excellent {
   background: #4ade80;
 }
 
-html[data-theme="dark"] .attendance-history-rate-track span.is-good {
+html[data-theme="dark"]
+.attendance-history-rate-track span.is-good {
   background: #60a5fa;
 }
 
-html[data-theme="dark"] .attendance-history-rate-track span.is-attention {
+html[data-theme="dark"]
+.attendance-history-rate-track span.is-attention {
   background: #fb7185;
 }
 
@@ -2769,28 +2965,43 @@ html[data-theme="dark"] .attendance-history-rate-track span.is-attention {
 ========================================================= */
 
 html[data-theme="dark"] .attendance-history-card-action {
-  background: rgba(8, 24, 43, 0.18);
-}
-
-html[data-theme="dark"] .attendance-history-card-action button {
-  border-color: #3478c5;
-
-  background: linear-gradient(135deg, #1d4f8f, #2467b2);
-
-  color: #ffffff;
-
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  background:
+    rgba(8, 24, 43, 0.18);
 }
 
 html[data-theme="dark"]
-  .attendance-history-card-action
-  button:hover:not(:disabled) {
-  border-color: #60a5fa;
+.attendance-history-card-action button {
+  border-color: #3478c5;
 
-  background: linear-gradient(135deg, #245fa8, #2c78c9);
+  background:
+    linear-gradient(
+      135deg,
+      #1d4f8f,
+      #2467b2
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 6px 14px
+    rgba(0, 0, 0, 0.12);
 }
 
-html[data-theme="dark"] .attendance-history-card-action small {
+html[data-theme="dark"]
+.attendance-history-card-action
+button:hover:not(:disabled) {
+  border-color: #60a5fa;
+
+  background:
+    linear-gradient(
+      135deg,
+      #245fa8,
+      #2c78c9
+    );
+}
+
+html[data-theme="dark"]
+.attendance-history-card-action small {
   color: #8fa1b8;
 }
 
@@ -2799,23 +3010,27 @@ html[data-theme="dark"] .attendance-history-card-action small {
 ========================================================= */
 
 html[data-theme="dark"] .attendance-history-records {
-  border-color: rgba(128, 166, 207, 0.2);
+  border-color:
+    rgba(128, 166, 207, 0.2);
 
   background: #102641;
 }
 
 html[data-theme="dark"] .attendance-history-records-head {
-  border-bottom-color: rgba(128, 166, 207, 0.14);
+  border-bottom-color:
+    rgba(128, 166, 207, 0.14);
 
-  background: linear-gradient(
-    90deg,
-    rgba(30, 64, 175, 0.11),
-    rgba(13, 31, 55, 0.76)
-  );
+  background:
+    linear-gradient(
+      90deg,
+      rgba(30, 64, 175, 0.11),
+      rgba(13, 31, 55, 0.76)
+    );
 }
 
 html[data-theme="dark"] .attendance-history-pagination {
-  background: rgba(10, 28, 49, 0.78);
+  background:
+    rgba(10, 28, 49, 0.78);
 }
 
 /* =========================================================
@@ -2823,9 +3038,11 @@ html[data-theme="dark"] .attendance-history-pagination {
 ========================================================= */
 
 html[data-theme="dark"] .attendance-history-ended-badge {
-  border-color: rgba(128, 166, 207, 0.16);
+  border-color:
+    rgba(128, 166, 207, 0.16);
 
-  background: rgba(255, 255, 255, 0.045);
+  background:
+    rgba(255, 255, 255, 0.045);
 
   color: #c7d3e2;
 }
@@ -2838,12 +3055,15 @@ html[data-theme="dark"] .attendance-history-ended-badge i {
    DARK MODE — TEXT CONTRAST
 ========================================================= */
 
-html[data-theme="dark"] .attendance-history-card-title h3 {
+html[data-theme="dark"]
+.attendance-history-card-title h3 {
   color: #f3f7fc;
 }
 
-html[data-theme="dark"] .attendance-history-card-title p,
-html[data-theme="dark"] .attendance-history-session-times strong {
+html[data-theme="dark"]
+.attendance-history-card-title p,
+html[data-theme="dark"]
+.attendance-history-session-times strong {
   color: #b6c4d5;
 }
 
@@ -2851,9 +3071,12 @@ html[data-theme="dark"] .attendance-history-session-times strong {
    DARK MODE — REMOVE LIGHT COLOR LEAKS
 ========================================================= */
 
-html[data-theme="dark"] .attendance-history-card-main,
-html[data-theme="dark"] .attendance-history-rate,
-html[data-theme="dark"] .attendance-history-card-action {
+html[data-theme="dark"]
+.attendance-history-card-main,
+html[data-theme="dark"]
+.attendance-history-rate,
+html[data-theme="dark"]
+.attendance-history-card-action {
   background-color: transparent;
 }
 
@@ -2862,14 +3085,19 @@ html[data-theme="dark"] .attendance-history-card-action {
 ========================================================= */
 
 @media (max-width: 820px) {
-  html[data-theme="dark"] .attendance-history-rate,
-  html[data-theme="dark"] .attendance-history-card-action {
-    border-top-color: rgba(128, 166, 207, 0.14);
+  html[data-theme="dark"]
+  .attendance-history-rate,
+  html[data-theme="dark"]
+  .attendance-history-card-action {
+    border-top-color:
+      rgba(128, 166, 207, 0.14);
   }
 }
 
 @media (max-width: 620px) {
-  html[data-theme="dark"] .attendance-history-date-block {
-    border-bottom-color: rgba(96, 165, 250, 0.18);
+  html[data-theme="dark"]
+  .attendance-history-date-block {
+    border-bottom-color:
+      rgba(96, 165, 250, 0.18);
   }
 }
