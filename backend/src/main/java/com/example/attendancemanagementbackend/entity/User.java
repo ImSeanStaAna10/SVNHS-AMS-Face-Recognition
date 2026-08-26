@@ -26,15 +26,62 @@ public class User {
     @Column(nullable = false)
     private boolean active = true;
 
+    /* =========================================================
+       DEPARTMENT
+
+       Nullable muna para hindi masira ang existing users
+       habang nagmi-migrate tayo to department-scoped Councilors.
+
+       Examples:
+
+       ICT Department Councilor
+       → department = ICT
+
+       TVL Department Councilor
+       → department = TVL
+
+       ICT Adviser
+       → department = ICT
+    ========================================================= */
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "department_id"
+    )
+    private Department department;
+
+    /* =========================================================
+       CONSTRUCTORS
+    ========================================================= */
+
     public User() {
     }
 
-    public User(String name, String email, String password, Role role) {
+    /*
+     * Existing constructor retained.
+     *
+     * Important:
+     * Current code that creates Users / Advisers using:
+     *
+     * new User(name, email, password, role)
+     *
+     * will continue working.
+     */
+    public User(
+            String name,
+            String email,
+            String password,
+            Role role
+    ) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
     }
+
+    /* =========================================================
+       GETTERS / SETTERS
+    ========================================================= */
 
     public String getId() {
         return id;
@@ -44,7 +91,9 @@ public class User {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(
+            String name
+    ) {
         this.name = name;
     }
 
@@ -52,7 +101,9 @@ public class User {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(
+            String email
+    ) {
         this.email = email;
     }
 
@@ -60,7 +111,9 @@ public class User {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(
+            String password
+    ) {
         this.password = password;
     }
 
@@ -68,7 +121,9 @@ public class User {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(
+            Role role
+    ) {
         this.role = role;
     }
 
@@ -76,7 +131,19 @@ public class User {
         return active;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(
+            boolean active
+    ) {
         this.active = active;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(
+            Department department
+    ) {
+        this.department = department;
     }
 }
