@@ -5927,3 +5927,401 @@ html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(2) {
     transform: none !important;
   }
 }
+
+/* =========================================================
+   ATTENDANCE SESSION V6 — LATE STATUS + SESSION POLICY
+   APPEND-ONLY SAFE OVERRIDES
+
+   Added for:
+   - PRESENT / LATE / PENDING distinction
+   - Live scheduled-end guard presentation
+   - Late cutoff / scheduled end session summary
+   - Existing camera, filters, pagination, dark mode and
+     animation behavior remain preserved.
+========================================================= */
+
+/* =========================================================
+   SESSION STATE PILL
+========================================================= */
+
+.attendance-live-session-pill.is-ended {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+.attendance-live-session-pill.is-ended i {
+  background: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+  animation: none;
+}
+
+/* =========================================================
+   CAMERA QUICK STATS — ADD LATE
+========================================================= */
+
+.attendance-camera-stats {
+  grid-template-columns: repeat(4, auto);
+}
+
+.attendance-camera-stats > div.is-late {
+  border-color: rgba(253, 186, 116, 0.32);
+  background: rgba(154, 52, 18, 0.58);
+}
+
+.attendance-camera-stats > div.is-late span {
+  color: #fed7aa;
+}
+
+.attendance-camera-stats > div.is-late strong {
+  color: #fdba74;
+}
+
+/* =========================================================
+   RESULT PANEL — LATE SUCCESS STATE
+========================================================= */
+
+.attendance-live-result-panel.is-success.is-late {
+  border-color: #f4c98a;
+  background: linear-gradient(180deg, rgba(255, 247, 237, 0.9), #ffffff 24%);
+  box-shadow: 0 24px 55px rgba(194, 65, 12, 0.11);
+}
+
+.attendance-live-result-panel.is-success.is-late
+  .attendance-result-panel-header {
+  background: #fff7ed;
+}
+
+.attendance-live-result-panel.is-success.is-late
+  .attendance-result-panel-header
+  strong,
+.attendance-live-result-panel.is-success.is-late .attendance-result-kicker {
+  color: #c2410c;
+}
+
+.attendance-live-result-panel.is-success.is-late .attendance-result-icon {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+/* =========================================================
+   SESSION MINI SUMMARY — 4 POLICY CELLS
+========================================================= */
+
+.attendance-session-mini-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.attendance-session-mini-summary > div + div {
+  border-top: 0;
+  border-left: 1px solid #e5eaf0;
+}
+
+.attendance-session-mini-summary > div:nth-child(odd) {
+  border-left: 0;
+}
+
+.attendance-session-mini-summary > div:nth-child(n + 3) {
+  border-top: 1px solid #e5eaf0;
+}
+
+.attendance-session-mini-summary > div:nth-child(1) {
+  background: #f3f8ff;
+}
+
+.attendance-session-mini-summary > div:nth-child(2) {
+  background: #fff7ed;
+}
+
+.attendance-session-mini-summary > div:nth-child(3) {
+  background: #faf8ff;
+}
+
+.attendance-session-mini-summary > div:nth-child(4) {
+  background: #f1fbf4;
+}
+
+.attendance-session-mini-summary > div:nth-child(1) span {
+  color: #2563eb;
+}
+
+.attendance-session-mini-summary > div:nth-child(2) span {
+  color: #c2410c;
+}
+
+.attendance-session-mini-summary > div:nth-child(3) span {
+  color: #6d28d9;
+}
+
+.attendance-session-mini-summary > div:nth-child(4) span {
+  color: #15803d;
+}
+
+/* =========================================================
+   REPORT SUMMARY — 5 CARDS
+========================================================= */
+
+.attendance-report-summary {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.attendance-summary-card.is-late {
+  border-color: #f4c98a;
+  border-top-color: #f97316;
+  background: #fff7ed;
+  color: #c2410c;
+  box-shadow: inset 0 0 0 1px rgba(249, 115, 22, 0.12);
+}
+
+.attendance-summary-card.is-late span,
+.attendance-summary-card.is-late strong {
+  color: currentColor;
+}
+
+/* =========================================================
+   TABLE — LATE / ABSENT STATUS
+========================================================= */
+
+.attendance-live-table tbody tr.is-late {
+  background: linear-gradient(90deg, rgba(255, 247, 237, 0.98), #ffffff 36%);
+}
+
+.attendance-live-table tbody tr.is-absent {
+  background: linear-gradient(90deg, rgba(255, 241, 242, 0.96), #ffffff 36%);
+}
+
+.attendance-live-table tbody tr.is-late:hover {
+  background: #fff5e9;
+}
+
+.attendance-live-table tbody tr.is-absent:hover {
+  background: #fff0f2;
+}
+
+.attendance-live-status.is-late {
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.attendance-live-status.is-late i {
+  background: #f97316;
+}
+
+.attendance-live-status.is-absent {
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+.attendance-live-status.is-absent i {
+  background: #ef4444;
+}
+
+/* =========================================================
+   END SESSION SUMMARY — PRESENT / LATE / REMAINING
+========================================================= */
+
+.attendance-live-end-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.attendance-live-end-summary > div:nth-child(1) {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.attendance-live-end-summary > div:nth-child(1) span {
+  color: #15803d;
+}
+
+.attendance-live-end-summary > div:nth-child(2) {
+  border-color: #f4c98a;
+  background: #fff7ed;
+}
+
+.attendance-live-end-summary > div:nth-child(2) span {
+  color: #c2410c;
+}
+
+.attendance-live-end-summary > div:nth-child(3) {
+  border-color: #d8e0ea;
+  background: #f8fafc;
+}
+
+.attendance-live-end-summary > div:nth-child(3) span {
+  color: #64748b;
+}
+
+/* =========================================================
+   DARK MODE — LATE / POLICY
+========================================================= */
+
+html[data-theme="dark"] .attendance-live-session-pill.is-ended {
+  border-color: #7f1d1d;
+  background: rgba(127, 29, 29, 0.2);
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .attendance-live-result-panel.is-success.is-late {
+  border-color: #7c451d;
+  background: linear-gradient(180deg, rgba(154, 52, 18, 0.18), #0d1727 24%);
+}
+
+html[data-theme="dark"]
+  .attendance-live-result-panel.is-success.is-late
+  .attendance-result-panel-header {
+  background: rgba(154, 52, 18, 0.18);
+}
+
+html[data-theme="dark"]
+  .attendance-live-result-panel.is-success.is-late
+  .attendance-result-panel-header
+  strong,
+html[data-theme="dark"]
+  .attendance-live-result-panel.is-success.is-late
+  .attendance-result-kicker {
+  color: #fdba74;
+}
+
+html[data-theme="dark"]
+  .attendance-live-result-panel.is-success.is-late
+  .attendance-result-icon {
+  background: rgba(154, 52, 18, 0.24);
+  color: #fdba74;
+}
+
+html[data-theme="dark"] .attendance-summary-card.is-late,
+html[data-theme="dark"] .attendance-live-status.is-late {
+  border-color: #7c451d;
+  background: rgba(154, 52, 18, 0.18);
+  color: #fdba74;
+}
+
+html[data-theme="dark"] .attendance-live-status.is-absent {
+  border-color: #7f1d1d;
+  background: rgba(127, 29, 29, 0.18);
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .attendance-live-table tbody tr.is-late,
+html[data-theme="dark"] .attendance-live-table tbody tr.is-late:hover {
+  background: rgba(154, 52, 18, 0.14);
+}
+
+html[data-theme="dark"] .attendance-live-table tbody tr.is-absent,
+html[data-theme="dark"] .attendance-live-table tbody tr.is-absent:hover {
+  background: rgba(127, 29, 29, 0.14);
+}
+
+html[data-theme="dark"] .attendance-session-mini-summary > div:nth-child(1) {
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .attendance-session-mini-summary > div:nth-child(2) {
+  background: rgba(154, 52, 18, 0.15);
+}
+
+html[data-theme="dark"] .attendance-session-mini-summary > div:nth-child(3) {
+  background: rgba(109, 40, 217, 0.14);
+}
+
+html[data-theme="dark"] .attendance-session-mini-summary > div:nth-child(4) {
+  background: rgba(22, 101, 52, 0.15);
+}
+
+html[data-theme="dark"] .attendance-session-mini-summary > div + div,
+html[data-theme="dark"]
+  .attendance-session-mini-summary
+  > div:nth-child(n + 3) {
+  border-color: #26354b;
+}
+
+html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(1) {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.15);
+}
+
+html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(2) {
+  border-color: #7c451d;
+  background: rgba(154, 52, 18, 0.16);
+}
+
+html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(3) {
+  border-color: #34455a;
+  background: #111e30;
+}
+
+/* =========================================================
+   RESPONSIVE — LATE / POLICY
+========================================================= */
+
+@media (max-width: 1100px) {
+  .attendance-report-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .attendance-report-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-summary-card.is-completion {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 650px) {
+  .attendance-camera-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .attendance-camera-stats > div {
+    min-width: 0;
+    padding: 8px 5px;
+  }
+
+  .attendance-camera-stats span {
+    font-size: 8px;
+  }
+
+  .attendance-camera-stats strong {
+    font-size: 15px;
+  }
+
+  .attendance-session-mini-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-session-mini-summary > div + div,
+  .attendance-session-mini-summary > div:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .attendance-session-mini-summary > div + div {
+    border-top: 1px solid #e5eaf0;
+  }
+
+  .attendance-report-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-summary-card.is-completion {
+    grid-column: 1 / -1;
+  }
+
+  .attendance-live-end-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-live-session-pill.is-ended i {
+    animation: none !important;
+  }
+}

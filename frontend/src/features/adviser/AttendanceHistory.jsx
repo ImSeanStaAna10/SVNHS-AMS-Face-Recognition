@@ -451,6 +451,150 @@ const getRateTone = (rate) => {
   return "attention";
 };
 
+const toNonNegativeNumber = (value) => {
+  const parsed =
+    Number(value);
+
+  if (
+    !Number.isFinite(parsed)
+  ) {
+    return 0;
+  }
+
+  return Math.max(
+    0,
+    parsed,
+  );
+};
+
+const getSessionAttendanceCounts = (
+  session,
+) => {
+  const students =
+    toNonNegativeNumber(
+      session?.studentCount,
+    );
+
+  const present =
+    toNonNegativeNumber(
+      session?.presentCount,
+    );
+
+  const absent =
+    toNonNegativeNumber(
+      session?.absentCount,
+    );
+
+  const explicitLateValue =
+    session?.lateCount ??
+    session?.late ??
+    null;
+
+  let late =
+    explicitLateValue !==
+      null &&
+    explicitLateValue !==
+      undefined
+      ? toNonNegativeNumber(
+          explicitLateValue,
+        )
+      : 0;
+
+  /*
+   * Backward compatibility:
+   *
+   * Older history payloads may not yet expose lateCount.
+   * If the completed session already has studentCount and
+   * absentCount, we can safely derive the missing LATE count:
+   *
+   * students = present + late + absent
+   *
+   * If the backend already treats presentCount as total
+   * attended, the derived value naturally stays at zero.
+   */
+  if (
+    explicitLateValue ===
+      null ||
+    explicitLateValue ===
+      undefined
+  ) {
+    const hasStudentCount =
+      session?.studentCount !==
+        null &&
+      session?.studentCount !==
+        undefined;
+
+    const hasAbsentCount =
+      session?.absentCount !==
+        null &&
+      session?.absentCount !==
+        undefined;
+
+    if (
+      hasStudentCount &&
+      hasAbsentCount
+    ) {
+      late =
+        Math.max(
+          0,
+          students -
+            absent -
+            present,
+        );
+    }
+  }
+
+  const attended =
+    present + late;
+
+  return {
+    students,
+    present,
+    late,
+    absent,
+    attended,
+  };
+};
+
+const getSessionAttendanceRate = (
+  session,
+  counts,
+) => {
+  const rawBackendRate =
+    session?.attendanceRate;
+
+  const backendRate =
+    Number(
+      rawBackendRate,
+    );
+
+  if (
+    rawBackendRate !==
+      null &&
+    rawBackendRate !==
+      undefined &&
+    Number.isFinite(
+      backendRate,
+    )
+  ) {
+    return clampRate(
+      backendRate,
+    );
+  }
+
+  if (
+    !counts?.students
+  ) {
+    return 0;
+  }
+
+  return clampRate(
+    (counts.attended /
+      counts.students) *
+      100,
+  );
+};
+
 /* =========================================================
    COMPONENT
 ========================================================= */
@@ -772,33 +916,37 @@ function AttendanceHistory() {
           totals,
           session,
         ) => {
+          const counts =
+            getSessionAttendanceCounts(
+              session,
+            );
+
           totals.sessions +=
             1;
 
           totals.present +=
-            Number(
-              session?.presentCount ||
-                0,
-            );
+            counts.present;
+
+          totals.late +=
+            counts.late;
 
           totals.absent +=
-            Number(
-              session?.absentCount ||
-                0,
-            );
+            counts.absent;
+
+          totals.attended +=
+            counts.attended;
 
           totals.students +=
-            Number(
-              session?.studentCount ||
-                0,
-            );
+            counts.students;
 
           return totals;
         },
         {
           sessions: 0,
           present: 0,
+          late: 0,
           absent: 0,
+          attended: 0,
           students: 0,
         },
       );
@@ -807,7 +955,7 @@ function AttendanceHistory() {
   const pageAttendanceRate =
     pageSummary.students > 0
       ? Math.round(
-          (pageSummary.present /
+          (pageSummary.attended /
             pageSummary.students) *
             100,
         )
@@ -933,7 +1081,23 @@ function AttendanceHistory() {
             </strong>
 
             <p>
-              Present records shown
+              On-time records shown
+            </p>
+          </article>
+
+          <article>
+            <span>
+              PAGE LATE
+            </span>
+
+            <strong className="is-late">
+              {loading
+                ? "—"
+                : pageSummary.late}
+            </strong>
+
+            <p>
+              Late records shown
             </p>
           </article>
 
@@ -965,7 +1129,7 @@ function AttendanceHistory() {
             </strong>
 
             <p>
-              Current page average
+              Present + late attendance
             </p>
           </article>
         </section>
@@ -1205,10 +1369,15 @@ function AttendanceHistory() {
             <div className="attendance-history-card-list">
               {filteredHistory.map(
                 (session) => {
+                  const counts =
+                    getSessionAttendanceCounts(
+                      session,
+                    );
+
                   const rate =
-                    clampRate(
-                      session
-                        ?.attendanceRate,
+                    getSessionAttendanceRate(
+                      session,
+                      counts,
                     );
 
                   const tone =
@@ -1335,8 +1504,9 @@ function AttendanceHistory() {
                           </span>
 
                           <strong>
-                            {session.studentCount ||
-                              0}
+                            {
+                              counts.students
+                            }
                           </strong>
                         </div>
 
@@ -1346,8 +1516,21 @@ function AttendanceHistory() {
                           </span>
 
                           <strong className="is-success">
-                            {session.presentCount ||
-                              0}
+                            {
+                              counts.present
+                            }
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>
+                            LATE
+                          </span>
+
+                          <strong className="is-late">
+                            {
+                              counts.late
+                            }
                           </strong>
                         </div>
 
@@ -1357,8 +1540,9 @@ function AttendanceHistory() {
                           </span>
 
                           <strong className="is-danger">
-                            {session.absentCount ||
-                              0}
+                            {
+                              counts.absent
+                            }
                           </strong>
                         </div>
                       </div>

@@ -49,14 +49,6 @@ const createStudent = async ({
  * Backend:
  *
  * PATCH /api/students/{studentId}
- *
- * Editable fields:
- *
- * studentNumber
- * name
- *
- * Student ID, section, face registration,
- * and attendance history are not changed.
  */
 const updateStudent = async (
   studentId,
@@ -83,10 +75,7 @@ const updateStudent = async (
  *
  * DELETE /api/students/{studentId}
  *
- * IMPORTANT:
  * Backend performs a soft delete.
- * The student record, face registration,
- * and attendance history remain preserved.
  */
 const deleteStudent = async (
   studentId,
@@ -106,9 +95,7 @@ const deleteStudent = async (
  * Backend expects multipart/form-data
  * with a file field named "image".
  *
- * IMPORTANT:
- * Do not manually set Content-Type here.
- * Axios/browser will generate the multipart boundary.
+ * Do not manually set Content-Type.
  */
 const registerStudentFace = async (
   studentId,
@@ -116,7 +103,10 @@ const registerStudentFace = async (
 ) => {
   const formData = new FormData();
 
-  formData.append("image", imageFile);
+  formData.append(
+    "image",
+    imageFile,
+  );
 
   const response = await api.post(
     `/students/${studentId}/face`,
@@ -131,9 +121,11 @@ const registerStudentFace = async (
 ========================================================= */
 
 /**
- * Returns the active attendance session for a section.
+ * Returns the active attendance session
+ * for a section.
  *
- * A 404 means there is currently no active session.
+ * A 404 means there is currently no
+ * active session.
  */
 const getActiveSession = async (
   sectionId,
@@ -160,23 +152,76 @@ const getActiveSession = async (
 ========================================================= */
 
 /**
- * Starts an attendance session for a section.
+ * Starts an attendance session.
  *
- * Backend:
+ * NEW API:
  *
  * POST /api/attendance-sessions
- * ?sectionId={sectionId}
+ *
+ * {
+ *   sectionId,
+ *   lateAfterMinutes,
+ *   scheduledEndTime
+ * }
+ *
+ *
+ * scheduledEndTime:
+ *
+ * "09:00" -> automatic ending
+ * null    -> manual ending only
+ *
+ *
+ * BACKWARD COMPATIBILITY:
+ *
+ * startAttendanceSession(sectionId)
+ *
+ * still uses the old query-param flow so the
+ * current AdviserAttendance page will not break
+ * while it is being migrated.
  */
 const startAttendanceSession = async (
-  sectionId,
+  configuration,
 ) => {
+  /* =======================================================
+     LEGACY CALL
+
+     Example:
+
+     startAttendanceSession(section.id)
+  ======================================================= */
+
+  if (
+    typeof configuration === "string"
+  ) {
+    const response = await api.post(
+      "/attendance-sessions",
+      null,
+      {
+        params: {
+          sectionId: configuration,
+        },
+      },
+    );
+
+    return response.data;
+  }
+
+  /* =======================================================
+     NEW CONFIGURED SESSION
+  ======================================================= */
+
+  const {
+    sectionId,
+    lateAfterMinutes,
+    scheduledEndTime = null,
+  } = configuration || {};
+
   const response = await api.post(
     "/attendance-sessions",
-    null,
     {
-      params: {
-        sectionId,
-      },
+      sectionId,
+      lateAfterMinutes,
+      scheduledEndTime,
     },
   );
 
@@ -188,7 +233,10 @@ const startAttendanceSession = async (
 ========================================================= */
 
 /**
- * Ends an active attendance session.
+ * Manually ends an active attendance session.
+ *
+ * Automatic ending is handled by the backend
+ * when scheduledEndAt has been configured.
  *
  * Backend:
  *
@@ -215,13 +263,6 @@ const endAttendanceSession = async (
  * Backend:
  *
  * GET /api/attendance-sessions/history
- *
- * Optional query params:
- *
- * fromDate=2026-08-01
- * toDate=2026-08-31
- * page=0
- * size=10
  */
 const getAttendanceHistory = async ({
   fromDate,
@@ -249,19 +290,14 @@ const getAttendanceHistory = async ({
 ========================================================= */
 
 /**
- * Returns all attendance records for a session.
+ * Returns all attendance records
+ * for a session.
  *
- * Supports either:
+ * Possible statuses:
  *
- * [
- *   {...}
- * ]
- *
- * or:
- *
- * {
- *   records: [...]
- * }
+ * PRESENT
+ * LATE
+ * ABSENT
  */
 const getSessionRecords = async (
   sessionId,
@@ -272,12 +308,16 @@ const getSessionRecords = async (
 
   const data = response.data;
 
-  if (Array.isArray(data)) {
+  if (
+    Array.isArray(data)
+  ) {
     return data;
   }
 
   if (
-    Array.isArray(data?.records)
+    Array.isArray(
+      data?.records,
+    )
   ) {
     return data.records;
   }
@@ -290,13 +330,16 @@ const getSessionRecords = async (
 ========================================================= */
 
 /**
- * Marks a student PRESENT manually.
+ * Records manual attendance.
  *
- * Backend:
+ * IMPORTANT:
  *
- * POST /api/attendance-records
- * ?sessionId={sessionId}
- * &studentId={studentId}
+ * The backend now determines the status:
+ *
+ * PRESENT -> before late cutoff
+ * LATE    -> at/after late cutoff
+ *
+ * The frontend does NOT choose the status.
  */
 const markManualAttendance = async ({
   sessionId,
@@ -323,13 +366,11 @@ const markManualAttendance = async ({
 /**
  * Performs face recognition attendance.
  *
- * Backend expects multipart/form-data:
+ * The backend automatically determines:
  *
- * sessionId = attendance session id
- * image     = face image
- *
- * IMPORTANT:
- * Do not manually set multipart Content-Type.
+ * PRESENT
+ * or
+ * LATE
  */
 const markFaceAttendance = async ({
   sessionId,
@@ -362,12 +403,6 @@ const markFaceAttendance = async ({
 /**
  * Removes a student's attendance record
  * from a specific active session.
- *
- * Backend:
- *
- * DELETE /api/attendance-records
- * ?sessionId={sessionId}
- * &studentId={studentId}
  */
 const removeAttendance = async ({
   sessionId,
@@ -391,14 +426,8 @@ const removeAttendance = async ({
 ========================================================= */
 
 /**
- * Changes the password of the currently authenticated user.
- *
- * Backend:
- *
- * PATCH /api/users/me/password
- *
- * The backend identifies the adviser through
- * the authenticated JWT principal.
+ * Changes the password of the currently
+ * authenticated user.
  */
 const changePassword = async ({
   currentPassword,
@@ -421,9 +450,11 @@ const changePassword = async ({
 
 const adviserService = {
   /* SECTIONS */
+
   getSections,
 
   /* STUDENTS */
+
   getStudents,
   createStudent,
   updateStudent,
@@ -431,20 +462,24 @@ const adviserService = {
   registerStudentFace,
 
   /* ATTENDANCE SESSION */
+
   getActiveSession,
   startAttendanceSession,
   endAttendanceSession,
 
   /* ATTENDANCE HISTORY */
+
   getAttendanceHistory,
 
   /* ATTENDANCE RECORDS */
+
   getSessionRecords,
   markManualAttendance,
   markFaceAttendance,
   removeAttendance,
 
   /* ACCOUNT SECURITY */
+
   changePassword,
 };
 

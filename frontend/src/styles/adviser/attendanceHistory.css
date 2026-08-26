@@ -1,5 +1,27 @@
 /* =========================================================
    SVNHS ATTENDANCE MANAGEMENT SYSTEM
+   ADVISER ATTENDANCE HISTORY — ORGANIZED BUILD
+
+   SAFE ORGANIZATION NOTES
+   - Existing selector/declaration order is preserved.
+   - Existing CSS cascade is preserved.
+   - No functional rules were removed.
+   - PRESENT / LATE / ABSENT support is retained.
+   - Responsive overflow/sidebar-width fix is retained.
+   - Dark mode, animations, filters and pagination are retained.
+
+   STRUCTURE
+   01. Base Attendance History UI
+   02. Base Responsive + Reduced Motion
+   03. V2 Readability + Semantic Colors
+   04. V3 Compact Session Stats
+   05. V4 Production Animation
+   06. V5 Present / Late / Absent Support
+   07. V6 Responsive Session Card Width Fix
+========================================================= */
+
+/* =========================================================
+   SVNHS ATTENDANCE MANAGEMENT SYSTEM
    ADVISER ATTENDANCE HISTORY
 ========================================================= */
 
@@ -2613,5 +2635,803 @@ html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
   .attendance-history-pagination-actions button:hover:not(:disabled),
   .attendance-history-pagination-actions button:active:not(:disabled) {
     transform: none !important;
+  }
+}
+
+/* =========================================================
+   ATTENDANCE HISTORY V5 — PRESENT / LATE / ABSENT SUPPORT
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Goals:
+   - Preserve all existing history UI, filters, pagination,
+     dark mode, responsive behavior, and animation.
+   - Add LATE as a first-class attendance status.
+   - Keep PRESENT + LATE included in attendance rate.
+   - Expand compact per-session stats from 3 to 4 columns.
+========================================================= */
+
+/* =========================================================
+   PAGE SUMMARY — 5 SEMANTIC CARDS
+========================================================= */
+
+.attendance-history-summary {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* 1 — completed sessions */
+.attendance-history-summary article:nth-child(1) {
+  border-color: #bfd7f5;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.attendance-history-summary article:nth-child(1)::before {
+  background: #2563eb;
+}
+
+.attendance-history-summary article:nth-child(1) span {
+  color: #1d4ed8;
+}
+
+/* 2 — present / on-time */
+.attendance-history-summary article:nth-child(2) {
+  border-color: #b9e5c7;
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.attendance-history-summary article:nth-child(2)::before {
+  background: #16a34a;
+}
+
+.attendance-history-summary article:nth-child(2) span {
+  color: #15803d;
+}
+
+/* 3 — late */
+.attendance-history-summary article:nth-child(3) {
+  border-color: #f1d89a;
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+}
+
+.attendance-history-summary article:nth-child(3)::before {
+  background: #f59e0b;
+}
+
+.attendance-history-summary article:nth-child(3) span,
+.attendance-history-summary strong.is-late {
+  color: #b45309;
+}
+
+/* 4 — absent */
+.attendance-history-summary article:nth-child(4) {
+  border-color: #fecaca;
+  background: linear-gradient(180deg, #fff1f2 0%, #ffffff 100%);
+}
+
+.attendance-history-summary article:nth-child(4)::before {
+  background: #e11d48;
+}
+
+.attendance-history-summary article:nth-child(4) span {
+  color: #be123c;
+}
+
+.attendance-history-summary article:nth-child(4) strong,
+.attendance-history-summary article:nth-child(4) strong.is-danger {
+  color: #b91c1c;
+}
+
+/* 5 — attendance rate */
+.attendance-history-summary article:nth-child(5) {
+  border-color: #d8c7f5;
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 100%);
+}
+
+.attendance-history-summary article:nth-child(5)::before {
+  background: #7c3aed;
+}
+
+.attendance-history-summary article:nth-child(5) span,
+.attendance-history-summary article:nth-child(5) strong {
+  color: #6d28d9;
+}
+
+/* =========================================================
+   SESSION CARD LAYOUT
+   Give the four status cells enough horizontal room.
+========================================================= */
+
+.attendance-history-card {
+  grid-template-columns:
+    82px
+    minmax(220px, 1.2fr)
+    minmax(260px, 0.95fr)
+    minmax(180px, 0.65fr)
+    165px;
+}
+
+/* =========================================================
+   COMPACT SESSION STATS — 4 COLUMNS
+========================================================= */
+
+.attendance-history-card-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.attendance-history-card-stats div:nth-child(1)::before {
+  background: #2563eb;
+}
+
+.attendance-history-card-stats div:nth-child(2)::before {
+  background: #16a34a;
+}
+
+.attendance-history-card-stats div:nth-child(3)::before {
+  background: #f59e0b;
+}
+
+.attendance-history-card-stats div:nth-child(4)::before {
+  background: #e11d48;
+}
+
+.attendance-history-card-stats div:nth-child(1) span {
+  color: #2563eb !important;
+}
+
+.attendance-history-card-stats div:nth-child(2) span {
+  color: #15803d !important;
+}
+
+.attendance-history-card-stats div:nth-child(3) span {
+  color: #b45309 !important;
+}
+
+.attendance-history-card-stats div:nth-child(4) span {
+  color: #be123c !important;
+}
+
+.attendance-history-card-stats div:nth-child(1) strong {
+  color: #173b70;
+}
+
+.attendance-history-card-stats div:nth-child(2) strong,
+.attendance-history-card-stats strong.is-success {
+  color: #15803d;
+}
+
+.attendance-history-card-stats div:nth-child(3) strong,
+.attendance-history-card-stats strong.is-late {
+  color: #b45309;
+}
+
+.attendance-history-card-stats div:nth-child(4) strong,
+.attendance-history-card-stats strong.is-danger {
+  color: #b91c1c;
+}
+
+/* =========================================================
+   DARK MODE — PRESENT / LATE / ABSENT
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-summary article:nth-child(1) {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .attendance-history-summary article:nth-child(2) {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.15);
+}
+
+html[data-theme="dark"] .attendance-history-summary article:nth-child(3) {
+  border-color: #72551e;
+  background: rgba(146, 64, 14, 0.14);
+}
+
+html[data-theme="dark"] .attendance-history-summary article:nth-child(4) {
+  border-color: #7f1d1d;
+  background: rgba(127, 29, 29, 0.18);
+}
+
+html[data-theme="dark"] .attendance-history-summary article:nth-child(5) {
+  border-color: #563a8a;
+  background: rgba(109, 40, 217, 0.14);
+}
+
+html[data-theme="dark"]
+  .attendance-history-summary
+  article:nth-child(1)
+  strong {
+  color: #93c5fd;
+}
+
+html[data-theme="dark"]
+  .attendance-history-summary
+  article:nth-child(2)
+  strong {
+  color: #86efac;
+}
+
+html[data-theme="dark"] .attendance-history-summary article:nth-child(3) strong,
+html[data-theme="dark"] .attendance-history-summary strong.is-late {
+  color: #fde68a;
+}
+
+html[data-theme="dark"]
+  .attendance-history-summary
+  article:nth-child(4)
+  strong {
+  color: #fda4af;
+}
+
+html[data-theme="dark"]
+  .attendance-history-summary
+  article:nth-child(5)
+  strong {
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div:nth-child(1) strong {
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div:nth-child(2) strong {
+  color: #86efac;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong,
+html[data-theme="dark"] .attendance-history-card-stats strong.is-late {
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div:nth-child(4) strong {
+  color: #fda4af;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1250px) {
+  .attendance-history-card {
+    grid-template-columns:
+      72px
+      minmax(250px, 1fr)
+      minmax(250px, 0.9fr)
+      minmax(160px, 0.55fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .attendance-history-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1050px) {
+  .attendance-history-card {
+    grid-template-columns:
+      72px
+      minmax(0, 1fr)
+      minmax(250px, 0.65fr);
+  }
+}
+
+@media (max-width: 820px) {
+  .attendance-history-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-history-card {
+    grid-template-columns:
+      68px
+      minmax(0, 1fr);
+  }
+
+  .attendance-history-card-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .attendance-history-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-history-card {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-history-card-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-history-card-stats div:nth-child(3) {
+    border-left: 0 !important;
+    border-top: 1px solid #e2e8f0 !important;
+  }
+
+  .attendance-history-card-stats div:nth-child(4) {
+    border-top: 1px solid #e2e8f0 !important;
+  }
+
+  html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3),
+  html[data-theme="dark"] .attendance-history-card-stats div:nth-child(4) {
+    border-top-color: #334155 !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .attendance-history-card-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-history-card-stats div + div {
+    border-left: 0 !important;
+    border-top: 1px solid #e2e8f0 !important;
+  }
+
+  html[data-theme="dark"] .attendance-history-card-stats div + div {
+    border-top-color: #334155 !important;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-history-summary article,
+  .attendance-history-card-stats,
+  .attendance-history-card-stats div {
+    transition: none !important;
+  }
+}
+
+/* =========================================================
+   ATTENDANCE HISTORY V6 — RESPONSIVE SESSION CARD WIDTH FIX
+   KEEP THIS BLOCK LAST
+
+   Fixes:
+   - cramped / overflowing history card columns
+   - 4 attendance stats: Students / Present / Late / Absent
+   - Started / Ended time truncation
+   - sidebar-content width mismatch
+========================================================= */
+
+/* =========================================================
+   BASIC WIDTH SAFETY
+========================================================= */
+
+.attendance-history-page,
+.attendance-history-records,
+.attendance-history-card-list,
+.attendance-history-card,
+.attendance-history-card > *,
+.attendance-history-card-main,
+.attendance-history-card-stats,
+.attendance-history-rate,
+.attendance-history-card-action {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   HISTORY CARD
+========================================================= */
+
+.attendance-history-card {
+  width: 100%;
+
+  grid-template-columns:
+    88px
+    minmax(280px, 1.15fr)
+    minmax(300px, 0.95fr)
+    minmax(170px, 0.58fr)
+    minmax(170px, 0.55fr);
+}
+
+/* =========================================================
+   SESSION INFORMATION
+========================================================= */
+
+.attendance-history-card-main {
+  overflow: hidden;
+}
+
+.attendance-history-card-title {
+  min-width: 0;
+}
+
+.attendance-history-card-title > div {
+  min-width: 0;
+}
+
+.attendance-history-card-title h3,
+.attendance-history-card-title p {
+  overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   START / END / DURATION
+========================================================= */
+
+.attendance-history-session-times {
+  width: 100%;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.attendance-history-session-times div {
+  min-width: 0;
+
+  padding: 10px 8px;
+}
+
+.attendance-history-session-times strong {
+  overflow: visible;
+
+  font-size: 10px;
+
+  line-height: 1.3;
+
+  text-overflow: clip;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   FOUR ATTENDANCE STATS
+========================================================= */
+
+.attendance-history-card-stats {
+  width: auto;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  margin: 14px;
+
+  overflow: hidden;
+}
+
+.attendance-history-card-stats div {
+  min-width: 0;
+
+  padding: 12px 5px;
+}
+
+.attendance-history-card-stats div + div {
+  border-left: 1px solid #e2e8f0 !important;
+}
+
+/* STUDENTS */
+
+.attendance-history-card-stats div:nth-child(1)::before {
+  background: #2563eb;
+}
+
+.attendance-history-card-stats div:nth-child(1) span {
+  color: #2563eb !important;
+}
+
+.attendance-history-card-stats div:nth-child(1) strong {
+  color: #173b70;
+}
+
+/* PRESENT */
+
+.attendance-history-card-stats div:nth-child(2)::before {
+  background: #16a34a;
+}
+
+.attendance-history-card-stats div:nth-child(2) span {
+  color: #15803d !important;
+}
+
+.attendance-history-card-stats div:nth-child(2) strong {
+  color: #15803d;
+}
+
+/* LATE */
+
+.attendance-history-card-stats div:nth-child(3)::before {
+  background: #f59e0b;
+}
+
+.attendance-history-card-stats div:nth-child(3) span {
+  color: #b45309 !important;
+}
+
+.attendance-history-card-stats div:nth-child(3) strong {
+  color: #d97706;
+}
+
+/* ABSENT */
+
+.attendance-history-card-stats div:nth-child(4)::before {
+  background: #e11d48;
+}
+
+.attendance-history-card-stats div:nth-child(4) span {
+  color: #be123c !important;
+}
+
+.attendance-history-card-stats div:nth-child(4) strong {
+  color: #b91c1c;
+}
+
+.attendance-history-card-stats span {
+  overflow: hidden;
+
+  font-size: 8px;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.attendance-history-card-stats strong {
+  font-size: 22px;
+}
+
+/* =========================================================
+   ATTENDANCE RATE
+========================================================= */
+
+.attendance-history-rate {
+  min-width: 0;
+
+  padding: 16px 14px;
+}
+
+.attendance-history-rate-head {
+  min-width: 0;
+
+  flex-wrap: wrap;
+}
+
+.attendance-history-rate-head strong {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   VIEW RECORD
+========================================================= */
+
+.attendance-history-card-action {
+  min-width: 0;
+
+  padding: 16px 14px;
+}
+
+.attendance-history-card-action button {
+  width: 100%;
+
+  min-width: 0;
+}
+
+/* =========================================================
+   CONTENT-AWARE RESPONSIVENESS
+
+   The Adviser sidebar consumes part of the viewport.
+   These breakpoints reorganize the history card earlier
+   instead of waiting until the whole browser becomes narrow.
+========================================================= */
+
+@media (max-width: 1700px) {
+  .attendance-history-card {
+    grid-template-columns:
+      82px
+      minmax(260px, 1.15fr)
+      minmax(290px, 0.95fr)
+      minmax(170px, 0.6fr);
+  }
+
+  /*
+   * View Record gets its own clean second row.
+   */
+
+  .attendance-history-card-action {
+    grid-column: 2 / -1;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    border-top: 1px solid var(--c-border-soft);
+  }
+
+  .attendance-history-card-action button {
+    width: 180px;
+
+    flex: 0 0 180px;
+  }
+
+  .attendance-history-card-action small {
+    max-width: 220px;
+
+    text-align: left;
+  }
+}
+
+/* =========================================================
+   MEDIUM DESKTOP / TABLET
+========================================================= */
+
+@media (max-width: 1300px) {
+  .attendance-history-card {
+    grid-template-columns:
+      76px
+      minmax(0, 1fr)
+      minmax(280px, 0.8fr);
+  }
+
+  .attendance-history-card-main {
+    border-right: 1px solid var(--c-border-soft);
+  }
+
+  .attendance-history-card-stats {
+    border-right: 0;
+  }
+
+  .attendance-history-rate {
+    grid-column: 2;
+
+    border-top: 1px solid var(--c-border-soft);
+
+    border-right: 1px solid var(--c-border-soft);
+  }
+
+  .attendance-history-card-action {
+    grid-column: 3;
+
+    align-items: center;
+
+    border-top: 1px solid var(--c-border-soft);
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .attendance-history-card {
+    grid-template-columns:
+      72px
+      minmax(0, 1fr);
+  }
+
+  .attendance-history-card-main,
+  .attendance-history-card-stats,
+  .attendance-history-rate,
+  .attendance-history-card-action {
+    grid-column: 2;
+
+    border-right: 0;
+  }
+
+  .attendance-history-card-stats,
+  .attendance-history-rate,
+  .attendance-history-card-action {
+    border-top: 1px solid var(--c-border-soft);
+  }
+
+  .attendance-history-card-action {
+    justify-content: flex-start;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 620px) {
+  .attendance-history-card {
+    display: grid;
+
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-history-date-block,
+  .attendance-history-card-main,
+  .attendance-history-card-stats,
+  .attendance-history-rate,
+  .attendance-history-card-action {
+    grid-column: 1;
+
+    width: auto;
+  }
+
+  .attendance-history-card-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    margin: 12px 15px;
+  }
+
+  .attendance-history-card-stats div:nth-child(3) {
+    border-left: 0 !important;
+
+    border-top: 1px solid #e2e8f0 !important;
+  }
+
+  .attendance-history-card-stats div:nth-child(4) {
+    border-top: 1px solid #e2e8f0 !important;
+  }
+
+  .attendance-history-session-times {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .attendance-history-session-times strong {
+    font-size: 9px;
+  }
+
+  .attendance-history-card-action {
+    display: grid;
+  }
+
+  .attendance-history-card-action button {
+    width: 100%;
+
+    max-width: none;
+
+    flex: none;
+  }
+
+  .attendance-history-card-action small {
+    max-width: none;
+
+    text-align: center;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 430px) {
+  .attendance-history-session-times {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-history-session-times strong {
+    font-size: 11px;
+  }
+
+  .attendance-history-card-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-card-stats div:nth-child(1) strong {
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div:nth-child(2) strong {
+  color: #86efac;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3) strong {
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div:nth-child(4) strong {
+  color: #fda4af;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div + div {
+  border-left-color: #334155 !important;
+}
+
+@media (max-width: 620px) {
+  html[data-theme="dark"] .attendance-history-card-stats div:nth-child(3),
+  html[data-theme="dark"] .attendance-history-card-stats div:nth-child(4) {
+    border-top-color: #334155 !important;
   }
 }

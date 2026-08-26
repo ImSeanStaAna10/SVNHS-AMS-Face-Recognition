@@ -49,10 +49,94 @@ const getRecordTime = (record) =>
 const getRecordMethod = (record) =>
   record?.method || record?.attendanceMethod || record?.source || "";
 
-const isPresentRecord = (record) => {
-  const status = String(record?.status || "").toUpperCase();
+const getRecordStatus = (record) => {
+  const status = String(record?.status || "").trim().toUpperCase();
 
-  return !status || status === "PRESENT";
+  /*
+   * Legacy attendance records created before explicit
+   * status support are treated as PRESENT.
+   */
+  return status || "PRESENT";
+};
+
+const isPresentRecord = (record) =>
+  getRecordStatus(record) === "PRESENT";
+
+const isLateRecord = (record) =>
+  getRecordStatus(record) === "LATE";
+
+const isAttendedRecord = (record) => {
+  const status = getRecordStatus(record);
+
+  return status === "PRESENT" || status === "LATE";
+};
+
+const getAttendanceStatusLabel = (status) => {
+  const normalizedStatus = String(status || "").toUpperCase();
+
+  if (normalizedStatus === "PRESENT") {
+    return "Present";
+  }
+
+  if (normalizedStatus === "LATE") {
+    return "Late";
+  }
+
+  if (normalizedStatus === "ABSENT") {
+    return "Absent";
+  }
+
+  return "Pending";
+};
+
+const getAttendanceStatusClass = (status) => {
+  const normalizedStatus = String(status || "").toUpperCase();
+
+  if (normalizedStatus === "PRESENT") {
+    return "is-present";
+  }
+
+  if (normalizedStatus === "LATE") {
+    return "is-late";
+  }
+
+  if (normalizedStatus === "ABSENT") {
+    return "is-absent";
+  }
+
+  return "is-pending";
+};
+
+const toSchoolDate = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const raw = value.trim();
+
+    /*
+     * Backend LocalDateTime values do not contain a timezone.
+     * Interpret those values explicitly as Philippine time.
+     */
+    if (
+      /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(
+        raw,
+      )
+    ) {
+      const parsed = new Date(`${raw.replace(" ", "T")}+08:00`);
+
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+  }
+
+  const parsed = new Date(value);
+
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
 const getStudentSectionId = (student) =>
@@ -387,10 +471,20 @@ function AttendanceSession() {
     [sessionRecords],
   );
 
-  const presentStudentIds = useMemo(() => {
+  const lateRecords = useMemo(
+    () => sessionRecords.filter(isLateRecord),
+    [sessionRecords],
+  );
+
+  const attendedRecords = useMemo(
+    () => sessionRecords.filter(isAttendedRecord),
+    [sessionRecords],
+  );
+
+  const attendedStudentIds = useMemo(() => {
     const ids = new Set();
 
-    presentRecords.forEach((record) => {
+    attendedRecords.forEach((record) => {
       const studentId = getRecordStudentId(record);
 
       if (studentId) {
@@ -399,14 +493,27 @@ function AttendanceSession() {
     });
 
     return ids;
-  }, [presentRecords]);
+  }, [attendedRecords]);
 
-  const presentCount = presentStudentIds.size || presentRecords.length;
+  const presentCount = presentRecords.length;
 
-  const remainingCount = Math.max(activeStudents.length - presentCount, 0);
+  const lateCount = lateRecords.length;
+
+  const attendedCount =
+    attendedStudentIds.size || attendedRecords.length;
+
+  const remainingCount = Math.max(
+    activeStudents.length - attendedCount,
+    0,
+  );
 
   const completionPercentage = activeStudents.length
-    ? Math.min(100, Math.round((presentCount / activeStudents.length) * 100))
+    ? Math.min(
+        100,
+        Math.round(
+          (attendedCount / activeStudents.length) * 100,
+        ),
+      )
     : 0;
 
   const sectionName = section?.name || "Assigned Section";
@@ -420,52 +527,96 @@ function AttendanceSession() {
     activeSession?.createdAt ||
     "";
 
+  const sessionLateAfterMinutes =
+    activeSession?.lateAfterMinutes ?? null;
+
+  const sessionLateCutoffAt =
+    activeSession?.lateCutoffAt || "";
+
+  const sessionScheduledEndAt =
+    activeSession?.scheduledEndAt || "";
+
+  const scheduledEndDate =
+    toSchoolDate(sessionScheduledEndAt);
+
+  const scheduledEndReached = Boolean(
+    scheduledEndDate &&
+      liveClock.getTime() >= scheduledEndDate.getTime(),
+  );
+
   const sessionIsActive = Boolean(
-    activeSession && String(getSessionId(activeSession)) === String(sessionId),
+    activeSession &&
+      String(getSessionId(activeSession)) === String(sessionId) &&
+      !scheduledEndReached,
   );
 
   const attendanceRows = useMemo(
     () =>
       activeStudents.map((student, originalIndex) => {
-        const record = presentRecords.find(
-          (item) => String(getRecordStudentId(item)) === String(student.id),
+        const record = sessionRecords.find(
+          (item) =>
+            String(getRecordStudentId(item)) === String(student.id),
         );
+
+        const status = record
+          ? getRecordStatus(record)
+          : "PENDING";
+
+        const attended = record
+          ? isAttendedRecord(record)
+          : false;
 
         return {
           student,
           record,
-          present: Boolean(record),
+          status,
+          attended,
           originalIndex,
         };
       }),
-    [activeStudents, presentRecords],
+    [activeStudents, sessionRecords],
   );
 
   const filteredStudentRows = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
-    const rows = attendanceRows.filter(({ student, record, present }) => {
-      const name = String(student?.name || "").toLowerCase();
+    const rows = attendanceRows.filter(
+      ({ student, record, status }) => {
+        const name = String(
+          student?.name || "",
+        ).toLowerCase();
 
-      const number = String(student?.studentNumber || "").toLowerCase();
+        const number = String(
+          student?.studentNumber || "",
+        ).toLowerCase();
 
-      const method = String(getRecordMethod(record) || "").toUpperCase();
+        const method = String(
+          getRecordMethod(record) || "",
+        ).toUpperCase();
 
-      const matchesSearch =
-        !query || name.includes(query) || number.includes(query);
+        const matchesSearch =
+          !query ||
+          name.includes(query) ||
+          number.includes(query);
 
-      const matchesStatus =
-        attendanceStatusFilter === "ALL" ||
-        (attendanceStatusFilter === "PRESENT" && present) ||
-        (attendanceStatusFilter === "PENDING" && !present);
+        const matchesStatus =
+          attendanceStatusFilter === "ALL" ||
+          attendanceStatusFilter === status;
 
-      const matchesMethod =
-        attendanceMethodFilter === "ALL" ||
-        (attendanceMethodFilter === "FACE" && method.includes("FACE")) ||
-        (attendanceMethodFilter === "MANUAL" && method.includes("MANUAL"));
+        const matchesMethod =
+          attendanceMethodFilter === "ALL" ||
+          (attendanceMethodFilter === "FACE" &&
+            method.includes("FACE")) ||
+          (attendanceMethodFilter === "MANUAL" &&
+            method.includes("MANUAL"));
 
-      return matchesSearch && matchesStatus && matchesMethod;
-    });
+        return (
+          matchesSearch &&
+          matchesStatus &&
+          matchesMethod
+        );
+      },
+    );
 
     return [...rows].sort((left, right) => {
       if (attendanceSort === "NAME_ASC") {
@@ -493,9 +644,12 @@ function AttendanceSession() {
       }
 
       if (attendanceSort === "RECENT") {
-        const leftTime = left.record ? new Date(getRecordTime(left.record)) : null;
+        const leftTime = left.record
+          ? toSchoolDate(getRecordTime(left.record))
+          : null;
+
         const rightTime = right.record
-          ? new Date(getRecordTime(right.record))
+          ? toSchoolDate(getRecordTime(right.record))
           : null;
 
         const leftValue =
@@ -773,6 +927,41 @@ function AttendanceSession() {
   }, [stopCamera]);
 
   /* =======================================================
+     SCHEDULED SESSION END GUARD
+  ======================================================= */
+
+  useEffect(() => {
+    if (!scheduledEndReached) {
+      return;
+    }
+
+    clearAutoTimer();
+    clearResultTimer();
+
+    scanLockRef.current =
+      false;
+
+    setAutoScanEnabled(
+      false,
+    );
+
+    setRecognitionResult(
+      null,
+    );
+
+    stopCamera();
+
+    setPageError(
+      "This attendance session has reached its scheduled end time. Attendance recording is now closed.",
+    );
+  }, [
+    scheduledEndReached,
+    clearAutoTimer,
+    clearResultTimer,
+    stopCamera,
+  ]);
+
+  /* =======================================================
      AUTO OPEN CAMERA
   ======================================================= */
 
@@ -823,7 +1012,9 @@ function AttendanceSession() {
 
       scanLockRef.current = true;
 
-      const previousPresentIds = new Set(presentStudentIds);
+      const previousAttendedIds = new Set(
+        attendedStudentIds,
+      );
 
       try {
         clearAutoTimer();
@@ -854,16 +1045,27 @@ function AttendanceSession() {
          * Submitted frame stays original
          * for consistent recognition.
          */
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        context.drawImage(
+          video,
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        );
 
-        const imageFile = await canvasToImageFile(canvas);
+        const imageFile =
+          await canvasToImageFile(
+            canvas,
+          );
 
-        const result = await adviserService.markFaceAttendance({
-          sessionId,
-          imageFile,
-        });
+        const result =
+          await adviserService.markFaceAttendance({
+            sessionId,
+            imageFile,
+          });
 
-        const refreshedRecords = await refreshRecords();
+        const refreshedRecords =
+          await refreshRecords();
 
         let recognizedStudentId =
           result?.studentId ||
@@ -872,111 +1074,237 @@ function AttendanceSession() {
           result?.attendanceRecord?.student?.id ||
           "";
 
-        let recognizedRecord = null;
+        let recognizedRecord =
+          null;
 
         if (recognizedStudentId) {
-          recognizedRecord = refreshedRecords.find(
-            (record) =>
-              String(getRecordStudentId(record)) ===
-              String(recognizedStudentId),
-          );
+          recognizedRecord =
+            refreshedRecords.find(
+              (record) =>
+                String(
+                  getRecordStudentId(
+                    record,
+                  ),
+                ) ===
+                String(
+                  recognizedStudentId,
+                ),
+            );
         }
 
         if (!recognizedStudentId) {
-          recognizedRecord = refreshedRecords.find((record) => {
-            const recordStudentId = getRecordStudentId(record);
+          recognizedRecord =
+            refreshedRecords.find(
+              (record) => {
+                const recordStudentId =
+                  getRecordStudentId(
+                    record,
+                  );
 
-            return (
-              recordStudentId &&
-              !previousPresentIds.has(String(recordStudentId)) &&
-              isPresentRecord(record)
+                return (
+                  recordStudentId &&
+                  !previousAttendedIds.has(
+                    String(
+                      recordStudentId,
+                    ),
+                  ) &&
+                  isAttendedRecord(
+                    record,
+                  )
+                );
+              },
             );
-          });
 
-          recognizedStudentId = getRecordStudentId(recognizedRecord);
+          recognizedStudentId =
+            getRecordStudentId(
+              recognizedRecord,
+            );
         }
 
-        const recognizedStudent = students.find(
-          (student) => String(student.id) === String(recognizedStudentId),
-        );
+        const recognizedStudent =
+          students.find(
+            (student) =>
+              String(student.id) ===
+              String(
+                recognizedStudentId,
+              ),
+          );
 
         const studentName =
           result?.studentName ||
           result?.student?.name ||
-          getRecordStudentName(recognizedRecord) ||
+          getRecordStudentName(
+            recognizedRecord,
+          ) ||
           recognizedStudent?.name ||
           "Recognized Student";
 
         const studentNumber =
           result?.studentNumber ||
-          result?.student?.studentNumber ||
-          getRecordStudentNumber(recognizedRecord) ||
-          recognizedStudent?.studentNumber ||
+          result?.student
+            ?.studentNumber ||
+          getRecordStudentNumber(
+            recognizedRecord,
+          ) ||
+          recognizedStudent
+            ?.studentNumber ||
           "—";
 
         const recordedAt =
-          getRecordTime(recognizedRecord) ||
+          getRecordTime(
+            recognizedRecord,
+          ) ||
           result?.recordedAt ||
-          result?.attendanceRecord?.recordedAt ||
+          result?.attendanceRecord
+            ?.recordedAt ||
           new Date();
+
+        const responseStatus =
+          String(
+            result?.attendanceStatus ||
+              result?.attendanceRecord
+                ?.status ||
+              "",
+          )
+            .trim()
+            .toUpperCase();
+
+        const attendanceStatus =
+          recognizedRecord
+            ? getRecordStatus(
+                recognizedRecord,
+              )
+            : responseStatus ===
+                  "LATE" ||
+                responseStatus ===
+                  "PRESENT"
+              ? responseStatus
+              : "PRESENT";
 
         setRecognitionResult({
           type: "success",
-          status: "MARKED PRESENT",
+          status:
+            attendanceStatus ===
+            "LATE"
+              ? "MARKED LATE"
+              : "MARKED PRESENT",
+          attendanceStatus,
           name: studentName,
           studentNumber,
           sectionName,
           recordedAt,
-          method: "Face Recognition",
-          message: result?.message || "Attendance recorded successfully.",
+          method:
+            "Face Recognition",
+          message:
+            result?.message ||
+            (attendanceStatus ===
+            "LATE"
+              ? "Attendance recorded as late."
+              : "Attendance recorded successfully."),
         });
 
-        setScannerState("success");
+        setScannerState(
+          "success",
+        );
 
-        resultTimerRef.current = window.setTimeout(() => {
-          setRecognitionResult(null);
+        resultTimerRef.current =
+          window.setTimeout(
+            () => {
+              setRecognitionResult(
+                null,
+              );
 
-          setScannerState("ready");
+              setScannerState(
+                "ready",
+              );
 
-          scanLockRef.current = false;
-        }, RESULT_HOLD_SUCCESS);
+              scanLockRef.current =
+                false;
+            },
+            RESULT_HOLD_SUCCESS,
+          );
       } catch (requestError) {
         console.error("Face attendance failed:", requestError);
 
         const status = requestError?.response?.status;
 
-        let title = "Face Not Recognized";
+        const responseMessage =
+          getErrorMessage(
+            requestError,
+            "",
+          );
 
-        let message = "No registered student matched the captured face.";
+        const normalizedResponseMessage =
+          responseMessage.toLowerCase();
 
-        let resultType = "error";
+        const sessionEndedConflict =
+          status === 409 &&
+          (normalizedResponseMessage.includes(
+            "scheduled end",
+          ) ||
+            normalizedResponseMessage.includes(
+              "session has reached",
+            ) ||
+            normalizedResponseMessage.includes(
+              "session is no longer active",
+            ));
 
-        if (status === 409) {
-          title = "Already Present";
+        let title =
+          "Face Not Recognized";
+
+        let message =
+          "No registered student matched the captured face.";
+
+        let resultType =
+          "error";
+
+        if (sessionEndedConflict) {
+          title = "Session Ended";
 
           message =
-            "This student has already been marked present for this session.";
+            "Attendance recording is already closed for this session.";
 
-          resultType = "warning";
+          setPageError(
+            responseMessage ||
+              message,
+          );
+
+          stopCamera();
+        } else if (status === 409) {
+          title =
+            "Already Recorded";
+
+          message =
+            "This student already has an attendance record for this session.";
+
+          resultType =
+            "warning";
         } else if (status === 403) {
           title = "Wrong Section";
 
-          message = "The recognized student does not belong to this section.";
+          message =
+            "The recognized student does not belong to this section.";
         } else if (status !== 422) {
-          title = "Recognition Failed";
+          title =
+            "Recognition Failed";
 
-          message = "Unable to process the face attendance request.";
+          message =
+            "Unable to process the face attendance request.";
         }
 
         setRecognitionResult({
           type: resultType,
-          status: title.toUpperCase(),
+          status:
+            title.toUpperCase(),
           name: title,
           studentNumber: "—",
           sectionName,
           recordedAt: new Date(),
-          method: "Face Recognition",
-          message: getErrorMessage(requestError, message),
+          method:
+            "Face Recognition",
+          message:
+            responseMessage ||
+            message,
         });
 
         setScannerState(resultType === "warning" ? "warning" : "error");
@@ -1002,12 +1330,13 @@ function AttendanceSession() {
       recognizing,
       cameraActive,
       cameraReady,
-      presentStudentIds,
+      attendedStudentIds,
       clearAutoTimer,
       clearResultTimer,
       refreshRecords,
       students,
       sectionName,
+      stopCamera,
       setCameraError,
     ],
   );
@@ -1108,7 +1437,7 @@ function AttendanceSession() {
     if (scannerState === "success") {
       return {
         eyebrow: "ATTENDANCE RECORDED",
-        title: "Student marked present",
+        title: "Student attendance recorded",
         description: "Preparing scanner for the next student.",
       };
     }
@@ -1116,7 +1445,7 @@ function AttendanceSession() {
     if (scannerState === "warning") {
       return {
         eyebrow: "ALREADY RECORDED",
-        title: "Student is already present",
+        title: "Attendance already exists",
         description: "The scanner will resume automatically.",
       };
     }
@@ -1193,18 +1522,45 @@ function AttendanceSession() {
         studentId: student.id,
       });
 
-      await refreshRecords();
+      const refreshedRecords =
+        await refreshRecords();
 
-      setManualMessage(`${student.name} was marked present.`);
+      const savedRecord =
+        refreshedRecords.find(
+          (record) =>
+            String(
+              getRecordStudentId(
+                record,
+              ),
+            ) ===
+            String(student.id),
+        );
+
+      const savedStatus =
+        savedRecord
+          ? getRecordStatus(
+              savedRecord,
+            )
+          : "PRESENT";
+
+      setManualMessage(
+        savedStatus === "LATE"
+          ? `${student.name} was recorded as late.`
+          : `${student.name} was marked present.`,
+      );
     } catch (requestError) {
-      console.error("Manual attendance failed:", requestError);
+      console.error(
+        "Manual attendance failed:",
+        requestError,
+      );
 
       setManualError(
         getErrorMessage(
           requestError,
-          requestError?.response?.status === 409
-            ? "The student has already been marked present."
-            : "Unable to mark the student present.",
+          requestError?.response?.status ===
+            409
+            ? "The student already has an attendance record for this session."
+            : "Unable to record the student's attendance.",
         ),
       );
     } finally {
@@ -1323,9 +1679,17 @@ function AttendanceSession() {
         </div>
 
         <div className="attendance-live-session-meta">
-          <span className="attendance-live-session-pill">
+          <span
+            className={`attendance-live-session-pill ${
+              scheduledEndReached
+                ? "is-ended"
+                : ""
+            }`}
+          >
             <i />
-            ACTIVE SESSION
+            {scheduledEndReached
+              ? "SESSION ENDED"
+              : "ACTIVE SESSION"}
           </span>
 
           <div className="attendance-live-clock">
@@ -1493,6 +1857,11 @@ function AttendanceSession() {
                     <strong>{presentCount}</strong>
                   </div>
 
+                  <div className="is-late">
+                    <span>LATE</span>
+                    <strong>{lateCount}</strong>
+                  </div>
+
                   <div className="is-remaining">
                     <span>REMAINING</span>
                     <strong>{remainingCount}</strong>
@@ -1570,6 +1939,10 @@ function AttendanceSession() {
         <aside
           className={`attendance-live-result-panel ${
             recognitionResult ? `is-${recognitionResult.type}` : ""
+          } ${
+            recognitionResult?.attendanceStatus === "LATE"
+              ? "is-late"
+              : ""
           }`}
         >
           <div className="attendance-result-panel-header">
@@ -1609,7 +1982,7 @@ function AttendanceSession() {
                 <div>
                   <span>03</span>
 
-                  <p>Attendance is marked present</p>
+                  <p>Attendance status is recorded</p>
                 </div>
               </div>
             </div>
@@ -1659,7 +2032,7 @@ function AttendanceSession() {
 
                   <strong>
                     {recognitionResult.type === "success"
-                      ? "PRESENT"
+                      ? recognitionResult.attendanceStatus || "PRESENT"
                       : recognitionResult.type === "warning"
                         ? "ALREADY RECORDED"
                         : "NOT RECORDED"}
@@ -1693,6 +2066,28 @@ function AttendanceSession() {
               <span>SESSION START</span>
 
               <strong>{formatSchoolTime(sessionStartedAt)}</strong>
+            </div>
+
+            <div>
+              <span>LATE CUTOFF</span>
+
+              <strong>
+                {sessionLateCutoffAt
+                  ? formatSchoolTime(sessionLateCutoffAt)
+                  : sessionLateAfterMinutes
+                    ? `${sessionLateAfterMinutes} min after start`
+                    : "Not configured"}
+              </strong>
+            </div>
+
+            <div>
+              <span>SESSION END</span>
+
+              <strong>
+                {sessionScheduledEndAt
+                  ? formatSchoolTime(sessionScheduledEndAt)
+                  : "Manual"}
+              </strong>
             </div>
 
             <div>
@@ -1733,6 +2128,12 @@ function AttendanceSession() {
             <span>PRESENT</span>
 
             <strong className="is-success">{presentCount}</strong>
+          </div>
+
+          <div className="attendance-summary-card is-late">
+            <span>LATE</span>
+
+            <strong>{lateCount}</strong>
           </div>
 
           <div className="attendance-summary-card is-remaining">
@@ -1851,6 +2252,7 @@ function AttendanceSession() {
                         >
                           <option value="ALL">All statuses</option>
                           <option value="PRESENT">Present only</option>
+                          <option value="LATE">Late only</option>
                           <option value="PENDING">Pending only</option>
                         </select>
                       </label>
@@ -1941,7 +2343,9 @@ function AttendanceSession() {
             <div className="attendance-active-filter-chips" aria-label="Active filters">
               {attendanceStatusFilter !== "ALL" && (
                 <span className="is-status">
-                  Status: {attendanceStatusFilter === "PRESENT" ? "Present" : "Pending"}
+                  Status: {getAttendanceStatusLabel(
+                    attendanceStatusFilter,
+                  )}
                 </span>
               )}
 
@@ -1996,99 +2400,130 @@ function AttendanceSession() {
 
             <tbody>
               {paginatedStudentRows.length ? (
-                paginatedStudentRows.map(({ student, record, present }, index) => {
-                  const marking = markingStudentId === student.id;
+                paginatedStudentRows.map(
+                  ({ student, record, status, attended }, index) => {
+                    const marking =
+                      markingStudentId === student.id;
 
-                  const removing = removingStudentId === student.id;
+                    const removing =
+                      removingStudentId === student.id;
 
-                  const methodLabel = record
-                    ? getRecordMethod(record) || "Attendance"
-                    : "—";
+                    const methodLabel = record
+                      ? getRecordMethod(record) || "Attendance"
+                      : "—";
 
-                  const methodUpper = String(methodLabel).toUpperCase();
+                    const methodUpper =
+                      String(methodLabel).toUpperCase();
 
-                  const methodClass = !record
-                    ? "is-empty"
-                    : methodUpper.includes("FACE")
-                      ? "is-face"
-                      : methodUpper.includes("MANUAL")
-                        ? "is-manual"
-                        : "is-generic";
+                    const methodClass = !record
+                      ? "is-empty"
+                      : methodUpper.includes("FACE")
+                        ? "is-face"
+                        : methodUpper.includes("MANUAL")
+                          ? "is-manual"
+                          : "is-generic";
 
-                  const rowNumber = (currentPage - 1) * pageSize + index + 1;
+                    const rowNumber =
+                      (currentPage - 1) * pageSize + index + 1;
 
-                  return (
-                    <tr
-                      key={student.id || student.studentNumber}
-                      className={present ? "is-present" : ""}
-                    >
-                      <td>{String(rowNumber).padStart(2, "0")}</td>
+                    const statusClass =
+                      getAttendanceStatusClass(status);
 
-                      <td>
-                        <span className="attendance-live-student-number">
-                          {student.studentNumber || "—"}
-                        </span>
-                      </td>
+                    const statusLabel =
+                      getAttendanceStatusLabel(status);
 
-                      <td>
-                        <div className="attendance-live-student">
-                          <span>
-                            {student.name?.charAt(0)?.toUpperCase() || "S"}
+                    return (
+                      <tr
+                        key={student.id || student.studentNumber}
+                        className={
+                          status === "PRESENT"
+                            ? "is-present"
+                            : status === "LATE"
+                              ? "is-late"
+                              : status === "ABSENT"
+                                ? "is-absent"
+                                : ""
+                        }
+                      >
+                        <td>{String(rowNumber).padStart(2, "0")}</td>
+
+                        <td>
+                          <span className="attendance-live-student-number">
+                            {student.studentNumber || "—"}
                           </span>
+                        </td>
 
-                          <div>
-                            <strong>{student.name || "Unnamed Student"}</strong>
+                        <td>
+                          <div className="attendance-live-student">
+                            <span>
+                              {student.name?.charAt(0)?.toUpperCase() || "S"}
+                            </span>
 
-                            <small>{sectionName}</small>
+                            <div>
+                              <strong>{student.name || "Unnamed Student"}</strong>
+
+                              <small>{sectionName}</small>
+                            </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      <td>
-                        <span
-                          className={`attendance-live-status ${
-                            present ? "is-present" : "is-pending"
-                          }`}
-                        >
-                          <i />
-
-                          {present ? "Present" : "Pending"}
-                        </span>
-                      </td>
-
-                      <td>
-                        {record ? formatSchoolTime(getRecordTime(record)) : "—"}
-                      </td>
-
-                      <td>
-                        <span
-                          className={`attendance-live-method ${methodClass}`}
-                        >
-                          {methodLabel}
-                        </span>
-                      </td>
-
-                      <td>
-                        {present ? (
-                          <button
-                            type="button"
-                            className="attendance-live-remove"
-                            disabled={!sessionIsActive || removing}
-                            onClick={() => void handleRemoveAttendance(student)}
+                        <td>
+                          <span
+                            className={`attendance-live-status ${statusClass}`}
                           >
-                            {removing ? "Removing..." : "Remove"}
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="attendance-live-mark"
-                            disabled={!sessionIsActive || marking}
-                            onClick={() => void handleMarkPresent(student)}
+                            <i />
+
+                            {statusLabel}
+                          </span>
+                        </td>
+
+                        <td>
+                          {record
+                            ? formatSchoolTime(getRecordTime(record))
+                            : "—"}
+                        </td>
+
+                        <td>
+                          <span
+                            className={`attendance-live-method ${methodClass}`}
                           >
-                            {marking ? "Marking..." : "Mark Present"}
-                          </button>
-                        )}
-                      </td>
+                            {methodLabel}
+                          </span>
+                        </td>
+
+                        <td>
+                          {attended ? (
+                            <button
+                              type="button"
+                              className="attendance-live-remove"
+                              disabled={!sessionIsActive || removing}
+                              onClick={() =>
+                                void handleRemoveAttendance(student)
+                              }
+                            >
+                              {removing ? "Removing..." : "Remove"}
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="attendance-live-mark"
+                              disabled={
+                                !sessionIsActive ||
+                                marking ||
+                                status === "ABSENT"
+                              }
+                              onClick={() =>
+                                void handleMarkPresent(student)
+                              }
+                            >
+                              {marking
+                                ? "Recording..."
+                                : status === "ABSENT"
+                                  ? "Session Ended"
+                                  : "Record Attendance"}
+                            </button>
+                          )}
+                        </td>
                     </tr>
                   );
                 })
@@ -2217,6 +2652,12 @@ function AttendanceSession() {
                 <span>PRESENT</span>
 
                 <strong>{presentCount}</strong>
+              </div>
+
+              <div>
+                <span>LATE</span>
+
+                <strong>{lateCount}</strong>
               </div>
 
               <div>
