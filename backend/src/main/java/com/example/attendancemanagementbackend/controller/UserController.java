@@ -6,10 +6,22 @@ import com.example.attendancemanagementbackend.dto.adviser.UpdateAdviserRequest;
 import com.example.attendancemanagementbackend.dto.password.ChangePasswordRequest;
 import com.example.attendancemanagementbackend.dto.password.ResetPasswordRequest;
 import com.example.attendancemanagementbackend.service.UserService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
+
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
@@ -23,46 +35,90 @@ public class UserController {
     public UserController(
             UserService userService
     ) {
-        this.userService = userService;
+        this.userService =
+                userService;
     }
 
     /* =========================================================
-       GET ALL USERS
-       Councilor only
+       GET DEPARTMENT ADVISERS
+
+       COUNCILOR ONLY
+
+       Returns only Advisers belonging to the authenticated
+       Councilor's department.
     ========================================================= */
 
     @GetMapping
-    public List<UserResponse> getAllUsers() {
-        return userService.getAllUsers();
+    public List<UserResponse> getAllUsers(
+            Authentication authentication
+    ) {
+
+        String councilorId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
+        return userService.getAllUsers(
+                councilorId
+        );
     }
 
     /* =========================================================
        CREATE ADVISER
-       Councilor only
+
+       COUNCILOR ONLY
+
+       The department is NOT accepted from the client.
+       The Adviser automatically inherits the authenticated
+       Councilor's department.
     ========================================================= */
 
     @PostMapping("/advisers")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse createAdviser(
-            @Valid @RequestBody CreateAdviserRequest request
+            Authentication authentication,
+            @Valid
+            @RequestBody
+            CreateAdviserRequest request
     ) {
+
+        String councilorId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
         return userService.createAdviser(
+                councilorId,
                 request
         );
     }
 
     /* =========================================================
        UPDATE ADVISER
-       Councilor only
+
+       COUNCILOR ONLY
+
+       A Councilor can only update an Adviser from the same
+       department.
     ========================================================= */
 
     @PatchMapping("/advisers/{adviserId}")
     public UserResponse updateAdviser(
-            @PathVariable String adviserId,
-            @Valid @RequestBody UpdateAdviserRequest request
+            Authentication authentication,
+            @PathVariable
+            String adviserId,
+            @Valid
+            @RequestBody
+            UpdateAdviserRequest request
     ) {
 
+        String councilorId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
         return userService.updateAdviser(
+                councilorId,
                 adviserId,
                 request
         );
@@ -70,29 +126,46 @@ public class UserController {
 
     /* =========================================================
        DEACTIVATE ADVISER
-       Councilor only
+
+       COUNCILOR ONLY
+
+       A Councilor can only deactivate an Adviser from the same
+       department.
     ========================================================= */
 
     @DeleteMapping("/advisers/{adviserId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAdviser(
-            @PathVariable String adviserId
+            Authentication authentication,
+            @PathVariable
+            String adviserId
     ) {
 
+        String councilorId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
         userService.deactivateAdviser(
+                councilorId,
                 adviserId
         );
     }
 
     /* =========================================================
        CHANGE OWN PASSWORD
-       Councilor or Adviser
+
+       SUPERADMIN, COUNCILOR, OR ADVISER
+
+       Authorization is controlled by SecurityConfig.
     ========================================================= */
 
     @PatchMapping("/me/password")
     public Map<String, String> changeOwnPassword(
             Authentication authentication,
-            @Valid @RequestBody ChangePasswordRequest request
+            @Valid
+            @RequestBody
+            ChangePasswordRequest request
     ) {
 
         String userId =
@@ -113,16 +186,32 @@ public class UserController {
 
     /* =========================================================
        RESET ADVISER PASSWORD
-       Councilor only
+
+       COUNCILOR ONLY
+
+       The Adviser must belong to the authenticated
+       Councilor's department.
     ========================================================= */
 
-    @PatchMapping("/advisers/{adviserId}/reset-password")
+    @PatchMapping(
+            "/advisers/{adviserId}/reset-password"
+    )
     public Map<String, String> resetAdviserPassword(
-            @PathVariable String adviserId,
-            @Valid @RequestBody ResetPasswordRequest request
+            Authentication authentication,
+            @PathVariable
+            String adviserId,
+            @Valid
+            @RequestBody
+            ResetPasswordRequest request
     ) {
 
+        String councilorId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
         userService.resetAdviserPassword(
+                councilorId,
                 adviserId,
                 request
         );

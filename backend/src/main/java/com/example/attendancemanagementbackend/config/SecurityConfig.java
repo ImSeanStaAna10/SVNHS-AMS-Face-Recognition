@@ -88,7 +88,7 @@ public class SecurityConfig {
                                 .permitAll()
 
                                 /* =================================
-                                   PUBLIC
+                                   PUBLIC LOGIN
                                 ================================= */
 
                                 .requestMatchers(
@@ -98,10 +98,10 @@ public class SecurityConfig {
                                 .permitAll()
 
                                 /* =================================
-                                   DISABLED REGISTRATION
+                                   DISABLED PUBLIC REGISTRATION
 
-                                   Councilor account is seeded
-                                   during system initialization.
+                                   User accounts are managed through
+                                   controlled administrative flows.
                                 ================================= */
 
                                 .requestMatchers(
@@ -111,10 +111,28 @@ public class SecurityConfig {
                                 .denyAll()
 
                                 /* =================================
+                                   SUPERADMIN MANAGEMENT
+
+                                   SUPERADMIN is responsible for:
+                                   - Departments
+                                   - Councilor accounts
+
+                                   Councilors and Advisers cannot
+                                   access these endpoints.
+                                ================================= */
+
+                                .requestMatchers(
+                                        "/api/superadmin/**"
+                                )
+                                .hasRole(
+                                        "SUPERADMIN"
+                                )
+
+                                /* =================================
                                    PASSWORD MANAGEMENT
 
-                                   Councilor and Adviser can change
-                                   their own password.
+                                   SUPERADMIN, COUNCILOR, and ADVISER
+                                   can change their own password.
                                 ================================= */
 
                                 .requestMatchers(
@@ -122,6 +140,7 @@ public class SecurityConfig {
                                         "/api/users/me/password"
                                 )
                                 .hasAnyRole(
+                                        "SUPERADMIN",
                                         "COUNCILOR",
                                         "ADVISER"
                                 )
@@ -141,7 +160,7 @@ public class SecurityConfig {
 
                                 /* =================================
                                    COUNCILOR
-                                   USER MANAGEMENT
+                                   CREATE ADVISER
                                 ================================= */
 
                                 .requestMatchers(
@@ -151,6 +170,37 @@ public class SecurityConfig {
                                 .hasRole(
                                         "COUNCILOR"
                                 )
+
+                                /* =================================
+                                   COUNCILOR
+                                   UPDATE ADVISER
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.PATCH,
+                                        "/api/users/advisers/*"
+                                )
+                                .hasRole(
+                                        "COUNCILOR"
+                                )
+
+                                /* =================================
+                                   COUNCILOR
+                                   DEACTIVATE ADVISER
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.DELETE,
+                                        "/api/users/advisers/*"
+                                )
+                                .hasRole(
+                                        "COUNCILOR"
+                                )
+
+                                /* =================================
+                                   COUNCILOR
+                                   USER MANAGEMENT LIST
+                                ================================= */
 
                                 .requestMatchers(
                                         HttpMethod.GET,
@@ -162,7 +212,7 @@ public class SecurityConfig {
 
                                 /* =================================
                                    COUNCILOR
-                                   SECTION MANAGEMENT
+                                   CREATE SECTION
                                 ================================= */
 
                                 .requestMatchers(
@@ -174,23 +224,44 @@ public class SecurityConfig {
                                 )
 
                                 /* =================================
+                                   COUNCILOR
+                                   UPDATE SECTION
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.PATCH,
+                                        "/api/sections/*"
+                                )
+                                .hasRole(
+                                        "COUNCILOR"
+                                )
+
+                                /* =================================
+                                   COUNCILOR
+                                   DEACTIVATE SECTION
+                                ================================= */
+
+                                .requestMatchers(
+                                        HttpMethod.DELETE,
+                                        "/api/sections/*"
+                                )
+                                .hasRole(
+                                        "COUNCILOR"
+                                )
+
+                                /* =================================
                                    ATTENDANCE REPORT ARCHIVE
 
-                                   Both roles can access the
-                                   reporting API.
+                                   COUNCILOR and ADVISER currently
+                                   access reporting endpoints.
 
-                                   IMPORTANT:
-                                   Route-level security only checks
-                                   the role.
+                                   Department-level Councilor
+                                   restrictions will be enforced
+                                   later inside the reporting
+                                   access/service layer.
 
-                                   Section ownership is enforced
-                                   inside AttendanceReportAccessService:
-
-                                   COUNCILOR
-                                   → any section
-
-                                   ADVISER
-                                   → assigned section only
+                                   ADVISER remains restricted to
+                                   assigned-section reports.
                                 ================================= */
 
                                 .requestMatchers(
@@ -203,14 +274,14 @@ public class SecurityConfig {
                                 )
 
                                 /* =================================
-                                   FUTURE REPORT ACTIONS
+                                   REPORT GENERATION /
+                                   REGENERATION
 
-                                   We will likely use POST later for:
-                                   - manual generation
-                                   - regeneration
+                                   COUNCILOR ONLY.
 
-                                   Only Councilor should be able
-                                   to manually regenerate archives.
+                                   SUPERADMIN does not automatically
+                                   inherit Councilor operational
+                                   permissions.
                                 ================================= */
 
                                 .requestMatchers(
@@ -284,7 +355,11 @@ public class SecurityConfig {
                                    EVERYTHING ELSE
 
                                    Any route not explicitly listed
-                                   above still requires authentication.
+                                   still requires authentication.
+
+                                   More specific department-level
+                                   ownership rules will be enforced
+                                   inside their respective services.
                                 ================================= */
 
                                 .anyRequest()
