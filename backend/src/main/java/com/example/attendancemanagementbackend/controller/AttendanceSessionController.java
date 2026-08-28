@@ -106,8 +106,10 @@ public class AttendanceSessionController {
 
         else {
 
-            if (sectionId == null ||
-                    sectionId.isBlank()) {
+            if (
+                    sectionId == null ||
+                            sectionId.isBlank()
+            ) {
 
                 throw new IllegalArgumentException(
                         "Section ID is required"
@@ -193,6 +195,10 @@ public class AttendanceSessionController {
 
     /* =========================================================
        GET ACTIVE SESSION
+
+       SECURITY:
+       Adviser may only access the active session
+       belonging to their own assigned Section.
     ========================================================= */
 
     @GetMapping(
@@ -200,14 +206,23 @@ public class AttendanceSessionController {
     )
     public ResponseEntity<Map<String, Object>>
     getActiveSession(
+
             @PathVariable
-            String sectionId
+            String sectionId,
+
+            Authentication authentication
     ) {
+
+        String adviserId =
+                authentication
+                        .getPrincipal()
+                        .toString();
 
         AttendanceSession session =
                 attendanceSessionService
                         .getActiveSession(
-                                sectionId
+                                sectionId,
+                                adviserId
                         );
 
         Map<String, Object> response =
@@ -278,6 +293,7 @@ public class AttendanceSessionController {
     )
     public ResponseEntity<Map<String, Object>>
     endSession(
+
             @PathVariable
             String sessionId,
 

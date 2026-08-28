@@ -8,31 +8,50 @@ import com.example.attendancemanagementbackend.dto.attendance.AttendanceSectionD
 import com.example.attendancemanagementbackend.dto.attendance.AttendanceSectionInfoResponse;
 import com.example.attendancemanagementbackend.dto.attendance.AttendanceStudentReportResponse;
 import com.example.attendancemanagementbackend.dto.attendance.PagedResponse;
+
 import com.example.attendancemanagementbackend.entity.Section;
+
 import com.example.attendancemanagementbackend.exception.ApiException;
+
 import com.example.attendancemanagementbackend.repository.AttendanceRecordRepository;
 import com.example.attendancemanagementbackend.repository.AttendanceSectionCardProjection;
 import com.example.attendancemanagementbackend.repository.AttendanceSectionDetailSummaryProjection;
 import com.example.attendancemanagementbackend.repository.AttendanceStudentReportProjection;
 import com.example.attendancemanagementbackend.repository.AttendanceSummaryProjection;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+
 import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+
 import java.util.Locale;
 
 @Service
 public class AttendanceReportService {
 
-    private static final int DEFAULT_SECTION_PAGE_SIZE = 9;
+    /* =========================================================
+       PAGINATION
+    ========================================================= */
 
-    private static final int DEFAULT_STUDENT_PAGE_SIZE = 25;
+    private static final int DEFAULT_SECTION_PAGE_SIZE =
+            9;
 
-    private static final int MAX_PAGE_SIZE = 100;
+    private static final int DEFAULT_STUDENT_PAGE_SIZE =
+            25;
+
+    private static final int MAX_PAGE_SIZE =
+            100;
+
+    /* =========================================================
+       DEPENDENCIES
+    ========================================================= */
 
     private final AttendanceRecordRepository
             attendanceRecordRepository;
@@ -40,10 +59,19 @@ public class AttendanceReportService {
     private final SectionRepository
             sectionRepository;
 
+    /* =========================================================
+       CONSTRUCTOR
+    ========================================================= */
+
     public AttendanceReportService(
-            AttendanceRecordRepository attendanceRecordRepository,
-            SectionRepository sectionRepository
+
+            AttendanceRecordRepository
+                    attendanceRecordRepository,
+
+            SectionRepository
+                    sectionRepository
     ) {
+
         this.attendanceRecordRepository =
                 attendanceRecordRepository;
 
@@ -52,25 +80,73 @@ public class AttendanceReportService {
     }
 
     /* =========================================================
-       SCHOOL / SECTION CARD REPORT
+       DEPARTMENT / SECTION CARD REPORT
+
+       COUNCILOR ONLY through Controller.
+
+       IMPORTANT:
+
+       departmentId comes from the authenticated Councilor,
+       NOT from the frontend.
+
+       Therefore:
+
+       ICT Councilor
+       → ICT attendance only
+
+       TVL Councilor
+       → TVL attendance only
     ========================================================= */
 
     @Transactional(readOnly = true)
-    public AttendanceReportResponse getSectionAttendanceReport(
+    public AttendanceReportResponse
+    getSectionAttendanceReport(
+
             LocalDate fromDate,
+
             LocalDate toDate,
+
+            String departmentId,
+
             String sectionId,
+
             String adviserId,
+
             String search,
+
             int page,
+
             int size
     ) {
+
+        /* =====================================================
+           DEPARTMENT REQUIRED
+        ===================================================== */
+
+        if (
+                departmentId == null ||
+                        departmentId.isBlank()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Department id is required"
+            );
+        }
+
+        /* =====================================================
+           DATE RANGE
+        ===================================================== */
 
         DateRange dateRange =
                 resolveDateRange(
                         fromDate,
                         toDate
                 );
+
+        /* =====================================================
+           PAGE SIZE
+        ===================================================== */
 
         int resolvedSize =
                 resolvePageSize(
@@ -81,6 +157,10 @@ public class AttendanceReportService {
         validatePage(
                 page
         );
+
+        /* =====================================================
+           FILTER NORMALIZATION
+        ===================================================== */
 
         String normalizedSectionId =
                 normalizeFilter(
@@ -103,15 +183,30 @@ public class AttendanceReportService {
                         resolvedSize
                 );
 
+        /* =====================================================
+           SECTION CARDS
+
+           Department filter is enforced in
+           AttendanceRecordRepository.
+        ===================================================== */
+
         Page<AttendanceSectionCardProjection>
                 projectionPage =
                 attendanceRecordRepository
                         .findSectionAttendanceReport(
+
                                 dateRange.fromDate(),
+
                                 dateRange.toDate(),
+
+                                departmentId,
+
                                 normalizedSectionId,
+
                                 normalizedAdviserId,
+
                                 normalizedSearch,
+
                                 pageable
                         );
 
@@ -121,14 +216,27 @@ public class AttendanceReportService {
                         this::mapSectionCard
                 );
 
+        /* =====================================================
+           DEPARTMENT SUMMARY
+
+           Uses the same authenticated Councilor Department.
+        ===================================================== */
+
         AttendanceSummaryProjection
                 summaryProjection =
                 attendanceRecordRepository
                         .findAttendanceSummary(
+
                                 dateRange.fromDate(),
+
                                 dateRange.toDate(),
+
+                                departmentId,
+
                                 normalizedSectionId,
+
                                 normalizedAdviserId,
+
                                 normalizedSearch
                         );
 
@@ -138,9 +246,13 @@ public class AttendanceReportService {
                 );
 
         return new AttendanceReportResponse(
+
                 dateRange.fromDate(),
+
                 dateRange.toDate(),
+
                 summary,
+
                 PagedResponse.from(
                         responsePage
                 )
@@ -149,21 +261,45 @@ public class AttendanceReportService {
 
     /* =========================================================
        DETAILED SECTION STUDENT REPORT
+
+       COUNCILOR ONLY through Controller.
+
+       Security:
+
+       Section must belong to the authenticated
+       Councilor's Department.
+
+       Knowing another Department's Section UUID
+       does not grant access.
     ========================================================= */
 
     @Transactional(readOnly = true)
     public AttendanceSectionDetailResponse
     getSectionStudentAttendanceReport(
+
             String sectionId,
+
+            String departmentId,
+
             LocalDate fromDate,
+
             LocalDate toDate,
+
             String search,
+
             int page,
+
             int size
     ) {
 
-        if (sectionId == null ||
-                sectionId.isBlank()) {
+        /* =====================================================
+           SECTION REQUIRED
+        ===================================================== */
+
+        if (
+                sectionId == null ||
+                        sectionId.isBlank()
+        ) {
 
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
@@ -172,17 +308,48 @@ public class AttendanceReportService {
         }
 
         /* =====================================================
-           VALIDATE SECTION
+           DEPARTMENT REQUIRED
+        ===================================================== */
+
+        if (
+                departmentId == null ||
+                        departmentId.isBlank()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Department id is required"
+            );
+        }
+
+        /* =====================================================
+           VALIDATE SECTION OWNERSHIP
+
+           BEFORE:
+
+           findById(sectionId)
+
+           → any Department could potentially resolve
+
+           NOW:
+
+           findByIdAndDepartment_Id(...)
+
+           → only authenticated Councilor Department
         ===================================================== */
 
         Section section =
                 sectionRepository
-                        .findById(sectionId)
-                        .orElseThrow(() ->
-                                new ApiException(
-                                        HttpStatus.NOT_FOUND,
-                                        "Section not found"
-                                )
+                        .findByIdAndDepartment_Id(
+                                sectionId,
+                                departmentId
+                        )
+                        .orElseThrow(
+                                () ->
+                                        new ApiException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Section not found in your department"
+                                        )
                         );
 
         /* =====================================================
@@ -226,16 +393,24 @@ public class AttendanceReportService {
 
         /* =====================================================
            STUDENT REPORT QUERY
+
+           Safe because Section ownership has already been
+           validated above.
         ===================================================== */
 
         Page<AttendanceStudentReportProjection>
                 studentProjectionPage =
                 attendanceRecordRepository
                         .findStudentAttendanceReport(
+
                                 sectionId,
+
                                 dateRange.fromDate(),
+
                                 dateRange.toDate(),
+
                                 normalizedSearch,
+
                                 pageable
                         );
 
@@ -253,8 +428,11 @@ public class AttendanceReportService {
                 summaryProjection =
                 attendanceRecordRepository
                         .findSectionDetailSummary(
+
                                 sectionId,
+
                                 dateRange.fromDate(),
+
                                 dateRange.toDate()
                         );
 
@@ -268,25 +446,38 @@ public class AttendanceReportService {
            SECTION INFORMATION
         ===================================================== */
 
-        String adviserId = null;
-        String adviserName = null;
+        String adviserId =
+                null;
 
-        if (section.getAdviser() != null) {
+        String adviserName =
+                null;
+
+        if (
+                section.getAdviser() !=
+                        null
+        ) {
+
             adviserId =
-                    section.getAdviser()
+                    section
+                            .getAdviser()
                             .getId();
 
             adviserName =
-                    section.getAdviser()
+                    section
+                            .getAdviser()
                             .getName();
         }
 
         AttendanceSectionInfoResponse
                 sectionInfo =
                 new AttendanceSectionInfoResponse(
+
                         section.getId(),
+
                         section.getName(),
+
                         adviserId,
+
                         adviserName
                 );
 
@@ -295,10 +486,15 @@ public class AttendanceReportService {
         ===================================================== */
 
         return new AttendanceSectionDetailResponse(
+
                 dateRange.fromDate(),
+
                 dateRange.toDate(),
+
                 sectionInfo,
+
                 summary,
+
                 PagedResponse.from(
                         studentResponsePage
                 )
@@ -307,6 +503,8 @@ public class AttendanceReportService {
 
     /* =========================================================
        MAP SECTION CARD
+
+       EXISTING CALCULATION RETAINED
     ========================================================= */
 
     private AttendanceSectionCardResponse mapSectionCard(
@@ -344,15 +542,25 @@ public class AttendanceReportService {
                 );
 
         return new AttendanceSectionCardResponse(
+
                 projection.getSectionId(),
+
                 projection.getSectionName(),
+
                 projection.getAdviserId(),
+
                 projection.getAdviserName(),
+
                 sessions,
+
                 students,
+
                 present,
+
                 late,
+
                 absent,
+
                 totalRecords,
 
                 percentage(
@@ -378,14 +586,20 @@ public class AttendanceReportService {
     }
 
     /* =========================================================
-       MAP SCHOOL SUMMARY
+       MAP DEPARTMENT SUMMARY
+
+       Existing calculation retained.
     ========================================================= */
 
     private AttendanceReportSummaryResponse mapSummary(
             AttendanceSummaryProjection projection
     ) {
 
-        if (projection == null) {
+        if (
+                projection ==
+                        null
+        ) {
+
             return emptySummary();
         }
 
@@ -425,12 +639,19 @@ public class AttendanceReportService {
                 );
 
         return new AttendanceReportSummaryResponse(
+
                 sections,
+
                 sessions,
+
                 students,
+
                 present,
+
                 late,
+
                 absent,
+
                 totalRecords,
 
                 percentage(
@@ -457,6 +678,8 @@ public class AttendanceReportService {
 
     /* =========================================================
        MAP DETAILED STUDENT REPORT
+
+       Existing calculation retained.
     ========================================================= */
 
     private AttendanceStudentReportResponse mapStudentReport(
@@ -489,12 +712,19 @@ public class AttendanceReportService {
                 );
 
         return new AttendanceStudentReportResponse(
+
                 projection.getStudentId(),
+
                 projection.getStudentNumber(),
+
                 projection.getStudentName(),
+
                 sessions,
+
                 present,
+
                 late,
+
                 absent,
 
                 percentage(
@@ -521,6 +751,8 @@ public class AttendanceReportService {
 
     /* =========================================================
        MAP SECTION DETAIL SUMMARY
+
+       Existing calculation retained.
     ========================================================= */
 
     private AttendanceSectionDetailSummaryResponse
@@ -528,7 +760,11 @@ public class AttendanceReportService {
             AttendanceSectionDetailSummaryProjection projection
     ) {
 
-        if (projection == null) {
+        if (
+                projection ==
+                        null
+        ) {
+
             return emptySectionDetailSummary();
         }
 
@@ -563,11 +799,17 @@ public class AttendanceReportService {
                 );
 
         return new AttendanceSectionDetailSummaryResponse(
+
                 students,
+
                 sessions,
+
                 present,
+
                 late,
+
                 absent,
+
                 totalRecords,
 
                 percentage(
@@ -593,7 +835,9 @@ public class AttendanceReportService {
     }
 
     /* =========================================================
-       EMPTY SCHOOL SUMMARY
+       EMPTY DEPARTMENT SUMMARY
+
+       Existing structure retained.
     ========================================================= */
 
     private AttendanceReportSummaryResponse emptySummary() {
@@ -615,6 +859,8 @@ public class AttendanceReportService {
 
     /* =========================================================
        EMPTY SECTION DETAIL SUMMARY
+
+       Existing structure retained.
     ========================================================= */
 
     private AttendanceSectionDetailSummaryResponse
@@ -636,10 +882,14 @@ public class AttendanceReportService {
 
     /* =========================================================
        DATE RANGE
+
+       Existing behavior retained.
     ========================================================= */
 
     private DateRange resolveDateRange(
+
             LocalDate fromDate,
+
             LocalDate toDate
     ) {
 
@@ -653,9 +903,11 @@ public class AttendanceReportService {
                         ? toDate
                         : resolvedFrom;
 
-        if (resolvedFrom.isAfter(
-                resolvedTo
-        )) {
+        if (
+                resolvedFrom.isAfter(
+                        resolvedTo
+                )
+        ) {
 
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
@@ -671,13 +923,18 @@ public class AttendanceReportService {
 
     /* =========================================================
        PAGINATION
+
+       Existing behavior retained.
     ========================================================= */
 
     private void validatePage(
             int page
     ) {
 
-        if (page < 0) {
+        if (
+                page < 0
+        ) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Page cannot be negative"
@@ -686,7 +943,9 @@ public class AttendanceReportService {
     }
 
     private int resolvePageSize(
+
             int size,
+
             int defaultSize
     ) {
 
@@ -695,11 +954,16 @@ public class AttendanceReportService {
                         ? defaultSize
                         : size;
 
-        if (resolvedSize > MAX_PAGE_SIZE) {
+        if (
+                resolvedSize >
+                        MAX_PAGE_SIZE
+        ) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Page size cannot exceed "
-                            + MAX_PAGE_SIZE
+                            +
+                            MAX_PAGE_SIZE
             );
         }
 
@@ -708,13 +972,19 @@ public class AttendanceReportService {
 
     /* =========================================================
        FILTER NORMALIZATION
+
+       Existing behavior retained.
     ========================================================= */
 
     private String normalizeFilter(
             String value
     ) {
 
-        if (value == null) {
+        if (
+                value ==
+                        null
+        ) {
+
             return "";
         }
 
@@ -725,7 +995,11 @@ public class AttendanceReportService {
             String value
     ) {
 
-        if (value == null) {
+        if (
+                value ==
+                        null
+        ) {
+
             return "";
         }
 
@@ -738,6 +1012,8 @@ public class AttendanceReportService {
 
     /* =========================================================
        SAFE LONG
+
+       Existing behavior retained.
     ========================================================= */
 
     private long safeLong(
@@ -751,24 +1027,45 @@ public class AttendanceReportService {
 
     /* =========================================================
        PERCENTAGE
+
+       Existing calculations retained exactly.
+
+       PRESENT
+       LATE
+       PRESENT + LATE attendance
+       ABSENT
     ========================================================= */
 
     private double percentage(
+
             long value,
+
             long total
     ) {
 
-        if (total <= 0) {
+        if (
+                total <= 0
+        ) {
+
             return 0.0;
         }
 
         double result =
-                ((double) value / total)
-                        * 100.0;
+                (
+                        (double) value
+                                /
+                                total
+                )
+                        *
+                        100.0;
 
         return Math.round(
-                result * 100.0
-        ) / 100.0;
+                result
+                        *
+                        100.0
+        )
+                /
+                100.0;
     }
 
     /* =========================================================
@@ -776,7 +1073,9 @@ public class AttendanceReportService {
     ========================================================= */
 
     private record DateRange(
+
             LocalDate fromDate,
+
             LocalDate toDate
     ) {
     }

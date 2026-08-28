@@ -35,19 +35,11 @@ public class AttendanceReportArchiveService {
     private static final int MAX_PAGE_SIZE =
             50;
 
-    /* =========================================================
-       DEPENDENCIES
-    ========================================================= */
-
     private final AttendanceReportArchiveRepository
             attendanceReportArchiveRepository;
 
     private final AttendanceReportAccessService
             attendanceReportAccessService;
-
-    /* =========================================================
-       CONSTRUCTOR
-    ========================================================= */
 
     public AttendanceReportArchiveService(
 
@@ -129,16 +121,11 @@ public class AttendanceReportArchiveService {
                 );
 
         /*
-         * If an Adviser explicitly requests a section,
-         * return 403 instead of simply returning an
-         * empty result.
+         * Explicit Section filters must always be authorized,
+         * including Councilors.
          */
         if (
                 normalizedSectionId != null
-                        &&
-                        !isCouncilor(
-                                authentication
-                        )
         ) {
 
             attendanceReportAccessService
@@ -147,6 +134,19 @@ public class AttendanceReportArchiveService {
                             authentication
                     );
         }
+
+        boolean councilor =
+                isCouncilor(
+                        authentication
+                );
+
+        String departmentId =
+                councilor
+                        ? attendanceReportAccessService
+                        .getCouncilorDepartmentId(
+                                authentication
+                        )
+                        : null;
 
         PageRequest pageable =
                 PageRequest.of(
@@ -158,13 +158,13 @@ public class AttendanceReportArchiveService {
                 attendanceReportArchiveRepository
                         .searchAccessibleReports(
 
-                                isCouncilor(
-                                        authentication
-                                ),
+                                councilor,
 
                                 getUserId(
                                         authentication
                                 ),
+
+                                departmentId,
 
                                 reportType,
 
@@ -216,10 +216,6 @@ public class AttendanceReportArchiveService {
                                         )
                         );
 
-        /*
-         * Re-check current section ownership before
-         * returning physical files.
-         */
         attendanceReportAccessService
                 .validateSectionAccess(
                         archive.getSectionId(),
@@ -230,7 +226,7 @@ public class AttendanceReportArchiveService {
     }
 
     /* =========================================================
-       GET ALL AUTHORIZED REPORTS FOR ZIP
+       GET REPORTS FOR ZIP
     ========================================================= */
 
     @Transactional(readOnly = true)
@@ -264,10 +260,6 @@ public class AttendanceReportArchiveService {
 
         if (
                 normalizedSectionId != null
-                        &&
-                        !isCouncilor(
-                                authentication
-                        )
         ) {
 
             attendanceReportAccessService
@@ -277,16 +269,29 @@ public class AttendanceReportArchiveService {
                     );
         }
 
+        boolean councilor =
+                isCouncilor(
+                        authentication
+                );
+
+        String departmentId =
+                councilor
+                        ? attendanceReportAccessService
+                        .getCouncilorDepartmentId(
+                                authentication
+                        )
+                        : null;
+
         return attendanceReportArchiveRepository
                 .findAccessibleReportsForDownload(
 
-                        isCouncilor(
-                                authentication
-                        ),
+                        councilor,
 
                         getUserId(
                                 authentication
                         ),
+
+                        departmentId,
 
                         reportType,
 
@@ -333,7 +338,7 @@ public class AttendanceReportArchiveService {
     }
 
     /* =========================================================
-       AUTHENTICATION VALIDATION
+       AUTHENTICATION
     ========================================================= */
 
     private void validateAuthentication(
@@ -341,10 +346,8 @@ public class AttendanceReportArchiveService {
     ) {
 
         if (
-                authentication == null
-                        ||
-                        !authentication
-                                .isAuthenticated()
+                authentication == null ||
+                        !authentication.isAuthenticated()
         ) {
 
             throw new ApiException(
@@ -355,21 +358,17 @@ public class AttendanceReportArchiveService {
     }
 
     /* =========================================================
-       DATE VALIDATION
+       DATE RANGE
     ========================================================= */
 
     private void validateDateRange(
-
             LocalDate fromDate,
-
             LocalDate toDate
     ) {
 
         if (
-                fromDate != null
-                        &&
-                        toDate != null
-                        &&
+                fromDate != null &&
+                        toDate != null &&
                         fromDate.isAfter(
                                 toDate
                         )

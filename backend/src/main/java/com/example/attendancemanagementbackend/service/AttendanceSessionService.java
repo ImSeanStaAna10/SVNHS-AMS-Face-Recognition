@@ -703,12 +703,55 @@ public class AttendanceSessionService {
 
     /* =========================================================
        GET ACTIVE SESSION
+
+       SECURITY UPDATE:
+       The authenticated Adviser must own the requested
+       Section before its active session can be returned.
     ========================================================= */
 
     @Transactional(readOnly = true)
     public AttendanceSession getActiveSession(
-            String sectionId
+            String sectionId,
+            String adviserId
     ) {
+
+        /* =====================================================
+           LOAD SECTION
+        ===================================================== */
+
+        Section section =
+                sectionRepository
+                        .findById(
+                                sectionId
+                        )
+                        .orElseThrow(() ->
+                                new ApiException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Section not found"
+                                )
+                        );
+
+        /* =====================================================
+           VERIFY ADVISER OWNERSHIP
+
+           Prevents Adviser A from using Adviser B's
+           Section UUID to read its active session.
+        ===================================================== */
+
+        if (section.getAdviser() == null ||
+                !section.getAdviser()
+                        .getId()
+                        .equals(adviserId)) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not assigned to this section"
+            );
+        }
+
+        /* =====================================================
+           EXISTING ACTIVE SESSION LOOKUP
+        ===================================================== */
 
         AttendanceSession session =
                 attendanceSessionRepository

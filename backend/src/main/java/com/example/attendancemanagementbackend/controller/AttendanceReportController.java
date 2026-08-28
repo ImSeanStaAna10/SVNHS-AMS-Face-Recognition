@@ -81,7 +81,7 @@ public class AttendanceReportController {
             attendanceReportService;
 
     /*
-     * NEW WEEKLY / MONTHLY REPORT SERVICES
+     * WEEKLY / MONTHLY REPORT ACCESS
      */
     private final AttendanceReportAccessService
             attendanceReportAccessService;
@@ -167,11 +167,12 @@ public class AttendanceReportController {
     /* =========================================================
        SECTION OVERVIEW REPORT
 
-       Restored existing endpoint.
+       COUNCILOR ONLY.
 
-       Used by the Councilor Attendance page.
+       Councilor can only see Attendance data belonging
+       to Sections inside their own Department.
 
-       GET
+       GET:
        /api/attendance-reports/sections
 
        Supports:
@@ -216,25 +217,27 @@ public class AttendanceReportController {
             Authentication authentication
     ) {
 
-        /*
-         * This is the Councilor-wide attendance overview.
-         *
-         * The generic GET security rule for attendance-reports
-         * also allows Adviser because Adviser needs access to
-         * the new archive endpoints.
-         *
-         * Therefore, explicitly protect this old Councilor
-         * overview endpoint here.
-         */
         requireCouncilor(
                 authentication
         );
+
+        /*
+         * Department comes from authenticated Councilor.
+         *
+         * It is NOT accepted from request parameters.
+         */
+        String departmentId =
+                attendanceReportAccessService
+                        .getCouncilorDepartmentId(
+                                authentication
+                        );
 
         AttendanceReportResponse response =
                 attendanceReportService
                         .getSectionAttendanceReport(
                                 from,
                                 to,
+                                departmentId,
                                 sectionId,
                                 adviserId,
                                 search,
@@ -250,14 +253,12 @@ public class AttendanceReportController {
     /* =========================================================
        DETAILED SECTION STUDENT REPORT
 
-       Restored existing endpoint.
+       COUNCILOR ONLY.
 
-       Used by:
-       Councilor
-       → Attendance
-       → Section Details
+       Requested Section must belong to the authenticated
+       Councilor's Department.
 
-       GET
+       GET:
        /api/attendance-reports/sections/{sectionId}/students
     ========================================================= */
 
@@ -296,10 +297,17 @@ public class AttendanceReportController {
                 authentication
         );
 
+        String departmentId =
+                attendanceReportAccessService
+                        .getCouncilorDepartmentId(
+                                authentication
+                        );
+
         AttendanceSectionDetailResponse response =
                 attendanceReportService
                         .getSectionStudentAttendanceReport(
                                 sectionId,
+                                departmentId,
                                 from,
                                 to,
                                 search,
@@ -313,11 +321,17 @@ public class AttendanceReportController {
     }
 
     /* =========================================================
-       NEW WEEKLY / MONTHLY REPORTING
+       WEEKLY / MONTHLY REPORTING
     ========================================================= */
 
     /* =========================================================
        PREVIEW REPORT
+
+       COUNCILOR:
+       - own Department only
+
+       ADVISER:
+       - assigned Section only
     ========================================================= */
 
     @GetMapping("/preview")
@@ -365,8 +379,11 @@ public class AttendanceReportController {
 
        COUNCILOR ONLY.
 
-       Actual PDF / XLSX files are uploaded to the
-       private Supabase Storage bucket.
+       Requested Section must belong to the authenticated
+       Councilor's Department.
+
+       Actual PDF / XLSX files continue to be uploaded to
+       private Supabase Storage.
     ========================================================= */
 
     @PostMapping("/generate")
@@ -389,8 +406,27 @@ public class AttendanceReportController {
             @DateTimeFormat(
                     iso = DateTimeFormat.ISO.DATE
             )
-            LocalDate to
+            LocalDate to,
+
+            Authentication authentication
     ) {
+
+        /*
+         * SecurityConfig already makes POST report endpoints
+         * Councilor-only.
+         *
+         * This explicit check keeps service-level ownership
+         * protection as well.
+         */
+        requireCouncilor(
+                authentication
+        );
+
+        attendanceReportAccessService
+                .validateSectionAccess(
+                        sectionId,
+                        authentication
+                );
 
         AttendanceReportArchiveResponse response =
                 attendanceReportFileService
@@ -411,9 +447,18 @@ public class AttendanceReportController {
 
        COUNCILOR ONLY.
 
-       Scheduler uses the same generation pipeline,
-       therefore scheduled reports are also uploaded
-       to Supabase Storage.
+       IMPORTANT:
+
+       Manual generation is Department-scoped.
+
+       ICT Councilor
+       → ICT Sections only
+
+       TVL Councilor
+       → TVL Sections only
+
+       Automatic scheduler remains GLOBAL and continues
+       processing all Departments.
     ========================================================= */
 
     @PostMapping("/generate-batch")
@@ -433,15 +478,22 @@ public class AttendanceReportController {
             @DateTimeFormat(
                     iso = DateTimeFormat.ISO.DATE
             )
-            LocalDate to
+            LocalDate to,
+
+            Authentication authentication
     ) {
+
+        requireCouncilor(
+                authentication
+        );
 
         AttendanceReportBatchGenerationResponse response =
                 attendanceReportScheduler
-                        .generateForPeriod(
+                        .generateForCouncilorPeriod(
                                 type,
                                 from,
-                                to
+                                to,
+                                authentication
                         );
 
         return ResponseEntity.ok(
@@ -454,9 +506,10 @@ public class AttendanceReportController {
 
        TEMPORARY.
 
-       We can remove this after both the old Attendance
-       feature and the new Attendance Records archive
-       have been verified together.
+       Existing behavior retained.
+
+       POST reporting endpoints are already protected
+       by SecurityConfig.
     ========================================================= */
 
     @PostMapping("/storage-test")
@@ -474,6 +527,15 @@ public class AttendanceReportController {
 
     /* =========================================================
        ARCHIVE LIST
+
+       COUNCILOR:
+       - own Department only
+
+       ADVISER:
+       - assigned Section only
+
+       Actual scoping is enforced by
+       AttendanceReportArchiveService.
     ========================================================= */
 
     @GetMapping("/archive")
@@ -529,23 +591,14 @@ public class AttendanceReportController {
     /* =========================================================
        VIEW / DOWNLOAD PDF
 
-       Security:
-       getAuthorizedReport(...) checks that:
+       COUNCILOR:
+       - own Department only
 
-       COUNCILOR
-       → may access allowed reports
+       ADVISER:
+       - assigned Section only
 
-       ADVISER
-       → may access assigned section only
-
-       Storage:
-       actual PDF bytes come from Supabase Storage.
-
-       download=false
-       → inline browser preview
-
-       download=true
-       → attachment
+       Authorization is enforced before the physical
+       PDF is loaded from Supabase Storage.
     ========================================================= */
 
     @GetMapping("/{reportId}/pdf")
@@ -625,7 +678,14 @@ public class AttendanceReportController {
     /* =========================================================
        DOWNLOAD EXCEL
 
-       Actual XLSX bytes come from Supabase Storage.
+       COUNCILOR:
+       - own Department only
+
+       ADVISER:
+       - assigned Section only
+
+       Actual XLSX bytes continue to come from
+       Supabase Storage.
     ========================================================= */
 
     @GetMapping("/{reportId}/excel")
@@ -685,7 +745,13 @@ public class AttendanceReportController {
     /* =========================================================
        DOWNLOAD ALL ZIP
 
-       Individual PDF/XLSX files are fetched from
+       COUNCILOR:
+       - own Department reports only
+
+       ADVISER:
+       - assigned Section reports only
+
+       Individual PDF / XLSX files are fetched from
        Supabase Storage and assembled into ZIP bytes.
 
        format:
@@ -775,11 +841,11 @@ public class AttendanceReportController {
     /* =========================================================
        COUNCILOR ACCESS GUARD
 
-       Important because GET /api/attendance-reports/**
-       is shared by COUNCILOR and ADVISER for the new archive.
+       GET /api/attendance-reports/**
+       is shared by COUNCILOR and ADVISER because Advisers
+       need archive/report access.
 
-       The two legacy section-wide endpoints expose school-wide
-       information, therefore they remain Councilor-only.
+       Some endpoints remain explicitly Councilor-only.
     ========================================================= */
 
     private void requireCouncilor(

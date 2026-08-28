@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.scheduling.annotation.Scheduled;
 
+import org.springframework.security.core.Authentication;
+
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -60,6 +62,9 @@ public class AttendanceReportScheduler {
     private final AttendanceReportFileService
             attendanceReportFileService;
 
+    private final AttendanceReportAccessService
+            attendanceReportAccessService;
+
     /* =========================================================
        CONSTRUCTOR
     ========================================================= */
@@ -69,7 +74,10 @@ public class AttendanceReportScheduler {
             SectionRepository sectionRepository,
 
             AttendanceReportFileService
-                    attendanceReportFileService
+                    attendanceReportFileService,
+
+            AttendanceReportAccessService
+                    attendanceReportAccessService
     ) {
 
         this.sectionRepository =
@@ -77,6 +85,9 @@ public class AttendanceReportScheduler {
 
         this.attendanceReportFileService =
                 attendanceReportFileService;
+
+        this.attendanceReportAccessService =
+                attendanceReportAccessService;
     }
 
     /* =========================================================
@@ -87,17 +98,18 @@ public class AttendanceReportScheduler {
        12:10 AM
        Asia/Manila
 
-       Generates the most recently completed
-       Monday-Friday school week.
+       IMPORTANT:
+
+       Automatic system generation remains GLOBAL.
+
+       It intentionally processes Sections from ALL
+       Departments.
 
        Example:
 
-       Saturday: August 22, 2026
-
-       Period:
-       August 17, 2026
-       to
-       August 21, 2026
+       ICT
+       TVL
+       future Departments
     ========================================================= */
 
     @Scheduled(
@@ -161,13 +173,12 @@ public class AttendanceReportScheduler {
        12:20 AM
        Asia/Manila
 
-       Generates the entire PREVIOUS month.
+       IMPORTANT:
 
-       Example:
+       Automatic system generation remains GLOBAL.
 
-       September 1, 2026
-       ↓
-       August 1-31, 2026
+       It intentionally processes Sections from ALL
+       Departments.
     ========================================================= */
 
     @Scheduled(
@@ -222,14 +233,15 @@ public class AttendanceReportScheduler {
     }
 
     /* =========================================================
-       BATCH GENERATION
+       GLOBAL BATCH GENERATION
 
-       Shared by:
-       - Weekly scheduler
-       - Monthly scheduler
-       - Manual Councilor batch regeneration
+       Used ONLY by system-level automatic scheduling.
 
-       This keeps generation logic DRY.
+       This intentionally processes ALL Sections from
+       ALL Departments.
+
+       DO NOT use this method directly for manual
+       Councilor generation.
     ========================================================= */
 
     public AttendanceReportBatchGenerationResponse generateForPeriod(
@@ -250,6 +262,98 @@ public class AttendanceReportScheduler {
         List<Section> sections =
                 sectionRepository
                         .findAll();
+
+        return generateForSections(
+                reportType,
+                periodStart,
+                periodEnd,
+                sections
+        );
+    }
+
+    /* =========================================================
+       COUNCILOR MANUAL BATCH GENERATION
+
+       COUNCILOR:
+       - Own Department only
+
+       Example:
+
+       ICT Councilor
+       → ICT Sections only
+
+       TVL Councilor
+       → TVL Sections only
+
+       Department is derived from the authenticated
+       Councilor.
+
+       The client cannot choose another Department.
+    ========================================================= */
+
+    public AttendanceReportBatchGenerationResponse
+    generateForCouncilorPeriod(
+
+            AttendanceReportType reportType,
+
+            LocalDate periodStart,
+
+            LocalDate periodEnd,
+
+            Authentication authentication
+    ) {
+
+        validatePeriod(
+                reportType,
+                periodStart,
+                periodEnd
+        );
+
+        String departmentId =
+                attendanceReportAccessService
+                        .getCouncilorDepartmentId(
+                                authentication
+                        );
+
+        List<Section> sections =
+                sectionRepository
+                        .findAllByDepartment_Id(
+                                departmentId
+                        );
+
+        return generateForSections(
+                reportType,
+                periodStart,
+                periodEnd,
+                sections
+        );
+    }
+
+    /* =========================================================
+       SHARED GENERATION PIPELINE
+
+       Shared by:
+
+       - Automatic weekly generation
+       - Automatic monthly generation
+       - Manual Councilor batch generation
+
+       The caller decides WHICH Sections are allowed.
+
+       This keeps the actual generation behavior unchanged.
+    ========================================================= */
+
+    private AttendanceReportBatchGenerationResponse
+    generateForSections(
+
+            AttendanceReportType reportType,
+
+            LocalDate periodStart,
+
+            LocalDate periodEnd,
+
+            List<Section> sections
+    ) {
 
         int generatedCount =
                 0;
@@ -289,12 +393,11 @@ public class AttendanceReportScheduler {
                  * Most commonly:
                  *
                  * No completed attendance records exist
-                 * for this section and period.
+                 * for this Section and period.
                  *
-                 * One section must never stop report
-                 * generation for every other section.
+                 * One Section must never stop report
+                 * generation for every other Section.
                  */
-
                 notGeneratedCount++;
 
                 LOGGER.info(
@@ -312,9 +415,9 @@ public class AttendanceReportScheduler {
                 /*
                  * Unexpected error isolation.
                  *
-                 * Continue processing the other sections.
+                 * Continue processing the remaining
+                 * Sections.
                  */
-
                 notGeneratedCount++;
 
                 LOGGER.error(
@@ -370,8 +473,7 @@ public class AttendanceReportScheduler {
         }
 
         if (
-                periodStart == null
-                        ||
+                periodStart == null ||
                         periodEnd == null
         ) {
 

@@ -58,15 +58,10 @@ public interface AttendanceReportArchiveRepository
        ARCHIVE SEARCH — PAGINATED
 
        COUNCILOR:
-       - all sections
+       - Sections from own Department only
 
        ADVISER:
-       - sections currently assigned to the adviser
-
-       Filters:
-       - Weekly / Monthly
-       - Section
-       - Date period
+       - Sections currently assigned to Adviser
     ========================================================= */
 
     @Query(
@@ -75,11 +70,22 @@ public interface AttendanceReportArchiveRepository
                     FROM AttendanceReportArchive archive
                     WHERE
                     (
-                        :isCouncilor = true
-                        OR archive.sectionId IN (
-                            SELECT section.id
-                            FROM Section section
-                            WHERE section.adviser.id = :userId
+                        (
+                            :isCouncilor = true
+                            AND archive.sectionId IN (
+                                SELECT section.id
+                                FROM Section section
+                                WHERE section.department.id = :departmentId
+                            )
+                        )
+                        OR
+                        (
+                            :isCouncilor = false
+                            AND archive.sectionId IN (
+                                SELECT section.id
+                                FROM Section section
+                                WHERE section.adviser.id = :userId
+                            )
                         )
                     )
                     AND (
@@ -108,11 +114,22 @@ public interface AttendanceReportArchiveRepository
                     FROM AttendanceReportArchive archive
                     WHERE
                     (
-                        :isCouncilor = true
-                        OR archive.sectionId IN (
-                            SELECT section.id
-                            FROM Section section
-                            WHERE section.adviser.id = :userId
+                        (
+                            :isCouncilor = true
+                            AND archive.sectionId IN (
+                                SELECT section.id
+                                FROM Section section
+                                WHERE section.department.id = :departmentId
+                            )
+                        )
+                        OR
+                        (
+                            :isCouncilor = false
+                            AND archive.sectionId IN (
+                                SELECT section.id
+                                FROM Section section
+                                WHERE section.adviser.id = :userId
+                            )
                         )
                     )
                     AND (
@@ -141,6 +158,9 @@ public interface AttendanceReportArchiveRepository
             @Param("userId")
             String userId,
 
+            @Param("departmentId")
+            String departmentId,
+
             @Param("reportType")
             AttendanceReportType reportType,
 
@@ -157,9 +177,7 @@ public interface AttendanceReportArchiveRepository
     );
 
     /* =========================================================
-       ARCHIVE SEARCH — ALL MATCHING
-
-       Used by Download All ZIP.
+       ARCHIVE SEARCH — DOWNLOAD ALL
     ========================================================= */
 
     @Query("""
@@ -167,11 +185,22 @@ public interface AttendanceReportArchiveRepository
             FROM AttendanceReportArchive archive
             WHERE
             (
-                :isCouncilor = true
-                OR archive.sectionId IN (
-                    SELECT section.id
-                    FROM Section section
-                    WHERE section.adviser.id = :userId
+                (
+                    :isCouncilor = true
+                    AND archive.sectionId IN (
+                        SELECT section.id
+                        FROM Section section
+                        WHERE section.department.id = :departmentId
+                    )
+                )
+                OR
+                (
+                    :isCouncilor = false
+                    AND archive.sectionId IN (
+                        SELECT section.id
+                        FROM Section section
+                        WHERE section.adviser.id = :userId
+                    )
                 )
             )
             AND (
@@ -201,6 +230,9 @@ public interface AttendanceReportArchiveRepository
 
             @Param("userId")
             String userId,
+
+            @Param("departmentId")
+            String departmentId,
 
             @Param("reportType")
             AttendanceReportType reportType,

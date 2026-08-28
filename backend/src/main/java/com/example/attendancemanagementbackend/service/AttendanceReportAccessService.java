@@ -2,15 +2,23 @@ package com.example.attendancemanagementbackend.service;
 
 import com.example.attendancemanagementbackend.dto.AttendanceReportAggregationResponse;
 import com.example.attendancemanagementbackend.entity.AttendanceReportType;
+import com.example.attendancemanagementbackend.entity.Role;
 import com.example.attendancemanagementbackend.entity.Section;
+import com.example.attendancemanagementbackend.entity.User;
 import com.example.attendancemanagementbackend.exception.ApiException;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
+import com.example.attendancemanagementbackend.repository.UserRepository;
 
 import org.springframework.http.HttpStatus;
+
 import org.springframework.security.core.Authentication;
+
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
+
 import java.util.Objects;
 
 @Service
@@ -20,7 +28,11 @@ public class AttendanceReportAccessService {
        DEPENDENCIES
     ========================================================= */
 
-    private final SectionRepository sectionRepository;
+    private final SectionRepository
+            sectionRepository;
+
+    private final UserRepository
+            userRepository;
 
     private final AttendanceReportAggregationService
             attendanceReportAggregationService;
@@ -30,12 +42,20 @@ public class AttendanceReportAccessService {
     ========================================================= */
 
     public AttendanceReportAccessService(
+
             SectionRepository sectionRepository,
-            AttendanceReportAggregationService attendanceReportAggregationService
+
+            UserRepository userRepository,
+
+            AttendanceReportAggregationService
+                    attendanceReportAggregationService
     ) {
 
         this.sectionRepository =
                 sectionRepository;
+
+        this.userRepository =
+                userRepository;
 
         this.attendanceReportAggregationService =
                 attendanceReportAggregationService;
@@ -44,13 +64,14 @@ public class AttendanceReportAccessService {
     /* =========================================================
        PREVIEW REPORT
 
-       COUNCILOR
-       - Any section
+       COUNCILOR:
+       - Own Department only
 
-       ADVISER
-       - Assigned section only
+       ADVISER:
+       - Assigned Section only
     ========================================================= */
 
+    @Transactional(readOnly = true)
     public AttendanceReportAggregationResponse preview(
 
             String sectionId,
@@ -80,8 +101,16 @@ public class AttendanceReportAccessService {
 
     /* =========================================================
        SECTION ACCESS VALIDATION
+
+       COUNCILOR:
+       - Requested Section must belong to own Department
+
+       ADVISER:
+       - Requested Section must currently be assigned
+         to authenticated Adviser
     ========================================================= */
 
+    @Transactional(readOnly = true)
     public void validateSectionAccess(
 
             String sectionId,
@@ -89,40 +118,50 @@ public class AttendanceReportAccessService {
             Authentication authentication
     ) {
 
-        /* =====================================================
-           AUTHENTICATION REQUIRED
-        ===================================================== */
+        validateAuthentication(
+                authentication
+        );
 
         if (
-                authentication == null ||
-                        !authentication.isAuthenticated()
+                sectionId == null ||
+                        sectionId.isBlank()
         ) {
 
             throw new ApiException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Authentication is required"
+                    HttpStatus.BAD_REQUEST,
+                    "Section id is required"
             );
         }
 
         /* =====================================================
            COUNCILOR
-
-           Councilor can access attendance reports
-           from any section.
         ===================================================== */
 
-        boolean isCouncilor =
-                authentication
-                        .getAuthorities()
-                        .stream()
-                        .anyMatch(
-                                authority ->
-                                        "ROLE_COUNCILOR".equals(
-                                                authority.getAuthority()
-                                        )
-                        );
+        if (
+                hasRole(
+                        authentication,
+                        "ROLE_COUNCILOR"
+                )
+        ) {
 
-        if (isCouncilor) {
+            String departmentId =
+                    getCouncilorDepartmentId(
+                            authentication
+                    );
+
+            sectionRepository
+                    .findByIdAndDepartment_Id(
+                            sectionId,
+                            departmentId
+                    )
+                    .orElseThrow(
+                            () ->
+                                    new ApiException(
+                                            HttpStatus.NOT_FOUND,
+                                            "Section not found in your department"
+                                    )
+                    );
+
             return;
         }
 
@@ -130,18 +169,12 @@ public class AttendanceReportAccessService {
            ADVISER ROLE CHECK
         ===================================================== */
 
-        boolean isAdviser =
-                authentication
-                        .getAuthorities()
-                        .stream()
-                        .anyMatch(
-                                authority ->
-                                        "ROLE_ADVISER".equals(
-                                                authority.getAuthority()
-                                        )
-                        );
-
-        if (!isAdviser) {
+        if (
+                !hasRole(
+                        authentication,
+                        "ROLE_ADVISER"
+                )
+        ) {
 
             throw new ApiException(
                     HttpStatus.FORBIDDEN,
@@ -150,10 +183,7 @@ public class AttendanceReportAccessService {
         }
 
         /* =====================================================
-           GET AUTHENTICATED ADVISER ID
-
-           Your JWT setup currently stores the authenticated
-           user's ID as the Authentication principal.
+           AUTHENTICATED ADVISER
         ===================================================== */
 
         String authenticatedAdviserId =
@@ -162,7 +192,7 @@ public class AttendanceReportAccessService {
                         .toString();
 
         /* =====================================================
-           FIND REQUESTED SECTION
+           REQUESTED SECTION
         ===================================================== */
 
         Section section =
@@ -196,6 +226,161 @@ public class AttendanceReportAccessService {
             throw new ApiException(
                     HttpStatus.FORBIDDEN,
                     "You can only access attendance reports for your assigned section"
+            );
+        }
+    }
+
+    /* =========================================================
+       GET COUNCILOR DEPARTMENT ID
+
+       Central helper used by:
+
+       - Attendance overview
+       - Attendance archive
+       - Manual report generation
+       - Manual batch generation
+       - Other Councilor reporting operations
+    ========================================================= */
+
+    @Transactional(readOnly = true)
+    public String getCouncilorDepartmentId(
+            Authentication authentication
+    ) {
+
+        validateAuthentication(
+                authentication
+        );
+
+        /* =====================================================
+           ROLE CHECK
+        ===================================================== */
+
+        if (
+                !hasRole(
+                        authentication,
+                        "ROLE_COUNCILOR"
+                )
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
+                    "Councilor access is required"
+            );
+        }
+
+        /* =====================================================
+           AUTHENTICATED COUNCILOR ID
+        ===================================================== */
+
+        String councilorId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
+        /* =====================================================
+           FIND COUNCILOR
+        ===================================================== */
+
+        User councilor =
+                userRepository
+                        .findById(
+                                councilorId
+                        )
+                        .orElseThrow(
+                                () ->
+                                        new ApiException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Councilor not found"
+                                        )
+                        );
+
+        /* =====================================================
+           VERIFY ROLE
+        ===================================================== */
+
+        if (
+                councilor.getRole() !=
+                        Role.COUNCILOR
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
+                    "Councilor access is required"
+            );
+        }
+
+        /* =====================================================
+           ACTIVE ACCOUNT REQUIRED
+        ===================================================== */
+
+        if (!councilor.isActive()) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
+                    "Councilor account is inactive"
+            );
+        }
+
+        /* =====================================================
+           DEPARTMENT REQUIRED
+        ===================================================== */
+
+        if (
+                councilor.getDepartment() ==
+                        null
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "Councilor is not assigned to a department"
+            );
+        }
+
+        return councilor
+                .getDepartment()
+                .getId();
+    }
+
+    /* =========================================================
+       ROLE CHECK
+    ========================================================= */
+
+    private boolean hasRole(
+
+            Authentication authentication,
+
+            String role
+    ) {
+
+        return authentication
+                .getAuthorities()
+                .stream()
+                .anyMatch(
+                        authority ->
+                                role.equals(
+                                        authority
+                                                .getAuthority()
+                                )
+                );
+    }
+
+    /* =========================================================
+       AUTHENTICATION VALIDATION
+    ========================================================= */
+
+    private void validateAuthentication(
+            Authentication authentication
+    ) {
+
+        if (
+                authentication == null ||
+                        !authentication
+                                .isAuthenticated()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authentication is required"
             );
         }
     }

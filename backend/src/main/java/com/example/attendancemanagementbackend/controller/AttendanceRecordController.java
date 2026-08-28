@@ -4,8 +4,12 @@ import com.example.attendancemanagementbackend.dto.AttendanceOverviewResponse;
 import com.example.attendancemanagementbackend.dto.AttendanceRecordResponse;
 import com.example.attendancemanagementbackend.entity.AttendanceRecord;
 import com.example.attendancemanagementbackend.service.AttendanceRecordService;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.core.Authentication;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +26,8 @@ public class AttendanceRecordController {
     public AttendanceRecordController(
             AttendanceRecordService attendanceRecordService
     ) {
-        this.attendanceRecordService = attendanceRecordService;
+        this.attendanceRecordService =
+                attendanceRecordService;
     }
 
     /**
@@ -30,18 +35,35 @@ public class AttendanceRecordController {
      *
      * POST
      * /api/attendance-records?sessionId=...&studentId=...
+     *
+     * SECURITY:
+     * The authenticated Adviser may only record attendance
+     * inside a session belonging to their assigned Section.
      */
     @PostMapping
     public ResponseEntity<Map<String, Object>> markPresent(
-            @RequestParam String sessionId,
-            @RequestParam String studentId
+
+            @RequestParam
+            String sessionId,
+
+            @RequestParam
+            String studentId,
+
+            Authentication authentication
     ) {
 
+        String adviserId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
         AttendanceRecord record =
-                attendanceRecordService.markPresent(
-                        sessionId,
-                        studentId
-                );
+                attendanceRecordService
+                        .markPresent(
+                                sessionId,
+                                studentId,
+                                adviserId
+                        );
 
         return ResponseEntity.ok(
                 Map.of(
@@ -61,16 +83,31 @@ public class AttendanceRecordController {
      *
      * GET
      * /api/attendance-records/session/{sessionId}
+     *
+     * SECURITY:
+     * Adviser may only read records from their own
+     * assigned Section/session.
      */
     @GetMapping("/session/{sessionId}")
     public ResponseEntity<Map<String, Object>> getSessionRecords(
-            @PathVariable String sessionId
+
+            @PathVariable
+            String sessionId,
+
+            Authentication authentication
     ) {
 
+        String adviserId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
         List<AttendanceRecordResponse> records =
-                attendanceRecordService.getSessionRecords(
-                        sessionId
-                );
+                attendanceRecordService
+                        .getSessionRecords(
+                                sessionId,
+                                adviserId
+                        );
 
         return ResponseEntity.ok(
                 Map.of(
@@ -83,16 +120,35 @@ public class AttendanceRecordController {
     }
 
     /**
-     * COUNCILOR ATTENDANCE OVERVIEW
+     * ADVISER ATTENDANCE OVERVIEW
      *
      * GET
      * /api/attendance-records/overview
+     *
+     * NOTE:
+     * SecurityConfig currently restricts
+     * /api/attendance-records/** to ROLE_ADVISER.
+     *
+     * The overview will therefore be restricted
+     * to the authenticated Adviser's assigned Section.
      */
     @GetMapping("/overview")
-    public ResponseEntity<Map<String, Object>> getAttendanceOverview() {
+    public ResponseEntity<Map<String, Object>>
+    getAttendanceOverview(
+
+            Authentication authentication
+    ) {
+
+        String adviserId =
+                authentication
+                        .getPrincipal()
+                        .toString();
 
         List<AttendanceOverviewResponse> overview =
-                attendanceRecordService.getAttendanceOverview();
+                attendanceRecordService
+                        .getAttendanceOverview(
+                                adviserId
+                        );
 
         return ResponseEntity.ok(
                 Map.of(
@@ -110,23 +166,45 @@ public class AttendanceRecordController {
      * /api/attendance-records/face
      *
      * multipart/form-data
+     *
      * sessionId = ...
      * image = file
+     *
+     * SECURITY:
+     * Adviser may only use face attendance inside
+     * a session belonging to their assigned Section.
+     *
+     * NOTE:
+     * Face-matching algorithm itself is NOT changed here.
      */
     @PostMapping(
             value = "/face",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<Map<String, Object>> markAttendanceByFace(
-            @RequestParam String sessionId,
-            @RequestParam MultipartFile image
+    public ResponseEntity<Map<String, Object>>
+    markAttendanceByFace(
+
+            @RequestParam
+            String sessionId,
+
+            @RequestParam
+            MultipartFile image,
+
+            Authentication authentication
     ) throws IOException {
 
+        String adviserId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
         AttendanceRecord record =
-                attendanceRecordService.markPresentByFace(
-                        sessionId,
-                        image
-                );
+                attendanceRecordService
+                        .markPresentByFace(
+                                sessionId,
+                                image,
+                                adviserId
+                        );
 
         return ResponseEntity.ok(
                 Map.of(
@@ -153,17 +231,35 @@ public class AttendanceRecordController {
      * /api/attendance-records?sessionId=...&studentId=...
      *
      * Useful for testing.
+     *
+     * SECURITY:
+     * Adviser may only delete attendance from
+     * their own assigned Section/session.
      */
     @DeleteMapping
-    public ResponseEntity<Map<String, Object>> deleteAttendance(
-            @RequestParam String sessionId,
-            @RequestParam String studentId
+    public ResponseEntity<Map<String, Object>>
+    deleteAttendance(
+
+            @RequestParam
+            String sessionId,
+
+            @RequestParam
+            String studentId,
+
+            Authentication authentication
     ) {
 
-        attendanceRecordService.deleteAttendanceRecord(
-                sessionId,
-                studentId
-        );
+        String adviserId =
+                authentication
+                        .getPrincipal()
+                        .toString();
+
+        attendanceRecordService
+                .deleteAttendanceRecord(
+                        sessionId,
+                        studentId,
+                        adviserId
+                );
 
         return ResponseEntity.ok(
                 Map.of(

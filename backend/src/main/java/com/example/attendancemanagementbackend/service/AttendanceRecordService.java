@@ -92,16 +92,22 @@ public class AttendanceRecordService {
      * LATE
      *
      * based on the session's late cutoff.
+     *
+     * SECURITY:
+     * The authenticated Adviser must own the
+     * Section of the requested attendance session.
      */
     @Transactional
     public AttendanceRecord markPresent(
             String sessionId,
-            String studentId
+            String studentId,
+            String adviserId
     ) {
 
         AttendanceSession session =
                 getActiveSession(
-                        sessionId
+                        sessionId,
+                        adviserId
                 );
 
         Student student =
@@ -132,16 +138,25 @@ public class AttendanceRecordService {
      *
      * The backend automatically determines
      * PRESENT or LATE.
+     *
+     * SECURITY:
+     * The authenticated Adviser must own the
+     * Section of the requested attendance session.
+     *
+     * NOTE:
+     * Existing face recognition behavior is retained.
      */
     @Transactional
     public AttendanceRecord markPresentByFace(
             String sessionId,
-            MultipartFile image
+            MultipartFile image,
+            String adviserId
     ) throws IOException {
 
         AttendanceSession session =
                 getActiveSession(
-                        sessionId
+                        sessionId,
+                        adviserId
                 );
 
         /* =====================================================
@@ -180,6 +195,11 @@ public class AttendanceRecordService {
 
         /* =====================================================
            FIND CLOSEST REGISTERED FACE
+
+           Existing global matching behavior retained.
+
+           Section-scoped / top-two / ambiguous face
+           recognition can be implemented separately later.
         ===================================================== */
 
         FaceMatchResult match =
@@ -221,6 +241,11 @@ public class AttendanceRecordService {
                                 )
                         );
 
+        /*
+         * createAttendanceRecord() still verifies that
+         * the recognized student belongs to the same
+         * Section as the attendance session.
+         */
         return createAttendanceRecord(
                 session,
                 student
@@ -238,11 +263,13 @@ public class AttendanceRecordService {
      * A session must:
      *
      * 1. Exist
-     * 2. Have ACTIVE database status
-     * 3. Not have reached its scheduled end time
+     * 2. Belong to the authenticated Adviser
+     * 3. Have ACTIVE database status
+     * 4. Not have reached its scheduled end time
      */
     private AttendanceSession getActiveSession(
-            String sessionId
+            String sessionId,
+            String adviserId
     ) {
 
         AttendanceSession session =
@@ -256,6 +283,15 @@ public class AttendanceRecordService {
                                         "Attendance session not found"
                                 )
                         );
+
+        /* =====================================================
+           VERIFY ADVISER OWNERSHIP
+        ===================================================== */
+
+        validateAdviserOwnsSession(
+                session,
+                adviserId
+        );
 
         /* =====================================================
            VERIFY DATABASE STATUS
@@ -544,22 +580,44 @@ public class AttendanceRecordService {
      * PRESENT
      * LATE
      * ABSENT
+     *
+     * SECURITY:
+     * Adviser may only read their own session.
      */
     @Transactional(readOnly = true)
     public List<AttendanceRecordResponse> getSessionRecords(
-            String sessionId
+            String sessionId,
+            String adviserId
     ) {
 
-        if (!attendanceSessionRepository
-                .existsById(
-                        sessionId
-                )) {
+        /* =====================================================
+           LOAD SESSION
+        ===================================================== */
 
-            throw new ApiException(
-                    HttpStatus.NOT_FOUND,
-                    "Attendance session not found"
-            );
-        }
+        AttendanceSession session =
+                attendanceSessionRepository
+                        .findById(
+                                sessionId
+                        )
+                        .orElseThrow(() ->
+                                new ApiException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Attendance session not found"
+                                )
+                        );
+
+        /* =====================================================
+           VERIFY ADVISER OWNERSHIP
+        ===================================================== */
+
+        validateAdviserOwnsSession(
+                session,
+                adviserId
+        );
+
+        /* =====================================================
+           EXISTING RECORD MAPPING
+        ===================================================== */
 
         return attendanceRecordRepository
                 .findBySessionId(
@@ -586,12 +644,13 @@ public class AttendanceRecordService {
     }
 
     /* =========================================================
-       COUNCILOR ATTENDANCE OVERVIEW
+       ADVISER ATTENDANCE OVERVIEW
     ========================================================= */
 
     /**
      * Returns attendance summaries
-     * for all sections and sessions.
+     * only for Sections assigned to the
+     * authenticated Adviser.
      *
      * PRESENT and LATE are both considered
      * attended when calculating:
@@ -602,14 +661,28 @@ public class AttendanceRecordService {
      */
     @Transactional(readOnly = true)
     public List<AttendanceOverviewResponse>
-    getAttendanceOverview() {
+    getAttendanceOverview(
+            String adviserId
+    ) {
 
         List<AttendanceOverviewResponse> overview =
                 new ArrayList<>();
 
+        /* =====================================================
+           SECURITY UPDATE
+
+           BEFORE:
+           sectionRepository.findAll()
+
+           NOW:
+           Only Sections assigned to the authenticated Adviser.
+        ===================================================== */
+
         List<Section> sections =
                 sectionRepository
-                        .findAll();
+                        .findByAdviserId(
+                                adviserId
+                        );
 
         for (Section section : sections) {
 
@@ -715,7 +788,7 @@ public class AttendanceRecordService {
                    ADVISER INFORMATION
                 ============================================= */
 
-                String adviserId =
+                String sectionAdviserId =
                         null;
 
                 String adviserName =
@@ -723,7 +796,7 @@ public class AttendanceRecordService {
 
                 if (section.getAdviser() != null) {
 
-                    adviserId =
+                    sectionAdviserId =
                             section.getAdviser()
                                     .getId();
 
@@ -754,7 +827,7 @@ public class AttendanceRecordService {
                                 session.getId(),
                                 section.getId(),
                                 section.getName(),
-                                adviserId,
+                                sectionAdviserId,
                                 adviserName,
                                 session.getAttendanceDate()
                                         .toString(),
@@ -777,12 +850,46 @@ public class AttendanceRecordService {
     /**
      * Deletes an attendance record
      * for a specific session and student.
+     *
+     * SECURITY:
+     * Adviser may only delete attendance from
+     * their own assigned Section/session.
      */
     @Transactional
     public void deleteAttendanceRecord(
             String sessionId,
-            String studentId
+            String studentId,
+            String adviserId
     ) {
+
+        /* =====================================================
+           LOAD SESSION
+        ===================================================== */
+
+        AttendanceSession session =
+                attendanceSessionRepository
+                        .findById(
+                                sessionId
+                        )
+                        .orElseThrow(() ->
+                                new ApiException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Attendance session not found"
+                                )
+                        );
+
+        /* =====================================================
+           VERIFY ADVISER OWNERSHIP
+        ===================================================== */
+
+        validateAdviserOwnsSession(
+                session,
+                adviserId
+        );
+
+        /* =====================================================
+           FIND ATTENDANCE RECORD
+        ===================================================== */
 
         AttendanceRecord record =
                 attendanceRecordRepository
@@ -801,5 +908,43 @@ public class AttendanceRecordService {
                 .delete(
                         record
                 );
+    }
+
+    /* =========================================================
+       ADVISER SESSION OWNERSHIP
+    ========================================================= */
+
+    /**
+     * Resource-level security.
+     *
+     * SecurityConfig already verifies ROLE_ADVISER.
+     *
+     * This verifies that the authenticated Adviser
+     * actually owns the Section associated with
+     * the requested attendance session.
+     */
+    private void validateAdviserOwnsSession(
+            AttendanceSession session,
+            String adviserId
+    ) {
+
+        if (
+                session == null ||
+                        session.getSection() == null ||
+                        session.getSection()
+                                .getAdviser() == null ||
+                        !session.getSection()
+                                .getAdviser()
+                                .getId()
+                                .equals(
+                                        adviserId
+                                )
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not assigned to this section"
+            );
+        }
     }
 }

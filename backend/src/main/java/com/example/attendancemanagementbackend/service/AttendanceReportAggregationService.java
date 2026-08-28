@@ -4,11 +4,13 @@ import com.example.attendancemanagementbackend.dto.AttendanceReportAggregationRe
 import com.example.attendancemanagementbackend.dto.AttendanceReportStudentSummary;
 
 import com.example.attendancemanagementbackend.entity.AttendanceReportType;
+import com.example.attendancemanagementbackend.entity.Section;
 
 import com.example.attendancemanagementbackend.repository.AttendanceRecordRepository;
 import com.example.attendancemanagementbackend.repository.AttendanceSectionCardProjection;
 import com.example.attendancemanagementbackend.repository.AttendanceSectionDetailSummaryProjection;
 import com.example.attendancemanagementbackend.repository.AttendanceStudentReportProjection;
+import com.example.attendancemanagementbackend.repository.SectionRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,18 +44,30 @@ public class AttendanceReportAggregationService {
        DEPENDENCIES
     ========================================================= */
 
-    private final AttendanceRecordRepository attendanceRecordRepository;
+    private final AttendanceRecordRepository
+            attendanceRecordRepository;
+
+    private final SectionRepository
+            sectionRepository;
 
     /* =========================================================
        CONSTRUCTOR
     ========================================================= */
 
     public AttendanceReportAggregationService(
-            AttendanceRecordRepository attendanceRecordRepository
+
+            AttendanceRecordRepository
+                    attendanceRecordRepository,
+
+            SectionRepository
+                    sectionRepository
     ) {
 
         this.attendanceRecordRepository =
                 attendanceRecordRepository;
+
+        this.sectionRepository =
+                sectionRepository;
     }
 
     /* =========================================================
@@ -86,11 +100,15 @@ public class AttendanceReportAggregationService {
         /* =====================================================
            SECTION METADATA
 
-           We reuse the existing section attendance query.
+           We reuse the existing Section attendance query.
 
-           This avoids duplicating Section / Adviser lookup
-           logic and guarantees that archived report metadata
-           matches the same data used by Councilor reports.
+           Department is resolved internally from the
+           requested Section.
+
+           This keeps aggregate(...) usable by both:
+
+           - authenticated report preview
+           - system-level automatic report generation
         ===================================================== */
 
         AttendanceSectionCardProjection section =
@@ -156,10 +174,6 @@ public class AttendanceReportAggregationService {
 
         /* =====================================================
            NO COMPLETED ATTENDANCE
-
-           We should not generate an official weekly/monthly
-           report when the section has zero completed records
-           for the selected period.
         ===================================================== */
 
         if (
@@ -224,6 +238,7 @@ public class AttendanceReportAggregationService {
                         );
 
         if (studentRows == null) {
+
             studentRows =
                     Collections.emptyList();
         }
@@ -282,6 +297,15 @@ public class AttendanceReportAggregationService {
 
     /* =========================================================
        SECTION METADATA
+
+       AttendanceRecordRepository now requires departmentId
+       for the Section attendance report query.
+
+       Instead of adding departmentId to aggregate(...),
+       resolve it here from the requested Section.
+
+       This is important because aggregate(...) is also
+       called by automatic system report generation.
     ========================================================= */
 
     private AttendanceSectionCardProjection findSectionMetadata(
@@ -293,6 +317,57 @@ public class AttendanceReportAggregationService {
             LocalDate periodEnd
     ) {
 
+        /* =====================================================
+           FIND SECTION
+        ===================================================== */
+
+        Section requestedSection =
+                sectionRepository
+                        .findById(
+                                sectionId
+                        )
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Section not found"
+                                        )
+                        );
+
+        /* =====================================================
+           DEPARTMENT REQUIRED
+        ===================================================== */
+
+        if (
+                requestedSection.getDepartment() ==
+                        null
+        ) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Section is not assigned to a department"
+            );
+        }
+
+        String departmentId =
+                requestedSection
+                        .getDepartment()
+                        .getId();
+
+        /* =====================================================
+           EXISTING ATTENDANCE REPORT QUERY
+
+           NEW parameter order:
+
+           fromDate
+           toDate
+           departmentId
+           sectionId
+           adviserId
+           search
+           pageable
+        ===================================================== */
+
         Page<AttendanceSectionCardProjection> page =
                 attendanceRecordRepository
                         .findSectionAttendanceReport(
@@ -300,6 +375,8 @@ public class AttendanceReportAggregationService {
                                 periodStart,
 
                                 periodEnd,
+
+                                departmentId,
 
                                 sectionId,
 
@@ -441,7 +518,9 @@ public class AttendanceReportAggregationService {
             );
         }
 
-        if (reportType == null) {
+        if (
+                reportType == null
+        ) {
 
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -501,7 +580,6 @@ public class AttendanceReportAggregationService {
              * Monthly archive must represent exactly one
              * calendar month.
              */
-
             LocalDate expectedStart =
                     periodStart
                             .withDayOfMonth(
@@ -538,7 +616,7 @@ public class AttendanceReportAggregationService {
 
             /*
              * The exact school-week scheduling policy
-             * will be enforced by the scheduler later.
+             * is handled by the scheduler.
              *
              * For aggregation preview we only ensure
              * the selected period does not exceed
@@ -578,7 +656,9 @@ public class AttendanceReportAggregationService {
             long denominator
     ) {
 
-        if (denominator <= 0) {
+        if (
+                denominator <= 0
+        ) {
 
             return BigDecimal.ZERO
                     .setScale(
@@ -613,7 +693,10 @@ public class AttendanceReportAggregationService {
             Number value
     ) {
 
-        if (value == null) {
+        if (
+                value == null
+        ) {
+
             return 0L;
         }
 

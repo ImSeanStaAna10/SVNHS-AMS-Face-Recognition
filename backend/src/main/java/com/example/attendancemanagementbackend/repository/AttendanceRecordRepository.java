@@ -41,9 +41,15 @@ public interface AttendanceRecordRepository
     );
 
     /* =========================================================
-       COUNCILOR SECTION ATTENDANCE REPORT
+       COUNCILOR DEPARTMENT ATTENDANCE REPORT
 
-       Returns one aggregated row per section.
+       Returns one aggregated row per Section.
+
+       Security:
+       - Results are restricted to the authenticated
+         Councilor's Department.
+       - departmentId comes from the backend authentication
+         flow, never from a client-controlled filter.
 
        Supports:
        - Date range
@@ -106,6 +112,8 @@ public interface AttendanceRecordRepository
 
                     WHERE
                         ats.status = 'ENDED'
+
+                        AND s.department_id = :departmentId
 
                         AND ats.attendance_date
                             BETWEEN :fromDate AND :toDate
@@ -176,6 +184,8 @@ public interface AttendanceRecordRepository
                     WHERE
                         ats.status = 'ENDED'
 
+                        AND s.department_id = :departmentId
+
                         AND ats.attendance_date
                             BETWEEN :fromDate AND :toDate
 
@@ -224,6 +234,9 @@ public interface AttendanceRecordRepository
             @Param("toDate")
             LocalDate toDate,
 
+            @Param("departmentId")
+            String departmentId,
+
             @Param("sectionId")
             String sectionId,
 
@@ -237,11 +250,14 @@ public interface AttendanceRecordRepository
     );
 
     /* =========================================================
-       SCHOOL-WIDE ATTENDANCE SUMMARY
+       DEPARTMENT ATTENDANCE SUMMARY
 
        Used by the Councilor Attendance dashboard.
 
-       Aggregates all matching completed attendance records.
+       Security:
+       - Aggregates completed attendance records only from
+         Sections belonging to the authenticated Councilor's
+         Department.
     ========================================================= */
 
     @Query(
@@ -292,6 +308,8 @@ public interface AttendanceRecordRepository
                     WHERE
                         ats.status = 'ENDED'
 
+                        AND s.department_id = :departmentId
+
                         AND ats.attendance_date
                             BETWEEN :fromDate AND :toDate
 
@@ -340,6 +358,9 @@ public interface AttendanceRecordRepository
             @Param("toDate")
             LocalDate toDate,
 
+            @Param("departmentId")
+            String departmentId,
+
             @Param("sectionId")
             String sectionId,
 
@@ -353,11 +374,11 @@ public interface AttendanceRecordRepository
     /* =========================================================
        DETAILED STUDENT ATTENDANCE REPORT
 
-       Returns one aggregated row per student.
+       EXISTING BEHAVIOR RETAINED.
 
-       Used by:
-       - Councilor attendance detail
-       - Date-specific section attendance review
+       Security is enforced before reaching this query by
+       validating that the requested Section belongs to the
+       authenticated Councilor's Department.
 
        Supports:
        - Section
@@ -503,7 +524,7 @@ public interface AttendanceRecordRepository
     /* =========================================================
        SECTION DETAIL SUMMARY
 
-       Existing summary used by the detailed attendance page.
+       Existing behavior retained.
 
        This projection is also reusable by the automated
        Weekly / Monthly report aggregation service.
@@ -572,14 +593,13 @@ public interface AttendanceRecordRepository
        AUTOMATED REPORT ARCHIVE
        COMPLETE STUDENT PERIOD SUMMARY
 
-       IMPORTANT:
+       EXISTING BEHAVIOR RETAINED.
+
        Unlike findStudentAttendanceReport(), this query has
        no pagination and no search filter.
 
-       Reason:
-       Weekly / Monthly PDF and Excel files must contain the
-       COMPLETE official section record, not just one UI page
-       or a filtered search result.
+       Weekly / Monthly PDF and Excel files contain the
+       COMPLETE official Section record.
 
        Used by:
        - Weekly report generator
@@ -664,11 +684,14 @@ public interface AttendanceRecordRepository
     /* =========================================================
        ADVISER ATTENDANCE HISTORY
 
+       EXISTING BEHAVIOR RETAINED.
+
        Returns one historical row per ENDED attendance session.
 
        Security:
        - Adviser ID comes from authenticated user
-       - Adviser only sees sessions belonging to their section
+       - Adviser only sees sessions belonging to their
+         assigned Section
 
        Supports:
        - Date range
