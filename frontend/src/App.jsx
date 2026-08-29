@@ -7,6 +7,16 @@ import {
 
 import Login from "./features/auth/login";
 
+import authService from "./services/authService";
+
+/* =========================================================
+   SUPERADMIN
+========================================================= */
+
+import SuperAdminDashboard from "./features/superadmin/SuperAdminDashboard";
+import DepartmentManagement from "./features/superadmin/DepartmentManagement";
+import CouncilorManagement from "./features/superadmin/CouncilorManagement";
+
 /* =========================================================
    ADVISER
 ========================================================= */
@@ -31,6 +41,82 @@ import CouncilorDashboard from "./features/councilor/CouncilorDashboard";
 import SectionManagement from "./features/councilor/SectionManagement";
 
 /* =========================================================
+   ROLE HELPERS
+========================================================= */
+
+const getDashboardPath = (role) => {
+  switch (role) {
+    case "SUPERADMIN":
+      return "/superadmin/dashboard";
+
+    case "COUNCILOR":
+      return "/councilor/dashboard";
+
+    case "ADVISER":
+      return "/adviser/dashboard";
+
+    default:
+      return "/login";
+  }
+};
+
+/* =========================================================
+   PROTECTED ROUTE
+========================================================= */
+
+function ProtectedRoute({
+  children,
+  allowedRoles,
+}) {
+  const authenticated =
+    authService.isAuthenticated();
+
+  const user =
+    authService.getUser();
+
+  /* =======================================================
+     NOT LOGGED IN
+  ======================================================= */
+
+  if (
+    !authenticated ||
+    !user
+  ) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
+
+  /* =======================================================
+     WRONG ROLE
+  ======================================================= */
+
+  if (
+    !allowedRoles.includes(
+      user.role,
+    )
+  ) {
+    return (
+      <Navigate
+        to={getDashboardPath(
+          user.role,
+        )}
+        replace
+      />
+    );
+  }
+
+  /* =======================================================
+     AUTHORIZED
+  ======================================================= */
+
+  return children;
+}
+
+/* =========================================================
    APP
 ========================================================= */
 
@@ -50,27 +136,88 @@ function App() {
         />
 
         {/* =================================================
+            SUPERADMIN
+        ================================================= */}
+
+        <Route
+          path="/superadmin/dashboard"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "SUPERADMIN",
+              ]}
+            >
+              <SuperAdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/superadmin/departments"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "SUPERADMIN",
+              ]}
+            >
+              <DepartmentManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/superadmin/councilors"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "SUPERADMIN",
+              ]}
+            >
+              <CouncilorManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* =================================================
             COUNCILOR
         ================================================= */}
 
         <Route
           path="/councilor/dashboard"
           element={
-            <CouncilorDashboard />
+            <ProtectedRoute
+              allowedRoles={[
+                "COUNCILOR",
+              ]}
+            >
+              <CouncilorDashboard />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/councilor/advisers"
           element={
-            <Advisers />
+            <ProtectedRoute
+              allowedRoles={[
+                "COUNCILOR",
+              ]}
+            >
+              <Advisers />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/councilor/sections"
           element={
-            <SectionManagement />
+            <ProtectedRoute
+              allowedRoles={[
+                "COUNCILOR",
+              ]}
+            >
+              <SectionManagement />
+            </ProtectedRoute>
           }
         />
 
@@ -81,14 +228,26 @@ function App() {
         <Route
           path="/councilor/attendance"
           element={
-            <AttendanceManagement />
+            <ProtectedRoute
+              allowedRoles={[
+                "COUNCILOR",
+              ]}
+            >
+              <AttendanceManagement />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/councilor/attendance/:sectionId"
           element={
-            <AttendanceDetails />
+            <ProtectedRoute
+              allowedRoles={[
+                "COUNCILOR",
+              ]}
+            >
+              <AttendanceDetails />
+            </ProtectedRoute>
           }
         />
 
@@ -99,7 +258,13 @@ function App() {
         <Route
           path="/councilor/attendance-records"
           element={
-            <CouncilorAttendanceRecords />
+            <ProtectedRoute
+              allowedRoles={[
+                "COUNCILOR",
+              ]}
+            >
+              <CouncilorAttendanceRecords />
+            </ProtectedRoute>
           }
         />
 
@@ -110,14 +275,26 @@ function App() {
         <Route
           path="/adviser/dashboard"
           element={
-            <AdviserDashboard />
+            <ProtectedRoute
+              allowedRoles={[
+                "ADVISER",
+              ]}
+            >
+              <AdviserDashboard />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/adviser/students"
           element={
-            <StudentManagement />
+            <ProtectedRoute
+              allowedRoles={[
+                "ADVISER",
+              ]}
+            >
+              <StudentManagement />
+            </ProtectedRoute>
           }
         />
 
@@ -128,7 +305,13 @@ function App() {
         <Route
           path="/adviser/attendance"
           element={
-            <AdviserAttendance />
+            <ProtectedRoute
+              allowedRoles={[
+                "ADVISER",
+              ]}
+            >
+              <AdviserAttendance />
+            </ProtectedRoute>
           }
         />
 
@@ -139,14 +322,26 @@ function App() {
         <Route
           path="/adviser/attendance/history"
           element={
-            <AttendanceHistory />
+            <ProtectedRoute
+              allowedRoles={[
+                "ADVISER",
+              ]}
+            >
+              <AttendanceHistory />
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/adviser/attendance/history/:sessionId"
           element={
-            <AttendanceHistoryDetail />
+            <ProtectedRoute
+              allowedRoles={[
+                "ADVISER",
+              ]}
+            >
+              <AttendanceHistoryDetail />
+            </ProtectedRoute>
           }
         />
 
@@ -157,7 +352,13 @@ function App() {
         <Route
           path="/adviser/attendance-records"
           element={
-            <AdviserAttendanceRecords />
+            <ProtectedRoute
+              allowedRoles={[
+                "ADVISER",
+              ]}
+            >
+              <AdviserAttendanceRecords />
+            </ProtectedRoute>
           }
         />
 
@@ -171,7 +372,13 @@ function App() {
         <Route
           path="/adviser/attendance/:sessionId"
           element={
-            <AttendanceSession />
+            <ProtectedRoute
+              allowedRoles={[
+                "ADVISER",
+              ]}
+            >
+              <AttendanceSession />
+            </ProtectedRoute>
           }
         />
 

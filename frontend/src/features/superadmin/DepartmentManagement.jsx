@@ -1,0 +1,2084 @@
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import {
+  useNavigate,
+} from "react-router-dom";
+
+import SuperAdminLayout from "../../layouts/SuperAdminLayout";
+
+import superAdminService from "../../services/superAdminService";
+
+import "../../styles/superadmin/departments.css";
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
+const INITIAL_FORM = {
+  code: "",
+  name: "",
+};
+
+const STATUS_FILTERS = [
+  {
+    value: "ALL",
+    label: "All Departments",
+  },
+  {
+    value: "ACTIVE",
+    label: "Active",
+  },
+  {
+    value: "INACTIVE",
+    label: "Inactive",
+  },
+];
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const getErrorMessage = (
+  error,
+  fallbackMessage,
+) =>
+  error?.response?.data?.message ||
+  error?.response?.data?.error ||
+  fallbackMessage;
+
+const sortDepartments = (
+  items,
+) =>
+  [...items].sort(
+    (first, second) =>
+      (
+        first.code ??
+        first.name ??
+        ""
+      ).localeCompare(
+        second.code ??
+          second.name ??
+          "",
+      ),
+  );
+
+function DepartmentManagement() {
+  const navigate =
+    useNavigate();
+
+  /* =======================================================
+     DATA
+  ======================================================= */
+
+  const [
+    departments,
+    setDepartments,
+  ] = useState([]);
+
+  const [
+    councilors,
+    setCouncilors,
+  ] = useState([]);
+
+  /* =======================================================
+     PAGE STATE
+  ======================================================= */
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    success,
+    setSuccess,
+  ] = useState("");
+
+  const [
+    reloadKey,
+    setReloadKey,
+  ] = useState(0);
+
+  /* =======================================================
+     FILTER STATE
+  ======================================================= */
+
+  const [
+    searchTerm,
+    setSearchTerm,
+  ] = useState("");
+
+  const [
+    statusFilter,
+    setStatusFilter,
+  ] = useState("ALL");
+
+  /* =======================================================
+     FORM MODAL STATE
+  ======================================================= */
+
+  const [
+    showFormModal,
+    setShowFormModal,
+  ] = useState(false);
+
+  const [
+    formMode,
+    setFormMode,
+  ] = useState("create");
+
+  const [
+    selectedDepartment,
+    setSelectedDepartment,
+  ] = useState(null);
+
+  const [
+    formData,
+    setFormData,
+  ] = useState(
+    INITIAL_FORM,
+  );
+
+  const [
+    formError,
+    setFormError,
+  ] = useState("");
+
+  const [
+    saving,
+    setSaving,
+  ] = useState(false);
+
+  /* =======================================================
+     STATUS MODAL STATE
+  ======================================================= */
+
+  const [
+    showStatusModal,
+    setShowStatusModal,
+  ] = useState(false);
+
+  const [
+    statusTarget,
+    setStatusTarget,
+  ] = useState(null);
+
+  const [
+    statusError,
+    setStatusError,
+  ] = useState("");
+
+  const [
+    changingStatus,
+    setChangingStatus,
+  ] = useState(false);
+
+  /* =======================================================
+     LOAD DATA
+  ======================================================= */
+
+  useEffect(() => {
+    let cancelled = false;
+
+    Promise.allSettled([
+      superAdminService.getDepartments(),
+      superAdminService.getCouncilors(),
+    ]).then(
+      ([
+        departmentResult,
+        councilorResult,
+      ]) => {
+        if (cancelled) {
+          return;
+        }
+
+        if (
+          departmentResult.status ===
+          "fulfilled"
+        ) {
+          const departmentData =
+            Array.isArray(
+              departmentResult.value,
+            )
+              ? departmentResult.value
+              : [];
+
+          setDepartments(
+            sortDepartments(
+              departmentData,
+            ),
+          );
+        } else {
+          setDepartments([]);
+        }
+
+        if (
+          councilorResult.status ===
+          "fulfilled"
+        ) {
+          setCouncilors(
+            Array.isArray(
+              councilorResult.value,
+            )
+              ? councilorResult.value
+              : [],
+          );
+        } else {
+          setCouncilors([]);
+        }
+
+        if (
+          departmentResult.status ===
+          "rejected"
+        ) {
+          setError(
+            getErrorMessage(
+              departmentResult.reason,
+              "Unable to load departments.",
+            ),
+          );
+        } else if (
+          councilorResult.status ===
+          "rejected"
+        ) {
+          setError(
+            "Departments loaded, but Councilor assignment information is temporarily unavailable.",
+          );
+        } else {
+          setError("");
+        }
+
+        setLoading(false);
+      },
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    reloadKey,
+  ]);
+
+  /* =======================================================
+     AUTO-HIDE SUCCESS MESSAGE
+  ======================================================= */
+
+  useEffect(() => {
+    if (!success) {
+      return undefined;
+    }
+
+    const timeoutId =
+      window.setTimeout(
+        () => {
+          setSuccess("");
+        },
+        4500,
+      );
+
+    return () => {
+      window.clearTimeout(
+        timeoutId,
+      );
+    };
+  }, [
+    success,
+  ]);
+
+  /* =======================================================
+     MODAL SCROLL LOCK
+  ======================================================= */
+
+  useEffect(() => {
+    if (
+      !showFormModal &&
+      !showStatusModal
+    ) {
+      return undefined;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow =
+      "hidden";
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+    };
+  }, [
+    showFormModal,
+    showStatusModal,
+  ]);
+
+  /* =======================================================
+     ESCAPE KEY
+  ======================================================= */
+
+  useEffect(() => {
+    if (
+      !showFormModal &&
+      !showStatusModal
+    ) {
+      return undefined;
+    }
+
+    const handleKeyDown = (
+      event,
+    ) => {
+      if (
+        event.key !==
+        "Escape"
+      ) {
+        return;
+      }
+
+      if (
+        showFormModal &&
+        !saving
+      ) {
+        setShowFormModal(
+          false,
+        );
+
+        setSelectedDepartment(
+          null,
+        );
+
+        setFormData(
+          INITIAL_FORM,
+        );
+
+        setFormError("");
+      }
+
+      if (
+        showStatusModal &&
+        !changingStatus
+      ) {
+        setShowStatusModal(
+          false,
+        );
+
+        setStatusTarget(
+          null,
+        );
+
+        setStatusError("");
+      }
+    };
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown,
+      );
+    };
+  }, [
+    showFormModal,
+    showStatusModal,
+    saving,
+    changingStatus,
+  ]);
+
+  /* =======================================================
+     METRICS
+  ======================================================= */
+
+  const activeDepartments =
+    useMemo(
+      () =>
+        departments.filter(
+          (department) =>
+            department.active !==
+            false,
+        ),
+      [
+        departments,
+      ],
+    );
+
+  const inactiveDepartments =
+    departments.length -
+    activeDepartments.length;
+
+  const activeCouncilorDepartmentIds =
+    useMemo(
+      () =>
+        new Set(
+          councilors
+            .filter(
+              (councilor) =>
+                councilor.active !==
+                false,
+            )
+            .map(
+              (councilor) =>
+                councilor.departmentId,
+            )
+            .filter(Boolean),
+        ),
+      [
+        councilors,
+      ],
+    );
+
+  const coveredDepartments =
+    useMemo(
+      () =>
+        activeDepartments.filter(
+          (department) =>
+            activeCouncilorDepartmentIds.has(
+              department.id,
+            ),
+        ).length,
+      [
+        activeDepartments,
+        activeCouncilorDepartmentIds,
+      ],
+    );
+
+  /* =======================================================
+     FILTERED DEPARTMENTS
+  ======================================================= */
+
+  const filteredDepartments =
+    useMemo(
+      () => {
+        const normalizedSearch =
+          searchTerm
+            .trim()
+            .toLowerCase();
+
+        return departments.filter(
+          (department) => {
+            const isActive =
+              department.active !==
+              false;
+
+            const matchesStatus =
+              statusFilter ===
+                "ALL" ||
+              (
+                statusFilter ===
+                  "ACTIVE" &&
+                isActive
+              ) ||
+              (
+                statusFilter ===
+                  "INACTIVE" &&
+                !isActive
+              );
+
+            if (
+              !matchesStatus
+            ) {
+              return false;
+            }
+
+            if (
+              !normalizedSearch
+            ) {
+              return true;
+            }
+
+            const searchableText =
+              [
+                department.code,
+                department.name,
+              ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            return searchableText.includes(
+              normalizedSearch,
+            );
+          },
+        );
+      },
+      [
+        departments,
+        searchTerm,
+        statusFilter,
+      ],
+    );
+
+  /* =======================================================
+     ACTIVE COUNCILOR LOOKUP
+  ======================================================= */
+
+  const getActiveCouncilor =
+    (departmentId) =>
+      councilors.find(
+        (councilor) =>
+          councilor.departmentId ===
+            departmentId &&
+          councilor.active !==
+            false,
+      ) ?? null;
+
+  /* =======================================================
+     REFRESH
+  ======================================================= */
+
+  const handleRefresh = () => {
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    setReloadKey(
+      (current) =>
+        current + 1,
+    );
+  };
+
+  /* =======================================================
+     CREATE MODAL
+  ======================================================= */
+
+  const openCreateModal = () => {
+    setFormMode("create");
+
+    setSelectedDepartment(
+      null,
+    );
+
+    setFormData(
+      INITIAL_FORM,
+    );
+
+    setFormError("");
+    setSuccess("");
+
+    setShowFormModal(true);
+  };
+
+  /* =======================================================
+     EDIT MODAL
+  ======================================================= */
+
+  const openEditModal = (
+    department,
+  ) => {
+    setFormMode("edit");
+
+    setSelectedDepartment(
+      department,
+    );
+
+    setFormData({
+      code:
+        department.code ??
+        "",
+      name:
+        department.name ??
+        "",
+    });
+
+    setFormError("");
+    setSuccess("");
+
+    setShowFormModal(true);
+  };
+
+  /* =======================================================
+     CLOSE FORM MODAL
+  ======================================================= */
+
+  const closeFormModal = () => {
+    if (saving) {
+      return;
+    }
+
+    setShowFormModal(false);
+
+    setSelectedDepartment(
+      null,
+    );
+
+    setFormData(
+      INITIAL_FORM,
+    );
+
+    setFormError("");
+  };
+
+  /* =======================================================
+     FORM CHANGE
+  ======================================================= */
+
+  const handleFormChange = (
+    event,
+  ) => {
+    const {
+      name,
+      value,
+    } = event.target;
+
+    const nextValue =
+      name === "code"
+        ? value.toUpperCase()
+        : value;
+
+    setFormData(
+      (current) => ({
+        ...current,
+        [name]: nextValue,
+      }),
+    );
+
+    if (formError) {
+      setFormError("");
+    }
+  };
+
+  /* =======================================================
+     FORM VALIDATION
+  ======================================================= */
+
+  const validateForm = () => {
+    const code =
+      formData.code
+        .trim()
+        .toUpperCase();
+
+    const name =
+      formData.name.trim();
+
+    if (
+      !code ||
+      !name
+    ) {
+      return {
+        valid: false,
+        message:
+          "Department code and name are required.",
+      };
+    }
+
+    if (
+      code.length > 50
+    ) {
+      return {
+        valid: false,
+        message:
+          "Department code must not exceed 50 characters.",
+      };
+    }
+
+    if (
+      name.length > 150
+    ) {
+      return {
+        valid: false,
+        message:
+          "Department name must not exceed 150 characters.",
+      };
+    }
+
+    return {
+      valid: true,
+      data: {
+        code,
+        name,
+      },
+    };
+  };
+
+  /* =======================================================
+     SAVE DEPARTMENT
+  ======================================================= */
+
+  const handleSaveDepartment =
+    async (event) => {
+      event.preventDefault();
+
+      const validation =
+        validateForm();
+
+      if (
+        !validation.valid
+      ) {
+        setFormError(
+          validation.message,
+        );
+
+        return;
+      }
+
+      try {
+        setSaving(true);
+        setFormError("");
+        setError("");
+        setSuccess("");
+
+        if (
+          formMode ===
+          "create"
+        ) {
+          const created =
+            await superAdminService.createDepartment(
+              validation.data,
+            );
+
+          setDepartments(
+            (current) =>
+              sortDepartments([
+                ...current,
+                created,
+              ]),
+          );
+
+          setSuccess(
+            `${created.name} was created successfully.`,
+          );
+        } else {
+          const updated =
+            await superAdminService.updateDepartment(
+              selectedDepartment.id,
+              validation.data,
+            );
+
+          setDepartments(
+            (current) =>
+              sortDepartments(
+                current.map(
+                  (department) =>
+                    department.id ===
+                    updated.id
+                      ? updated
+                      : department,
+                ),
+              ),
+          );
+
+          setSuccess(
+            `${updated.name} was updated successfully.`,
+          );
+        }
+
+        setShowFormModal(false);
+
+        setSelectedDepartment(
+          null,
+        );
+
+        setFormData(
+          INITIAL_FORM,
+        );
+      } catch (saveError) {
+        setFormError(
+          getErrorMessage(
+            saveError,
+            formMode ===
+              "create"
+              ? "Unable to create department."
+              : "Unable to update department.",
+          ),
+        );
+      } finally {
+        setSaving(false);
+      }
+    };
+
+  /* =======================================================
+     OPEN STATUS MODAL
+  ======================================================= */
+
+  const openStatusModal = (
+    department,
+  ) => {
+    setStatusTarget(
+      department,
+    );
+
+    setStatusError("");
+    setSuccess("");
+
+    setShowStatusModal(true);
+  };
+
+  /* =======================================================
+     CLOSE STATUS MODAL
+  ======================================================= */
+
+  const closeStatusModal = () => {
+    if (changingStatus) {
+      return;
+    }
+
+    setShowStatusModal(false);
+
+    setStatusTarget(
+      null,
+    );
+
+    setStatusError("");
+  };
+
+  /* =======================================================
+     STATUS DETAILS
+  ======================================================= */
+
+  const statusTargetIsActive =
+    statusTarget?.active !==
+    false;
+
+  const statusTargetCouncilor =
+    statusTarget
+      ? getActiveCouncilor(
+          statusTarget.id,
+        )
+      : null;
+
+  const deactivationBlocked =
+    Boolean(
+      statusTarget &&
+        statusTargetIsActive &&
+        statusTargetCouncilor,
+    );
+
+  /* =======================================================
+     UPDATE STATUS
+  ======================================================= */
+
+  const handleStatusChange =
+    async () => {
+      if (
+        !statusTarget ||
+        deactivationBlocked
+      ) {
+        return;
+      }
+
+      const newActiveStatus =
+        !statusTargetIsActive;
+
+      try {
+        setChangingStatus(
+          true,
+        );
+
+        setStatusError("");
+        setError("");
+        setSuccess("");
+
+        const updated =
+          await superAdminService.updateDepartmentStatus(
+            statusTarget.id,
+            newActiveStatus,
+          );
+
+        setDepartments(
+          (current) =>
+            sortDepartments(
+              current.map(
+                (department) =>
+                  department.id ===
+                  updated.id
+                    ? updated
+                    : department,
+              ),
+            ),
+        );
+
+        setSuccess(
+          `${updated.name} is now ${
+            updated.active
+              ? "active"
+              : "inactive"
+          }.`,
+        );
+
+        setShowStatusModal(
+          false,
+        );
+
+        setStatusTarget(
+          null,
+        );
+      } catch (statusChangeError) {
+        setStatusError(
+          getErrorMessage(
+            statusChangeError,
+            "Unable to update department status.",
+          ),
+        );
+      } finally {
+        setChangingStatus(
+          false,
+        );
+      }
+    };
+
+  /* =======================================================
+     MANAGE COUNCILORS
+  ======================================================= */
+
+  const handleManageCouncilors =
+    () => {
+      setShowStatusModal(
+        false,
+      );
+
+      setStatusTarget(
+        null,
+      );
+
+      navigate(
+        "/superadmin/councilors",
+      );
+    };
+
+  /* =======================================================
+     RENDER
+  ======================================================= */
+
+  return (
+    <SuperAdminLayout
+      title="Departments"
+      eyebrow="SUPERADMIN PORTAL"
+      description="Department Administration"
+    >
+      <section className="superadmin-departments">
+        {/* =================================================
+            PAGE HEADER
+        ================================================== */}
+
+        <header className="superadmin-departments-header">
+          <div className="superadmin-departments-header-copy">
+            <span className="superadmin-departments-kicker">
+              ORGANIZATIONAL STRUCTURE
+            </span>
+
+            <h2>
+              Department Management
+            </h2>
+
+            <p>
+              Create and maintain the
+              departments that organize
+              Councilor accounts and
+              school attendance
+              administration.
+            </p>
+          </div>
+
+          <div className="superadmin-departments-header-actions">
+            <button
+              type="button"
+              className="superadmin-departments-refresh"
+              onClick={
+                handleRefresh
+              }
+              disabled={
+                loading
+              }
+            >
+              <span
+                aria-hidden="true"
+              >
+                ↻
+              </span>
+
+              {loading
+                ? "Loading..."
+                : "Refresh"}
+            </button>
+
+            <button
+              type="button"
+              className="superadmin-departments-create"
+              onClick={
+                openCreateModal
+              }
+            >
+              <span
+                aria-hidden="true"
+              >
+                +
+              </span>
+
+              New Department
+            </button>
+          </div>
+        </header>
+
+        {/* =================================================
+            ALERTS
+        ================================================== */}
+
+        {success && (
+          <div
+            className="superadmin-departments-alert success"
+            role="status"
+            aria-live="polite"
+          >
+            <span
+              aria-hidden="true"
+            >
+              ✓
+            </span>
+
+            <div>
+              <strong>
+                Update successful
+              </strong>
+
+              <p>
+                {success}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                setSuccess("")
+              }
+              aria-label="Dismiss success message"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {error && (
+          <div
+            className="superadmin-departments-alert error"
+            role="alert"
+          >
+            <span
+              aria-hidden="true"
+            >
+              !
+            </span>
+
+            <div>
+              <strong>
+                Unable to load all
+                information
+              </strong>
+
+              <p>
+                {error}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                setError("")
+              }
+              aria-label="Dismiss error message"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {/* =================================================
+            SUMMARY
+        ================================================== */}
+
+        <section
+          className="superadmin-departments-summary"
+          aria-label="Department summary"
+        >
+          <article>
+            <div className="superadmin-departments-summary-icon">
+              ▤
+            </div>
+
+            <div>
+              <span>
+                TOTAL
+              </span>
+
+              <strong>
+                {loading
+                  ? "—"
+                  : departments.length}
+              </strong>
+
+              <p>
+                Registered departments
+              </p>
+            </div>
+          </article>
+
+          <article>
+            <div className="superadmin-departments-summary-icon active">
+              ✓
+            </div>
+
+            <div>
+              <span>
+                ACTIVE
+              </span>
+
+              <strong>
+                {loading
+                  ? "—"
+                  : activeDepartments.length}
+              </strong>
+
+              <p>
+                Available departments
+              </p>
+            </div>
+          </article>
+
+          <article>
+            <div className="superadmin-departments-summary-icon inactive">
+              —
+            </div>
+
+            <div>
+              <span>
+                INACTIVE
+              </span>
+
+              <strong>
+                {loading
+                  ? "—"
+                  : inactiveDepartments}
+              </strong>
+
+              <p>
+                Disabled departments
+              </p>
+            </div>
+          </article>
+
+          <article>
+            <div className="superadmin-departments-summary-icon coverage">
+              ◎
+            </div>
+
+            <div>
+              <span>
+                COVERED
+              </span>
+
+              <strong>
+                {loading
+                  ? "—"
+                  : coveredDepartments}
+              </strong>
+
+              <p>
+                With active Councilor
+              </p>
+            </div>
+          </article>
+        </section>
+
+        {/* =================================================
+            DIRECTORY PANEL
+        ================================================== */}
+
+        <section className="superadmin-departments-panel">
+          {/* ===============================================
+              PANEL HEADER
+          ================================================ */}
+
+          <div className="superadmin-departments-panel-header">
+            <div>
+              <span>
+                DEPARTMENT DIRECTORY
+              </span>
+
+              <h3>
+                School Departments
+              </h3>
+
+              <p>
+                Manage department
+                identity, Councilor
+                assignment visibility,
+                and availability.
+              </p>
+            </div>
+
+            <div className="superadmin-departments-result-count">
+              {loading
+                ? "Loading departments..."
+                : `${filteredDepartments.length} of ${departments.length} shown`}
+            </div>
+          </div>
+
+          {/* ===============================================
+              TOOLBAR
+          ================================================ */}
+
+          <div className="superadmin-departments-toolbar">
+            <div className="superadmin-departments-search">
+              <span
+                aria-hidden="true"
+              >
+                ⌕
+              </span>
+
+              <input
+                type="search"
+                value={
+                  searchTerm
+                }
+                onChange={(
+                  event,
+                ) =>
+                  setSearchTerm(
+                    event.target
+                      .value,
+                  )
+                }
+                placeholder="Search by code or department name..."
+                aria-label="Search departments"
+              />
+
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSearchTerm("")
+                  }
+                  aria-label="Clear department search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <div className="superadmin-departments-filter">
+              <label htmlFor="department-status-filter">
+                Status
+              </label>
+
+              <select
+                id="department-status-filter"
+                value={
+                  statusFilter
+                }
+                onChange={(
+                  event,
+                ) =>
+                  setStatusFilter(
+                    event.target
+                      .value,
+                  )
+                }
+              >
+                {STATUS_FILTERS.map(
+                  (filter) => (
+                    <option
+                      key={
+                        filter.value
+                      }
+                      value={
+                        filter.value
+                      }
+                    >
+                      {
+                        filter.label
+                      }
+                    </option>
+                  ),
+                )}
+              </select>
+            </div>
+          </div>
+
+          {/* ===============================================
+              LOADING
+          ================================================ */}
+
+          {loading ? (
+            <div className="superadmin-departments-loading">
+              <div className="superadmin-departments-spinner" />
+
+              <strong>
+                Loading departments
+              </strong>
+
+              <p>
+                Retrieving the current
+                department directory.
+              </p>
+            </div>
+          ) : filteredDepartments.length ===
+            0 ? (
+            /* =============================================
+               EMPTY
+            ============================================== */
+
+            <div className="superadmin-departments-empty">
+              <div className="superadmin-departments-empty-icon">
+                ▤
+              </div>
+
+              <strong>
+                {departments.length ===
+                0
+                  ? "No departments yet"
+                  : "No matching departments"}
+              </strong>
+
+              <p>
+                {departments.length ===
+                0
+                  ? "Create the first department to begin organizing Councilor accounts."
+                  : "Try changing your search or status filter."}
+              </p>
+
+              {departments.length ===
+                0 && (
+                <button
+                  type="button"
+                  onClick={
+                    openCreateModal
+                  }
+                >
+                  Create Department
+                </button>
+              )}
+            </div>
+          ) : (
+            /* =============================================
+               TABLE
+            ============================================== */
+
+            <div className="superadmin-departments-table-wrapper">
+              <table className="superadmin-departments-table">
+                <thead>
+                  <tr>
+                    <th>
+                      Department
+                    </th>
+
+                    <th>
+                      Code
+                    </th>
+
+                    <th>
+                      Active Councilor
+                    </th>
+
+                    <th>
+                      Status
+                    </th>
+
+                    <th>
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {filteredDepartments.map(
+                    (
+                      department,
+                      index,
+                    ) => {
+                      const isActive =
+                        department.active !==
+                        false;
+
+                      const activeCouncilor =
+                        getActiveCouncilor(
+                          department.id,
+                        );
+
+                      return (
+                        <tr
+                          key={
+                            department.id
+                          }
+                          style={{
+                            "--department-row-index":
+                              index,
+                          }}
+                        >
+                          {/* =================================
+                              DEPARTMENT
+                          ================================== */}
+
+                          <td
+                            data-label="Department"
+                          >
+                            <div className="superadmin-departments-identity">
+                              <div className="superadmin-departments-code-avatar">
+                                {department.code
+                                  ?.trim()
+                                  ?.charAt(
+                                    0,
+                                  )
+                                  ?.toUpperCase() ||
+                                  "D"}
+                              </div>
+
+                              <div>
+                                <strong>
+                                  {
+                                    department.name
+                                  }
+                                </strong>
+
+                                <span>
+                                  Department
+                                  administration
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* =================================
+                              CODE
+                          ================================== */}
+
+                          <td
+                            data-label="Code"
+                          >
+                            <span className="superadmin-departments-code-badge">
+                              {
+                                department.code
+                              }
+                            </span>
+                          </td>
+
+                          {/* =================================
+                              COUNCILOR
+                          ================================== */}
+
+                          <td
+                            data-label="Active Councilor"
+                          >
+                            {activeCouncilor ? (
+                              <div className="superadmin-departments-councilor">
+                                <div className="superadmin-departments-councilor-avatar">
+                                  {activeCouncilor.name
+                                    ?.trim()
+                                    ?.charAt(
+                                      0,
+                                    )
+                                    ?.toUpperCase() ||
+                                    "C"}
+                                </div>
+
+                                <div>
+                                  <strong>
+                                    {
+                                      activeCouncilor.name
+                                    }
+                                  </strong>
+
+                                  <span>
+                                    {
+                                      activeCouncilor.email
+                                    }
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="superadmin-departments-unassigned">
+                                <span
+                                  aria-hidden="true"
+                                />
+
+                                No active
+                                Councilor
+                              </span>
+                            )}
+                          </td>
+
+                          {/* =================================
+                              STATUS
+                          ================================== */}
+
+                          <td
+                            data-label="Status"
+                          >
+                            <span
+                              className={`superadmin-departments-status ${
+                                isActive
+                                  ? "active"
+                                  : "inactive"
+                              }`}
+                            >
+                              <span
+                                aria-hidden="true"
+                              />
+
+                              {isActive
+                                ? "Active"
+                                : "Inactive"}
+                            </span>
+                          </td>
+
+                          {/* =================================
+                              ACTIONS
+                          ================================== */}
+
+                          <td
+                            data-label="Actions"
+                          >
+                            <div className="superadmin-departments-actions">
+                              <button
+                                type="button"
+                                className="edit"
+                                onClick={() =>
+                                  openEditModal(
+                                    department,
+                                  )
+                                }
+                              >
+                                Edit
+                              </button>
+
+                              <button
+                                type="button"
+                                className={
+                                  isActive
+                                    ? "deactivate"
+                                    : "activate"
+                                }
+                                onClick={() =>
+                                  openStatusModal(
+                                    department,
+                                  )
+                                }
+                              >
+                                {isActive
+                                  ? "Deactivate"
+                                  : "Activate"}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    },
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* ===============================================
+              PANEL FOOTER
+          ================================================ */}
+
+          {!loading &&
+            departments.length >
+              0 && (
+              <footer className="superadmin-departments-panel-footer">
+                <div>
+                  <span>
+                    {
+                      activeDepartments.length
+                    }{" "}
+                    active
+                  </span>
+
+                  <span
+                    aria-hidden="true"
+                  >
+                    •
+                  </span>
+
+                  <span>
+                    {
+                      inactiveDepartments
+                    }{" "}
+                    inactive
+                  </span>
+                </div>
+
+                <p>
+                  Departments are
+                  deactivated rather
+                  than permanently
+                  deleted to preserve
+                  administrative
+                  history.
+                </p>
+              </footer>
+            )}
+        </section>
+      </section>
+
+      {/* =================================================
+          CREATE / EDIT MODAL
+      ================================================== */}
+
+      {showFormModal && (
+        <div
+          className="superadmin-departments-modal-backdrop"
+          onMouseDown={(
+            event,
+          ) => {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              closeFormModal();
+            }
+          }}
+        >
+          <section
+            className="superadmin-departments-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="department-form-title"
+          >
+            {/* ===========================================
+                HEADER
+            ============================================ */}
+
+            <header className="superadmin-departments-modal-header">
+              <div>
+                <span>
+                  {formMode ===
+                  "create"
+                    ? "NEW DEPARTMENT"
+                    : "DEPARTMENT DETAILS"}
+                </span>
+
+                <h2 id="department-form-title">
+                  {formMode ===
+                  "create"
+                    ? "Create Department"
+                    : "Edit Department"}
+                </h2>
+
+                <p>
+                  {formMode ===
+                  "create"
+                    ? "Add a new organizational department to the attendance management system."
+                    : "Update the department code or official department name."}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={
+                  closeFormModal
+                }
+                disabled={
+                  saving
+                }
+                aria-label="Close department form"
+              >
+                ×
+              </button>
+            </header>
+
+            {/* ===========================================
+                FORM
+            ============================================ */}
+
+            <form
+              className="superadmin-departments-form"
+              onSubmit={
+                handleSaveDepartment
+              }
+              noValidate
+            >
+              <div className="superadmin-departments-form-notice">
+                <span
+                  aria-hidden="true"
+                >
+                  i
+                </span>
+
+                <div>
+                  <strong>
+                    Department identity
+                  </strong>
+
+                  <p>
+                    Department codes
+                    should be short and
+                    recognizable, such
+                    as ICT or TVL.
+                  </p>
+                </div>
+              </div>
+
+              {/* =========================================
+                  CODE
+              ========================================== */}
+
+              <div className="superadmin-departments-field">
+                <label htmlFor="department-code">
+                  Department Code
+                </label>
+
+                <input
+                  id="department-code"
+                  name="code"
+                  type="text"
+                  value={
+                    formData.code
+                  }
+                  onChange={
+                    handleFormChange
+                  }
+                  placeholder="Example: ICT"
+                  maxLength={50}
+                  autoComplete="off"
+                  disabled={
+                    saving
+                  }
+                  autoFocus
+                />
+
+                <span>
+                  Maximum 50
+                  characters.
+                </span>
+              </div>
+
+              {/* =========================================
+                  NAME
+              ========================================== */}
+
+              <div className="superadmin-departments-field">
+                <label htmlFor="department-name">
+                  Department Name
+                </label>
+
+                <input
+                  id="department-name"
+                  name="name"
+                  type="text"
+                  value={
+                    formData.name
+                  }
+                  onChange={
+                    handleFormChange
+                  }
+                  placeholder="Example: ICT Department"
+                  maxLength={150}
+                  autoComplete="off"
+                  disabled={
+                    saving
+                  }
+                />
+
+                <span>
+                  Use the official
+                  department name.
+                </span>
+              </div>
+
+              {/* =========================================
+                  ERROR
+              ========================================== */}
+
+              {formError && (
+                <div
+                  className="superadmin-departments-form-error"
+                  role="alert"
+                >
+                  <span
+                    aria-hidden="true"
+                  >
+                    !
+                  </span>
+
+                  <p>
+                    {formError}
+                  </p>
+                </div>
+              )}
+
+              {/* =========================================
+                  ACTIONS
+              ========================================== */}
+
+              <div className="superadmin-departments-modal-actions">
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={
+                    closeFormModal
+                  }
+                  disabled={
+                    saving
+                  }
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="primary"
+                  disabled={
+                    saving
+                  }
+                >
+                  {saving && (
+                    <span className="superadmin-departments-button-spinner" />
+                  )}
+
+                  {saving
+                    ? formMode ===
+                      "create"
+                      ? "Creating..."
+                      : "Saving..."
+                    : formMode ===
+                        "create"
+                      ? "Create Department"
+                      : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
+
+      {/* =================================================
+          STATUS MODAL
+      ================================================== */}
+
+      {showStatusModal &&
+        statusTarget && (
+          <div
+            className="superadmin-departments-modal-backdrop"
+            onMouseDown={(
+              event,
+            ) => {
+              if (
+                event.target ===
+                event.currentTarget
+              ) {
+                closeStatusModal();
+              }
+            }}
+          >
+            <section
+              className="superadmin-departments-status-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="department-status-title"
+            >
+              {/* =========================================
+                  ICON
+              ========================================== */}
+
+              <div
+                className={`superadmin-departments-status-modal-icon ${
+                  statusTargetIsActive
+                    ? "deactivate"
+                    : "activate"
+                }`}
+                aria-hidden="true"
+              >
+                {statusTargetIsActive
+                  ? "!"
+                  : "✓"}
+              </div>
+
+              {/* =========================================
+                  COPY
+              ========================================== */}
+
+              <span className="superadmin-departments-status-modal-kicker">
+                DEPARTMENT STATUS
+              </span>
+
+              <h2 id="department-status-title">
+                {statusTargetIsActive
+                  ? "Deactivate Department?"
+                  : "Activate Department?"}
+              </h2>
+
+              <p>
+                {statusTargetIsActive
+                  ? `You are about to deactivate ${statusTarget.name}.`
+                  : `You are about to reactivate ${statusTarget.name}.`}
+              </p>
+
+              <div className="superadmin-departments-status-summary">
+                <div>
+                  <span>
+                    CODE
+                  </span>
+
+                  <strong>
+                    {
+                      statusTarget.code
+                    }
+                  </strong>
+                </div>
+
+                <div>
+                  <span>
+                    CURRENT STATUS
+                  </span>
+
+                  <strong>
+                    {statusTargetIsActive
+                      ? "Active"
+                      : "Inactive"}
+                  </strong>
+                </div>
+              </div>
+
+              {/* =========================================
+                  BLOCKED DEACTIVATION
+              ========================================== */}
+
+              {deactivationBlocked && (
+                <div className="superadmin-departments-blocked">
+                  <span
+                    aria-hidden="true"
+                  >
+                    !
+                  </span>
+
+                  <div>
+                    <strong>
+                      Deactivation
+                      blocked
+                    </strong>
+
+                    <p>
+                      {
+                        statusTargetCouncilor.name
+                      }{" "}
+                      is currently the
+                      active Councilor
+                      for this
+                      department.
+                      Deactivate or
+                      reassign the
+                      Councilor first.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* =========================================
+                  NORMAL NOTICE
+              ========================================== */}
+
+              {!deactivationBlocked && (
+                <div className="superadmin-departments-status-notice">
+                  <span
+                    aria-hidden="true"
+                  >
+                    i
+                  </span>
+
+                  <p>
+                    {statusTargetIsActive
+                      ? "The department will remain in the system and historical records will be preserved."
+                      : "The department will become available again for administrative assignment."}
+                  </p>
+                </div>
+              )}
+
+              {/* =========================================
+                  STATUS ERROR
+              ========================================== */}
+
+              {statusError && (
+                <div
+                  className="superadmin-departments-form-error"
+                  role="alert"
+                >
+                  <span
+                    aria-hidden="true"
+                  >
+                    !
+                  </span>
+
+                  <p>
+                    {statusError}
+                  </p>
+                </div>
+              )}
+
+              {/* =========================================
+                  ACTIONS
+              ========================================== */}
+
+              <div className="superadmin-departments-status-actions">
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={
+                    closeStatusModal
+                  }
+                  disabled={
+                    changingStatus
+                  }
+                >
+                  Cancel
+                </button>
+
+                {deactivationBlocked ? (
+                  <button
+                    type="button"
+                    className="primary"
+                    onClick={
+                      handleManageCouncilors
+                    }
+                  >
+                    Manage Councilors
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className={
+                      statusTargetIsActive
+                        ? "danger"
+                        : "primary"
+                    }
+                    onClick={
+                      handleStatusChange
+                    }
+                    disabled={
+                      changingStatus
+                    }
+                  >
+                    {changingStatus && (
+                      <span className="superadmin-departments-button-spinner" />
+                    )}
+
+                    {changingStatus
+                      ? "Updating..."
+                      : statusTargetIsActive
+                        ? "Deactivate"
+                        : "Activate"}
+                  </button>
+                )}
+              </div>
+            </section>
+          </div>
+        )}
+    </SuperAdminLayout>
+  );
+}
+
+export default DepartmentManagement;

@@ -1,0 +1,3458 @@
+/* =========================================================
+   SVNHS ATTENDANCE MANAGEMENT SYSTEM
+   SUPER ADMINISTRATOR - DEPARTMENTS
+
+   Theme:
+   - Institutional navy / blue
+   - SVNHS red
+   - Gold accents
+   - Light / dark mode
+   - Responsive
+   - Production motion
+========================================================= */
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.superadmin-departments {
+  width: 100%;
+
+  display: grid;
+
+  gap: 20px;
+
+  padding-bottom: 38px;
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.superadmin-departments-header {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  overflow: hidden;
+
+  padding: 24px 26px;
+
+  border: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  border-radius: 14px;
+
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  box-shadow:
+    var(
+      --c-card-shadow,
+      0 8px 26px
+        rgba(
+          15,
+          32,
+          63,
+          0.07
+        )
+    );
+
+  animation:
+    superadmin-department-header-enter
+    0.46s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-departments-header::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0 auto 0 0;
+
+  width: 4px;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(
+        --c-blue-800,
+        #153f78
+      ),
+      var(
+        --c-red-600,
+        #c51f2d
+      )
+    );
+}
+
+.superadmin-departments-header::after {
+  content: "";
+
+  position: absolute;
+
+  top: -95px;
+  right: -70px;
+
+  width: 220px;
+  height: 220px;
+
+  border: 36px solid
+    rgba(
+      28,
+      83,
+      145,
+      0.04
+    );
+
+  border-radius: 50%;
+
+  pointer-events: none;
+
+  animation:
+    superadmin-department-orbit
+    12s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+.superadmin-departments-header-copy {
+  position: relative;
+
+  z-index: 2;
+
+  min-width: 0;
+}
+
+.superadmin-departments-kicker {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color:
+    var(
+      --c-blue-800,
+      #153f78
+    );
+
+  font-size: 7px;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+}
+
+.superadmin-departments-header-copy
+  h2 {
+  margin: 0;
+
+  color:
+    var(
+      --c-text-primary,
+      #10233f
+    );
+
+  font-size:
+    clamp(
+      20px,
+      2.4vw,
+      26px
+    );
+
+  font-weight: 830;
+
+  letter-spacing: -0.45px;
+}
+
+.superadmin-departments-header-copy
+  p {
+  max-width: 650px;
+
+  margin: 7px 0 0;
+
+  color:
+    var(
+      --c-text-body,
+      #617086
+    );
+
+  font-size: 9px;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   HEADER ACTIONS
+========================================================= */
+
+.superadmin-departments-header-actions {
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  flex: 0 0 auto;
+}
+
+.superadmin-departments-refresh,
+.superadmin-departments-create {
+  min-height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 13px;
+
+  border-radius: 8px;
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.superadmin-departments-refresh {
+  border: 1px solid
+    var(
+      --c-secondary-border,
+      #d5dfeb
+    );
+
+  background:
+    var(
+      --c-secondary-bg,
+      #f8fafc
+    );
+
+  color:
+    var(
+      --c-secondary-text,
+      #263f61
+    );
+}
+
+.superadmin-departments-create {
+  border: 1px solid
+    var(
+      --c-blue-900,
+      #0b2d59
+    );
+
+  background:
+    linear-gradient(
+      135deg,
+      var(
+        --c-blue-900,
+        #0b2d59
+      ),
+      var(
+        --c-blue-800,
+        #153f78
+      )
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 6px 16px
+      rgba(
+        11,
+        45,
+        89,
+        0.18
+      );
+}
+
+.superadmin-departments-refresh:disabled {
+  opacity: 0.55;
+
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .superadmin-departments-refresh:hover:not(
+      :disabled
+    ),
+  .superadmin-departments-create:hover {
+    transform:
+      translateY(-2px);
+  }
+
+  .superadmin-departments-create:hover {
+    box-shadow:
+      0 9px 21px
+        rgba(
+          11,
+          45,
+          89,
+          0.24
+        );
+  }
+}
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.superadmin-departments-alert {
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 13px 15px;
+
+  border-radius: 10px;
+
+  animation:
+    superadmin-department-alert-enter
+    0.34s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-departments-alert.success {
+  border: 1px solid
+    var(
+      --c-success-border,
+      #b9e2c4
+    );
+
+  background:
+    var(
+      --c-success-bg,
+      #edf9f0
+    );
+
+  color:
+    var(
+      --c-success-text,
+      #216b38
+    );
+}
+
+.superadmin-departments-alert.error {
+  border: 1px solid
+    var(
+      --c-error-border,
+      #f0c1c5
+    );
+
+  background:
+    var(
+      --c-error-bg,
+      #fff1f2
+    );
+
+  color:
+    var(
+      --c-error-text,
+      #a3232f
+    );
+}
+
+.superadmin-departments-alert
+  > span {
+  width: 25px;
+  height: 25px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    currentColor;
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.superadmin-departments-alert
+  strong {
+  display: block;
+
+  font-size: 9px;
+  font-weight: 820;
+}
+
+.superadmin-departments-alert
+  p {
+  margin: 2px 0 0;
+
+  font-size: 8px;
+
+  line-height: 1.45;
+}
+
+.superadmin-departments-alert
+  > button {
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+
+  border-radius: 6px;
+
+  background:
+    transparent;
+
+  color: currentColor;
+
+  font-family: inherit;
+  font-size: 18px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease;
+}
+
+@media (hover: hover) {
+  .superadmin-departments-alert
+    > button:hover {
+    background:
+      rgba(
+        0,
+        0,
+        0,
+        0.05
+      );
+  }
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.superadmin-departments-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 13px;
+}
+
+.superadmin-departments-summary
+  article {
+  position: relative;
+
+  min-width: 0;
+  min-height: 112px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  overflow: hidden;
+
+  padding: 17px;
+
+  border: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  border-radius: 12px;
+
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  box-shadow:
+    var(
+      --c-card-shadow,
+      0 7px 22px
+        rgba(
+          15,
+          32,
+          63,
+          0.06
+        )
+    );
+
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+
+  animation:
+    superadmin-department-card-enter
+    0.42s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-departments-summary
+  article:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.superadmin-departments-summary
+  article:nth-child(2) {
+  animation-delay: 0.09s;
+}
+
+.superadmin-departments-summary
+  article:nth-child(3) {
+  animation-delay: 0.13s;
+}
+
+.superadmin-departments-summary
+  article:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.superadmin-departments-summary
+  article::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  width: 3px;
+}
+
+.superadmin-departments-summary
+  article:nth-child(1)::after {
+  background:
+    var(
+      --c-blue-800,
+      #153f78
+    );
+}
+
+.superadmin-departments-summary
+  article:nth-child(2)::after {
+  background: #2c8b4b;
+}
+
+.superadmin-departments-summary
+  article:nth-child(3)::after {
+  background:
+    var(
+      --c-red-600,
+      #c51f2d
+    );
+}
+
+.superadmin-departments-summary
+  article:nth-child(4)::after {
+  background:
+    var(
+      --c-gold,
+      #f1bf3d
+    );
+}
+
+@media (hover: hover) {
+  .superadmin-departments-summary
+    article:hover {
+    transform:
+      translateY(-3px);
+
+    border-color:
+      var(
+        --c-brand-border,
+        #b9cbe0
+      );
+
+    box-shadow:
+      var(
+        --c-card-hover-shadow,
+        0 12px 28px
+          rgba(
+            15,
+            32,
+            63,
+            0.11
+          )
+      );
+  }
+}
+
+.superadmin-departments-summary-icon {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  background:
+    var(
+      --c-icon-bg,
+      #edf3f9
+    );
+
+  color:
+    var(
+      --c-icon-text,
+      #174c83
+    );
+
+  font-size: 15px;
+  font-weight: 900;
+
+  transition:
+    transform 0.18s ease;
+}
+
+.superadmin-departments-summary-icon.active {
+  background:
+    var(
+      --c-success-bg,
+      #edf9f0
+    );
+
+  color:
+    var(
+      --c-success-text,
+      #216b38
+    );
+}
+
+.superadmin-departments-summary-icon.inactive {
+  background:
+    rgba(
+      197,
+      31,
+      45,
+      0.08
+    );
+
+  color:
+    var(
+      --c-red-600,
+      #c51f2d
+    );
+}
+
+.superadmin-departments-summary-icon.coverage {
+  background:
+    rgba(
+      241,
+      191,
+      61,
+      0.14
+    );
+
+  color: #a47708;
+}
+
+@media (hover: hover) {
+  .superadmin-departments-summary
+    article:hover
+    .superadmin-departments-summary-icon {
+    transform:
+      translateY(-1px)
+      scale(1.045);
+  }
+}
+
+.superadmin-departments-summary
+  article
+  > div:last-child {
+  min-width: 0;
+}
+
+.superadmin-departments-summary
+  article
+  span {
+  display: block;
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+}
+
+.superadmin-departments-summary
+  article
+  strong {
+  display: block;
+
+  margin-top: 2px;
+
+  color:
+    var(
+      --c-text-primary,
+      #10233f
+    );
+
+  font-size: 24px;
+  font-weight: 850;
+
+  line-height: 1;
+}
+
+.superadmin-departments-summary
+  article
+  p {
+  margin: 5px 0 0;
+
+  color:
+    var(
+      --c-text-body,
+      #617086
+    );
+
+  font-size: 7.5px;
+}
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+.superadmin-departments-panel {
+  overflow: hidden;
+
+  border: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  border-radius: 14px;
+
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  box-shadow:
+    var(
+      --c-panel-shadow,
+      0 8px 28px
+        rgba(
+          15,
+          32,
+          63,
+          0.065
+        )
+    );
+
+  animation:
+    superadmin-department-panel-enter
+    0.48s
+    0.18s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+/* =========================================================
+   PANEL HEADER
+========================================================= */
+
+.superadmin-departments-panel-header {
+  min-height: 92px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 18px 21px;
+
+  border-bottom: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+}
+
+.superadmin-departments-panel-header
+  > div:first-child
+  > span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color:
+    var(
+      --c-blue-800,
+      #153f78
+    );
+
+  font-size: 6.5px;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+}
+
+.superadmin-departments-panel-header
+  h3 {
+  margin: 0;
+
+  color:
+    var(
+      --c-text-primary,
+      #10233f
+    );
+
+  font-size: 15px;
+  font-weight: 810;
+}
+
+.superadmin-departments-panel-header
+  p {
+  margin: 4px 0 0;
+
+  color:
+    var(
+      --c-text-body,
+      #617086
+    );
+
+  font-size: 8px;
+
+  line-height: 1.45;
+}
+
+.superadmin-departments-result-count {
+  flex: 0 0 auto;
+
+  padding: 7px 9px;
+
+  border: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  border-radius: 7px;
+
+  background:
+    var(
+      --c-surface-soft,
+      #f7f9fc
+    );
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 7px;
+  font-weight: 750;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.superadmin-departments-toolbar {
+  display: grid;
+
+  grid-template-columns:
+    minmax(
+      0,
+      1fr
+    )
+    auto;
+
+  align-items: end;
+
+  gap: 14px;
+
+  padding: 14px 21px;
+
+  border-bottom: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  background:
+    var(
+      --c-surface-soft,
+      #fafbfd
+    );
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.superadmin-departments-search {
+  position: relative;
+
+  max-width: 460px;
+
+  display: flex;
+  align-items: center;
+}
+
+.superadmin-departments-search
+  > span {
+  position: absolute;
+
+  left: 12px;
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 14px;
+
+  pointer-events: none;
+}
+
+.superadmin-departments-search
+  input {
+  width: 100%;
+  height: 38px;
+
+  padding:
+    0 38px 0 35px;
+
+  border: 1px solid
+    var(
+      --c-border,
+      #d9e0e9
+    );
+
+  border-radius: 8px;
+
+  outline: none;
+
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  color:
+    var(
+      --c-text-primary,
+      #10233f
+    );
+
+  font-family: inherit;
+
+  font-size: 8.5px;
+
+  transition:
+    border-color 0.17s ease,
+    box-shadow 0.17s ease,
+    background 0.17s ease;
+}
+
+.superadmin-departments-search
+  input::placeholder {
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+}
+
+.superadmin-departments-search
+  input:focus {
+  border-color:
+    var(
+      --c-blue-600,
+      #2f6fae
+    );
+
+  box-shadow:
+    0 0 0 3px
+      rgba(
+        47,
+        111,
+        174,
+        0.11
+      );
+}
+
+.superadmin-departments-search
+  button {
+  position: absolute;
+
+  right: 7px;
+
+  width: 26px;
+  height: 26px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 6px;
+
+  background:
+    transparent;
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-family: inherit;
+  font-size: 16px;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   FILTER
+========================================================= */
+
+.superadmin-departments-filter {
+  min-width: 155px;
+
+  display: grid;
+
+  gap: 5px;
+}
+
+.superadmin-departments-filter
+  label {
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 6.5px;
+  font-weight: 850;
+
+  letter-spacing: 0.08em;
+}
+
+.superadmin-departments-filter
+  select {
+  height: 38px;
+
+  padding: 0 11px;
+
+  border: 1px solid
+    var(
+      --c-border,
+      #d9e0e9
+    );
+
+  border-radius: 8px;
+
+  outline: none;
+
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  color:
+    var(
+      --c-text-secondary,
+      #32465f
+    );
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.superadmin-departments-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+.superadmin-departments-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  table-layout: fixed;
+}
+
+.superadmin-departments-table
+  thead {
+  background:
+    var(
+      --c-surface-soft,
+      #f7f9fc
+    );
+}
+
+.superadmin-departments-table
+  th {
+  padding: 11px 15px;
+
+  border-bottom: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 6.3px;
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+
+  text-align: left;
+
+  text-transform: uppercase;
+}
+
+.superadmin-departments-table
+  th:nth-child(1) {
+  width: 27%;
+}
+
+.superadmin-departments-table
+  th:nth-child(2) {
+  width: 11%;
+}
+
+.superadmin-departments-table
+  th:nth-child(3) {
+  width: 29%;
+}
+
+.superadmin-departments-table
+  th:nth-child(4) {
+  width: 13%;
+}
+
+.superadmin-departments-table
+  th:nth-child(5) {
+  width: 20%;
+}
+
+.superadmin-departments-table
+  td {
+  padding: 13px 15px;
+
+  border-bottom: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  vertical-align: middle;
+
+  color:
+    var(
+      --c-text-body,
+      #617086
+    );
+
+  font-size: 8px;
+}
+
+.superadmin-departments-table
+  tbody
+  tr {
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  animation:
+    superadmin-department-row-enter
+    0.34s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+
+  animation-delay:
+    calc(
+      min(
+          var(
+            --department-row-index
+          ),
+          8
+        ) *
+        0.035s
+    );
+
+  transition:
+    background 0.16s ease;
+}
+
+.superadmin-departments-table
+  tbody
+  tr:last-child
+  td {
+  border-bottom: 0;
+}
+
+@media (hover: hover) {
+  .superadmin-departments-table
+    tbody
+    tr:hover {
+    background:
+      var(
+        --c-table-hover,
+        #f8fbfe
+      );
+  }
+}
+
+/* =========================================================
+   DEPARTMENT IDENTITY
+========================================================= */
+
+.superadmin-departments-identity,
+.superadmin-departments-councilor {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.superadmin-departments-code-avatar {
+  width: 38px;
+  height: 38px;
+
+  flex: 0 0 38px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid
+    var(
+      --c-brand-border,
+      #c9d7e6
+    );
+
+  border-radius: 9px;
+
+  background:
+    var(
+      --c-icon-bg,
+      #edf3f9
+    );
+
+  color:
+    var(
+      --c-blue-900,
+      #0b2d59
+    );
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.superadmin-departments-identity
+  > div:last-child,
+.superadmin-departments-councilor
+  > div:last-child {
+  min-width: 0;
+}
+
+.superadmin-departments-identity
+  strong,
+.superadmin-departments-councilor
+  strong {
+  display: block;
+
+  overflow: hidden;
+
+  color:
+    var(
+      --c-table-title,
+      #1b2c43
+    );
+
+  font-size: 8.8px;
+  font-weight: 790;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.superadmin-departments-identity
+  span,
+.superadmin-departments-councilor
+  span {
+  display: block;
+
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color:
+    var(
+      --c-table-muted,
+      #7c899a
+    );
+
+  font-size: 7px;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   CODE BADGE
+========================================================= */
+
+.superadmin-departments-code-badge {
+  min-height: 27px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 9px;
+
+  border-radius: 6px;
+
+  background:
+    var(
+      --c-role-bg,
+      #edf3f9
+    );
+
+  color:
+    var(
+      --c-role-text,
+      #174c83
+    );
+
+  font-size: 7px;
+  font-weight: 900;
+
+  letter-spacing: 0.05em;
+}
+
+/* =========================================================
+   COUNCILOR
+========================================================= */
+
+.superadmin-departments-councilor-avatar {
+  width: 32px;
+  height: 32px;
+
+  flex: 0 0 32px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(
+        --c-icon-bg,
+        #edf3f9
+      ),
+      var(
+        --c-surface-soft,
+        #f7f9fc
+      )
+    );
+
+  color:
+    var(
+      --c-icon-text,
+      #174c83
+    );
+
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.superadmin-departments-unassigned {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 7.5px;
+  font-weight: 700;
+}
+
+.superadmin-departments-unassigned
+  > span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #d09a21;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.superadmin-departments-status {
+  min-height: 27px;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 0 9px;
+
+  border-radius: 999px;
+
+  font-size: 7px;
+  font-weight: 820;
+
+  white-space: nowrap;
+}
+
+.superadmin-departments-status
+  > span {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+}
+
+.superadmin-departments-status.active {
+  border: 1px solid
+    var(
+      --c-success-border,
+      #b9e2c4
+    );
+
+  background:
+    var(
+      --c-success-bg,
+      #edf9f0
+    );
+
+  color:
+    var(
+      --c-success-text,
+      #216b38
+    );
+}
+
+.superadmin-departments-status.active
+  > span {
+  background:
+    var(
+      --c-success-dot,
+      #36a75a
+    );
+}
+
+.superadmin-departments-status.inactive {
+  border: 1px solid
+    var(
+      --c-border,
+      #d9e0e9
+    );
+
+  background:
+    var(
+      --c-inactive-bg,
+      #f2f4f7
+    );
+
+  color:
+    var(
+      --c-inactive-text,
+      #667283
+    );
+}
+
+.superadmin-departments-status.inactive
+  > span {
+  background:
+    var(
+      --c-inactive-dot,
+      #8f99a7
+    );
+}
+
+/* =========================================================
+   ROW ACTIONS
+========================================================= */
+
+.superadmin-departments-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  flex-wrap: wrap;
+}
+
+.superadmin-departments-actions
+  button {
+  min-height: 29px;
+
+  padding: 0 9px;
+
+  border-radius: 6px;
+
+  font-family: inherit;
+
+  font-size: 7px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.superadmin-departments-actions
+  .edit {
+  border: 1px solid
+    var(
+      --c-secondary-border,
+      #d5dfeb
+    );
+
+  background:
+    var(
+      --c-secondary-bg,
+      #f8fafc
+    );
+
+  color:
+    var(
+      --c-secondary-text,
+      #263f61
+    );
+}
+
+.superadmin-departments-actions
+  .deactivate {
+  border: 1px solid
+    rgba(
+      197,
+      31,
+      45,
+      0.2
+    );
+
+  background:
+    rgba(
+      197,
+      31,
+      45,
+      0.055
+    );
+
+  color:
+    var(
+      --c-red-600,
+      #c51f2d
+    );
+}
+
+.superadmin-departments-actions
+  .activate {
+  border: 1px solid
+    var(
+      --c-success-border,
+      #b9e2c4
+    );
+
+  background:
+    var(
+      --c-success-bg,
+      #edf9f0
+    );
+
+  color:
+    var(
+      --c-success-text,
+      #216b38
+    );
+}
+
+@media (hover: hover) {
+  .superadmin-departments-actions
+    button:hover {
+    transform:
+      translateY(-1px);
+  }
+}
+
+/* =========================================================
+   PANEL FOOTER
+========================================================= */
+
+.superadmin-departments-panel-footer {
+  min-height: 49px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 11px 21px;
+
+  border-top: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  background:
+    var(
+      --c-surface-soft,
+      #fafbfd
+    );
+}
+
+.superadmin-departments-panel-footer
+  > div {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 7px;
+  font-weight: 720;
+}
+
+.superadmin-departments-panel-footer
+  p {
+  margin: 0;
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 7px;
+
+  text-align: right;
+}
+
+/* =========================================================
+   LOADING / EMPTY
+========================================================= */
+
+.superadmin-departments-loading,
+.superadmin-departments-empty {
+  min-height: 310px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  padding: 35px;
+
+  text-align: center;
+}
+
+.superadmin-departments-spinner {
+  width: 32px;
+  height: 32px;
+
+  border: 3px solid
+    var(
+      --c-icon-bg,
+      #edf3f9
+    );
+
+  border-top-color:
+    var(
+      --c-blue-800,
+      #153f78
+    );
+
+  border-radius: 50%;
+
+  animation:
+    superadmin-department-spin
+    0.75s
+    linear
+    infinite;
+}
+
+.superadmin-departments-loading
+  strong,
+.superadmin-departments-empty
+  strong {
+  margin-top: 12px;
+
+  color:
+    var(
+      --c-text-primary,
+      #10233f
+    );
+
+  font-size: 10px;
+  font-weight: 810;
+}
+
+.superadmin-departments-loading
+  p,
+.superadmin-departments-empty
+  p {
+  max-width: 320px;
+
+  margin: 5px 0 0;
+
+  color:
+    var(
+      --c-text-body,
+      #617086
+    );
+
+  font-size: 8px;
+
+  line-height: 1.5;
+}
+
+.superadmin-departments-empty-icon {
+  width: 50px;
+  height: 50px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  background:
+    var(
+      --c-icon-bg,
+      #edf3f9
+    );
+
+  color:
+    var(
+      --c-icon-text,
+      #174c83
+    );
+
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.superadmin-departments-empty
+  button {
+  min-height: 35px;
+
+  margin-top: 14px;
+
+  padding: 0 12px;
+
+  border: 1px solid
+    var(
+      --c-blue-800,
+      #153f78
+    );
+
+  border-radius: 7px;
+
+  background:
+    var(
+      --c-blue-800,
+      #153f78
+    );
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   MODAL BACKDROP
+========================================================= */
+
+.superadmin-departments-modal-backdrop {
+  position: fixed;
+
+  z-index: 5000;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow-y: auto;
+
+  padding: 24px;
+
+  background:
+    rgba(
+      5,
+      16,
+      32,
+      0.64
+    );
+
+  backdrop-filter:
+    blur(5px);
+
+  animation:
+    superadmin-department-backdrop-enter
+    0.2s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   FORM MODAL
+========================================================= */
+
+.superadmin-departments-modal {
+  width: min(
+    100%,
+    520px
+  );
+
+  overflow: hidden;
+
+  border: 1px solid
+    var(
+      --c-border,
+      #d9e0e9
+    );
+
+  border-radius: 15px;
+
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  box-shadow:
+    0 24px 70px
+      rgba(
+        0,
+        0,
+        0,
+        0.25
+      );
+
+  animation:
+    superadmin-department-modal-enter
+    0.3s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.superadmin-departments-modal-header {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 21px 22px;
+
+  border-bottom: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  background:
+    linear-gradient(
+      135deg,
+      var(
+        --c-surface,
+        #ffffff
+      ),
+      var(
+        --c-surface-soft,
+        #f7f9fc
+      )
+    );
+}
+
+.superadmin-departments-modal-header::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0 0 auto;
+
+  height: 3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(
+        --c-red-600,
+        #c51f2d
+      )
+        0%,
+      var(
+        --c-red-600,
+        #c51f2d
+      )
+        35%,
+      var(
+        --c-gold,
+        #f1bf3d
+      )
+        35%,
+      var(
+        --c-gold,
+        #f1bf3d
+      )
+        48%,
+      var(
+        --c-blue-800,
+        #153f78
+      )
+        48%,
+      var(
+        --c-blue-800,
+        #153f78
+      )
+        100%
+    );
+}
+
+.superadmin-departments-modal-header
+  span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color:
+    var(
+      --c-blue-800,
+      #153f78
+    );
+
+  font-size: 6.5px;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+}
+
+.superadmin-departments-modal-header
+  h2 {
+  margin: 0;
+
+  color:
+    var(
+      --c-text-primary,
+      #10233f
+    );
+
+  font-size: 18px;
+  font-weight: 820;
+}
+
+.superadmin-departments-modal-header
+  p {
+  max-width: 390px;
+
+  margin: 5px 0 0;
+
+  color:
+    var(
+      --c-text-body,
+      #617086
+    );
+
+  font-size: 8px;
+
+  line-height: 1.5;
+}
+
+.superadmin-departments-modal-header
+  > button {
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  border-radius: 7px;
+
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-family: inherit;
+  font-size: 18px;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.superadmin-departments-form {
+  display: grid;
+
+  gap: 16px;
+
+  padding: 21px 22px 22px;
+}
+
+.superadmin-departments-form-notice,
+.superadmin-departments-status-notice,
+.superadmin-departments-blocked {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 11px 12px;
+
+  border-radius: 9px;
+}
+
+.superadmin-departments-form-notice,
+.superadmin-departments-status-notice {
+  border: 1px solid
+    rgba(
+      47,
+      111,
+      174,
+      0.16
+    );
+
+  background:
+    rgba(
+      47,
+      111,
+      174,
+      0.055
+    );
+}
+
+.superadmin-departments-form-notice
+  > span,
+.superadmin-departments-status-notice
+  > span,
+.superadmin-departments-blocked
+  > span {
+  width: 22px;
+  height: 22px;
+
+  flex: 0 0 22px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.superadmin-departments-form-notice
+  > span,
+.superadmin-departments-status-notice
+  > span {
+  background:
+    var(
+      --c-blue-800,
+      #153f78
+    );
+
+  color: #ffffff;
+}
+
+.superadmin-departments-form-notice
+  strong,
+.superadmin-departments-blocked
+  strong {
+  display: block;
+
+  color:
+    var(
+      --c-text-secondary,
+      #32465f
+    );
+
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.superadmin-departments-form-notice
+  p,
+.superadmin-departments-status-notice
+  p,
+.superadmin-departments-blocked
+  p {
+  margin: 2px 0 0;
+
+  color:
+    var(
+      --c-text-body,
+      #617086
+    );
+
+  font-size: 7.5px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   FIELD
+========================================================= */
+
+.superadmin-departments-field {
+  display: grid;
+
+  gap: 6px;
+}
+
+.superadmin-departments-field
+  label {
+  color:
+    var(
+      --c-text-secondary,
+      #32465f
+    );
+
+  font-size: 7.5px;
+  font-weight: 800;
+}
+
+.superadmin-departments-field
+  input {
+  width: 100%;
+  height: 42px;
+
+  padding: 0 12px;
+
+  border: 1px solid
+    var(
+      --c-border,
+      #d9e0e9
+    );
+
+  border-radius: 8px;
+
+  outline: none;
+
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  color:
+    var(
+      --c-text-primary,
+      #10233f
+    );
+
+  font-family: inherit;
+
+  font-size: 9px;
+
+  transition:
+    border-color 0.17s ease,
+    box-shadow 0.17s ease,
+    background 0.17s ease;
+}
+
+.superadmin-departments-field
+  input:focus {
+  border-color:
+    var(
+      --c-blue-600,
+      #2f6fae
+    );
+
+  box-shadow:
+    0 0 0 3px
+      rgba(
+        47,
+        111,
+        174,
+        0.11
+      );
+}
+
+.superadmin-departments-field
+  input:disabled {
+  opacity: 0.65;
+
+  cursor: not-allowed;
+}
+
+.superadmin-departments-field
+  > span {
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 6.8px;
+}
+
+/* =========================================================
+   FORM ERROR
+========================================================= */
+
+.superadmin-departments-form-error {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  padding: 10px 11px;
+
+  border: 1px solid
+    var(
+      --c-error-border,
+      #f0c1c5
+    );
+
+  border-radius: 8px;
+
+  background:
+    var(
+      --c-error-bg,
+      #fff1f2
+    );
+
+  color:
+    var(
+      --c-error-text,
+      #a3232f
+    );
+
+  animation:
+    superadmin-department-alert-enter
+    0.24s
+    ease-out
+    both;
+}
+
+.superadmin-departments-form-error
+  > span {
+  width: 21px;
+  height: 21px;
+
+  flex: 0 0 21px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    currentColor;
+
+  color: #ffffff;
+
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.superadmin-departments-form-error
+  p {
+  margin: 2px 0 0;
+
+  font-size: 7.5px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   MODAL ACTIONS
+========================================================= */
+
+.superadmin-departments-modal-actions,
+.superadmin-departments-status-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  padding-top: 2px;
+}
+
+.superadmin-departments-modal-actions
+  button,
+.superadmin-departments-status-actions
+  button {
+  min-height: 37px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 13px;
+
+  border-radius: 8px;
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.17s ease,
+    border-color 0.17s ease,
+    background 0.17s ease,
+    box-shadow 0.17s ease;
+}
+
+.superadmin-departments-modal-actions
+  .secondary,
+.superadmin-departments-status-actions
+  .secondary {
+  border: 1px solid
+    var(
+      --c-secondary-border,
+      #d5dfeb
+    );
+
+  background:
+    var(
+      --c-secondary-bg,
+      #f8fafc
+    );
+
+  color:
+    var(
+      --c-secondary-text,
+      #263f61
+    );
+}
+
+.superadmin-departments-modal-actions
+  .primary,
+.superadmin-departments-status-actions
+  .primary {
+  border: 1px solid
+    var(
+      --c-blue-900,
+      #0b2d59
+    );
+
+  background:
+    linear-gradient(
+      135deg,
+      var(
+        --c-blue-900,
+        #0b2d59
+      ),
+      var(
+        --c-blue-800,
+        #153f78
+      )
+    );
+
+  color: #ffffff;
+}
+
+.superadmin-departments-status-actions
+  .danger {
+  border: 1px solid
+    var(
+      --c-red-600,
+      #c51f2d
+    );
+
+  background:
+    var(
+      --c-red-600,
+      #c51f2d
+    );
+
+  color: #ffffff;
+}
+
+.superadmin-departments-modal-actions
+  button:disabled,
+.superadmin-departments-status-actions
+  button:disabled {
+  opacity: 0.58;
+
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .superadmin-departments-modal-actions
+    button:hover:not(
+      :disabled
+    ),
+  .superadmin-departments-status-actions
+    button:hover:not(
+      :disabled
+    ) {
+    transform:
+      translateY(-1px);
+  }
+}
+
+/* =========================================================
+   BUTTON SPINNER
+========================================================= */
+
+.superadmin-departments-button-spinner {
+  width: 13px;
+  height: 13px;
+
+  border: 2px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.35
+    );
+
+  border-top-color: #ffffff;
+
+  border-radius: 50%;
+
+  animation:
+    superadmin-department-spin
+    0.7s
+    linear
+    infinite;
+}
+
+/* =========================================================
+   STATUS MODAL
+========================================================= */
+
+.superadmin-departments-status-modal {
+  width: min(
+    100%,
+    445px
+  );
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  padding: 27px;
+
+  border: 1px solid
+    var(
+      --c-border,
+      #d9e0e9
+    );
+
+  border-radius: 15px;
+
+  background:
+    var(
+      --c-surface,
+      #ffffff
+    );
+
+  box-shadow:
+    0 24px 70px
+      rgba(
+        0,
+        0,
+        0,
+        0.25
+      );
+
+  text-align: center;
+
+  animation:
+    superadmin-department-modal-enter
+    0.3s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-departments-status-modal-icon {
+  width: 52px;
+  height: 52px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 14px;
+
+  font-size: 18px;
+  font-weight: 900;
+
+  animation:
+    superadmin-department-status-icon-enter
+    0.4s
+    0.05s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-departments-status-modal-icon.deactivate {
+  background:
+    rgba(
+      197,
+      31,
+      45,
+      0.09
+    );
+
+  color:
+    var(
+      --c-red-600,
+      #c51f2d
+    );
+}
+
+.superadmin-departments-status-modal-icon.activate {
+  background:
+    var(
+      --c-success-bg,
+      #edf9f0
+    );
+
+  color:
+    var(
+      --c-success-text,
+      #216b38
+    );
+}
+
+.superadmin-departments-status-modal-kicker {
+  margin-top: 15px;
+
+  color:
+    var(
+      --c-blue-800,
+      #153f78
+    );
+
+  font-size: 6.5px;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+}
+
+.superadmin-departments-status-modal
+  > h2 {
+  margin: 5px 0 0;
+
+  color:
+    var(
+      --c-text-primary,
+      #10233f
+    );
+
+  font-size: 19px;
+  font-weight: 830;
+}
+
+.superadmin-departments-status-modal
+  > p {
+  margin: 7px 0 0;
+
+  color:
+    var(
+      --c-text-body,
+      #617086
+    );
+
+  font-size: 8.5px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   STATUS SUMMARY
+========================================================= */
+
+.superadmin-departments-status-summary {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 8px;
+
+  margin-top: 18px;
+}
+
+.superadmin-departments-status-summary
+  > div {
+  padding: 11px;
+
+  border: 1px solid
+    var(
+      --c-border-soft,
+      #e3e8f0
+    );
+
+  border-radius: 8px;
+
+  background:
+    var(
+      --c-surface-soft,
+      #f7f9fc
+    );
+}
+
+.superadmin-departments-status-summary
+  span {
+  display: block;
+
+  color:
+    var(
+      --c-text-muted,
+      #8792a3
+    );
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+}
+
+.superadmin-departments-status-summary
+  strong {
+  display: block;
+
+  margin-top: 4px;
+
+  color:
+    var(
+      --c-text-primary,
+      #10233f
+    );
+
+  font-size: 9px;
+  font-weight: 820;
+}
+
+/* =========================================================
+   BLOCKED / NOTICE
+========================================================= */
+
+.superadmin-departments-blocked,
+.superadmin-departments-status-notice {
+  width: 100%;
+
+  margin-top: 14px;
+
+  text-align: left;
+}
+
+.superadmin-departments-blocked {
+  border: 1px solid
+    var(
+      --c-error-border,
+      #f0c1c5
+    );
+
+  background:
+    var(
+      --c-error-bg,
+      #fff1f2
+    );
+}
+
+.superadmin-departments-blocked
+  > span {
+  background:
+    var(
+      --c-error-text,
+      #a3232f
+    );
+
+  color: #ffffff;
+}
+
+.superadmin-departments-blocked
+  strong {
+  color:
+    var(
+      --c-error-text,
+      #a3232f
+    );
+}
+
+.superadmin-departments-status-actions {
+  width: 100%;
+
+  margin-top: 18px;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"]
+  .superadmin-departments-header,
+html[data-theme="dark"]
+  .superadmin-departments-summary
+  article,
+html[data-theme="dark"]
+  .superadmin-departments-panel,
+html[data-theme="dark"]
+  .superadmin-departments-modal,
+html[data-theme="dark"]
+  .superadmin-departments-status-modal {
+  background:
+    var(
+      --c-surface,
+      #111c2a
+    );
+
+  border-color:
+    var(
+      --c-border,
+      #28384c
+    );
+}
+
+html[data-theme="dark"]
+  .superadmin-departments-summary-icon.coverage {
+  color: #f4d46f;
+}
+
+html[data-theme="dark"]
+  .superadmin-departments-code-avatar,
+html[data-theme="dark"]
+  .superadmin-departments-councilor-avatar {
+  color: #9dccff;
+}
+
+html[data-theme="dark"]
+  .superadmin-departments-toolbar,
+html[data-theme="dark"]
+  .superadmin-departments-panel-footer {
+  background:
+    var(
+      --c-surface-soft,
+      #162333
+    );
+}
+
+html[data-theme="dark"]
+  .superadmin-departments-table
+  thead {
+  background:
+    var(
+      --c-surface-soft,
+      #162333
+    );
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .superadmin-departments-summary {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+  .superadmin-departments-table {
+    min-width: 880px;
+  }
+}
+
+/* =========================================================
+   SMALL TABLET
+========================================================= */
+
+@media (max-width: 760px) {
+  .superadmin-departments {
+    gap: 16px;
+  }
+
+  .superadmin-departments-header {
+    align-items:
+      flex-start;
+
+    flex-direction: column;
+
+    padding: 21px;
+  }
+
+  .superadmin-departments-header-actions {
+    width: 100%;
+  }
+
+  .superadmin-departments-refresh,
+  .superadmin-departments-create {
+    flex: 1;
+  }
+
+  .superadmin-departments-toolbar {
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-departments-search {
+    max-width: none;
+  }
+
+  .superadmin-departments-filter {
+    min-width: 0;
+  }
+
+  .superadmin-departments-panel-header {
+    align-items:
+      flex-start;
+
+    flex-direction: column;
+  }
+
+  .superadmin-departments-result-count {
+    align-self:
+      flex-start;
+  }
+
+  .superadmin-departments-panel-footer {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+  .superadmin-departments-panel-footer
+    p {
+    text-align: left;
+  }
+}
+
+/* =========================================================
+   MOBILE CARD TABLE
+========================================================= */
+
+@media (max-width: 620px) {
+  .superadmin-departments-summary {
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-departments-summary
+    article {
+    min-height: 98px;
+  }
+
+  .superadmin-departments-table-wrapper {
+    overflow: visible;
+
+    padding: 12px;
+  }
+
+  .superadmin-departments-table {
+    min-width: 0;
+
+    border-collapse:
+      separate;
+
+    border-spacing:
+      0 10px;
+  }
+
+  .superadmin-departments-table
+    thead {
+    display: none;
+  }
+
+  .superadmin-departments-table
+    tbody,
+  .superadmin-departments-table
+    tr,
+  .superadmin-departments-table
+    td {
+    display: block;
+
+    width: 100%;
+  }
+
+  .superadmin-departments-table
+    tbody
+    tr {
+    overflow: hidden;
+
+    border: 1px solid
+      var(
+        --c-border-soft,
+        #e3e8f0
+      );
+
+    border-radius: 11px;
+
+    box-shadow:
+      0 4px 14px
+        rgba(
+          15,
+          32,
+          63,
+          0.045
+        );
+  }
+
+  .superadmin-departments-table
+    td {
+    display: grid;
+
+    grid-template-columns:
+      118px
+      minmax(
+        0,
+        1fr
+      );
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 11px 13px;
+
+    border-bottom: 1px solid
+      var(
+        --c-border-soft,
+        #e3e8f0
+      );
+  }
+
+  .superadmin-departments-table
+    td::before {
+    content:
+      attr(
+        data-label
+      );
+
+    color:
+      var(
+        --c-text-muted,
+        #8792a3
+      );
+
+    font-size: 6.2px;
+    font-weight: 900;
+
+    letter-spacing:
+      0.08em;
+
+    text-transform:
+      uppercase;
+  }
+
+  .superadmin-departments-table
+    td:last-child {
+    border-bottom: 0;
+  }
+
+  .superadmin-departments-actions {
+    justify-content:
+      flex-start;
+  }
+
+  .superadmin-departments-modal-backdrop {
+    align-items:
+      flex-end;
+
+    padding: 12px;
+  }
+
+  .superadmin-departments-modal,
+  .superadmin-departments-status-modal {
+    width: 100%;
+
+    max-height:
+      calc(
+        100vh -
+        24px
+      );
+
+    overflow-y: auto;
+  }
+
+  .superadmin-departments-modal {
+    border-radius:
+      15px 15px
+      10px 10px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 450px) {
+  .superadmin-departments-header-actions {
+    display: grid;
+
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-departments-table
+    td {
+    grid-template-columns:
+      1fr;
+
+    gap: 7px;
+  }
+
+  .superadmin-departments-status-summary {
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-departments-modal-header,
+  .superadmin-departments-form {
+    padding-right: 17px;
+    padding-left: 17px;
+  }
+
+  .superadmin-departments-status-modal {
+    padding: 23px 18px;
+  }
+
+  .superadmin-departments-modal-actions,
+  .superadmin-departments-status-actions {
+    display: grid;
+
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-departments-modal-actions
+    button,
+  .superadmin-departments-status-actions
+    button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   FOCUS
+========================================================= */
+
+.superadmin-departments
+  button:focus-visible,
+.superadmin-departments
+  input:focus-visible,
+.superadmin-departments
+  select:focus-visible,
+.superadmin-departments-modal
+  button:focus-visible,
+.superadmin-departments-status-modal
+  button:focus-visible {
+  outline:
+    3px solid
+      var(
+        --c-focus-ring,
+        rgba(
+          47,
+          111,
+          174,
+          0.25
+        )
+      );
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes superadmin-department-header-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes superadmin-department-card-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px)
+      scale(0.994);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes superadmin-department-panel-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes superadmin-department-row-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes superadmin-department-alert-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes superadmin-department-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes superadmin-department-modal-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(12px)
+      scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes superadmin-department-status-icon-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.75)
+      rotate(-5deg);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1)
+      rotate(0);
+  }
+}
+
+@keyframes superadmin-department-orbit {
+  from {
+    transform:
+      translate3d(
+        0,
+        0,
+        0
+      );
+  }
+
+  to {
+    transform:
+      translate3d(
+        -8px,
+        7px,
+        0
+      );
+  }
+}
+
+@keyframes superadmin-department-spin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .superadmin-departments-header,
+  .superadmin-departments-header::after,
+  .superadmin-departments-summary
+    article,
+  .superadmin-departments-panel,
+  .superadmin-departments-alert,
+  .superadmin-departments-table
+    tbody
+    tr,
+  .superadmin-departments-modal-backdrop,
+  .superadmin-departments-modal,
+  .superadmin-departments-status-modal,
+  .superadmin-departments-status-modal-icon {
+    animation:
+      none !important;
+  }
+
+  .superadmin-departments-spinner,
+  .superadmin-departments-button-spinner {
+    animation-duration:
+      1.2s;
+  }
+
+  .superadmin-departments-header-actions
+    button,
+  .superadmin-departments-summary
+    article,
+  .superadmin-departments-actions
+    button,
+  .superadmin-departments-modal-actions
+    button,
+  .superadmin-departments-status-actions
+    button {
+    transition:
+      none !important;
+  }
+
+  .superadmin-departments-header-actions
+    button:hover,
+  .superadmin-departments-summary
+    article:hover,
+  .superadmin-departments-actions
+    button:hover,
+  .superadmin-departments-modal-actions
+    button:hover,
+  .superadmin-departments-status-actions
+    button:hover {
+    transform:
+      none !important;
+  }
+}

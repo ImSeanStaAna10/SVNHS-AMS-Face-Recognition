@@ -1,0 +1,3032 @@
+/* =========================================================
+   SVNHS ATTENDANCE MANAGEMENT SYSTEM
+   SUPER ADMINISTRATOR - COUNCILORS
+========================================================= */
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.superadmin-councilors {
+  width: 100%;
+
+  display: grid;
+
+  gap: 20px;
+
+  padding-bottom: 38px;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.superadmin-councilors-header {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  overflow: hidden;
+
+  padding: 24px 26px;
+
+  border: 1px solid
+    var(--c-border-soft);
+
+  border-radius: 14px;
+
+  background:
+    var(--c-surface);
+
+  box-shadow:
+    var(--c-card-shadow);
+
+  animation:
+    superadmin-councilor-header-enter
+    0.46s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-councilors-header::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0 auto 0 0;
+
+  width: 4px;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--c-blue-800),
+      var(--c-red-600)
+    );
+}
+
+.superadmin-councilors-header::after {
+  content: "";
+
+  position: absolute;
+
+  top: -105px;
+  right: -75px;
+
+  width: 230px;
+  height: 230px;
+
+  border: 38px solid
+    rgba(
+      28,
+      83,
+      145,
+      0.04
+    );
+
+  border-radius: 50%;
+
+  pointer-events: none;
+
+  animation:
+    superadmin-councilor-orbit
+    13s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+.superadmin-councilors-header-copy {
+  position: relative;
+
+  z-index: 2;
+
+  min-width: 0;
+}
+
+.superadmin-councilors-kicker {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color:
+    var(--c-blue-800);
+
+  font-size: 7px;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+}
+
+.superadmin-councilors-header-copy
+  h2 {
+  margin: 0;
+
+  color:
+    var(--c-text-primary);
+
+  font-size:
+    clamp(
+      20px,
+      2.4vw,
+      26px
+    );
+
+  font-weight: 830;
+
+  letter-spacing: -0.45px;
+}
+
+.superadmin-councilors-header-copy
+  p {
+  max-width: 690px;
+
+  margin: 7px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 9px;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   HEADER ACTIONS
+========================================================= */
+
+.superadmin-councilors-header-actions {
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  flex: 0 0 auto;
+}
+
+.superadmin-councilors-refresh,
+.superadmin-councilors-create {
+  min-height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 13px;
+
+  border-radius: 8px;
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.superadmin-councilors-refresh {
+  border: 1px solid
+    var(--c-secondary-border);
+
+  background:
+    var(--c-secondary-bg);
+
+  color:
+    var(--c-secondary-text);
+}
+
+.superadmin-councilors-create {
+  border: 1px solid
+    var(--c-blue-900);
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--c-blue-900),
+      var(--c-blue-800)
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 6px 16px
+      rgba(
+        11,
+        45,
+        89,
+        0.18
+      );
+}
+
+.superadmin-councilors-refresh:disabled {
+  opacity: 0.55;
+
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .superadmin-councilors-refresh:hover:not(
+      :disabled
+    ),
+  .superadmin-councilors-create:hover {
+    transform:
+      translateY(-2px);
+  }
+
+  .superadmin-councilors-create:hover {
+    box-shadow:
+      0 10px 22px
+        rgba(
+          11,
+          45,
+          89,
+          0.24
+        );
+  }
+}
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.superadmin-councilors-alert {
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 13px 15px;
+
+  border-radius: 10px;
+
+  animation:
+    superadmin-councilor-alert-enter
+    0.34s
+    ease-out
+    both;
+}
+
+.superadmin-councilors-alert.success {
+  border: 1px solid
+    var(--c-success-border);
+
+  background:
+    var(--c-success-bg);
+
+  color:
+    var(--c-success-text);
+}
+
+.superadmin-councilors-alert.error {
+  border: 1px solid
+    var(--c-error-border);
+
+  background:
+    var(--c-error-bg);
+
+  color:
+    var(--c-error-text);
+}
+
+.superadmin-councilors-alert
+  > span {
+  width: 25px;
+  height: 25px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    currentColor;
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.superadmin-councilors-alert
+  strong {
+  display: block;
+
+  font-size: 9px;
+  font-weight: 820;
+}
+
+.superadmin-councilors-alert
+  p {
+  margin: 2px 0 0;
+
+  font-size: 8px;
+
+  line-height: 1.45;
+}
+
+.superadmin-councilors-alert
+  > button {
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 6px;
+
+  background:
+    transparent;
+
+  color: currentColor;
+
+  font-family: inherit;
+
+  font-size: 18px;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.superadmin-councilors-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  gap: 13px;
+}
+
+.superadmin-councilors-summary
+  article {
+  position: relative;
+
+  min-width: 0;
+  min-height: 112px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  overflow: hidden;
+
+  padding: 17px;
+
+  border: 1px solid
+    var(--c-border-soft);
+
+  border-radius: 12px;
+
+  background:
+    var(--c-surface);
+
+  box-shadow:
+    var(--c-card-shadow);
+
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+
+  animation:
+    superadmin-councilor-card-enter
+    0.42s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-councilors-summary
+  article:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.superadmin-councilors-summary
+  article:nth-child(2) {
+  animation-delay: 0.09s;
+}
+
+.superadmin-councilors-summary
+  article:nth-child(3) {
+  animation-delay: 0.13s;
+}
+
+.superadmin-councilors-summary
+  article:nth-child(4) {
+  animation-delay: 0.17s;
+}
+
+.superadmin-councilors-summary
+  article::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0 0 0 auto;
+
+  width: 3px;
+}
+
+.superadmin-councilors-summary
+  article:nth-child(1)::after {
+  background:
+    var(--c-blue-800);
+}
+
+.superadmin-councilors-summary
+  article:nth-child(2)::after {
+  background:
+    var(--c-success-dot);
+}
+
+.superadmin-councilors-summary
+  article:nth-child(3)::after {
+  background:
+    var(--c-red-600);
+}
+
+.superadmin-councilors-summary
+  article:nth-child(4)::after {
+  background:
+    var(--c-gold);
+}
+
+@media (hover: hover) {
+  .superadmin-councilors-summary
+    article:hover {
+    transform:
+      translateY(-3px);
+
+    border-color:
+      var(--c-brand-border);
+
+    box-shadow:
+      var(--c-card-hover-shadow);
+  }
+}
+
+.superadmin-councilors-summary-icon {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  background:
+    var(--c-icon-bg);
+
+  color:
+    var(--c-icon-text);
+
+  font-size: 15px;
+  font-weight: 900;
+
+  transition:
+    transform 0.18s ease;
+}
+
+.superadmin-councilors-summary-icon.active {
+  background:
+    var(--c-success-bg);
+
+  color:
+    var(--c-success-text);
+}
+
+.superadmin-councilors-summary-icon.inactive {
+  background:
+    rgba(
+      197,
+      31,
+      45,
+      0.08
+    );
+
+  color:
+    var(--c-red-600);
+}
+
+.superadmin-councilors-summary-icon.available {
+  background:
+    rgba(
+      241,
+      191,
+      61,
+      0.14
+    );
+
+  color: #9d7308;
+}
+
+@media (hover: hover) {
+  .superadmin-councilors-summary
+    article:hover
+    .superadmin-councilors-summary-icon {
+    transform:
+      translateY(-1px)
+      scale(1.045);
+  }
+}
+
+.superadmin-councilors-summary
+  article
+  > div:last-child {
+  min-width: 0;
+}
+
+.superadmin-councilors-summary
+  article
+  span {
+  display: block;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+}
+
+.superadmin-councilors-summary
+  article
+  strong {
+  display: block;
+
+  margin-top: 2px;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 24px;
+  font-weight: 850;
+
+  line-height: 1;
+}
+
+.superadmin-councilors-summary
+  article
+  p {
+  margin: 5px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 7.5px;
+}
+
+/* =========================================================
+   DIRECTORY PANEL
+========================================================= */
+
+.superadmin-councilors-panel {
+  overflow: hidden;
+
+  border: 1px solid
+    var(--c-border-soft);
+
+  border-radius: 14px;
+
+  background:
+    var(--c-surface);
+
+  box-shadow:
+    var(--c-panel-shadow);
+
+  animation:
+    superadmin-councilor-panel-enter
+    0.48s
+    0.18s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+/* =========================================================
+   PANEL HEADER
+========================================================= */
+
+.superadmin-councilors-panel-header {
+  min-height: 92px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 18px 21px;
+
+  border-bottom: 1px solid
+    var(--c-border-soft);
+}
+
+.superadmin-councilors-panel-header
+  > div:first-child
+  > span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color:
+    var(--c-blue-800);
+
+  font-size: 6.5px;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+}
+
+.superadmin-councilors-panel-header
+  h3 {
+  margin: 0;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 15px;
+  font-weight: 810;
+}
+
+.superadmin-councilors-panel-header
+  p {
+  margin: 4px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 8px;
+
+  line-height: 1.45;
+}
+
+.superadmin-councilors-result-count {
+  flex: 0 0 auto;
+
+  padding: 7px 9px;
+
+  border: 1px solid
+    var(--c-border-soft);
+
+  border-radius: 7px;
+
+  background:
+    var(--c-surface-soft);
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 7px;
+  font-weight: 750;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.superadmin-councilors-toolbar {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    205px
+    160px;
+
+  align-items: end;
+
+  gap: 12px;
+
+  padding: 14px 21px;
+
+  border-bottom: 1px solid
+    var(--c-border-soft);
+
+  background:
+    var(--c-surface-soft);
+}
+
+.superadmin-councilors-search {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  max-width: 470px;
+}
+
+.superadmin-councilors-search
+  > span {
+  position: absolute;
+
+  left: 12px;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 14px;
+
+  pointer-events: none;
+}
+
+.superadmin-councilors-search
+  input {
+  width: 100%;
+  height: 38px;
+
+  padding:
+    0 38px 0 35px;
+
+  border: 1px solid
+    var(--c-border);
+
+  border-radius: 8px;
+
+  outline: none;
+
+  background:
+    var(--c-surface);
+
+  color:
+    var(--c-text-primary);
+
+  font-family: inherit;
+
+  font-size: 8.5px;
+
+  transition:
+    border-color 0.17s ease,
+    box-shadow 0.17s ease;
+}
+
+.superadmin-councilors-search
+  input:focus {
+  border-color:
+    var(--c-blue-600);
+
+  box-shadow:
+    0 0 0 3px
+      rgba(
+        47,
+        111,
+        174,
+        0.11
+      );
+}
+
+.superadmin-councilors-search
+  input::placeholder {
+  color:
+    var(--c-text-muted);
+}
+
+.superadmin-councilors-search
+  button {
+  position: absolute;
+
+  right: 7px;
+
+  width: 26px;
+  height: 26px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 6px;
+
+  background:
+    transparent;
+
+  color:
+    var(--c-text-muted);
+
+  font-family: inherit;
+
+  font-size: 16px;
+
+  cursor: pointer;
+}
+
+.superadmin-councilors-filter {
+  min-width: 0;
+
+  display: grid;
+
+  gap: 5px;
+}
+
+.superadmin-councilors-filter
+  label {
+  color:
+    var(--c-text-muted);
+
+  font-size: 6.5px;
+  font-weight: 850;
+
+  letter-spacing: 0.08em;
+}
+
+.superadmin-councilors-filter
+  select {
+  width: 100%;
+  height: 38px;
+
+  padding: 0 10px;
+
+  border: 1px solid
+    var(--c-border);
+
+  border-radius: 8px;
+
+  outline: none;
+
+  background:
+    var(--c-surface);
+
+  color:
+    var(--c-text-secondary);
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.superadmin-councilors-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+.superadmin-councilors-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  table-layout: fixed;
+}
+
+.superadmin-councilors-table
+  thead {
+  background:
+    var(--c-surface-soft);
+}
+
+.superadmin-councilors-table
+  th {
+  padding: 11px 15px;
+
+  border-bottom: 1px solid
+    var(--c-border-soft);
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 6.3px;
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+
+  text-align: left;
+
+  text-transform: uppercase;
+}
+
+.superadmin-councilors-table
+  th:nth-child(1) {
+  width: 31%;
+}
+
+.superadmin-councilors-table
+  th:nth-child(2) {
+  width: 25%;
+}
+
+.superadmin-councilors-table
+  th:nth-child(3) {
+  width: 13%;
+}
+
+.superadmin-councilors-table
+  th:nth-child(4) {
+  width: 31%;
+}
+
+.superadmin-councilors-table
+  td {
+  padding: 13px 15px;
+
+  border-bottom: 1px solid
+    var(--c-border-soft);
+
+  vertical-align: middle;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 8px;
+}
+
+.superadmin-councilors-table
+  tbody
+  tr {
+  background:
+    var(--c-surface);
+
+  animation:
+    superadmin-councilor-row-enter
+    0.34s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+
+  animation-delay:
+    calc(
+      min(
+          var(
+            --councilor-row-index
+          ),
+          8
+        ) *
+        0.035s
+    );
+
+  transition:
+    background 0.16s ease;
+}
+
+.superadmin-councilors-table
+  tbody
+  tr:last-child
+  td {
+  border-bottom: 0;
+}
+
+@media (hover: hover) {
+  .superadmin-councilors-table
+    tbody
+    tr:hover {
+    background:
+      var(--c-table-hover);
+  }
+}
+
+/* =========================================================
+   ACCOUNT IDENTITY
+========================================================= */
+
+.superadmin-councilors-identity,
+.superadmin-councilors-department {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.superadmin-councilors-avatar {
+  width: 39px;
+  height: 39px;
+
+  flex: 0 0 39px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid
+    var(--c-brand-border);
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--c-icon-bg),
+      var(--c-surface-soft)
+    );
+
+  color:
+    var(--c-blue-900);
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.superadmin-councilors-identity
+  > div:last-child,
+.superadmin-councilors-department
+  > div:last-child {
+  min-width: 0;
+}
+
+.superadmin-councilors-identity
+  strong,
+.superadmin-councilors-department
+  strong {
+  display: block;
+
+  overflow: hidden;
+
+  color:
+    var(--c-table-title);
+
+  font-size: 8.8px;
+  font-weight: 790;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.superadmin-councilors-identity
+  span,
+.superadmin-councilors-department
+  span {
+  display: block;
+
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color:
+    var(--c-table-muted);
+
+  font-size: 7px;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   DEPARTMENT
+========================================================= */
+
+.superadmin-councilors-department-code {
+  min-width: 42px;
+  height: 30px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0 8px;
+
+  border-radius: 7px;
+
+  background:
+    var(--c-role-bg);
+
+  color:
+    var(--c-role-text);
+
+  font-size: 7px;
+  font-weight: 900;
+
+  letter-spacing: 0.04em;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.superadmin-councilors-status {
+  min-height: 27px;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 0 9px;
+
+  border-radius: 999px;
+
+  font-size: 7px;
+  font-weight: 820;
+
+  white-space: nowrap;
+}
+
+.superadmin-councilors-status
+  > span {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+}
+
+.superadmin-councilors-status.active {
+  border: 1px solid
+    var(--c-success-border);
+
+  background:
+    var(--c-success-bg);
+
+  color:
+    var(--c-success-text);
+}
+
+.superadmin-councilors-status.active
+  > span {
+  background:
+    var(--c-success-dot);
+}
+
+.superadmin-councilors-status.inactive {
+  border: 1px solid
+    var(--c-border);
+
+  background:
+    var(--c-inactive-bg);
+
+  color:
+    var(--c-inactive-text);
+}
+
+.superadmin-councilors-status.inactive
+  > span {
+  background:
+    var(--c-inactive-dot);
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.superadmin-councilors-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  flex-wrap: wrap;
+}
+
+.superadmin-councilors-actions
+  button {
+  min-height: 29px;
+
+  padding: 0 8px;
+
+  border-radius: 6px;
+
+  font-family: inherit;
+
+  font-size: 6.8px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.superadmin-councilors-actions
+  .edit {
+  border: 1px solid
+    var(--c-secondary-border);
+
+  background:
+    var(--c-secondary-bg);
+
+  color:
+    var(--c-secondary-text);
+}
+
+.superadmin-councilors-actions
+  .password {
+  border: 1px solid
+    rgba(
+      47,
+      111,
+      174,
+      0.2
+    );
+
+  background:
+    rgba(
+      47,
+      111,
+      174,
+      0.06
+    );
+
+  color:
+    var(--c-blue-800);
+}
+
+.superadmin-councilors-actions
+  .deactivate {
+  border: 1px solid
+    rgba(
+      197,
+      31,
+      45,
+      0.2
+    );
+
+  background:
+    rgba(
+      197,
+      31,
+      45,
+      0.055
+    );
+
+  color:
+    var(--c-red-600);
+}
+
+.superadmin-councilors-actions
+  .activate {
+  border: 1px solid
+    var(--c-success-border);
+
+  background:
+    var(--c-success-bg);
+
+  color:
+    var(--c-success-text);
+}
+
+@media (hover: hover) {
+  .superadmin-councilors-actions
+    button:hover {
+    transform:
+      translateY(-1px);
+  }
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.superadmin-councilors-panel-footer {
+  min-height: 49px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 11px 21px;
+
+  border-top: 1px solid
+    var(--c-border-soft);
+
+  background:
+    var(--c-surface-soft);
+}
+
+.superadmin-councilors-panel-footer
+  > div {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 7px;
+  font-weight: 720;
+}
+
+.superadmin-councilors-panel-footer
+  p {
+  margin: 0;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 7px;
+
+  text-align: right;
+}
+
+/* =========================================================
+   LOADING / EMPTY
+========================================================= */
+
+.superadmin-councilors-loading,
+.superadmin-councilors-empty {
+  min-height: 310px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  padding: 35px;
+
+  text-align: center;
+}
+
+.superadmin-councilors-spinner {
+  width: 32px;
+  height: 32px;
+
+  border: 3px solid
+    var(--c-icon-bg);
+
+  border-top-color:
+    var(--c-blue-800);
+
+  border-radius: 50%;
+
+  animation:
+    superadmin-councilor-spin
+    0.75s
+    linear
+    infinite;
+}
+
+.superadmin-councilors-empty-icon {
+  width: 50px;
+  height: 50px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 12px;
+
+  background:
+    var(--c-icon-bg);
+
+  color:
+    var(--c-icon-text);
+
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.superadmin-councilors-loading
+  strong,
+.superadmin-councilors-empty
+  strong {
+  margin-top: 12px;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 10px;
+  font-weight: 810;
+}
+
+.superadmin-councilors-loading
+  p,
+.superadmin-councilors-empty
+  p {
+  max-width: 330px;
+
+  margin: 5px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 8px;
+
+  line-height: 1.5;
+}
+
+.superadmin-councilors-empty
+  button {
+  min-height: 35px;
+
+  margin-top: 14px;
+
+  padding: 0 12px;
+
+  border: 1px solid
+    var(--c-blue-800);
+
+  border-radius: 7px;
+
+  background:
+    var(--c-blue-800);
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   MODAL BACKDROP
+========================================================= */
+
+.superadmin-councilors-modal-backdrop {
+  position: fixed;
+
+  z-index: 5000;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow-y: auto;
+
+  padding: 24px;
+
+  background:
+    rgba(
+      5,
+      16,
+      32,
+      0.64
+    );
+
+  backdrop-filter:
+    blur(5px);
+
+  animation:
+    superadmin-councilor-backdrop-enter
+    0.2s
+    ease-out
+    both;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.superadmin-councilors-modal {
+  width: min(
+    100%,
+    540px
+  );
+
+  overflow: hidden;
+
+  border: 1px solid
+    var(--c-border);
+
+  border-radius: 15px;
+
+  background:
+    var(--c-surface);
+
+  box-shadow:
+    0 24px 70px
+      rgba(
+        0,
+        0,
+        0,
+        0.25
+      );
+
+  animation:
+    superadmin-councilor-modal-enter
+    0.3s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-councilors-modal-header {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 21px 22px;
+
+  border-bottom: 1px solid
+    var(--c-border-soft);
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--c-surface),
+      var(--c-surface-soft)
+    );
+}
+
+.superadmin-councilors-modal-header::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0 0 auto;
+
+  height: 3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--c-red-600)
+        0%,
+      var(--c-red-600)
+        35%,
+      var(--c-gold)
+        35%,
+      var(--c-gold)
+        48%,
+      var(--c-blue-800)
+        48%,
+      var(--c-blue-800)
+        100%
+    );
+}
+
+.superadmin-councilors-modal-header
+  span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color:
+    var(--c-blue-800);
+
+  font-size: 6.5px;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+}
+
+.superadmin-councilors-modal-header
+  h2 {
+  margin: 0;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 18px;
+  font-weight: 820;
+}
+
+.superadmin-councilors-modal-header
+  p {
+  max-width: 405px;
+
+  margin: 5px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 8px;
+
+  line-height: 1.5;
+}
+
+.superadmin-councilors-modal-header
+  > button {
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid
+    var(--c-border-soft);
+
+  border-radius: 7px;
+
+  background:
+    var(--c-surface);
+
+  color:
+    var(--c-text-muted);
+
+  font-family: inherit;
+
+  font-size: 18px;
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.superadmin-councilors-form {
+  display: grid;
+
+  gap: 16px;
+
+  padding:
+    21px 22px 22px;
+}
+
+.superadmin-councilors-form-notice,
+.superadmin-councilors-security-notice,
+.superadmin-councilors-status-notice,
+.superadmin-councilors-blocked {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 11px 12px;
+
+  border-radius: 9px;
+}
+
+.superadmin-councilors-form-notice,
+.superadmin-councilors-status-notice {
+  border: 1px solid
+    rgba(
+      47,
+      111,
+      174,
+      0.16
+    );
+
+  background:
+    rgba(
+      47,
+      111,
+      174,
+      0.055
+    );
+}
+
+.superadmin-councilors-security-notice,
+.superadmin-councilors-blocked {
+  border: 1px solid
+    var(--c-error-border);
+
+  background:
+    var(--c-error-bg);
+}
+
+.superadmin-councilors-form-notice
+  > span,
+.superadmin-councilors-status-notice
+  > span,
+.superadmin-councilors-security-notice
+  > span,
+.superadmin-councilors-blocked
+  > span {
+  width: 22px;
+  height: 22px;
+
+  flex: 0 0 22px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.superadmin-councilors-form-notice
+  > span,
+.superadmin-councilors-status-notice
+  > span {
+  background:
+    var(--c-blue-800);
+
+  color: #ffffff;
+}
+
+.superadmin-councilors-security-notice
+  > span,
+.superadmin-councilors-blocked
+  > span {
+  background:
+    var(--c-error-text);
+
+  color: #ffffff;
+}
+
+.superadmin-councilors-form-notice
+  strong,
+.superadmin-councilors-security-notice
+  strong,
+.superadmin-councilors-blocked
+  strong {
+  display: block;
+
+  color:
+    var(--c-text-secondary);
+
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.superadmin-councilors-security-notice
+  strong,
+.superadmin-councilors-blocked
+  strong {
+  color:
+    var(--c-error-text);
+}
+
+.superadmin-councilors-form-notice
+  p,
+.superadmin-councilors-status-notice
+  p,
+.superadmin-councilors-security-notice
+  p,
+.superadmin-councilors-blocked
+  p {
+  margin: 2px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 7.5px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   FIELD
+========================================================= */
+
+.superadmin-councilors-field {
+  display: grid;
+
+  gap: 6px;
+}
+
+.superadmin-councilors-field
+  label {
+  color:
+    var(--c-text-secondary);
+
+  font-size: 7.5px;
+  font-weight: 800;
+}
+
+.superadmin-councilors-field
+  input,
+.superadmin-councilors-field
+  select {
+  width: 100%;
+  height: 42px;
+
+  padding: 0 12px;
+
+  border: 1px solid
+    var(--c-border);
+
+  border-radius: 8px;
+
+  outline: none;
+
+  background:
+    var(--c-surface);
+
+  color:
+    var(--c-text-primary);
+
+  font-family: inherit;
+
+  font-size: 9px;
+
+  transition:
+    border-color 0.17s ease,
+    box-shadow 0.17s ease;
+}
+
+.superadmin-councilors-field
+  select {
+  cursor: pointer;
+}
+
+.superadmin-councilors-field
+  input:focus,
+.superadmin-councilors-field
+  select:focus {
+  border-color:
+    var(--c-blue-600);
+
+  box-shadow:
+    0 0 0 3px
+      rgba(
+        47,
+        111,
+        174,
+        0.11
+      );
+}
+
+.superadmin-councilors-field
+  input:disabled,
+.superadmin-councilors-field
+  select:disabled {
+  opacity: 0.65;
+
+  cursor: not-allowed;
+}
+
+.superadmin-councilors-field
+  > span {
+  color:
+    var(--c-text-muted);
+
+  font-size: 6.8px;
+}
+
+.superadmin-councilors-field
+  .superadmin-councilors-field-warning {
+  color:
+    #9a6b00;
+
+  font-weight: 750;
+}
+
+/* =========================================================
+   PASSWORD INPUT
+========================================================= */
+
+.superadmin-councilors-password-input {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+.superadmin-councilors-password-input
+  input {
+  padding-right: 45px;
+}
+
+.superadmin-councilors-password-input
+  button {
+  position: absolute;
+
+  right: 6px;
+
+  width: 31px;
+  height: 31px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 6px;
+
+  background:
+    transparent;
+
+  color:
+    var(--c-text-muted);
+
+  cursor: pointer;
+}
+
+.superadmin-councilors-password-input
+  button
+  svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* =========================================================
+   ACCOUNT CARD
+========================================================= */
+
+.superadmin-councilors-account-card {
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 12px;
+
+  border: 1px solid
+    var(--c-border-soft);
+
+  border-radius: 10px;
+
+  background:
+    var(--c-surface-soft);
+}
+
+.superadmin-councilors-account-avatar {
+  width: 39px;
+  height: 39px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    var(--c-icon-bg);
+
+  color:
+    var(--c-icon-text);
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.superadmin-councilors-account-card
+  > div:nth-child(2) {
+  min-width: 0;
+}
+
+.superadmin-councilors-account-card
+  > div:nth-child(2)
+  span {
+  display: block;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 5.8px;
+  font-weight: 900;
+
+  letter-spacing: 0.1em;
+}
+
+.superadmin-councilors-account-card
+  > div:nth-child(2)
+  strong {
+  display: block;
+
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 8.8px;
+  font-weight: 810;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.superadmin-councilors-account-card
+  small {
+  display: block;
+
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 7px;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   FORM ERROR
+========================================================= */
+
+.superadmin-councilors-form-error {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  padding: 10px 11px;
+
+  border: 1px solid
+    var(--c-error-border);
+
+  border-radius: 8px;
+
+  background:
+    var(--c-error-bg);
+
+  color:
+    var(--c-error-text);
+
+  animation:
+    superadmin-councilor-alert-enter
+    0.24s
+    ease-out
+    both;
+}
+
+.superadmin-councilors-form-error
+  > span {
+  width: 21px;
+  height: 21px;
+
+  flex: 0 0 21px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    currentColor;
+
+  color: #ffffff;
+
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.superadmin-councilors-form-error
+  p {
+  margin: 2px 0 0;
+
+  font-size: 7.5px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   MODAL ACTIONS
+========================================================= */
+
+.superadmin-councilors-modal-actions,
+.superadmin-councilors-status-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  padding-top: 2px;
+}
+
+.superadmin-councilors-modal-actions
+  button,
+.superadmin-councilors-status-actions
+  button {
+  min-height: 37px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 13px;
+
+  border-radius: 8px;
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.17s ease,
+    border-color 0.17s ease,
+    background 0.17s ease,
+    box-shadow 0.17s ease;
+}
+
+.superadmin-councilors-modal-actions
+  .secondary,
+.superadmin-councilors-status-actions
+  .secondary {
+  border: 1px solid
+    var(--c-secondary-border);
+
+  background:
+    var(--c-secondary-bg);
+
+  color:
+    var(--c-secondary-text);
+}
+
+.superadmin-councilors-modal-actions
+  .primary,
+.superadmin-councilors-status-actions
+  .primary {
+  border: 1px solid
+    var(--c-blue-900);
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--c-blue-900),
+      var(--c-blue-800)
+    );
+
+  color: #ffffff;
+}
+
+.superadmin-councilors-status-actions
+  .danger {
+  border: 1px solid
+    var(--c-red-600);
+
+  background:
+    var(--c-red-600);
+
+  color: #ffffff;
+}
+
+.superadmin-councilors-modal-actions
+  button:disabled,
+.superadmin-councilors-status-actions
+  button:disabled {
+  opacity: 0.58;
+
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .superadmin-councilors-modal-actions
+    button:hover:not(
+      :disabled
+    ),
+  .superadmin-councilors-status-actions
+    button:hover:not(
+      :disabled
+    ) {
+    transform:
+      translateY(-1px);
+  }
+}
+
+/* =========================================================
+   BUTTON SPINNER
+========================================================= */
+
+.superadmin-councilors-button-spinner {
+  width: 13px;
+  height: 13px;
+
+  border: 2px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.35
+    );
+
+  border-top-color:
+    #ffffff;
+
+  border-radius: 50%;
+
+  animation:
+    superadmin-councilor-spin
+    0.7s
+    linear
+    infinite;
+}
+
+/* =========================================================
+   STATUS MODAL
+========================================================= */
+
+.superadmin-councilors-status-modal {
+  width: min(
+    100%,
+    450px
+  );
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  padding: 27px;
+
+  border: 1px solid
+    var(--c-border);
+
+  border-radius: 15px;
+
+  background:
+    var(--c-surface);
+
+  box-shadow:
+    0 24px 70px
+      rgba(
+        0,
+        0,
+        0,
+        0.25
+      );
+
+  text-align: center;
+
+  animation:
+    superadmin-councilor-modal-enter
+    0.3s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-councilors-status-modal-icon {
+  width: 52px;
+  height: 52px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 14px;
+
+  font-size: 18px;
+  font-weight: 900;
+
+  animation:
+    superadmin-councilor-status-icon-enter
+    0.4s
+    0.05s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    )
+    both;
+}
+
+.superadmin-councilors-status-modal-icon.deactivate {
+  background:
+    rgba(
+      197,
+      31,
+      45,
+      0.09
+    );
+
+  color:
+    var(--c-red-600);
+}
+
+.superadmin-councilors-status-modal-icon.activate {
+  background:
+    var(--c-success-bg);
+
+  color:
+    var(--c-success-text);
+}
+
+.superadmin-councilors-status-modal-kicker {
+  margin-top: 15px;
+
+  color:
+    var(--c-blue-800);
+
+  font-size: 6.5px;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+}
+
+.superadmin-councilors-status-modal
+  > h2 {
+  margin: 5px 0 0;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 19px;
+  font-weight: 830;
+}
+
+.superadmin-councilors-status-modal
+  > p {
+  margin: 7px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 8.5px;
+
+  line-height: 1.5;
+}
+
+.superadmin-councilors-status-summary {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap: 8px;
+
+  margin-top: 18px;
+}
+
+.superadmin-councilors-status-summary
+  > div {
+  padding: 11px;
+
+  border: 1px solid
+    var(--c-border-soft);
+
+  border-radius: 8px;
+
+  background:
+    var(--c-surface-soft);
+}
+
+.superadmin-councilors-status-summary
+  span {
+  display: block;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 6px;
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+}
+
+.superadmin-councilors-status-summary
+  strong {
+  display: block;
+
+  margin-top: 4px;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 9px;
+  font-weight: 820;
+}
+
+.superadmin-councilors-status-notice,
+.superadmin-councilors-blocked {
+  width: 100%;
+
+  margin-top: 14px;
+
+  text-align: left;
+}
+
+.superadmin-councilors-status-actions {
+  width: 100%;
+
+  margin-top: 18px;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"]
+  .superadmin-councilors-header,
+html[data-theme="dark"]
+  .superadmin-councilors-summary
+  article,
+html[data-theme="dark"]
+  .superadmin-councilors-panel,
+html[data-theme="dark"]
+  .superadmin-councilors-modal,
+html[data-theme="dark"]
+  .superadmin-councilors-status-modal {
+  border-color:
+    var(--c-border);
+
+  background:
+    var(--c-surface);
+}
+
+html[data-theme="dark"]
+  .superadmin-councilors-summary-icon.available {
+  color: #f4d46f;
+}
+
+html[data-theme="dark"]
+  .superadmin-councilors-avatar,
+html[data-theme="dark"]
+  .superadmin-councilors-account-avatar {
+  color: #9dccff;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .superadmin-councilors-summary {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .superadmin-councilors-toolbar {
+    grid-template-columns:
+      minmax(0, 1fr)
+      repeat(
+        2,
+        minmax(
+          145px,
+          190px
+        )
+      );
+  }
+
+  .superadmin-councilors-table {
+    min-width: 900px;
+  }
+}
+
+/* =========================================================
+   SMALL TABLET
+========================================================= */
+
+@media (max-width: 760px) {
+  .superadmin-councilors {
+    gap: 16px;
+  }
+
+  .superadmin-councilors-header {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+
+    padding: 21px;
+  }
+
+  .superadmin-councilors-header-actions {
+    width: 100%;
+  }
+
+  .superadmin-councilors-refresh,
+  .superadmin-councilors-create {
+    flex: 1;
+  }
+
+  .superadmin-councilors-toolbar {
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-councilors-search {
+    max-width: none;
+  }
+
+  .superadmin-councilors-panel-header {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+  .superadmin-councilors-result-count {
+    align-self:
+      flex-start;
+  }
+
+  .superadmin-councilors-panel-footer {
+    align-items:
+      flex-start;
+
+    flex-direction:
+      column;
+  }
+
+  .superadmin-councilors-panel-footer
+    p {
+    text-align: left;
+  }
+}
+
+/* =========================================================
+   MOBILE CARD TABLE
+========================================================= */
+
+@media (max-width: 620px) {
+  .superadmin-councilors-summary {
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-councilors-summary
+    article {
+    min-height: 98px;
+  }
+
+  .superadmin-councilors-table-wrapper {
+    overflow: visible;
+
+    padding: 12px;
+  }
+
+  .superadmin-councilors-table {
+    min-width: 0;
+
+    border-collapse:
+      separate;
+
+    border-spacing:
+      0 10px;
+  }
+
+  .superadmin-councilors-table
+    thead {
+    display: none;
+  }
+
+  .superadmin-councilors-table
+    tbody,
+  .superadmin-councilors-table
+    tr,
+  .superadmin-councilors-table
+    td {
+    display: block;
+
+    width: 100%;
+  }
+
+  .superadmin-councilors-table
+    tbody
+    tr {
+    overflow: hidden;
+
+    border: 1px solid
+      var(--c-border-soft);
+
+    border-radius: 11px;
+
+    box-shadow:
+      0 4px 14px
+        rgba(
+          15,
+          32,
+          63,
+          0.045
+        );
+  }
+
+  .superadmin-councilors-table
+    td {
+    display: grid;
+
+    grid-template-columns:
+      118px
+      minmax(0, 1fr);
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 11px 13px;
+
+    border-bottom: 1px solid
+      var(--c-border-soft);
+  }
+
+  .superadmin-councilors-table
+    td::before {
+    content:
+      attr(
+        data-label
+      );
+
+    color:
+      var(--c-text-muted);
+
+    font-size: 6.2px;
+    font-weight: 900;
+
+    letter-spacing:
+      0.08em;
+
+    text-transform:
+      uppercase;
+  }
+
+  .superadmin-councilors-table
+    td:last-child {
+    border-bottom: 0;
+  }
+
+  .superadmin-councilors-actions {
+    justify-content:
+      flex-start;
+  }
+
+  .superadmin-councilors-modal-backdrop {
+    align-items:
+      flex-end;
+
+    padding: 12px;
+  }
+
+  .superadmin-councilors-modal,
+  .superadmin-councilors-status-modal {
+    width: 100%;
+
+    max-height:
+      calc(
+        100vh -
+        24px
+      );
+
+    overflow-y: auto;
+  }
+
+  .superadmin-councilors-modal {
+    border-radius:
+      15px 15px
+      10px 10px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 450px) {
+  .superadmin-councilors-header-actions {
+    display: grid;
+
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-councilors-table
+    td {
+    grid-template-columns:
+      1fr;
+
+    gap: 7px;
+  }
+
+  .superadmin-councilors-status-summary {
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-councilors-account-card {
+    grid-template-columns:
+      auto
+      minmax(0, 1fr);
+  }
+
+  .superadmin-councilors-account-card
+    > .superadmin-councilors-status {
+    grid-column:
+      1 / -1;
+
+    justify-self:
+      flex-start;
+  }
+
+  .superadmin-councilors-modal-header,
+  .superadmin-councilors-form {
+    padding-right: 17px;
+    padding-left: 17px;
+  }
+
+  .superadmin-councilors-status-modal {
+    padding: 23px 18px;
+  }
+
+  .superadmin-councilors-modal-actions,
+  .superadmin-councilors-status-actions {
+    display: grid;
+
+    grid-template-columns:
+      1fr;
+  }
+
+  .superadmin-councilors-modal-actions
+    button,
+  .superadmin-councilors-status-actions
+    button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   FOCUS
+========================================================= */
+
+.superadmin-councilors
+  button:focus-visible,
+.superadmin-councilors
+  input:focus-visible,
+.superadmin-councilors
+  select:focus-visible,
+.superadmin-councilors-modal
+  button:focus-visible,
+.superadmin-councilors-status-modal
+  button:focus-visible {
+  outline:
+    3px solid
+      var(--c-focus-ring);
+
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes superadmin-councilor-header-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(9px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes superadmin-councilor-card-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(8px)
+      scale(0.994);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes superadmin-councilor-panel-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes superadmin-councilor-row-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes superadmin-councilor-alert-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes superadmin-councilor-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes superadmin-councilor-modal-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(12px)
+      scale(0.975);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes superadmin-councilor-status-icon-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.75)
+      rotate(-5deg);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1)
+      rotate(0);
+  }
+}
+
+@keyframes superadmin-councilor-orbit {
+  from {
+    transform:
+      translate3d(
+        0,
+        0,
+        0
+      );
+  }
+
+  to {
+    transform:
+      translate3d(
+        -9px,
+        7px,
+        0
+      );
+  }
+}
+
+@keyframes superadmin-councilor-spin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .superadmin-councilors-header,
+  .superadmin-councilors-header::after,
+  .superadmin-councilors-summary
+    article,
+  .superadmin-councilors-panel,
+  .superadmin-councilors-alert,
+  .superadmin-councilors-table
+    tbody
+    tr,
+  .superadmin-councilors-modal-backdrop,
+  .superadmin-councilors-modal,
+  .superadmin-councilors-status-modal,
+  .superadmin-councilors-status-modal-icon {
+    animation:
+      none !important;
+  }
+
+  .superadmin-councilors-spinner,
+  .superadmin-councilors-button-spinner {
+    animation-duration:
+      1.2s;
+  }
+
+  .superadmin-councilors-header-actions
+    button,
+  .superadmin-councilors-summary
+    article,
+  .superadmin-councilors-actions
+    button,
+  .superadmin-councilors-modal-actions
+    button,
+  .superadmin-councilors-status-actions
+    button {
+    transition:
+      none !important;
+  }
+
+  .superadmin-councilors-header-actions
+    button:hover,
+  .superadmin-councilors-summary
+    article:hover,
+  .superadmin-councilors-actions
+    button:hover,
+  .superadmin-councilors-modal-actions
+    button:hover,
+  .superadmin-councilors-status-actions
+    button:hover {
+    transform:
+      none !important;
+  }
+}
