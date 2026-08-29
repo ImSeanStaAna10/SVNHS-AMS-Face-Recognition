@@ -1,10 +1,15 @@
 package com.example.attendancemanagementbackend.dto.student;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 public class CreateStudentRequest {
 
     @NotBlank(message = "Student number is required")
+    @Pattern(
+            regexp = "^\\d{12}$",
+            message = "Student number must contain exactly 12 digits"
+    )
     private String studentNumber;
 
     @NotBlank(message = "Student name is required")
@@ -20,7 +25,9 @@ public class CreateStudentRequest {
         return studentNumber;
     }
 
-    public void setStudentNumber(String studentNumber) {
+    public void setStudentNumber(
+            String studentNumber
+    ) {
         this.studentNumber = studentNumber;
     }
 
@@ -28,7 +35,9 @@ public class CreateStudentRequest {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(
+            String name
+    ) {
         this.name = name;
     }
 
@@ -36,7 +45,9 @@ public class CreateStudentRequest {
         return sectionId;
     }
 
-    public void setSectionId(String sectionId) {
+    public void setSectionId(
+            String sectionId
+    ) {
         this.sectionId = sectionId;
     }
 }
