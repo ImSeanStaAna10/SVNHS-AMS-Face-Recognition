@@ -42,7 +42,26 @@ public interface UserRepository
     );
 
     /* =========================================================
+       ROLE LOOKUPS
+
+       Used by SUPERADMIN for retrieving and validating
+       Councilor accounts without loading every User.
+    ========================================================= */
+
+    List<User> findAllByRole(
+            Role role
+    );
+
+    Optional<User> findByIdAndRole(
+            String id,
+            Role role
+    );
+
+    /* =========================================================
        DEPARTMENT-SCOPED USER LOOKUPS
+
+       Existing methods retained for Councilor → Adviser
+       ownership and department isolation.
     ========================================================= */
 
     List<User> findAllByRoleAndDepartment_Id(
@@ -54,5 +73,31 @@ public interface UserRepository
             String id,
             Role role,
             String departmentId
+    );
+
+    /* =========================================================
+       ACTIVE ROLE / DEPARTMENT CHECKS
+
+       Used by SUPERADMIN to enforce the rule:
+
+       One ACTIVE Councilor per Department.
+    ========================================================= */
+
+    boolean existsByRoleAndDepartment_IdAndActiveTrue(
+            Role role,
+            String departmentId
+    );
+
+    /*
+     * Same check, but excludes one User.
+     *
+     * Needed when editing/reactivating an existing
+     * Councilor so the account does not conflict
+     * with itself.
+     */
+    boolean existsByRoleAndDepartment_IdAndActiveTrueAndIdNot(
+            Role role,
+            String departmentId,
+            String id
     );
 }

@@ -1,13 +1,20 @@
 package com.example.attendancemanagementbackend.service;
 
 import com.example.attendancemanagementbackend.dto.FaceMatchResult;
+import com.example.attendancemanagementbackend.entity.Section;
 import com.example.attendancemanagementbackend.entity.Student;
 import com.example.attendancemanagementbackend.exception.ApiException;
 import com.example.attendancemanagementbackend.repository.StudentFaceRepository;
 import com.example.attendancemanagementbackend.repository.StudentRepository;
+
 import org.springframework.http.HttpStatus;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -24,20 +31,32 @@ public class StudentFaceService {
      *
      * Lower distance = more similar.
      */
-    private static final double FACE_DUPLICATE_THRESHOLD = 0.50;
+    private static final double FACE_DUPLICATE_THRESHOLD =
+            0.50;
 
-    private final StudentRepository studentRepository;
-    private final StudentFaceRepository studentFaceRepository;
-    private final FaceRecognitionClient faceRecognitionClient;
+    private final StudentRepository
+            studentRepository;
+
+    private final StudentFaceRepository
+            studentFaceRepository;
+
+    private final FaceRecognitionClient
+            faceRecognitionClient;
 
     public StudentFaceService(
             StudentRepository studentRepository,
             StudentFaceRepository studentFaceRepository,
             FaceRecognitionClient faceRecognitionClient
     ) {
-        this.studentRepository = studentRepository;
-        this.studentFaceRepository = studentFaceRepository;
-        this.faceRecognitionClient = faceRecognitionClient;
+
+        this.studentRepository =
+                studentRepository;
+
+        this.studentFaceRepository =
+                studentFaceRepository;
+
+        this.faceRecognitionClient =
+                faceRecognitionClient;
     }
 
     /**
@@ -46,12 +65,13 @@ public class StudentFaceService {
      * Flow:
      *
      * 1. Find student
-     * 2. Validate image
-     * 3. Determine whether student already has a face
-     * 4. Generate embedding using Python face service
-     * 5. Validate embedding
-     * 6. Check duplicate faces belonging to OTHER students
-     * 7. UPDATE existing face or INSERT new face
+     * 2. Verify Adviser ownership
+     * 3. Validate image
+     * 4. Determine whether student already has a face
+     * 5. Generate embedding using Python face service
+     * 6. Validate embedding
+     * 7. Check duplicate faces belonging to OTHER students
+     * 8. UPDATE existing face or INSERT new face
      */
     @Transactional
     public void enrollFace(
@@ -64,7 +84,10 @@ public class StudentFaceService {
         // =====================================================
 
         Student student =
-                studentRepository.findById(studentId)
+                studentRepository
+                        .findById(
+                                studentId
+                        )
                         .orElseThrow(() ->
                                 new ApiException(
                                         HttpStatus.NOT_FOUND,
@@ -73,10 +96,43 @@ public class StudentFaceService {
                         );
 
         // =====================================================
-        // 2. VALIDATE IMAGE
+        // 2. VERIFY ADVISER OWNERSHIP
+        //
+        // Prevent Adviser A from enrolling/updating
+        // a face belonging to Adviser B's student.
         // =====================================================
 
-        if (image == null || image.isEmpty()) {
+        String adviserId =
+                getAuthenticatedAdviserId();
+
+        Section section =
+                student.getSection();
+
+        if (
+                section == null ||
+                        section.getAdviser() == null ||
+                        !section.getAdviser()
+                                .getId()
+                                .equals(
+                                        adviserId
+                                )
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not allowed to manage this student's face"
+            );
+        }
+
+        // =====================================================
+        // 3. VALIDATE IMAGE
+        // =====================================================
+
+        if (
+                image == null ||
+                        image.isEmpty()
+        ) {
+
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Image is required"
@@ -84,10 +140,7 @@ public class StudentFaceService {
         }
 
         // =====================================================
-        // 3. CHECK WHETHER STUDENT ALREADY HAS A FACE
-        //
-        // IMPORTANT:
-        // This is no longer an error.
+        // 4. CHECK WHETHER STUDENT ALREADY HAS A FACE
         //
         // false = REGISTER
         // true  = UPDATE
@@ -95,26 +148,31 @@ public class StudentFaceService {
 
         boolean alreadyRegistered =
                 studentFaceRepository
-                        .existsByStudentId(studentId);
+                        .existsByStudentId(
+                                studentId
+                        );
 
         // =====================================================
-        // 4. SEND IMAGE TO PYTHON FACE SERVICE
+        // 5. SEND IMAGE TO PYTHON FACE SERVICE
         // =====================================================
 
         FaceRecognitionClient.FaceEnrollmentResult result =
-                faceRecognitionClient.enrollFace(
-                        studentId,
-                        image.getBytes(),
-                        image.getOriginalFilename()
-                );
+                faceRecognitionClient
+                        .enrollFace(
+                                studentId,
+                                image.getBytes(),
+                                image.getOriginalFilename()
+                        );
 
         // =====================================================
-        // 5. VALIDATE PYTHON RESPONSE
+        // 6. VALIDATE PYTHON RESPONSE
         // =====================================================
 
-        if (result == null ||
-                !result.success() ||
-                result.embedding() == null) {
+        if (
+                result == null ||
+                        !result.success() ||
+                        result.embedding() == null
+        ) {
 
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
@@ -123,7 +181,7 @@ public class StudentFaceService {
         }
 
         // =====================================================
-        // 6. CONVERT EMBEDDING TO PGVECTOR FORMAT
+        // 7. CONVERT EMBEDDING TO PGVECTOR FORMAT
         // =====================================================
 
         String embedding =
@@ -132,7 +190,7 @@ public class StudentFaceService {
                 );
 
         // =====================================================
-        // 7. CHECK DUPLICATE FACE
+        // 8. CHECK DUPLICATE FACE
         //
         // IMPORTANT:
         // Exclude the current student.
@@ -149,7 +207,10 @@ public class StudentFaceService {
                 )
                 .ifPresent(match -> {
 
-                    if (match.distance() <= FACE_DUPLICATE_THRESHOLD) {
+                    if (
+                            match.distance() <=
+                                    FACE_DUPLICATE_THRESHOLD
+                    ) {
 
                         throw new ApiException(
                                 HttpStatus.CONFLICT,
@@ -159,14 +220,14 @@ public class StudentFaceService {
                 });
 
         // =====================================================
-        // 8. CURRENT DATE/TIME
+        // 9. CURRENT DATE/TIME
         // =====================================================
 
         LocalDateTime now =
                 LocalDateTime.now();
 
         // =====================================================
-        // 9. UPDATE EXISTING FACE
+        // 10. UPDATE EXISTING FACE
         // =====================================================
 
         if (alreadyRegistered) {
@@ -180,6 +241,7 @@ public class StudentFaceService {
                             );
 
             if (updatedRows == 0) {
+
                 throw new ApiException(
                         HttpStatus.INTERNAL_SERVER_ERROR,
                         "Unable to update student face"
@@ -190,19 +252,21 @@ public class StudentFaceService {
         }
 
         // =====================================================
-        // 10. INSERT NEW FACE
+        // 11. INSERT NEW FACE
         // =====================================================
 
         String faceId =
-                UUID.randomUUID().toString();
+                UUID.randomUUID()
+                        .toString();
 
-        studentFaceRepository.insertFaceEmbedding(
-                faceId,
-                student.getId(),
-                embedding,
-                now,
-                now
-        );
+        studentFaceRepository
+                .insertFaceEmbedding(
+                        faceId,
+                        student.getId(),
+                        embedding,
+                        now,
+                        now
+                );
     }
 
     /**
@@ -238,6 +302,10 @@ public class StudentFaceService {
      * cosine distance from the supplied embedding.
      *
      * Used by attendance face recognition.
+     *
+     * IMPORTANT:
+     * Existing global recognition behavior is
+     * intentionally retained here.
      */
     @Transactional(readOnly = true)
     public FaceMatchResult findMostSimilarFace(
@@ -249,19 +317,52 @@ public class StudentFaceService {
         // =====================================================
 
         String vector =
-                toVectorString(embedding);
+                toVectorString(
+                        embedding
+                );
 
         // =====================================================
         // 2. FIND NEAREST REGISTERED FACE
         // =====================================================
 
         return studentFaceRepository
-                .findMostSimilarFace(vector)
+                .findMostSimilarFace(
+                        vector
+                )
                 .orElseThrow(() ->
                         new ApiException(
                                 HttpStatus.NOT_FOUND,
                                 "No registered face found"
                         )
                 );
+    }
+
+    /* =========================================================
+       GET AUTHENTICATED ADVISER ID
+
+       Used only for face enrollment/update ownership.
+
+       Attendance recognition does NOT use this method.
+    ========================================================= */
+
+    private String getAuthenticatedAdviserId() {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        if (
+                authentication == null ||
+                        !authentication.isAuthenticated()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authentication is required"
+            );
+        }
+
+        return authentication.getName();
     }
 }

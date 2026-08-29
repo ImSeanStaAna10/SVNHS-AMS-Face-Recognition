@@ -9,6 +9,10 @@ import java.util.Optional;
 public interface DepartmentRepository
         extends JpaRepository<Department, String> {
 
+    /* =========================================================
+       LOOKUPS
+    ========================================================= */
+
     Optional<Department> findByCode(
             String code
     );
@@ -17,11 +21,32 @@ public interface DepartmentRepository
             String name
     );
 
-    boolean existsByCode(
+    /* =========================================================
+       CREATE DUPLICATE CHECKS
+    ========================================================= */
+
+    boolean existsByCodeIgnoreCase(
             String code
     );
 
-    boolean existsByName(
+    boolean existsByNameIgnoreCase(
             String name
+    );
+
+    /* =========================================================
+       UPDATE DUPLICATE CHECKS
+
+       Excludes the Department currently being edited so
+       keeping its existing code/name remains allowed.
+    ========================================================= */
+
+    boolean existsByCodeIgnoreCaseAndIdNot(
+            String code,
+            String id
+    );
+
+    boolean existsByNameIgnoreCaseAndIdNot(
+            String name,
+            String id
     );
 }
