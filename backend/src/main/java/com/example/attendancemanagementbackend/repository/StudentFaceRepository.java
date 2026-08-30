@@ -8,20 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface StudentFaceRepository
         extends JpaRepository<StudentFace, String> {
 
-    /* =========================================================
-       CHECK IF STUDENT HAS REGISTERED FACE
-    ========================================================= */
-
     boolean existsByStudentId(String studentId);
-
-    /* =========================================================
-       INSERT NEW FACE
-    ========================================================= */
 
     @Modifying
     @Query(value = """
@@ -48,10 +41,6 @@ public interface StudentFaceRepository
             @Param("updatedAt") LocalDateTime updatedAt
     );
 
-    /* =========================================================
-       UPDATE EXISTING FACE
-    ========================================================= */
-
     @Modifying
     @Query(value = """
             UPDATE student_faces
@@ -67,9 +56,7 @@ public interface StudentFaceRepository
     );
 
     /* =========================================================
-       FIND MOST SIMILAR FACE
-
-       Used by normal attendance face recognition.
+       LEGACY GLOBAL ATTENDANCE MATCH
     ========================================================= */
 
     @Query(value = """
@@ -85,12 +72,36 @@ public interface StudentFaceRepository
     );
 
     /* =========================================================
-       FIND MOST SIMILAR FACE EXCLUDING CURRENT STUDENT
+       SECTION-SCOPED TOP TWO MATCHES
 
-       Used when registering/updating a student's face.
+       Attendance recognition only.
 
-       This prevents the student's OLD face from being
-       detected as a duplicate of their NEW face.
+       Rules:
+       - same Section as active attendance session
+       - active students only
+       - registered faces only
+       - return the closest two candidates
+    ========================================================= */
+
+    @Query(value = """
+            SELECT
+                sf.student_id AS studentId,
+                sf.embedding <=> CAST(:embedding AS vector) AS distance
+            FROM student_faces sf
+            INNER JOIN students s
+                ON s.id = sf.student_id
+            WHERE s.section_id = :sectionId
+              AND s.active = true
+            ORDER BY sf.embedding <=> CAST(:embedding AS vector)
+            LIMIT 2
+            """, nativeQuery = true)
+    List<FaceMatchResult> findTopSimilarFacesBySection(
+            @Param("embedding") String embedding,
+            @Param("sectionId") String sectionId
+    );
+
+    /* =========================================================
+       GLOBAL DUPLICATE FACE CHECK
     ========================================================= */
 
     @Query(value = """

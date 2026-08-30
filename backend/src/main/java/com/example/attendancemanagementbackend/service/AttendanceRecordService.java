@@ -16,6 +16,9 @@ import com.example.attendancemanagementbackend.repository.SectionRepository;
 import com.example.attendancemanagementbackend.repository.StudentRepository;
 import com.example.attendancemanagementbackend.util.AppTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,11 @@ import java.util.List;
 
 @Service
 public class AttendanceRecordService {
+
+    private static final Logger log =
+            LoggerFactory.getLogger(
+                    AttendanceRecordService.class
+            );
 
     private static final double FACE_MATCH_THRESHOLD =
             0.50;
@@ -143,8 +151,17 @@ public class AttendanceRecordService {
      * The authenticated Adviser must own the
      * Section of the requested attendance session.
      *
-     * NOTE:
-     * Existing face recognition behavior is retained.
+     * FACE MATCHING:
+     * Recognition candidates are restricted to
+     * ACTIVE students inside the attendance
+     * session's Section.
+     *
+     * The repository returns up to the two closest
+     * registered faces. For this migration phase,
+     * Top-1 still uses the existing 0.50 match
+     * threshold. Top-2 is retrieved so ambiguous
+     * face handling can be added without returning
+     * to global matching.
      */
     @Transactional
     public AttendanceRecord markPresentByFace(
@@ -173,7 +190,7 @@ public class AttendanceRecordService {
         }
 
         /* =====================================================
-           FACE RECOGNITION
+           GENERATE FACE EMBEDDING
         ===================================================== */
 
         FaceRecognitionClient.FaceRecognitionResult result =
@@ -194,21 +211,50 @@ public class AttendanceRecordService {
         }
 
         /* =====================================================
-           FIND CLOSEST REGISTERED FACE
+           GET ATTENDANCE SESSION SECTION
 
-           Existing global matching behavior retained.
-
-           Section-scoped / top-two / ambiguous face
-           recognition can be implemented separately later.
+           getActiveSession() already verifies that the session
+           belongs to the authenticated Adviser and has a valid
+           Section. This Section becomes the recognition scope.
         ===================================================== */
 
-        FaceMatchResult match =
+        String sectionId =
+                session.getSection()
+                        .getId();
+
+        /* =====================================================
+           FIND TOP TWO REGISTERED FACES IN THIS SECTION
+
+           Repository rules:
+
+           - same Section only
+           - active students only
+           - registered faces only
+           - closest cosine distance first
+           - maximum of two candidates
+
+           This prevents a student from another Section from
+           becoming the global nearest match.
+        ===================================================== */
+
+        List<FaceMatchResult> matches =
                 studentFaceService
-                        .findMostSimilarFace(
-                                result.embedding()
+                        .findTopSimilarFacesBySection(
+                                result.embedding(),
+                                sectionId
                         );
 
-        if (match == null) {
+        /* =====================================================
+           NO REGISTERED CANDIDATE IN SECTION
+        ===================================================== */
+
+        if (matches == null ||
+                matches.isEmpty()) {
+
+            log.info(
+                    "FACE_MATCH_DIAGNOSTIC | sectionId={} | candidates=0",
+                    sectionId
+            );
 
             throw new ApiException(
                     HttpStatus.UNAUTHORIZED,
@@ -216,7 +262,84 @@ public class AttendanceRecordService {
             );
         }
 
-        if (match.distance() >
+        /* =====================================================
+           TOP-1 CANDIDATE
+
+           The query is ordered by cosine distance ASC, so
+           index 0 is always the closest registered face.
+        ===================================================== */
+
+        FaceMatchResult bestMatch =
+                matches.get(0);
+
+        if (bestMatch == null) {
+
+            log.warn(
+                    "FACE_MATCH_DIAGNOSTIC | sectionId={} | top1=NULL",
+                    sectionId
+            );
+
+            throw new ApiException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Face not recognized"
+            );
+        }
+
+        /* =====================================================
+           TOP-2 DIAGNOSTIC DATA
+
+           This does NOT change the recognition decision yet.
+
+           We record the real Top-1 / Top-2 cosine distances
+           so the ambiguity-gap rule can be calibrated using
+           actual recognition attempts instead of choosing an
+           arbitrary value.
+
+           IMPORTANT:
+           The 512-dimensional embedding is NOT logged.
+        ===================================================== */
+
+        FaceMatchResult secondMatch =
+                matches.size() > 1
+                        ? matches.get(1)
+                        : null;
+
+        if (secondMatch != null) {
+
+            double gap =
+                    secondMatch.distance() -
+                            bestMatch.distance();
+
+            log.info(
+                    "FACE_MATCH_DIAGNOSTIC | sectionId={} | top1StudentId={} | top1Distance={} | top2StudentId={} | top2Distance={} | gap={}",
+                    sectionId,
+                    bestMatch.studentId(),
+                    bestMatch.distance(),
+                    secondMatch.studentId(),
+                    secondMatch.distance(),
+                    gap
+            );
+
+        } else {
+
+            log.info(
+                    "FACE_MATCH_DIAGNOSTIC | sectionId={} | top1StudentId={} | top1Distance={} | top2=NONE",
+                    sectionId,
+                    bestMatch.studentId(),
+                    bestMatch.distance()
+            );
+        }
+
+        /* =====================================================
+           EXISTING TOP-1 MATCH THRESHOLD
+
+           Diagnostic logging above is observation-only.
+
+           Recognition behavior remains:
+           Top-1 distance must be <= 0.50.
+        ===================================================== */
+
+        if (bestMatch.distance() >
                 FACE_MATCH_THRESHOLD) {
 
             throw new ApiException(
@@ -232,7 +355,7 @@ public class AttendanceRecordService {
         Student student =
                 studentRepository
                         .findById(
-                                match.studentId()
+                                bestMatch.studentId()
                         )
                         .orElseThrow(() ->
                                 new ApiException(
@@ -242,9 +365,12 @@ public class AttendanceRecordService {
                         );
 
         /*
-         * createAttendanceRecord() still verifies that
-         * the recognized student belongs to the same
-         * Section as the attendance session.
+         * Defense in depth:
+         *
+         * The face query is already Section-scoped, but
+         * createAttendanceRecord() still verifies Section
+         * ownership, student active status, duplicate
+         * attendance, and session expiration.
          */
         return createAttendanceRecord(
                 session,
