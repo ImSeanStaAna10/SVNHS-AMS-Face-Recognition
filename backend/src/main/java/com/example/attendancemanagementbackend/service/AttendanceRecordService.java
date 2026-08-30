@@ -9,6 +9,7 @@ import com.example.attendancemanagementbackend.entity.AttendanceSessionStatus;
 import com.example.attendancemanagementbackend.entity.AttendanceStatus;
 import com.example.attendancemanagementbackend.entity.Section;
 import com.example.attendancemanagementbackend.entity.Student;
+import com.example.attendancemanagementbackend.exception.AmbiguousFaceMatchException;
 import com.example.attendancemanagementbackend.exception.ApiException;
 import com.example.attendancemanagementbackend.repository.AttendanceRecordRepository;
 import com.example.attendancemanagementbackend.repository.AttendanceSessionRepository;
@@ -157,11 +158,25 @@ public class AttendanceRecordService {
      * session's Section.
      *
      * The repository returns up to the two closest
-     * registered faces. For this migration phase,
-     * Top-1 still uses the existing 0.50 match
-     * threshold. Top-2 is retrieved so ambiguous
-     * face handling can be added without returning
-     * to global matching.
+     * registered faces.
+     *
+     * Decision rules:
+     *
+     * NO_MATCH:
+     * Top-1 distance > 0.50
+     *
+     * MATCH:
+     * Top-1 distance <= 0.50 and there is no
+     * second distinct candidate inside the same
+     * accepted 0.50 threshold.
+     *
+     * AMBIGUOUS:
+     * Top-1 and Top-2 are different students and
+     * BOTH distances are <= 0.50.
+     *
+     * IMPORTANT:
+     * AMBIGUOUS exits before createAttendanceRecord(),
+     * so no automatic attendance record is saved.
      */
     @Transactional
     public AttendanceRecord markPresentByFace(
@@ -287,16 +302,6 @@ public class AttendanceRecordService {
 
         /* =====================================================
            TOP-2 DIAGNOSTIC DATA
-
-           This does NOT change the recognition decision yet.
-
-           We record the real Top-1 / Top-2 cosine distances
-           so the ambiguity-gap rule can be calibrated using
-           actual recognition attempts instead of choosing an
-           arbitrary value.
-
-           IMPORTANT:
-           The 512-dimensional embedding is NOT logged.
         ===================================================== */
 
         FaceMatchResult secondMatch =
@@ -331,22 +336,129 @@ public class AttendanceRecordService {
         }
 
         /* =====================================================
-           EXISTING TOP-1 MATCH THRESHOLD
+           TOP-1 MATCH THRESHOLD
 
-           Diagnostic logging above is observation-only.
-
-           Recognition behavior remains:
-           Top-1 distance must be <= 0.50.
+           If even the closest candidate is outside
+           the accepted 0.50 threshold, this is a
+           NO_MATCH outcome.
         ===================================================== */
 
         if (bestMatch.distance() >
                 FACE_MATCH_THRESHOLD) {
+
+            log.info(
+                    "FACE_MATCH_DECISION | sectionId={} | outcome=NO_MATCH | top1StudentId={} | top1Distance={}",
+                    sectionId,
+                    bestMatch.studentId(),
+                    bestMatch.distance()
+            );
 
             throw new ApiException(
                     HttpStatus.UNAUTHORIZED,
                     "Face not recognized"
             );
         }
+
+        /* =====================================================
+           AMBIGUITY CHECK
+
+           Conservative V1 rule:
+
+           - Top-1 is already inside <= 0.50
+           - Top-2 exists
+           - Top-2 belongs to a DIFFERENT Student
+           - Top-2 is also inside <= 0.50
+
+           If all conditions are true, the system does
+           NOT guess between the two Students.
+
+           IMPORTANT:
+           This block runs BEFORE createAttendanceRecord(),
+           therefore an AMBIGUOUS result cannot create
+           PRESENT or LATE attendance automatically.
+        ===================================================== */
+
+        boolean ambiguous =
+                secondMatch != null &&
+                        secondMatch.studentId() != null &&
+                        bestMatch.studentId() != null &&
+                        !secondMatch.studentId()
+                                .equals(
+                                        bestMatch.studentId()
+                                ) &&
+                        secondMatch.distance() <=
+                                FACE_MATCH_THRESHOLD;
+
+        if (ambiguous) {
+
+            Student topCandidateStudent =
+                    studentRepository
+                            .findById(
+                                    bestMatch.studentId()
+                            )
+                            .orElseThrow(() ->
+                                    new ApiException(
+                                            HttpStatus.NOT_FOUND,
+                                            "Top face candidate student not found"
+                                    )
+                            );
+
+            Student secondCandidateStudent =
+                    studentRepository
+                            .findById(
+                                    secondMatch.studentId()
+                            )
+                            .orElseThrow(() ->
+                                    new ApiException(
+                                            HttpStatus.NOT_FOUND,
+                                            "Second face candidate student not found"
+                                    )
+                            );
+
+            double gap =
+                    secondMatch.distance() -
+                            bestMatch.distance();
+
+            log.warn(
+                    "FACE_MATCH_DECISION | sectionId={} | outcome=AMBIGUOUS | top1StudentId={} | top1Distance={} | top2StudentId={} | top2Distance={} | gap={}",
+                    sectionId,
+                    bestMatch.studentId(),
+                    bestMatch.distance(),
+                    secondMatch.studentId(),
+                    secondMatch.distance(),
+                    gap
+            );
+
+            throw new AmbiguousFaceMatchException(
+                    topCandidateStudent.getId(),
+                    topCandidateStudent.getStudentNumber(),
+                    topCandidateStudent.getName(),
+                    bestMatch.distance(),
+                    secondCandidateStudent.getId(),
+                    secondCandidateStudent.getStudentNumber(),
+                    secondCandidateStudent.getName(),
+                    secondMatch.distance()
+            );
+        }
+
+        /* =====================================================
+           SAFE MATCH
+
+           At this point:
+
+           - Top-1 is inside <= 0.50
+           - there is no second DISTINCT candidate that is
+             also inside <= 0.50
+
+           The Top-1 candidate may now be used.
+        ===================================================== */
+
+        log.info(
+                "FACE_MATCH_DECISION | sectionId={} | outcome=MATCH | studentId={} | distance={}",
+                sectionId,
+                bestMatch.studentId(),
+                bestMatch.distance()
+        );
 
         /* =====================================================
            LOAD MATCHED STUDENT
@@ -434,17 +546,6 @@ public class AttendanceRecordService {
 
         /* =====================================================
            VERIFY SCHEDULED END
-
-           This protects the session even if the
-           automatic scheduler has not yet updated
-           the database status.
-
-           Example:
-
-           scheduledEndAt = 09:00:00
-           request time   = 09:00:02
-
-           Attendance is rejected.
         ===================================================== */
 
         LocalDateTime currentTime =
@@ -466,14 +567,6 @@ public class AttendanceRecordService {
      * Prevents attendance from being recorded
      * once the configured automatic end time
      * has been reached.
-     *
-     * Exact boundary:
-     *
-     * attendanceTime < scheduledEndAt
-     *     allowed
-     *
-     * attendanceTime >= scheduledEndAt
-     *     rejected
      */
     private void validateSessionNotExpired(
             AttendanceSession session,
@@ -483,10 +576,6 @@ public class AttendanceRecordService {
         LocalDateTime scheduledEndAt =
                 session.getScheduledEndAt();
 
-        /*
-         * null means this session uses
-         * manual ending only.
-         */
         if (scheduledEndAt == null) {
             return;
         }
@@ -506,20 +595,6 @@ public class AttendanceRecordService {
        CREATE ATTENDANCE RECORD
     ========================================================= */
 
-    /**
-     * Creates an attendance record after validating:
-     *
-     * 1. Student belongs to the session section.
-     * 2. Student is active.
-     * 3. Student has not already been recorded.
-     * 4. Session has not reached scheduled end.
-     *
-     * The status is automatically determined:
-     *
-     * PRESENT
-     * or
-     * LATE.
-     */
     private AttendanceRecord createAttendanceRecord(
             AttendanceSession session,
             Student student
@@ -574,14 +649,6 @@ public class AttendanceRecordService {
 
         /* =====================================================
            CAPTURE ATTENDANCE TIME ONCE
-
-           This timestamp will be used for BOTH:
-
-           - checking session expiration
-           - determining PRESENT/LATE
-           - saved recordedAt value
-
-           This prevents boundary inconsistencies.
         ===================================================== */
 
         LocalDateTime attendanceTime =
@@ -589,11 +656,6 @@ public class AttendanceRecordService {
 
         /* =====================================================
            RE-CHECK SCHEDULED END
-
-           We already checked when loading the session,
-           but we check again here because time may have
-           crossed the scheduled boundary while processing
-           the request.
         ===================================================== */
 
         validateSessionNotExpired(
@@ -633,28 +695,6 @@ public class AttendanceRecordService {
        DETERMINE ATTENDANCE STATUS
     ========================================================= */
 
-    /**
-     * Determines PRESENT or LATE.
-     *
-     * Example:
-     *
-     * Session started:
-     * 07:30
-     *
-     * Late cutoff:
-     * 07:45
-     *
-     *
-     * 07:44:59 -> PRESENT
-     *
-     * 07:45:00 -> LATE
-     *
-     * 07:45:01 -> LATE
-     *
-     *
-     * Legacy sessions that do not have
-     * lateCutoffAt remain PRESENT.
-     */
     private AttendanceStatus determineAttendanceStatus(
             AttendanceSession session,
             LocalDateTime attendanceTime
@@ -663,21 +703,10 @@ public class AttendanceRecordService {
         LocalDateTime lateCutoffAt =
                 session.getLateCutoffAt();
 
-        /* =====================================================
-           LEGACY SESSION SUPPORT
-
-           Older sessions may not have a late cutoff.
-           Preserve their original behavior.
-        ===================================================== */
-
         if (lateCutoffAt == null) {
 
             return AttendanceStatus.PRESENT;
         }
-
-        /* =====================================================
-           BEFORE CUTOFF
-        ===================================================== */
 
         if (attendanceTime.isBefore(
                 lateCutoffAt
@@ -686,10 +715,6 @@ public class AttendanceRecordService {
             return AttendanceStatus.PRESENT;
         }
 
-        /* =====================================================
-           AT OR AFTER CUTOFF
-        ===================================================== */
-
         return AttendanceStatus.LATE;
     }
 
@@ -697,28 +722,11 @@ public class AttendanceRecordService {
        GET SESSION ATTENDANCE
     ========================================================= */
 
-    /**
-     * Returns all attendance records
-     * for a specific session.
-     *
-     * Status may now be:
-     *
-     * PRESENT
-     * LATE
-     * ABSENT
-     *
-     * SECURITY:
-     * Adviser may only read their own session.
-     */
     @Transactional(readOnly = true)
     public List<AttendanceRecordResponse> getSessionRecords(
             String sessionId,
             String adviserId
     ) {
-
-        /* =====================================================
-           LOAD SESSION
-        ===================================================== */
 
         AttendanceSession session =
                 attendanceSessionRepository
@@ -732,18 +740,10 @@ public class AttendanceRecordService {
                                 )
                         );
 
-        /* =====================================================
-           VERIFY ADVISER OWNERSHIP
-        ===================================================== */
-
         validateAdviserOwnsSession(
                 session,
                 adviserId
         );
-
-        /* =====================================================
-           EXISTING RECORD MAPPING
-        ===================================================== */
 
         return attendanceRecordRepository
                 .findBySessionId(
@@ -773,18 +773,6 @@ public class AttendanceRecordService {
        ADVISER ATTENDANCE OVERVIEW
     ========================================================= */
 
-    /**
-     * Returns attendance summaries
-     * only for Sections assigned to the
-     * authenticated Adviser.
-     *
-     * PRESENT and LATE are both considered
-     * attended when calculating:
-     *
-     * - attended students
-     * - absent students
-     * - attendance rate
-     */
     @Transactional(readOnly = true)
     public List<AttendanceOverviewResponse>
     getAttendanceOverview(
@@ -794,16 +782,6 @@ public class AttendanceRecordService {
         List<AttendanceOverviewResponse> overview =
                 new ArrayList<>();
 
-        /* =====================================================
-           SECURITY UPDATE
-
-           BEFORE:
-           sectionRepository.findAll()
-
-           NOW:
-           Only Sections assigned to the authenticated Adviser.
-        ===================================================== */
-
         List<Section> sections =
                 sectionRepository
                         .findByAdviserId(
@@ -811,10 +789,6 @@ public class AttendanceRecordService {
                         );
 
         for (Section section : sections) {
-
-            /* =================================================
-               ACTIVE STUDENTS
-            ================================================= */
 
             List<Student> students =
                     studentRepository
@@ -828,10 +802,6 @@ public class AttendanceRecordService {
                                     Student::isActive
                             )
                             .count();
-
-            /* =================================================
-               SECTION SESSIONS
-            ================================================= */
 
             List<AttendanceSession> sessions =
                     attendanceSessionRepository
@@ -847,10 +817,6 @@ public class AttendanceRecordService {
                                         session.getId()
                                 );
 
-                /* =============================================
-                   PRESENT
-                ============================================= */
-
                 int present =
                         (int) records.stream()
                                 .filter(record ->
@@ -860,10 +826,6 @@ public class AttendanceRecordService {
                                                         AttendanceStatus.PRESENT
                                 )
                                 .count();
-
-                /* =============================================
-                   LATE
-                ============================================= */
 
                 int late =
                         (int) records.stream()
@@ -875,20 +837,9 @@ public class AttendanceRecordService {
                                 )
                                 .count();
 
-                /* =============================================
-                   ATTENDED
-
-                   Both PRESENT and LATE count
-                   as attendance.
-                ============================================= */
-
                 int attended =
                         present +
                                 late;
-
-                /* =============================================
-                   ABSENT
-                ============================================= */
 
                 int absent =
                         Math.max(
@@ -897,22 +848,11 @@ public class AttendanceRecordService {
                                 0
                         );
 
-                /* =============================================
-                   ATTENDANCE RATE
-
-                   PRESENT + LATE are both
-                   considered attended.
-                ============================================= */
-
                 double attendanceRate =
                         totalStudents == 0
                                 ? 0.0
                                 : ((double) attended /
                                 totalStudents) * 100.0;
-
-                /* =============================================
-                   ADVISER INFORMATION
-                ============================================= */
 
                 String sectionAdviserId =
                         null;
@@ -930,23 +870,6 @@ public class AttendanceRecordService {
                             section.getAdviser()
                                     .getName();
                 }
-
-                /* =============================================
-                   BUILD RESPONSE
-
-                   AttendanceOverviewResponse currently has
-                   one attendance-count field called present.
-
-                   To preserve the existing response structure
-                   and prevent breaking the frontend, we send
-                   total attended students here:
-
-                   PRESENT + LATE
-
-                   Later, if we add a dedicated late field to
-                   AttendanceOverviewResponse, we can expose
-                   PRESENT and LATE separately.
-                ============================================= */
 
                 overview.add(
                         new AttendanceOverviewResponse(
@@ -973,24 +896,12 @@ public class AttendanceRecordService {
        DELETE ATTENDANCE RECORD
     ========================================================= */
 
-    /**
-     * Deletes an attendance record
-     * for a specific session and student.
-     *
-     * SECURITY:
-     * Adviser may only delete attendance from
-     * their own assigned Section/session.
-     */
     @Transactional
     public void deleteAttendanceRecord(
             String sessionId,
             String studentId,
             String adviserId
     ) {
-
-        /* =====================================================
-           LOAD SESSION
-        ===================================================== */
 
         AttendanceSession session =
                 attendanceSessionRepository
@@ -1004,18 +915,10 @@ public class AttendanceRecordService {
                                 )
                         );
 
-        /* =====================================================
-           VERIFY ADVISER OWNERSHIP
-        ===================================================== */
-
         validateAdviserOwnsSession(
                 session,
                 adviserId
         );
-
-        /* =====================================================
-           FIND ATTENDANCE RECORD
-        ===================================================== */
 
         AttendanceRecord record =
                 attendanceRecordRepository
@@ -1040,15 +943,6 @@ public class AttendanceRecordService {
        ADVISER SESSION OWNERSHIP
     ========================================================= */
 
-    /**
-     * Resource-level security.
-     *
-     * SecurityConfig already verifies ROLE_ADVISER.
-     *
-     * This verifies that the authenticated Adviser
-     * actually owns the Section associated with
-     * the requested attendance session.
-     */
     private void validateAdviserOwnsSession(
             AttendanceSession session,
             String adviserId

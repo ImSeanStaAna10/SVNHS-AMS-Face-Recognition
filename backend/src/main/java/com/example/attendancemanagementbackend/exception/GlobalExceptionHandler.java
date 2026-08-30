@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -22,6 +24,173 @@ public class GlobalExceptionHandler {
             LoggerFactory.getLogger(
                     GlobalExceptionHandler.class
             );
+
+    /* =========================================================
+       AMBIGUOUS FACE MATCH
+    ========================================================= */
+
+    /**
+     * Handles attendance face-recognition attempts where
+     * two different students inside the SAME attendance
+     * Section are both within the accepted face-match
+     * threshold.
+     *
+     * IMPORTANT:
+     *
+     * AttendanceRecordService throws this exception BEFORE
+     * an AttendanceRecord is created.
+     *
+     * Therefore:
+     *
+     * - no PRESENT record is created
+     * - no LATE record is created
+     * - the backend does not guess between the candidates
+     *
+     * The frontend receives both candidates so the Adviser
+     * can safely fall back to manual attendance.
+     */
+    @ExceptionHandler(AmbiguousFaceMatchException.class)
+    public ResponseEntity<Map<String, Object>>
+    handleAmbiguousFaceMatchException(
+            AmbiguousFaceMatchException exception,
+            HttpServletRequest request
+    ) {
+
+        double distanceGap =
+                exception.getSecondDistance() -
+                        exception.getTopDistance();
+
+        logger.warn(
+                "Ambiguous face match: method={}, path={}, topStudentId={}, topDistance={}, secondStudentId={}, secondDistance={}, gap={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                exception.getTopStudentId(),
+                exception.getTopDistance(),
+                exception.getSecondStudentId(),
+                exception.getSecondDistance(),
+                distanceGap
+        );
+
+        /* =====================================================
+           TOP CANDIDATE
+        ===================================================== */
+
+        Map<String, Object> topCandidate =
+                new LinkedHashMap<>();
+
+        topCandidate.put(
+                "studentId",
+                exception.getTopStudentId()
+        );
+
+        topCandidate.put(
+                "studentNumber",
+                exception.getTopStudentNumber()
+        );
+
+        topCandidate.put(
+                "studentName",
+                exception.getTopStudentName()
+        );
+
+        topCandidate.put(
+                "distance",
+                exception.getTopDistance()
+        );
+
+        /* =====================================================
+           SECOND CANDIDATE
+        ===================================================== */
+
+        Map<String, Object> secondCandidate =
+                new LinkedHashMap<>();
+
+        secondCandidate.put(
+                "studentId",
+                exception.getSecondStudentId()
+        );
+
+        secondCandidate.put(
+                "studentNumber",
+                exception.getSecondStudentNumber()
+        );
+
+        secondCandidate.put(
+                "studentName",
+                exception.getSecondStudentName()
+        );
+
+        secondCandidate.put(
+                "distance",
+                exception.getSecondDistance()
+        );
+
+        /* =====================================================
+           STRUCTURED AMBIGUOUS RESPONSE
+        ===================================================== */
+
+        Map<String, Object> response =
+                new LinkedHashMap<>();
+
+        response.put(
+                "success",
+                false
+        );
+
+        response.put(
+                "status",
+                exception.getStatus().value()
+        );
+
+        response.put(
+                "error",
+                exception.getStatus()
+                        .getReasonPhrase()
+        );
+
+        response.put(
+                "outcome",
+                "AMBIGUOUS"
+        );
+
+        response.put(
+                "message",
+                exception.getMessage()
+        );
+
+        response.put(
+                "distanceGap",
+                distanceGap
+        );
+
+        response.put(
+                "topCandidate",
+                topCandidate
+        );
+
+        response.put(
+                "secondCandidate",
+                secondCandidate
+        );
+
+        response.put(
+                "path",
+                request.getRequestURI()
+        );
+
+        response.put(
+                "timestamp",
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity
+                .status(
+                        exception.getStatus()
+                )
+                .body(
+                        response
+                );
+    }
 
     /* =========================================================
        API EXCEPTIONS
