@@ -6325,3 +6325,1919 @@ html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(3) {
     animation: none !important;
   }
 }
+
+/* =========================================================
+   ATTENDANCE SESSION V7 — AMBIGUOUS FACE MATCH
+   APPEND-ONLY SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Added for:
+   - Backend outcome: AMBIGUOUS
+   - Two possible student identities
+   - Human-readable cosine similarity percentages
+   - No-attendance-recorded safety state
+   - Manual attendance fallback
+========================================================= */
+
+/* =========================================================
+   CAMERA — AMBIGUOUS STATE
+========================================================= */
+
+.attendance-face-target.scanner-ambiguous .attendance-face-target-oval {
+  border-color: #fbbf24;
+  box-shadow:
+    0 0 0 999px rgba(5, 10, 22, 0.1),
+    0 0 42px rgba(251, 191, 36, 0.26);
+}
+
+.attendance-live-camera-shell.scanner-ambiguous
+  .attendance-scanner-message {
+  border-color: rgba(253, 224, 71, 0.3);
+  background: rgba(113, 63, 18, 0.78);
+}
+
+.attendance-live-camera-shell.scanner-ambiguous
+  .attendance-scanner-message
+  > span {
+  color: #fde68a;
+}
+
+/* =========================================================
+   RESULT PANEL — AMBIGUOUS CONTENT
+========================================================= */
+
+.attendance-result-ambiguous {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 24px 20px;
+  text-align: center;
+  animation: attendance-session-result-warning-v5 0.36s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-result-ambiguous-icon {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 72px;
+  margin-top: 2px;
+  border: 1px solid #f4d78d;
+  border-radius: 50%;
+  background: #fff7d6;
+  color: #a16207;
+  font-size: 30px;
+  font-weight: 950;
+  animation: attendance-session-result-icon-pop-v5 0.38s 0.04s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-result-ambiguous h2 {
+  margin: 7px 0 0;
+  color: #10213c;
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 900;
+  line-height: 1.12;
+}
+
+.attendance-result-ambiguous-intro {
+  max-width: 330px;
+  margin: 9px auto 0;
+  color: #687990;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   POSSIBLE MATCH CARDS
+========================================================= */
+
+.attendance-ambiguous-candidates {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  margin-top: 17px;
+}
+
+.attendance-ambiguous-candidate {
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid #e7d49a;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #fffdf5 0%, #fffaf0 100%);
+  text-align: left;
+  animation: attendance-session-mini-card-enter-v5 0.3s
+    var(--c-ease-enter, cubic-bezier(0.22, 1, 0.36, 1)) both;
+}
+
+.attendance-ambiguous-candidate:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.attendance-ambiguous-candidate-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.attendance-ambiguous-candidate-topline > span {
+  color: #8a6a00;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.attendance-ambiguous-candidate-topline > strong {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  border: 1px solid #f0d37f;
+  border-radius: 999px;
+  background: #fff4bf;
+  color: #8a5d00;
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.attendance-ambiguous-candidate h3 {
+  margin: 7px 0 0;
+  overflow: hidden;
+  color: #172b47;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attendance-ambiguous-candidate > p {
+  margin: 3px 0 0;
+  color: #718197;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.attendance-ambiguous-similarity {
+  margin-top: 10px;
+}
+
+.attendance-ambiguous-similarity > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.attendance-ambiguous-similarity > div:first-child span {
+  color: #7c8b9d;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+}
+
+.attendance-ambiguous-similarity > div:first-child strong {
+  color: #8a5d00;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.attendance-ambiguous-meter {
+  height: 7px;
+  overflow: hidden;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: #eee7d4;
+}
+
+.attendance-ambiguous-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #eab308 0%, #f59e0b 100%);
+  transition: width 0.28s ease;
+}
+
+/* =========================================================
+   SIMILARITY DIFFERENCE
+========================================================= */
+
+.attendance-ambiguous-difference {
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 12px;
+  border: 1px solid #dbe4ee;
+  border-radius: 10px;
+  background: #f8fafc;
+  text-align: left;
+}
+
+.attendance-ambiguous-difference > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.attendance-ambiguous-difference span {
+  color: #60758e;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+}
+
+.attendance-ambiguous-difference strong {
+  color: #123d7e;
+  font-size: 14px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.attendance-ambiguous-difference p {
+  margin: 6px 0 0;
+  color: #75869a;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   SAFETY NOTE
+========================================================= */
+
+.attendance-ambiguous-safe-note {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 10px;
+  padding: 10px 11px;
+  border: 1px solid #b9e5c7;
+  border-radius: 10px;
+  background: #f0fdf4;
+  text-align: left;
+}
+
+.attendance-ambiguous-safe-note strong {
+  color: #166534;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.attendance-ambiguous-safe-note span {
+  color: #47745a;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   AMBIGUOUS ACTIONS
+========================================================= */
+
+.attendance-ambiguous-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.attendance-ambiguous-actions button {
+  min-height: 40px;
+  padding: 0 11px;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-ambiguous-actions .is-manual {
+  border: 1px solid #123d7e;
+  background: #123d7e;
+  color: #ffffff;
+}
+
+.attendance-ambiguous-actions .is-secondary {
+  border: 1px solid #cbd7e5;
+  background: #ffffff;
+  color: #35516f;
+}
+
+@media (hover: hover) {
+  .attendance-ambiguous-actions button:hover {
+    transform: translateY(-1px);
+  }
+
+  .attendance-ambiguous-actions .is-manual:hover {
+    border-color: #0d326b;
+    background: #0d326b;
+    box-shadow: 0 7px 16px rgba(18, 61, 126, 0.13);
+  }
+
+  .attendance-ambiguous-actions .is-secondary:hover {
+    border-color: #aebed1;
+    background: #f5f8fb;
+  }
+}
+
+.attendance-ambiguous-actions button:active {
+  transform: translateY(0) scale(0.985);
+}
+
+/* =========================================================
+   DARK MODE — AMBIGUOUS
+========================================================= */
+
+html[data-theme="dark"] .attendance-result-ambiguous h2 {
+  color: #f0f5fb;
+}
+
+html[data-theme="dark"] .attendance-result-ambiguous-intro {
+  color: #9aaabd;
+}
+
+html[data-theme="dark"] .attendance-result-ambiguous-icon {
+  border-color: #72551e;
+  background: rgba(146, 64, 14, 0.22);
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate {
+  border-color: #665527;
+  background: rgba(113, 63, 18, 0.17);
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate-topline > span,
+html[data-theme="dark"]
+  .attendance-ambiguous-similarity
+  > div:first-child
+  strong {
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate-topline > strong {
+  border-color: #735f27;
+  background: rgba(146, 64, 14, 0.3);
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate h3 {
+  color: #eef4fb;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate > p,
+html[data-theme="dark"]
+  .attendance-ambiguous-similarity
+  > div:first-child
+  span {
+  color: #9baabd;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-meter {
+  background: #263247;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-difference {
+  border-color: #34475f;
+  background: #101c2e;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-difference span {
+  color: #9aaabd;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-difference strong {
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-difference p {
+  color: #8fa0b6;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-safe-note {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.16);
+}
+
+html[data-theme="dark"] .attendance-ambiguous-safe-note strong {
+  color: #86efac;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-safe-note span {
+  color: #a7c9b2;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-actions .is-secondary {
+  border-color: #34475f;
+  background: #101c2e;
+  color: #dce6f2;
+}
+
+/* =========================================================
+   RESPONSIVE — AMBIGUOUS
+========================================================= */
+
+@media (max-width: 650px) {
+  .attendance-result-ambiguous {
+    padding: 20px 15px;
+  }
+
+  .attendance-result-ambiguous-icon {
+    width: 64px;
+    height: 64px;
+    flex-basis: 64px;
+    font-size: 27px;
+  }
+
+  .attendance-result-ambiguous h2 {
+    font-size: 22px;
+  }
+
+  .attendance-result-ambiguous-intro {
+    font-size: 11px;
+  }
+
+  .attendance-ambiguous-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION — AMBIGUOUS
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-result-ambiguous,
+  .attendance-result-ambiguous-icon,
+  .attendance-ambiguous-candidate {
+    animation: none !important;
+  }
+
+  .attendance-ambiguous-meter > span,
+  .attendance-ambiguous-actions button {
+    transition: none !important;
+  }
+
+  .attendance-ambiguous-actions button:hover,
+  .attendance-ambiguous-actions button:active {
+    transform: none !important;
+  }
+}
+
+
+/* =========================================================
+   ATTENDANCE SESSION V6 — AMBIGUOUS DECISION UX
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Goals:
+   - Keep ambiguous results readable in the side panel.
+   - Make the two possible students easy to compare.
+   - Allow direct manual attendance from each candidate card.
+   - Keep the decision visible until the adviser acts.
+========================================================= */
+
+/* Let long ambiguity content scroll inside the side panel instead of
+   forcing the whole page to jump or clipping the action controls. */
+.attendance-live-result-panel:has(.attendance-result-ambiguous) {
+  overflow: hidden;
+}
+
+.attendance-result-ambiguous {
+  align-items: stretch;
+  overflow-y: auto;
+  padding: 18px;
+  text-align: left;
+  scrollbar-width: thin;
+  scrollbar-color: #c7d3e2 transparent;
+}
+
+.attendance-result-ambiguous::-webkit-scrollbar {
+  width: 7px;
+}
+
+.attendance-result-ambiguous::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #c7d3e2;
+}
+
+.attendance-ambiguous-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+.attendance-ambiguous-heading .attendance-result-ambiguous-icon {
+  width: 50px;
+  height: 50px;
+  flex-basis: 50px;
+  margin: 0;
+  border-radius: 15px;
+  font-size: 23px;
+}
+
+.attendance-ambiguous-heading .attendance-result-kicker {
+  margin-top: 1px;
+}
+
+.attendance-ambiguous-heading h2 {
+  margin-top: 5px;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.attendance-ambiguous-heading .attendance-result-ambiguous-intro {
+  max-width: none;
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Explicit persistence cue so the adviser knows there is no countdown. */
+.attendance-ambiguous-persistent-note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 8px 10px;
+  border: 1px solid #d9e3ef;
+  border-radius: 9px;
+  background: #f7faff;
+  color: #526a84;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.attendance-ambiguous-persistent-note > span {
+  color: #2563eb;
+  font-size: 9px;
+}
+
+.attendance-ambiguous-candidates {
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.attendance-ambiguous-candidate {
+  position: relative;
+  padding: 12px;
+  border-color: #d8e2ee;
+  background: #ffffff;
+  box-shadow: 0 5px 16px rgba(15, 35, 70, 0.045);
+}
+
+.attendance-ambiguous-candidate.is-closest {
+  border-color: #f0cf73;
+  background: linear-gradient(180deg, #fffdf6 0%, #ffffff 100%);
+  box-shadow: 0 6px 18px rgba(161, 98, 7, 0.07);
+}
+
+.attendance-ambiguous-candidate-topline > span {
+  color: #637890;
+  font-size: 8px;
+}
+
+.attendance-ambiguous-candidate.is-closest
+  .attendance-ambiguous-candidate-topline
+  > span {
+  color: #9a6700;
+}
+
+.attendance-ambiguous-candidate-topline > strong {
+  min-height: 26px;
+  padding: 0 8px;
+  border-color: #d5e0eb;
+  background: #f5f8fc;
+  color: #294d73;
+  font-size: 11px;
+}
+
+.attendance-ambiguous-candidate.is-closest
+  .attendance-ambiguous-candidate-topline
+  > strong {
+  border-color: #f0d37f;
+  background: #fff4bf;
+  color: #8a5d00;
+}
+
+.attendance-ambiguous-candidate-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin-top: 9px;
+}
+
+.attendance-ambiguous-avatar {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #c9d9eb;
+  border-radius: 11px;
+  background: #edf5ff;
+  color: #17427f;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.attendance-ambiguous-candidate.is-closest .attendance-ambiguous-avatar {
+  border-color: #f0d37f;
+  background: #fff7d6;
+  color: #9a6700;
+}
+
+.attendance-ambiguous-identity {
+  min-width: 0;
+}
+
+.attendance-ambiguous-identity h3 {
+  margin: 0;
+  overflow: hidden;
+  color: #142b47;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attendance-ambiguous-identity p {
+  margin: 3px 0 0;
+  color: #74859a;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.attendance-ambiguous-similarity {
+  margin-top: 9px;
+}
+
+.attendance-ambiguous-meter {
+  height: 6px;
+}
+
+/* Primary action lives inside the candidate card so the adviser does not
+   have to search the table below after identifying the student. */
+.attendance-ambiguous-mark-button {
+  width: 100%;
+  min-height: 38px;
+  margin-top: 11px;
+  border: 1px solid #2563eb;
+  border-radius: 9px;
+  background: #2563eb;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-ambiguous-candidate.is-closest
+  .attendance-ambiguous-mark-button {
+  border-color: #123d7e;
+  background: #123d7e;
+}
+
+@media (hover: hover) {
+  .attendance-ambiguous-mark-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: #1d4ed8;
+    background: #1d4ed8;
+    box-shadow: 0 7px 16px rgba(37, 99, 235, 0.15);
+  }
+
+  .attendance-ambiguous-candidate.is-closest
+    .attendance-ambiguous-mark-button:hover:not(:disabled) {
+    border-color: #0d326b;
+    background: #0d326b;
+  }
+}
+
+.attendance-ambiguous-mark-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+.attendance-ambiguous-mark-button:disabled {
+  border-color: #cbd5e1;
+  background: #e9eef4;
+  color: #8190a2;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Keep the technical information secondary to the decision. */
+.attendance-ambiguous-difference {
+  margin-top: 10px;
+  padding: 9px 10px;
+  background: #f8fafc;
+}
+
+.attendance-ambiguous-difference p {
+  margin-top: 5px;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.attendance-ambiguous-safe-note {
+  margin-top: 9px;
+  padding: 9px 10px;
+}
+
+.attendance-ambiguous-safe-note strong {
+  font-size: 10px;
+}
+
+.attendance-ambiguous-safe-note span {
+  font-size: 9px;
+}
+
+.attendance-ambiguous-action-error {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 9px;
+  padding: 9px 10px;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  background: #fff1f2;
+  color: #9f1239;
+}
+
+.attendance-ambiguous-action-error strong {
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.attendance-ambiguous-action-error span {
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+/* Only Scan Again belongs in the footer now; candidate-specific recording
+   happens directly on the cards above. Keep it visible at the bottom. */
+.attendance-ambiguous-actions {
+  position: sticky;
+  bottom: -18px;
+  z-index: 3;
+  grid-template-columns: 1fr;
+  margin: 12px -18px -18px;
+  padding: 10px 18px 18px;
+  border-top: 1px solid #e5eaf0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    #ffffff 28%
+  );
+  backdrop-filter: blur(10px);
+}
+
+.attendance-ambiguous-actions .is-secondary {
+  min-height: 39px;
+  border-color: #c9d6e5;
+  background: #ffffff;
+  color: #35516f;
+}
+
+.attendance-ambiguous-actions .is-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   DARK MODE — V6 AMBIGUOUS DECISION UX
+========================================================= */
+
+html[data-theme="dark"] .attendance-result-ambiguous {
+  scrollbar-color: #42536b transparent;
+}
+
+html[data-theme="dark"] .attendance-result-ambiguous::-webkit-scrollbar-thumb {
+  background: #42536b;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-persistent-note {
+  border-color: #30445f;
+  background: #101d2e;
+  color: #aab9cb;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-persistent-note > span {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate {
+  border-color: #34475f;
+  background: #101c2e;
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate.is-closest {
+  border-color: #735f27;
+  background: linear-gradient(
+    180deg,
+    rgba(146, 64, 14, 0.17),
+    #101c2e 42%
+  );
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate-topline > span {
+  color: #9bacc0;
+}
+
+html[data-theme="dark"]
+  .attendance-ambiguous-candidate.is-closest
+  .attendance-ambiguous-candidate-topline
+  > span {
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate-topline > strong {
+  border-color: #40536b;
+  background: #142238;
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-avatar {
+  border-color: #31588b;
+  background: #132d50;
+  color: #93c5fd;
+}
+
+html[data-theme="dark"]
+  .attendance-ambiguous-candidate.is-closest
+  .attendance-ambiguous-avatar {
+  border-color: #735f27;
+  background: rgba(146, 64, 14, 0.25);
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-identity h3 {
+  color: #eef4fb;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-identity p {
+  color: #9bacc0;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-mark-button:disabled {
+  border-color: #34475f;
+  background: #172337;
+  color: #71839a;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-action-error {
+  border-color: #7f1d1d;
+  background: rgba(127, 29, 29, 0.18);
+  color: #fecdd3;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-actions {
+  border-top-color: #26354b;
+  background: linear-gradient(
+    180deg,
+    rgba(13, 23, 39, 0.9) 0%,
+    #0d1727 28%
+  );
+}
+
+/* =========================================================
+   RESPONSIVE — V6 AMBIGUOUS DECISION UX
+========================================================= */
+
+@media (max-width: 1180px) {
+  .attendance-result-ambiguous {
+    max-height: 720px;
+  }
+}
+
+@media (max-width: 650px) {
+  .attendance-result-ambiguous {
+    max-height: none;
+    padding: 15px;
+  }
+
+  .attendance-ambiguous-heading {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .attendance-ambiguous-heading .attendance-result-ambiguous-icon {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+    border-radius: 13px;
+    font-size: 20px;
+  }
+
+  .attendance-ambiguous-heading h2 {
+    font-size: 18px;
+  }
+
+  .attendance-ambiguous-actions {
+    bottom: -15px;
+    margin: 11px -15px -15px;
+    padding: 9px 15px 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-ambiguous-mark-button {
+    transition: none !important;
+  }
+
+  .attendance-ambiguous-mark-button:hover,
+  .attendance-ambiguous-mark-button:active {
+    transform: none !important;
+  }
+}
+
+/* =========================================================
+   ATTENDANCE SESSION V6 — MANUAL-FIRST, CALM SCANNER UX
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Interaction model:
+   - Manual Capture is the default.
+   - Auto Capture remains opt-in through the existing switch.
+   - Manual-mode results stay visible until the adviser continues.
+   - Ambiguous identity turns the camera off and requires review.
+   - Camera/session metrics live outside the preview to reduce clutter.
+========================================================= */
+
+/* ---------- Page / hero rhythm ---------- */
+
+.attendance-live-page {
+  background:
+    radial-gradient(circle at 82% -8%, rgba(37, 99, 235, 0.08), transparent 28%),
+    linear-gradient(180deg, #f8fafc 0%, #eef3f8 100%);
+}
+
+.attendance-live-hero {
+  width: min(100%, 1580px);
+  min-height: auto;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 410px);
+  align-items: start;
+  gap: 20px;
+  padding: 18px 24px 26px;
+}
+
+.attendance-live-camera-column {
+  gap: 12px;
+}
+
+.attendance-live-camera-header {
+  align-items: center;
+  gap: 20px;
+  padding: 4px 2px 2px;
+}
+
+.attendance-live-camera-header h1 {
+  margin-top: 6px;
+  font-size: clamp(28px, 2.5vw, 38px);
+  letter-spacing: -0.55px;
+}
+
+.attendance-live-camera-header p {
+  max-width: 720px;
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.attendance-live-header-actions {
+  flex: 0 0 auto;
+}
+
+/* ---------- Manual-first controls ---------- */
+
+.attendance-auto-toggle,
+.attendance-scan-now-button {
+  min-height: 42px;
+  border-radius: 10px;
+}
+
+.attendance-auto-toggle {
+  border-color: #cbd8e8;
+  background: #ffffff;
+  color: #53677e;
+}
+
+.attendance-auto-toggle.is-on {
+  border-color: #9fd7af;
+  background: #effbf3;
+  color: #166534;
+}
+
+.attendance-auto-toggle:disabled {
+  filter: grayscale(0.2);
+}
+
+.attendance-scan-now-button {
+  min-width: 112px;
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  box-shadow: 0 7px 18px rgba(29, 78, 216, 0.12);
+}
+
+.attendance-scan-now-button:hover:not(:disabled) {
+  border-color: #1e40af;
+  background: #1e40af;
+}
+
+/* ---------- Camera workspace ---------- */
+
+.attendance-camera-workspace {
+  overflow: hidden;
+  border: 1px solid #ced9e7;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 22px 48px rgba(15, 35, 70, 0.1);
+}
+
+.attendance-live-camera-shell {
+  width: 100%;
+  height: clamp(500px, 62vh, 670px);
+  min-height: 0;
+  max-height: none;
+  flex: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background:
+    radial-gradient(circle at 50% 44%, #172b4d 0%, #0a162b 54%, #050b16 100%);
+}
+
+.attendance-live-camera-shell.is-review-paused {
+  background:
+    radial-gradient(circle at 50% 42%, #25334a 0%, #111a2a 55%, #080d16 100%);
+}
+
+.attendance-live-camera-shell video {
+  filter: saturate(0.96) contrast(1.02);
+}
+
+/* Keep the framing target visually stable across desktop sizes. */
+.attendance-face-target {
+  width: clamp(220px, 21vw, 292px);
+  height: clamp(300px, 29vw, 390px);
+}
+
+.attendance-face-target-oval {
+  border-color: rgba(255, 255, 255, 0.68);
+}
+
+.attendance-live-badge {
+  top: 16px;
+  left: 16px;
+  min-height: 30px;
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(5, 14, 31, 0.72);
+}
+
+.attendance-capture-mode-badge {
+  position: absolute;
+  z-index: 7;
+  top: 16px;
+  right: 16px;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(5, 14, 31, 0.72);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  backdrop-filter: blur(10px);
+}
+
+.attendance-capture-mode-badge > span {
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 9px;
+}
+
+.attendance-capture-mode-badge.is-manual > span {
+  background: rgba(96, 165, 250, 0.2);
+  color: #bfdbfe;
+}
+
+.attendance-capture-mode-badge.is-auto {
+  border-color: rgba(134, 239, 172, 0.24);
+  background: rgba(20, 83, 45, 0.68);
+  color: #dcfce7;
+}
+
+.attendance-capture-mode-badge.is-auto > span {
+  background: rgba(134, 239, 172, 0.17);
+  color: #bbf7d0;
+}
+
+/* Camera message is a calm instruction bar, not a second dashboard. */
+.attendance-scanner-message {
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  background: rgba(4, 12, 27, 0.76);
+}
+
+.attendance-scanner-message > span {
+  font-size: 9px;
+}
+
+.attendance-scanner-message strong {
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+.attendance-scanner-message small {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+/* Old overlay stats are intentionally retired by the V6 JSX. */
+.attendance-camera-stats {
+  display: none !important;
+}
+
+/* ---------- Session stats below camera ---------- */
+
+.attendance-camera-session-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  border-top: 1px solid #dbe4ee;
+  background: #fbfcfe;
+}
+
+.attendance-camera-session-strip > div {
+  position: relative;
+  min-width: 0;
+  padding: 12px 15px;
+}
+
+.attendance-camera-session-strip > div + div {
+  border-left: 1px solid #e1e7ee;
+}
+
+.attendance-camera-session-strip span {
+  display: block;
+  color: #718196;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+}
+
+.attendance-camera-session-strip strong {
+  display: block;
+  margin-top: 4px;
+  color: #17304e;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.attendance-camera-session-strip .is-present {
+  background: #f3fbf5;
+}
+
+.attendance-camera-session-strip .is-present strong {
+  color: #15803d;
+}
+
+.attendance-camera-session-strip .is-late {
+  background: #fffaf0;
+}
+
+.attendance-camera-session-strip .is-late strong {
+  color: #b45309;
+}
+
+.attendance-camera-session-strip .is-remaining {
+  background: #f7f9fc;
+}
+
+.attendance-camera-session-strip .is-remaining strong {
+  color: #475569;
+}
+
+.attendance-camera-session-strip .is-completion {
+  background: #f5f7ff;
+}
+
+.attendance-camera-session-strip .is-completion strong {
+  color: #4f46e5;
+}
+
+/* ---------- Camera safety pause ---------- */
+
+.attendance-live-camera-placeholder.is-review-pause,
+.attendance-live-camera-placeholder.is-complete-pause {
+  z-index: 12;
+  max-width: 100%;
+  padding: 34px;
+}
+
+.attendance-live-camera-placeholder.is-review-pause {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(180, 83, 9, 0.13), transparent 32%),
+    rgba(6, 12, 24, 0.58);
+}
+
+.attendance-live-camera-placeholder.is-review-pause
+  .attendance-live-camera-placeholder-icon {
+  border-color: rgba(253, 230, 138, 0.22);
+  background: rgba(120, 53, 15, 0.46);
+  color: #fde68a;
+}
+
+.attendance-live-camera-placeholder.is-review-pause > span {
+  color: #fde68a;
+}
+
+.attendance-live-camera-placeholder.is-complete-pause {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(21, 128, 61, 0.13), transparent 32%),
+    rgba(6, 12, 24, 0.58);
+}
+
+.attendance-live-camera-placeholder.is-complete-pause
+  .attendance-live-camera-placeholder-icon {
+  border-color: rgba(134, 239, 172, 0.22);
+  background: rgba(20, 83, 45, 0.46);
+  color: #bbf7d0;
+}
+
+.attendance-live-camera-placeholder.is-complete-pause > span {
+  color: #bbf7d0;
+}
+
+.attendance-camera-pause-status {
+  min-width: min(100%, 320px);
+  margin-top: 5px;
+  padding: 11px 14px;
+  border: 1px solid rgba(253, 230, 138, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.attendance-camera-pause-status strong,
+.attendance-camera-pause-status span {
+  display: block;
+}
+
+.attendance-camera-pause-status strong {
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.attendance-camera-pause-status span {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+}
+
+/* ---------- Footer ---------- */
+
+.attendance-camera-footer {
+  min-height: 34px;
+  padding: 0 3px;
+}
+
+.attendance-camera-footer span {
+  color: #66788f;
+  font-size: 11px;
+}
+
+.attendance-camera-footer button {
+  font-size: 11px;
+}
+
+/* ---------- Result panel: quieter, predictable structure ---------- */
+
+.attendance-live-result-panel {
+  position: sticky;
+  top: 92px;
+  max-height: calc(100dvh - 110px);
+  min-height: 560px;
+  border-color: #d3dce7;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(15, 35, 70, 0.09);
+}
+
+.attendance-result-panel-header {
+  padding: 16px 18px;
+  background: #f8fafc;
+}
+
+.attendance-result-empty,
+.attendance-result-student {
+  padding: 22px 20px;
+}
+
+.attendance-result-empty-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 20px;
+  font-size: 28px;
+}
+
+.attendance-result-empty h2 {
+  margin-top: 14px;
+  font-size: 19px;
+}
+
+.attendance-result-empty > p {
+  max-width: 300px;
+  font-size: 12px;
+}
+
+.attendance-result-empty-steps {
+  margin-top: 20px;
+  gap: 6px;
+}
+
+.attendance-result-empty-steps > div {
+  padding: 10px 11px;
+}
+
+.attendance-result-empty-steps p {
+  font-size: 11px;
+}
+
+/* Keep the four session facts compact in a 2x2 footer. */
+.attendance-session-mini-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.attendance-session-mini-summary > div {
+  padding: 11px 13px;
+}
+
+.attendance-session-mini-summary > div + div {
+  border-top: 0;
+}
+
+.attendance-session-mini-summary > div:nth-child(even) {
+  border-left: 1px solid #e5eaf0;
+}
+
+.attendance-session-mini-summary > div:nth-child(n + 3) {
+  border-top: 1px solid #e5eaf0;
+}
+
+.attendance-session-mini-summary span {
+  font-size: 9px;
+}
+
+.attendance-session-mini-summary strong {
+  font-size: 12px;
+}
+
+/* ---------- Ambiguous review ---------- */
+
+.attendance-live-result-panel:has(.attendance-result-ambiguous) {
+  border-color: #e8cf92;
+  background: #fffef9;
+}
+
+.attendance-result-ambiguous {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 18px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.attendance-ambiguous-heading {
+  align-items: flex-start;
+  gap: 11px;
+}
+
+.attendance-ambiguous-heading .attendance-result-ambiguous-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 13px;
+  background: #fff3cd;
+  color: #9a6700;
+  font-size: 20px;
+}
+
+.attendance-ambiguous-heading h2 {
+  margin-top: 4px;
+  font-size: 18px;
+  line-height: 1.18;
+}
+
+.attendance-ambiguous-heading .attendance-result-ambiguous-intro {
+  margin-top: 5px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.attendance-ambiguous-persistent-note {
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 1px solid #e8d9ad;
+  border-radius: 9px;
+  background: #fffaf0;
+  color: #7a5b17;
+  font-size: 10px;
+}
+
+.attendance-ambiguous-candidates {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+}
+
+.attendance-ambiguous-candidate,
+.attendance-ambiguous-candidate.is-closest {
+  padding: 12px;
+  border: 1px solid #dce4ed;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.attendance-ambiguous-candidate.is-closest {
+  border-color: #b9d0ec;
+  background: #f8fbff;
+}
+
+.attendance-ambiguous-candidate-topline {
+  margin-bottom: 9px;
+}
+
+.attendance-ambiguous-candidate-topline > span {
+  font-size: 9px;
+}
+
+.attendance-ambiguous-candidate-topline > strong {
+  font-size: 14px;
+}
+
+.attendance-ambiguous-candidate-main {
+  gap: 9px;
+}
+
+.attendance-ambiguous-avatar {
+  width: 39px;
+  height: 39px;
+  flex: 0 0 39px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.attendance-ambiguous-identity h3 {
+  font-size: 13px;
+}
+
+.attendance-ambiguous-identity p {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.attendance-ambiguous-similarity {
+  margin-top: 9px;
+}
+
+.attendance-ambiguous-similarity > div:first-child span {
+  font-size: 9px;
+}
+
+.attendance-ambiguous-similarity > div:first-child strong {
+  font-size: 11px;
+}
+
+.attendance-ambiguous-meter {
+  height: 6px;
+}
+
+.attendance-ambiguous-mark-button {
+  min-height: 38px;
+  margin-top: 10px;
+  border-radius: 9px;
+  font-size: 11px;
+}
+
+.attendance-ambiguous-difference {
+  padding: 10px 11px;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.attendance-ambiguous-difference > div {
+  min-width: 110px;
+}
+
+.attendance-ambiguous-difference span {
+  font-size: 8px;
+}
+
+.attendance-ambiguous-difference strong {
+  font-size: 13px;
+}
+
+.attendance-ambiguous-difference p {
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.attendance-ambiguous-safe-note {
+  padding: 10px 11px;
+  border-radius: 10px;
+}
+
+.attendance-ambiguous-safe-note strong {
+  font-size: 11px;
+}
+
+.attendance-ambiguous-safe-note span {
+  margin-top: 3px;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.attendance-ambiguous-actions {
+  margin-top: 0;
+}
+
+.attendance-ambiguous-actions .is-secondary {
+  min-height: 38px;
+  border-color: #c9d5e2;
+  background: #ffffff;
+  color: #38516d;
+  font-size: 11px;
+}
+
+/* ---------- Standard result ---------- */
+
+.attendance-result-icon {
+  width: 68px;
+  height: 68px;
+  margin-top: 4px;
+  font-size: 28px;
+}
+
+.attendance-result-kicker {
+  margin-top: 13px;
+}
+
+.attendance-result-student h2 {
+  font-size: clamp(22px, 2vw, 28px);
+}
+
+.attendance-result-details {
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.attendance-result-details > div {
+  padding: 10px;
+}
+
+.attendance-result-message {
+  font-size: 12px;
+}
+
+.attendance-result-student > button {
+  min-height: 41px;
+  margin-top: 16px;
+  font-size: 12px;
+}
+
+/* ---------- Report section consistency ---------- */
+
+.attendance-live-report-section {
+  width: min(calc(100% - 48px), 1580px);
+}
+
+.attendance-report-summary {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.attendance-summary-card.is-late {
+  border-color: #f2d7a0;
+  border-top-color: #f59e0b;
+  background: #fffaf0;
+  color: #b45309;
+}
+
+.attendance-summary-card.is-late span,
+.attendance-summary-card.is-late strong {
+  color: currentColor;
+}
+
+.attendance-live-table tbody tr.is-late {
+  background: linear-gradient(90deg, rgba(255, 250, 235, 0.95), #ffffff 36%);
+}
+
+.attendance-live-status.is-late {
+  border: 1px solid #f0d7a2;
+  background: #fff8e8;
+  color: #a85d08;
+}
+
+.attendance-live-status.is-late i {
+  background: #f59e0b;
+}
+
+/* End modal currently displays Present / Late / Remaining. */
+.attendance-live-end-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.attendance-live-end-summary > div:nth-child(2) {
+  border-color: #f2d7a0;
+  background: #fffaf0;
+}
+
+.attendance-live-end-summary > div:nth-child(2) span {
+  color: #b45309;
+}
+
+.attendance-live-end-summary > div:nth-child(3) {
+  border-color: #d8e0ea;
+  background: #f8fafc;
+}
+
+.attendance-live-end-summary > div:nth-child(3) span {
+  color: #64748b;
+}
+
+/* ---------- Dark mode ---------- */
+
+html[data-theme="dark"] .attendance-camera-workspace,
+html[data-theme="dark"] .attendance-live-result-panel {
+  border-color: #2a3a50;
+  background: #0d1727;
+}
+
+html[data-theme="dark"] .attendance-camera-session-strip {
+  border-color: #2a3a50;
+  background: #101c2e;
+}
+
+html[data-theme="dark"] .attendance-camera-session-strip > div + div {
+  border-left-color: #26364d;
+}
+
+html[data-theme="dark"] .attendance-camera-session-strip .is-present {
+  background: rgba(22, 101, 52, 0.14);
+}
+
+html[data-theme="dark"] .attendance-camera-session-strip .is-late {
+  background: rgba(146, 64, 14, 0.14);
+}
+
+html[data-theme="dark"] .attendance-camera-session-strip .is-remaining {
+  background: #101c2e;
+}
+
+html[data-theme="dark"] .attendance-camera-session-strip .is-completion {
+  background: rgba(79, 70, 229, 0.13);
+}
+
+html[data-theme="dark"] .attendance-camera-session-strip span {
+  color: #91a1b6;
+}
+
+html[data-theme="dark"] .attendance-camera-session-strip .is-remaining strong {
+  color: #d6dfeb;
+}
+
+html[data-theme="dark"] .attendance-live-result-panel:has(.attendance-result-ambiguous) {
+  border-color: #6c5426;
+  background: #0d1727;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-persistent-note {
+  border-color: #665329;
+  background: rgba(146, 64, 14, 0.14);
+  color: #f6d98a;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate,
+html[data-theme="dark"] .attendance-ambiguous-candidate.is-closest {
+  border-color: #304158;
+  background: #101c2e;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-candidate.is-closest {
+  border-color: #3c648f;
+  background: #102038;
+}
+
+html[data-theme="dark"] .attendance-ambiguous-difference {
+  border-color: #2d3d55;
+  background: #101c2e;
+}
+
+html[data-theme="dark"] .attendance-summary-card.is-late {
+  border-color: #72551e;
+  border-top-color: #fbbf24;
+  background: rgba(146, 64, 14, 0.16);
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .attendance-live-status.is-late {
+  border-color: #72551e;
+  background: rgba(146, 64, 14, 0.16);
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(2) {
+  border-color: #72551e;
+  background: rgba(146, 64, 14, 0.14);
+}
+
+html[data-theme="dark"] .attendance-live-end-summary > div:nth-child(3) {
+  border-color: #34455a;
+  background: #101c2e;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1180px) {
+  .attendance-live-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-live-result-panel {
+    position: static;
+    top: auto;
+    max-height: none;
+    min-height: 0;
+  }
+
+  .attendance-result-ambiguous {
+    overflow: visible;
+  }
+
+  .attendance-ambiguous-candidates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-report-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .attendance-live-camera-shell {
+    height: clamp(480px, 60vh, 610px);
+  }
+
+  .attendance-live-camera-header {
+    align-items: flex-start;
+  }
+
+  .attendance-camera-session-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-camera-session-strip > div:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid #e1e7ee;
+  }
+
+  .attendance-camera-session-strip > div:nth-child(4) {
+    border-top: 1px solid #e1e7ee;
+  }
+
+  html[data-theme="dark"] .attendance-camera-session-strip > div:nth-child(3),
+  html[data-theme="dark"] .attendance-camera-session-strip > div:nth-child(4) {
+    border-top-color: #26364d;
+  }
+}
+
+@media (max-width: 650px) {
+  .attendance-live-hero {
+    padding: 14px 12px 20px;
+  }
+
+  .attendance-live-camera-header {
+    gap: 12px;
+  }
+
+  .attendance-live-camera-header h1 {
+    font-size: 27px;
+  }
+
+  .attendance-live-header-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .attendance-live-camera-shell {
+    height: clamp(460px, 66vh, 560px);
+  }
+
+  .attendance-face-target {
+    width: 190px;
+    height: 272px;
+  }
+
+  .attendance-capture-mode-badge {
+    top: 12px;
+    right: 12px;
+    max-width: calc(100% - 106px);
+    overflow: hidden;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .attendance-live-badge {
+    top: 12px;
+    left: 12px;
+  }
+
+  .attendance-camera-session-strip > div {
+    padding: 11px 12px;
+  }
+
+  .attendance-camera-session-strip strong {
+    font-size: 17px;
+  }
+
+  .attendance-ambiguous-candidates {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-result-ambiguous {
+    padding: 15px;
+  }
+
+  .attendance-ambiguous-difference {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .attendance-session-mini-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-session-mini-summary > div:nth-child(even) {
+    border-left: 0;
+  }
+
+  .attendance-session-mini-summary > div + div {
+    border-top: 1px solid #e5eaf0;
+  }
+
+  .attendance-report-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .attendance-live-end-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-capture-mode-badge,
+  .attendance-camera-session-strip > div,
+  .attendance-live-camera-placeholder.is-review-pause,
+  .attendance-live-camera-placeholder.is-complete-pause {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+

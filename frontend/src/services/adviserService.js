@@ -90,12 +90,28 @@ const deleteStudent = async (
 ========================================================= */
 
 /**
- * Registers a face image for a student.
+ * Registers or updates a face image for a student.
  *
  * Backend expects multipart/form-data
  * with a file field named "image".
  *
  * Do not manually set Content-Type.
+ *
+ * POSSIBLE SUCCESSFUL BUSINESS OUTCOMES:
+ *
+ * ENROLLED
+ * -> HTTP 200
+ * -> face was saved successfully
+ *
+ * FACE_CONFLICT
+ * -> HTTP 409
+ * -> a highly similar enrolled face was detected
+ * -> face was NOT saved
+ *
+ * FACE_CONFLICT is intentionally returned to the UI
+ * instead of being treated as a generic Axios failure.
+ *
+ * Other 4xx/5xx errors are still thrown normally.
  */
 const registerStudentFace = async (
   studentId,
@@ -108,9 +124,133 @@ const registerStudentFace = async (
     imageFile,
   );
 
+  try {
+    const response = await api.post(
+      `/students/${studentId}/face`,
+      formData,
+    );
+
+    return response.data;
+  } catch (error) {
+    const status =
+      error?.response?.status;
+
+    const data =
+      error?.response?.data;
+
+    /* =======================================================
+       EXPECTED FACE-CONFLICT OUTCOME
+
+       Backend intentionally returns HTTP 409 when another
+       globally enrolled face is unusually similar.
+
+       This is NOT converted into a normal JavaScript error
+       because the enrollment UI needs the conflict details.
+    ======================================================= */
+
+    if (
+      status === 409 &&
+      data?.outcome === "FACE_CONFLICT"
+    ) {
+      return data;
+    }
+
+    /* =======================================================
+       REAL API ERROR
+
+       Examples:
+       - 400 invalid image
+       - 401 unauthenticated
+       - 403 wrong Adviser
+       - 404 student missing
+       - 500 backend error
+    ======================================================= */
+
+    throw error;
+  }
+};
+
+/* =========================================================
+   STUDENT FACE CONFLICT VERIFICATION
+========================================================= */
+
+/**
+ * Performs the required second face capture for a
+ * persisted face conflict.
+ *
+ * Backend:
+ *
+ * POST
+ * /api/students/{studentId}/face-conflicts/{conflictId}/verify-capture
+ *
+ * multipart/form-data:
+ * image = File
+ *
+ * Possible outcomes:
+ *
+ * MANUAL_REVIEW_REQUIRED
+ * -> the same conflict was reproduced
+ * -> a human decision is now required
+ *
+ * CONFLICT_NOT_REPRODUCED
+ * -> the second capture did not reproduce the original conflict
+ * -> retry normal face enrollment with a fresh capture
+ *
+ * VERIFIED_DIFFERENT_PEOPLE
+ * CONFIRMED_SAME_PERSON
+ * -> the conflict had already been resolved previously
+ *
+ * Do not manually set Content-Type. Axios/browser will add
+ * the multipart boundary.
+ */
+const verifyStudentFaceConflictCapture = async (
+  studentId,
+  conflictId,
+  imageFile,
+) => {
+  const formData = new FormData();
+
+  formData.append(
+    "image",
+    imageFile,
+  );
+
   const response = await api.post(
-    `/students/${studentId}/face`,
+    `/students/${studentId}/face-conflicts/${conflictId}/verify-capture`,
     formData,
+  );
+
+  return response.data;
+};
+
+/* =========================================================
+   STUDENT FACE CONFLICT RESOLUTION
+========================================================= */
+
+/**
+ * Performs the final human identity decision after
+ * second-capture verification.
+ *
+ * decision:
+ *
+ * DIFFERENT_PEOPLE
+ * SAME_PERSON
+ *
+ * Backend:
+ *
+ * POST
+ * /api/students/{studentId}/face-conflicts/{conflictId}/resolve
+ */
+const resolveStudentFaceConflict = async (
+  studentId,
+  conflictId,
+  decision,
+) => {
+  const response = await api.post(
+    `/students/${studentId}/face-conflicts/${conflictId}/resolve`,
+    {
+      decision,
+    },
   );
 
   return response.data;
@@ -460,6 +600,8 @@ const adviserService = {
   updateStudent,
   deleteStudent,
   registerStudentFace,
+  verifyStudentFaceConflictCapture,
+  resolveStudentFaceConflict,
 
   /* ATTENDANCE SESSION */
 

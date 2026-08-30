@@ -32,6 +32,56 @@ const getErrorMessage = (error, fallbackMessage) =>
   error?.response?.data?.detail ||
   fallbackMessage;
 
+/*
+ * Backend face matching uses cosine distance where a lower value
+ * means a closer face match. For adviser-facing UI, convert that
+ * distance into an easier-to-read similarity percentage:
+ *
+ * similarity = (1 - cosineDistance) × 100
+ *
+ * This is a readability aid, not a probability or calibrated
+ * biometric confidence score.
+ */
+const getFaceSimilarityPercent = (distance) => {
+  const numericDistance = Number(distance);
+
+  if (!Number.isFinite(numericDistance)) {
+    return null;
+  }
+
+  return Math.max(
+    0,
+    Math.min(
+      100,
+      (1 - numericDistance) * 100,
+    ),
+  );
+};
+
+const formatFaceSimilarityPercent = (distance) => {
+  const percentage =
+    getFaceSimilarityPercent(
+      distance,
+    );
+
+  return percentage === null
+    ? "—"
+    : `${percentage.toFixed(1)}%`;
+};
+
+const formatSimilarityDifference = (distanceGap) => {
+  const numericGap =
+    Number(
+      distanceGap,
+    );
+
+  if (!Number.isFinite(numericGap)) {
+    return "—";
+  }
+
+  return `${Math.abs(numericGap * 100).toFixed(1)} pts`;
+};
+
 const getSessionId = (session) => session?.sessionId || session?.id || "";
 
 const getRecordStudentId = (record) =>
@@ -307,7 +357,7 @@ function AttendanceSession() {
 
   const [cameraError, setCameraError] = useState("");
 
-  const [autoScanEnabled, setAutoScanEnabled] = useState(true);
+  const [autoScanEnabled, setAutoScanEnabled] = useState(false);
 
   const [scannerState, setScannerState] = useState("idle");
 
@@ -316,6 +366,8 @@ function AttendanceSession() {
   const [recognizing, setRecognizing] = useState(false);
 
   const [recognitionResult, setRecognitionResult] = useState(null);
+
+  const [cameraHoldReason, setCameraHoldReason] = useState("");
 
   /* =======================================================
      MANUAL ATTENDANCE
@@ -328,6 +380,8 @@ function AttendanceSession() {
   const [manualMessage, setManualMessage] = useState("");
 
   const [manualError, setManualError] = useState("");
+
+  const [ambiguousActionError, setAmbiguousActionError] = useState("");
 
   /* =======================================================
      SESSION END
@@ -549,6 +603,15 @@ function AttendanceSession() {
       String(getSessionId(activeSession)) === String(sessionId) &&
       !scheduledEndReached,
   );
+
+  const cameraPausedForReview =
+    cameraHoldReason === "AMBIGUOUS";
+
+  const cameraPausedAfterReview =
+    cameraHoldReason === "MANUAL_RESULT";
+
+  const cameraIsHeld =
+    cameraPausedForReview || cameraPausedAfterReview;
 
   const attendanceRows = useMemo(
     () =>
@@ -949,6 +1012,8 @@ function AttendanceSession() {
       null,
     );
 
+    setCameraHoldReason("");
+
     stopCamera();
 
     setPageError(
@@ -966,7 +1031,12 @@ function AttendanceSession() {
   ======================================================= */
 
   useEffect(() => {
-    if (loading || !sessionIsActive || cameraActive) {
+    if (
+      loading ||
+      !sessionIsActive ||
+      cameraActive ||
+      cameraIsHeld
+    ) {
       return undefined;
     }
 
@@ -975,7 +1045,13 @@ function AttendanceSession() {
     }, 220);
 
     return () => window.clearTimeout(timer);
-  }, [loading, sessionIsActive, cameraActive, startCamera]);
+  }, [
+    loading,
+    sessionIsActive,
+    cameraActive,
+    cameraIsHeld,
+    startCamera,
+  ]);
 
   /* =======================================================
      RECOGNITION
@@ -1016,6 +1092,8 @@ function AttendanceSession() {
         attendedStudentIds,
       );
 
+      let keepScanLocked = false;
+
       try {
         clearAutoTimer();
         clearResultTimer();
@@ -1029,6 +1107,8 @@ function AttendanceSession() {
         setCameraError("");
 
         setRecognitionResult(null);
+
+        setAmbiguousActionError("");
 
         canvas.width = video.videoWidth;
 
@@ -1207,26 +1287,48 @@ function AttendanceSession() {
           "success",
         );
 
-        resultTimerRef.current =
-          window.setTimeout(
-            () => {
-              setRecognitionResult(
-                null,
-              );
+        if (autoScanEnabled) {
+          resultTimerRef.current =
+            window.setTimeout(
+              () => {
+                setRecognitionResult(
+                  null,
+                );
 
-              setScannerState(
-                "ready",
-              );
+                setScannerState(
+                  "ready",
+                );
 
-              scanLockRef.current =
-                false;
-            },
-            RESULT_HOLD_SUCCESS,
-          );
+                scanLockRef.current =
+                  false;
+              },
+              RESULT_HOLD_SUCCESS,
+            );
+        } else {
+          /*
+           * Manual-first mode keeps the result visible until the
+           * adviser explicitly continues to the next student.
+           */
+          keepScanLocked = true;
+          scanLockRef.current = true;
+        }
       } catch (requestError) {
         console.error("Face attendance failed:", requestError);
 
-        const status = requestError?.response?.status;
+        const status =
+          requestError?.response?.status;
+
+        const responseData =
+          requestError?.response?.data ||
+          {};
+
+        const responseOutcome =
+          String(
+            responseData?.outcome ||
+              "",
+          )
+            .trim()
+            .toUpperCase();
 
         const responseMessage =
           getErrorMessage(
@@ -1236,6 +1338,11 @@ function AttendanceSession() {
 
         const normalizedResponseMessage =
           responseMessage.toLowerCase();
+
+        const ambiguousFaceMatch =
+          status === 409 &&
+          responseOutcome ===
+            "AMBIGUOUS";
 
         const sessionEndedConflict =
           status === 409 &&
@@ -1249,6 +1356,103 @@ function AttendanceSession() {
               "session is no longer active",
             ));
 
+        /*
+         * AMBIGUOUS must be handled before the generic 409 branch.
+         * Otherwise the UI would incorrectly label it as
+         * "Already Recorded".
+         */
+        if (ambiguousFaceMatch) {
+          const topCandidate =
+            responseData?.topCandidate ||
+            null;
+
+          const secondCandidate =
+            responseData?.secondCandidate ||
+            null;
+
+          const normalizeCandidate =
+            (candidate) => {
+              if (!candidate) {
+                return null;
+              }
+
+              return {
+                studentId:
+                  candidate?.studentId ||
+                  "",
+                studentNumber:
+                  candidate?.studentNumber ||
+                  "—",
+                studentName:
+                  candidate?.studentName ||
+                  "Possible Student",
+                distance:
+                  candidate?.distance,
+                similarityPercent:
+                  getFaceSimilarityPercent(
+                    candidate?.distance,
+                  ),
+                similarityLabel:
+                  formatFaceSimilarityPercent(
+                    candidate?.distance,
+                  ),
+              };
+            };
+
+          setRecognitionResult({
+            type:
+              "warning",
+            outcome:
+              "AMBIGUOUS",
+            status:
+              "IDENTITY UNCERTAIN",
+            name:
+              "Manual verification required",
+            studentNumber:
+              "2 possible matches",
+            sectionName,
+            recordedAt:
+              new Date(),
+            method:
+              "Face Recognition",
+            message:
+              "Two similar student identities were detected. No attendance was recorded. Verify the student before recording attendance manually.",
+            topCandidate:
+              normalizeCandidate(
+                topCandidate,
+              ),
+            secondCandidate:
+              normalizeCandidate(
+                secondCandidate,
+              ),
+            similarityDifference:
+              formatSimilarityDifference(
+                responseData?.distanceGap,
+              ),
+          });
+
+          /*
+           * Identity conflict is a safety stop:
+           * - disable Auto Capture
+           * - stop the physical camera
+           * - keep the result visible
+           * - wait for an adviser decision
+           */
+          setAutoScanEnabled(false);
+          setCameraHoldReason("AMBIGUOUS");
+
+          stopCamera();
+
+          setScannerState(
+            "ambiguous",
+          );
+
+          keepScanLocked = true;
+          scanLockRef.current = true;
+
+          return;
+        }
+
         let title =
           "Face Not Recognized";
 
@@ -1259,7 +1463,8 @@ function AttendanceSession() {
           "error";
 
         if (sessionEndedConflict) {
-          title = "Session Ended";
+          title =
+            "Session Ended";
 
           message =
             "Attendance recording is already closed for this session.";
@@ -1280,11 +1485,24 @@ function AttendanceSession() {
           resultType =
             "warning";
         } else if (status === 403) {
-          title = "Wrong Section";
+          title =
+            "Wrong Section";
 
           message =
             "The recognized student does not belong to this section.";
-        } else if (status !== 422) {
+        } else if (
+          status === 422 ||
+          (status === 401 &&
+            normalizedResponseMessage.includes(
+              "face not recognized",
+            ))
+        ) {
+          title =
+            "Face Not Recognized";
+
+          message =
+            "No registered student matched the captured face.";
+        } else {
           title =
             "Recognition Failed";
 
@@ -1293,13 +1511,17 @@ function AttendanceSession() {
         }
 
         setRecognitionResult({
-          type: resultType,
+          type:
+            resultType,
           status:
             title.toUpperCase(),
-          name: title,
-          studentNumber: "—",
+          name:
+            title,
+          studentNumber:
+            "—",
           sectionName,
-          recordedAt: new Date(),
+          recordedAt:
+            new Date(),
           method:
             "Face Recognition",
           message:
@@ -1307,19 +1529,42 @@ function AttendanceSession() {
             message,
         });
 
-        setScannerState(resultType === "warning" ? "warning" : "error");
+        setScannerState(
+          resultType ===
+            "warning"
+            ? "warning"
+            : "error",
+        );
 
-        resultTimerRef.current = window.setTimeout(() => {
-          setRecognitionResult(null);
+        if (autoScanEnabled) {
+          resultTimerRef.current =
+            window.setTimeout(
+              () => {
+                setRecognitionResult(
+                  null,
+                );
 
-          setScannerState("ready");
+                setScannerState(
+                  "ready",
+                );
 
-          scanLockRef.current = false;
-        }, RESULT_HOLD_ERROR);
+                scanLockRef.current =
+                  false;
+              },
+              RESULT_HOLD_ERROR,
+            );
+        } else {
+          /*
+           * In Manual Capture mode the adviser should have time to
+           * read the result instead of watching it disappear.
+           */
+          keepScanLocked = true;
+          scanLockRef.current = true;
+        }
       } finally {
         setRecognizing(false);
 
-        if (!resultTimerRef.current) {
+        if (!resultTimerRef.current && !keepScanLocked) {
           scanLockRef.current = false;
         }
       }
@@ -1338,6 +1583,7 @@ function AttendanceSession() {
       sectionName,
       stopCamera,
       setCameraError,
+      autoScanEnabled,
     ],
   );
 
@@ -1442,6 +1688,15 @@ function AttendanceSession() {
       };
     }
 
+    if (scannerState === "ambiguous") {
+      return {
+        eyebrow: "IDENTITY UNCERTAIN",
+        title: "Two possible matches detected",
+        description:
+          "No attendance was recorded. Verify the student manually.",
+      };
+    }
+
     if (scannerState === "warning") {
       return {
         eyebrow: "ALREADY RECORDED",
@@ -1468,7 +1723,7 @@ function AttendanceSession() {
 
     if (scannerState === "aligning") {
       return {
-        eyebrow: "AUTO SCAN ACTIVE",
+        eyebrow: "AUTO CAPTURE ACTIVE",
         title: "Center your face",
         description: "Look directly at the camera and hold still.",
       };
@@ -1476,13 +1731,13 @@ function AttendanceSession() {
 
     if (cameraActive && cameraReady) {
       return {
-        eyebrow: autoScanEnabled ? "AUTO SCAN ACTIVE" : "SCANNER READY",
+        eyebrow: autoScanEnabled ? "AUTO CAPTURE ACTIVE" : "MANUAL CAPTURE",
         title: autoScanEnabled
           ? "Ready for the next student"
           : "Position one student in frame",
         description: autoScanEnabled
-          ? "The camera will capture automatically."
-          : "Use Scan Now when the student is ready.",
+          ? "Keep one student centered. The camera will capture automatically."
+          : "Center one student, then press Scan Now when ready.",
       };
     }
 
@@ -1500,6 +1755,43 @@ function AttendanceSession() {
       description: "Enable the camera to start face attendance.",
     };
   }, [scannerState, cameraActive, cameraReady, autoScanEnabled]);
+
+  const handleContinueScanner = useCallback(async () => {
+    clearAutoTimer();
+    clearResultTimer();
+
+    setAmbiguousActionError("");
+    setRecognitionResult(null);
+    setCountdown(null);
+
+    scanLockRef.current = false;
+
+    const shouldRestartCamera =
+      !cameraActive && sessionIsActive;
+
+    setCameraHoldReason("");
+
+    if (shouldRestartCamera) {
+      setScannerState("starting");
+
+      await startCamera();
+
+      return;
+    }
+
+    setScannerState(
+      cameraActive && cameraReady
+        ? "ready"
+        : "idle",
+    );
+  }, [
+    clearAutoTimer,
+    clearResultTimer,
+    cameraActive,
+    cameraReady,
+    sessionIsActive,
+    startCamera,
+  ]);
 
   /* =======================================================
      MANUAL ATTENDANCE
@@ -1563,6 +1855,121 @@ function AttendanceSession() {
             : "Unable to record the student's attendance.",
         ),
       );
+    } finally {
+      setMarkingStudentId("");
+    }
+  };
+
+  const handleAmbiguousMarkPresent = async (candidate) => {
+    if (
+      !sessionId ||
+      !candidate?.studentId ||
+      !sessionIsActive ||
+      markingStudentId
+    ) {
+      return;
+    }
+
+    try {
+      clearResultTimer();
+
+      scanLockRef.current = true;
+
+      setMarkingStudentId(candidate.studentId);
+
+      setAmbiguousActionError("");
+
+      setManualError("");
+
+      setManualMessage("");
+
+      const result = await adviserService.markManualAttendance({
+        sessionId,
+        studentId: candidate.studentId,
+      });
+
+      const refreshedRecords = await refreshRecords();
+
+      const savedRecord = refreshedRecords.find(
+        (record) =>
+          String(getRecordStudentId(record)) ===
+          String(candidate.studentId),
+      );
+
+      const responseStatus = String(
+        result?.attendanceStatus ||
+          result?.status ||
+          result?.attendanceRecord?.status ||
+          "",
+      )
+        .trim()
+        .toUpperCase();
+
+      const attendanceStatus = savedRecord
+        ? getRecordStatus(savedRecord)
+        : responseStatus === "LATE" || responseStatus === "PRESENT"
+          ? responseStatus
+          : "PRESENT";
+
+      const recordedAt =
+        getRecordTime(savedRecord) ||
+        result?.recordedAt ||
+        result?.attendanceRecord?.recordedAt ||
+        new Date();
+
+      setRecognitionResult({
+        type: "success",
+        outcome: "MANUAL_RECORDED",
+        status:
+          attendanceStatus === "LATE"
+            ? "MARKED LATE"
+            : "MARKED PRESENT",
+        attendanceStatus,
+        name: candidate.studentName || "Selected Student",
+        studentNumber: candidate.studentNumber || "—",
+        sectionName,
+        recordedAt,
+        method: "Manual Verification",
+        message:
+          attendanceStatus === "LATE"
+            ? "Identity was manually confirmed and attendance was recorded as late based on the session cutoff."
+            : "Identity was manually confirmed and attendance was recorded successfully.",
+      });
+
+      setCameraHoldReason("MANUAL_RESULT");
+
+      setScannerState("success");
+
+      setManualMessage(
+        attendanceStatus === "LATE"
+          ? `${candidate.studentName} was manually verified and recorded as late.`
+          : `${candidate.studentName} was manually verified and marked present.`,
+      );
+
+      /*
+       * The camera remains off after a manual identity decision.
+       * The adviser explicitly continues to the next student.
+       */
+      clearResultTimer();
+      scanLockRef.current = true;
+    } catch (requestError) {
+      console.error(
+        "Ambiguous manual attendance failed:",
+        requestError,
+      );
+
+      const fallbackMessage =
+        requestError?.response?.status === 409
+          ? "This student already has an attendance record for this session."
+          : "Unable to record the selected student's attendance. Please try again.";
+
+      setAmbiguousActionError(
+        getErrorMessage(requestError, fallbackMessage),
+      );
+
+      setScannerState("ambiguous");
+
+      scanLockRef.current = true;
     } finally {
       setMarkingStudentId("");
     }
@@ -1744,21 +2151,27 @@ function AttendanceSession() {
             <div>
               <span>FACE RECOGNITION ATTENDANCE</span>
 
-              <h1>Live Attendance Scanner</h1>
+              <h1>Attendance Scanner</h1>
 
               <p>
-                Students only need to face the camera. Attendance is captured
-                and recorded automatically.
+                Manual capture is the default for safer, more controlled
+                attendance. Turn on Auto Capture only when you want continuous
+                scanning.
               </p>
             </div>
 
             <div className="attendance-live-header-actions">
               <button
                 type="button"
+                aria-pressed={autoScanEnabled}
                 className={`attendance-auto-toggle ${
                   autoScanEnabled ? "is-on" : ""
                 }`}
-                disabled={!sessionIsActive}
+                disabled={
+                  !sessionIsActive ||
+                  cameraIsHeld ||
+                  Boolean(recognitionResult)
+                }
                 onClick={() => {
                   clearAutoTimer();
 
@@ -1768,7 +2181,7 @@ function AttendanceSession() {
                 }}
               >
                 <span aria-hidden="true" />
-                Auto Scan {autoScanEnabled ? "ON" : "OFF"}
+                Auto Capture {autoScanEnabled ? "ON" : "OFF"}
               </button>
 
               <button
@@ -1778,7 +2191,9 @@ function AttendanceSession() {
                   !sessionIsActive ||
                   !cameraActive ||
                   !cameraReady ||
-                  recognizing
+                  recognizing ||
+                  Boolean(recognitionResult) ||
+                  cameraIsHeld
                 }
                 onClick={() =>
                   void captureAndRecognize({
@@ -1786,124 +2201,187 @@ function AttendanceSession() {
                   })
                 }
               >
-                Scan Now
+                {recognizing ? "Processing..." : "Scan Now"}
               </button>
             </div>
           </div>
 
-          <div
-            className={`attendance-live-camera-shell scanner-${scannerState}`}
-          >
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              playsInline
-              className={cameraActive ? "is-active" : ""}
-              onCanPlay={() => {
-                setCameraReady(true);
+          <div className="attendance-camera-workspace">
+            <div
+              className={`attendance-live-camera-shell scanner-${scannerState} ${
+                cameraIsHeld ? "is-review-paused" : ""
+              }`}
+            >
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                playsInline
+                className={cameraActive ? "is-active" : ""}
+                onCanPlay={() => {
+                  setCameraReady(true);
 
-                setScannerState("ready");
-              }}
-            />
+                  setScannerState("ready");
+                }}
+              />
 
-            <canvas ref={canvasRef} hidden />
+              <canvas ref={canvasRef} hidden />
 
-            {!cameraActive && (
-              <div className="attendance-live-camera-placeholder">
-                <div className="attendance-live-camera-placeholder-icon">◎</div>
+              {!cameraActive && cameraPausedForReview && (
+                <div className="attendance-live-camera-placeholder is-review-pause">
+                  <div className="attendance-live-camera-placeholder-icon">!</div>
 
-                <span>CAMERA OFF</span>
+                  <span>CAMERA PAUSED FOR SAFETY</span>
 
-                <h2>Start the face scanner</h2>
+                  <h2>Identity review required</h2>
 
-                <p>Allow camera access to begin automated attendance.</p>
+                  <p>
+                    The camera was turned off automatically because two student
+                    identities matched. Verify the student in the panel before
+                    continuing.
+                  </p>
 
-                <button
-                  type="button"
-                  disabled={!sessionIsActive}
-                  onClick={() => void startCamera()}
-                >
-                  Enable Camera
-                </button>
+                  <div className="attendance-camera-pause-status">
+                    <strong>No attendance recorded</strong>
+                    <span>Choose a student or scan again.</span>
+                  </div>
+                </div>
+              )}
+
+              {!cameraActive && cameraPausedAfterReview && (
+                <div className="attendance-live-camera-placeholder is-complete-pause">
+                  <div className="attendance-live-camera-placeholder-icon">✓</div>
+
+                  <span>REVIEW COMPLETE</span>
+
+                  <h2>Ready for the next student</h2>
+
+                  <p>
+                    The camera remains off after a manual identity decision so
+                    the result can be reviewed without another capture starting.
+                  </p>
+
+                  <button
+                    type="button"
+                    disabled={!sessionIsActive}
+                    onClick={() => void handleContinueScanner()}
+                  >
+                    Continue to Next Student
+                  </button>
+                </div>
+              )}
+
+              {!cameraActive && !cameraIsHeld && (
+                <div className="attendance-live-camera-placeholder">
+                  <div className="attendance-live-camera-placeholder-icon">◎</div>
+
+                  <span>CAMERA OFF</span>
+
+                  <h2>Start the face scanner</h2>
+
+                  <p>
+                    Enable the camera, position one student inside the guide,
+                    then use Scan Now. Auto Capture stays off unless you enable
+                    it.
+                  </p>
+
+                  <button
+                    type="button"
+                    disabled={!sessionIsActive}
+                    onClick={() => void startCamera()}
+                  >
+                    Enable Camera
+                  </button>
+                </div>
+              )}
+
+              {cameraActive && (
+                <>
+                  <div className="attendance-camera-shade" />
+
+                  <div
+                    className={`attendance-face-target scanner-${scannerState}`}
+                    aria-hidden="true"
+                  >
+                    <div className="attendance-face-target-oval" />
+                    <div className="attendance-face-target-line" />
+
+                    <span className="corner corner-one" />
+                    <span className="corner corner-two" />
+                    <span className="corner corner-three" />
+                    <span className="corner corner-four" />
+                  </div>
+
+                  <div className="attendance-live-badge">
+                    <span />
+                    LIVE CAMERA
+                  </div>
+
+                  <div
+                    className={`attendance-capture-mode-badge ${
+                      autoScanEnabled ? "is-auto" : "is-manual"
+                    }`}
+                  >
+                    <span aria-hidden="true">
+                      {autoScanEnabled ? "↻" : "●"}
+                    </span>
+                    {autoScanEnabled ? "AUTO CAPTURE" : "MANUAL CAPTURE"}
+                  </div>
+
+                  <div className="attendance-scanner-message">
+                    <span>{scannerCopy.eyebrow}</span>
+
+                    <strong>{scannerCopy.title}</strong>
+
+                    <small>{scannerCopy.description}</small>
+                  </div>
+
+                  {countdown !== null && (
+                    <div className="attendance-countdown">
+                      <span>HOLD STILL</span>
+
+                      <strong>{countdown}</strong>
+                    </div>
+                  )}
+
+                  {recognizing && (
+                    <div className="attendance-processing-overlay">
+                      <div className="attendance-processing-spinner" />
+
+                      <strong>Recognizing student</strong>
+
+                      <span>Matching registered face identity...</span>
+                    </div>
+                  )}
+
+                  {scannerState === "success" && (
+                    <div className="attendance-camera-flash" />
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="attendance-camera-session-strip">
+              <div className="is-present">
+                <span>PRESENT</span>
+                <strong>{presentCount}</strong>
               </div>
-            )}
 
-            {cameraActive && (
-              <>
-                <div className="attendance-camera-shade" />
+              <div className="is-late">
+                <span>LATE</span>
+                <strong>{lateCount}</strong>
+              </div>
 
-                <div
-                  className={`attendance-face-target scanner-${scannerState}`}
-                  aria-hidden="true"
-                >
-                  <div className="attendance-face-target-oval" />
-                  <div className="attendance-face-target-line" />
+              <div className="is-remaining">
+                <span>REMAINING</span>
+                <strong>{remainingCount}</strong>
+              </div>
 
-                  <span className="corner corner-one" />
-                  <span className="corner corner-two" />
-                  <span className="corner corner-three" />
-                  <span className="corner corner-four" />
-                </div>
-
-                <div className="attendance-live-badge">
-                  <span />
-                  LIVE
-                </div>
-
-                <div className="attendance-camera-stats">
-                  <div className="is-present">
-                    <span>PRESENT</span>
-                    <strong>{presentCount}</strong>
-                  </div>
-
-                  <div className="is-late">
-                    <span>LATE</span>
-                    <strong>{lateCount}</strong>
-                  </div>
-
-                  <div className="is-remaining">
-                    <span>REMAINING</span>
-                    <strong>{remainingCount}</strong>
-                  </div>
-
-                  <div className="is-completion">
-                    <span>COMPLETION</span>
-                    <strong>{completionPercentage}%</strong>
-                  </div>
-                </div>
-
-                <div className="attendance-scanner-message">
-                  <span>{scannerCopy.eyebrow}</span>
-
-                  <strong>{scannerCopy.title}</strong>
-
-                  <small>{scannerCopy.description}</small>
-                </div>
-
-                {countdown !== null && (
-                  <div className="attendance-countdown">
-                    <span>HOLD STILL</span>
-
-                    <strong>{countdown}</strong>
-                  </div>
-                )}
-
-                {recognizing && (
-                  <div className="attendance-processing-overlay">
-                    <div className="attendance-processing-spinner" />
-
-                    <strong>Recognizing student</strong>
-
-                    <span>Matching registered face identity...</span>
-                  </div>
-                )}
-
-                {scannerState === "success" && (
-                  <div className="attendance-camera-flash" />
-                )}
-              </>
-            )}
+              <div className="is-completion">
+                <span>COMPLETION</span>
+                <strong>{completionPercentage}%</strong>
+              </div>
+            </div>
           </div>
 
           {cameraError && (
@@ -1920,17 +2398,22 @@ function AttendanceSession() {
 
           <div className="attendance-camera-footer">
             <span>
-              Camera preview is mirrored for natural positioning. Recognition
-              uses the original frame.
+              {cameraIsHeld
+                ? "Camera is paused while the current result needs adviser review."
+                : autoScanEnabled
+                  ? "Auto Capture is active. Keep only one student inside the frame."
+                  : "Manual Capture is active. The camera will not capture until you press Scan Now."}
             </span>
 
-            <button
-              type="button"
-              disabled={recognizing}
-              onClick={cameraActive ? stopCamera : () => void startCamera()}
-            >
-              {cameraActive ? "Turn Camera Off" : "Turn Camera On"}
-            </button>
+            {!cameraIsHeld && (
+              <button
+                type="button"
+                disabled={recognizing}
+                onClick={cameraActive ? stopCamera : () => void startCamera()}
+              >
+                {cameraActive ? "Turn Camera Off" : "Turn Camera On"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -1959,31 +2442,196 @@ function AttendanceSession() {
             <div className="attendance-result-empty">
               <div className="attendance-result-empty-avatar">◎</div>
 
-              <h2>Ready for attendance</h2>
+              <h2>Ready for the next student</h2>
 
               <p>
-                The recognized student's information will appear here
-                automatically.
+                Keep one student inside the frame. Manual Capture is the
+                default, so nothing is recorded until you press Scan Now.
               </p>
 
               <div className="attendance-result-empty-steps">
                 <div>
                   <span>01</span>
 
-                  <p>Student faces the camera</p>
+                  <p>Center one student inside the face guide</p>
                 </div>
 
                 <div>
                   <span>02</span>
 
-                  <p>System recognizes identity</p>
+                  <p>Press Scan Now, or enable Auto Capture</p>
                 </div>
 
                 <div>
                   <span>03</span>
 
-                  <p>Attendance status is recorded</p>
+                  <p>Review the result before continuing</p>
                 </div>
+              </div>
+            </div>
+          ) : recognitionResult.outcome === "AMBIGUOUS" ? (
+            <div
+              className="attendance-result-ambiguous"
+              role="alert"
+              aria-live="assertive"
+            >
+              <div className="attendance-ambiguous-heading">
+                <div className="attendance-result-ambiguous-icon">!</div>
+
+                <div>
+                  <span className="attendance-result-kicker">
+                    {recognitionResult.status}
+                  </span>
+
+                  <h2>Confirm who is in front of you</h2>
+
+                  <p className="attendance-result-ambiguous-intro">
+                    Two registered students matched. The camera is off and no
+                    attendance was recorded until you make a decision.
+                  </p>
+                </div>
+              </div>
+
+              <div className="attendance-ambiguous-persistent-note">
+                <span aria-hidden="true">●</span>
+                Review mode — this screen will not disappear automatically.
+              </div>
+
+              <div className="attendance-ambiguous-candidates">
+                {[
+                  recognitionResult.topCandidate,
+                  recognitionResult.secondCandidate,
+                ]
+                  .filter(Boolean)
+                  .map((candidate, index) => {
+                    const candidateAlreadyAttended = Boolean(
+                      candidate.studentId &&
+                        attendedStudentIds.has(String(candidate.studentId)),
+                    );
+
+                    const candidateMarking =
+                      markingStudentId === candidate.studentId;
+
+                    return (
+                      <div
+                        className={`attendance-ambiguous-candidate ${
+                          index === 0 ? "is-closest" : ""
+                        }`}
+                        key={
+                          candidate.studentId ||
+                          `${candidate.studentName}-${index}`
+                        }
+                      >
+                        <div className="attendance-ambiguous-candidate-topline">
+                          <span>
+                            {index === 0 ? "CLOSEST MATCH" : "SECOND MATCH"}
+                          </span>
+
+                          <strong>{candidate.similarityLabel}</strong>
+                        </div>
+
+                        <div className="attendance-ambiguous-candidate-main">
+                          <div className="attendance-ambiguous-avatar">
+                            {candidate.studentName
+                              ?.charAt(0)
+                              ?.toUpperCase() || "S"}
+                          </div>
+
+                          <div className="attendance-ambiguous-identity">
+                            <h3>{candidate.studentName}</h3>
+
+                            <p>Student No. {candidate.studentNumber}</p>
+                          </div>
+                        </div>
+
+                        <div
+                          className="attendance-ambiguous-similarity"
+                          aria-label={`Face similarity ${candidate.similarityLabel}`}
+                        >
+                          <div>
+                            <span>FACE SIMILARITY</span>
+
+                            <strong>{candidate.similarityLabel}</strong>
+                          </div>
+
+                          <div className="attendance-ambiguous-meter">
+                            <span
+                              style={{
+                                width: `${
+                                  candidate.similarityPercent === null
+                                    ? 0
+                                    : candidate.similarityPercent
+                                }%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="attendance-ambiguous-mark-button"
+                          disabled={
+                            !sessionIsActive ||
+                            Boolean(markingStudentId) ||
+                            candidateAlreadyAttended
+                          }
+                          onClick={() =>
+                            void handleAmbiguousMarkPresent(candidate)
+                          }
+                        >
+                          {candidateAlreadyAttended
+                            ? "Already Recorded"
+                            : candidateMarking
+                              ? "Recording..."
+                              : "Confirm & Record"}
+                        </button>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              <div className="attendance-ambiguous-difference">
+                <div>
+                  <span>SIMILARITY DIFFERENCE</span>
+
+                  <strong>{recognitionResult.similarityDifference}</strong>
+                </div>
+
+                <p>
+                  Smaller differences mean the two matches are harder to
+                  distinguish. Similarity is a readability aid, not a
+                  probability score.
+                </p>
+              </div>
+
+              <div className="attendance-ambiguous-safe-note">
+                <strong>Verify the student's name or school ID first.</strong>
+
+                <span>
+                  Confirm & Record uses manual attendance for the selected
+                  student. The session's late rule still applies.
+                </span>
+              </div>
+
+              {ambiguousActionError && (
+                <div
+                  className="attendance-ambiguous-action-error"
+                  role="alert"
+                >
+                  <strong>Attendance was not recorded.</strong>
+                  <span>{ambiguousActionError}</span>
+                </div>
+              )}
+
+              <div className="attendance-ambiguous-actions">
+                <button
+                  type="button"
+                  className="is-secondary"
+                  disabled={Boolean(markingStudentId)}
+                  onClick={() => void handleContinueScanner()}
+                >
+                  Scan Again
+                </button>
               </div>
             </div>
           ) : (
@@ -2033,9 +2681,7 @@ function AttendanceSession() {
                   <strong>
                     {recognitionResult.type === "success"
                       ? recognitionResult.attendanceStatus || "PRESENT"
-                      : recognitionResult.type === "warning"
-                        ? "ALREADY RECORDED"
-                        : "NOT RECORDED"}
+                      : "NOT RECORDED"}
                   </strong>
                 </div>
               </div>
@@ -2046,17 +2692,11 @@ function AttendanceSession() {
 
               <button
                 type="button"
-                onClick={() => {
-                  clearResultTimer();
-
-                  setRecognitionResult(null);
-
-                  setScannerState("ready");
-
-                  scanLockRef.current = false;
-                }}
+                onClick={() => void handleContinueScanner()}
               >
-                Next Student
+                {recognitionResult.type === "success"
+                  ? "Next Student"
+                  : "Try Again"}
               </button>
             </div>
           )}

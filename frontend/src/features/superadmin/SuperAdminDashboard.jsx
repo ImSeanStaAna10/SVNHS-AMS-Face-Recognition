@@ -159,8 +159,8 @@ function SuperAdminDashboard() {
   ] = useState("");
 
   const [
-    reloadKey,
-    setReloadKey,
+    retryKey,
+    setRetryKey,
   ] = useState(0);
 
   /* =======================================================
@@ -196,10 +196,6 @@ function SuperAdminDashboard() {
               : "error",
         };
 
-        /* ===============================================
-           DEPARTMENTS
-        ================================================ */
-
         if (
           departmentResult.status ===
           "fulfilled"
@@ -214,10 +210,6 @@ function SuperAdminDashboard() {
         } else {
           setDepartments([]);
         }
-
-        /* ===============================================
-           COUNCILORS
-        ================================================ */
 
         if (
           councilorResult.status ===
@@ -237,10 +229,6 @@ function SuperAdminDashboard() {
         setDataStatus(
           nextStatus,
         );
-
-        /* ===============================================
-           PARTIAL FAILURE
-        ================================================ */
 
         const unavailable = [];
 
@@ -282,7 +270,7 @@ function SuperAdminDashboard() {
       cancelled = true;
     };
   }, [
-    reloadKey,
+    retryKey,
   ]);
 
   /* =======================================================
@@ -489,10 +477,13 @@ function SuperAdminDashboard() {
     };
 
   /* =======================================================
-     REFRESH
+     ERROR RETRY
+
+     This is not a routine refresh.
+     It is only used after an actual API load failure.
   ======================================================= */
 
-  const handleRefresh = () => {
+  const handleRetry = () => {
     if (loading) {
       return;
     }
@@ -504,7 +495,7 @@ function SuperAdminDashboard() {
       INITIAL_DATA_STATUS,
     );
 
-    setReloadKey(
+    setRetryKey(
       (current) =>
         current + 1,
     );
@@ -631,7 +622,7 @@ function SuperAdminDashboard() {
         </section>
 
         {/* =================================================
-            WARNING
+            ERROR RECOVERY
         ================================================== */}
 
         {error && (
@@ -662,13 +653,15 @@ function SuperAdminDashboard() {
             <button
               type="button"
               onClick={
-                handleRefresh
+                handleRetry
               }
               disabled={
                 loading
               }
             >
-              Retry
+              {loading
+                ? "Retrying..."
+                : "Retry"}
             </button>
           </div>
         )}
@@ -681,8 +674,6 @@ function SuperAdminDashboard() {
           className="superadmin-dashboard-kpi-grid"
           aria-label="Super Administrator dashboard summary"
         >
-          {/* TOTAL DEPARTMENTS */}
-
           <article className="superadmin-dashboard-kpi-card">
             <div className="superadmin-dashboard-kpi-header">
               <span
@@ -721,8 +712,6 @@ function SuperAdminDashboard() {
             </p>
           </article>
 
-          {/* ACTIVE DEPARTMENTS */}
-
           <article className="superadmin-dashboard-kpi-card">
             <div className="superadmin-dashboard-kpi-header">
               <span
@@ -758,8 +747,6 @@ function SuperAdminDashboard() {
                 : "Availability unavailable"}
             </p>
           </article>
-
-          {/* COUNCILORS */}
 
           <article className="superadmin-dashboard-kpi-card">
             <div className="superadmin-dashboard-kpi-header">
@@ -798,8 +785,6 @@ function SuperAdminDashboard() {
                 : "Councilor information unavailable"}
             </p>
           </article>
-
-          {/* COVERAGE */}
 
           <article className="superadmin-dashboard-kpi-card">
             <div className="superadmin-dashboard-kpi-header">
@@ -847,10 +832,6 @@ function SuperAdminDashboard() {
         ================================================== */}
 
         <section className="superadmin-dashboard-operational-grid">
-          {/* ===============================================
-              DEPARTMENT COVERAGE
-          ================================================ */}
-
           <article className="superadmin-dashboard-panel">
             <header className="superadmin-dashboard-panel-header">
               <div>
@@ -1011,7 +992,7 @@ function SuperAdminDashboard() {
           </article>
 
           {/* ===============================================
-              ADMIN READINESS
+              ADMINISTRATION HEALTH
           ================================================ */}
 
           <article className="superadmin-dashboard-panel">
@@ -1032,32 +1013,9 @@ function SuperAdminDashboard() {
                   Councilor accounts.
                 </p>
               </div>
-
-              <button
-                type="button"
-                className="superadmin-dashboard-refresh-button"
-                onClick={
-                  handleRefresh
-                }
-                disabled={
-                  loading
-                }
-              >
-                <span
-                  aria-hidden="true"
-                >
-                  ↻
-                </span>
-
-                {loading
-                  ? "Loading"
-                  : "Refresh"}
-              </button>
             </header>
 
             <div className="superadmin-dashboard-readiness">
-              {/* DEPARTMENT AVAILABILITY */}
-
               <div className="superadmin-dashboard-readiness-item">
                 <div className="superadmin-dashboard-readiness-head">
                   <div>
@@ -1090,8 +1048,6 @@ function SuperAdminDashboard() {
                   />
                 </div>
               </div>
-
-              {/* COUNCILOR AVAILABILITY */}
 
               <div className="superadmin-dashboard-readiness-item">
                 <div className="superadmin-dashboard-readiness-head">
@@ -1126,8 +1082,6 @@ function SuperAdminDashboard() {
                   />
                 </div>
               </div>
-
-              {/* COVERAGE */}
 
               <div className="superadmin-dashboard-readiness-item">
                 <div className="superadmin-dashboard-readiness-head">
@@ -1234,10 +1188,6 @@ function SuperAdminDashboard() {
         ================================================== */}
 
         <section className="superadmin-dashboard-directory-grid">
-          {/* ===============================================
-              DEPARTMENT SNAPSHOT
-          ================================================ */}
-
           <article className="superadmin-dashboard-panel superadmin-dashboard-directory-panel">
             <header className="superadmin-dashboard-panel-header">
               <div>
@@ -1281,9 +1231,9 @@ function SuperAdminDashboard() {
                 </strong>
 
                 <p>
-                  Refresh the dashboard
-                  to try loading the
-                  department directory
+                  Use the Retry option
+                  above to attempt loading
+                  the department data
                   again.
                 </p>
               </div>
@@ -1404,10 +1354,6 @@ function SuperAdminDashboard() {
               )}
           </article>
 
-          {/* ===============================================
-              COUNCILOR SNAPSHOT
-          ================================================ */}
-
           <article className="superadmin-dashboard-panel superadmin-dashboard-directory-panel">
             <header className="superadmin-dashboard-panel-header">
               <div>
@@ -1451,9 +1397,9 @@ function SuperAdminDashboard() {
                 </strong>
 
                 <p>
-                  Refresh the dashboard
-                  to try loading the
-                  Councilor directory
+                  Use the Retry option
+                  above to attempt loading
+                  the Councilor data
                   again.
                 </p>
               </div>

@@ -2706,3 +2706,845 @@ html[data-theme="dark"]
       none !important;
   }
 }
+
+/* =========================================================
+   SUPERADMIN DASHBOARD
+   UI SIZE ENHANCEMENT
+
+   Purpose:
+   - Improve readability
+   - Make desktop UI feel less zoomed-out
+   - Preserve existing theme, layout and animations
+========================================================= */
+
+/* =========================================================
+   PAGE SPACING
+========================================================= */
+
+.superadmin-dashboard {
+  gap: 26px;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.superadmin-dashboard-hero {
+  min-height: 265px;
+
+  padding: 40px 44px;
+}
+
+.superadmin-dashboard-hero-copy {
+  width: min(
+    100%,
+    730px
+  );
+}
+
+.superadmin-dashboard-hero-kicker {
+  margin-bottom: 10px;
+
+  font-size: 10px;
+}
+
+.superadmin-dashboard-hero h2 {
+  font-size:
+    clamp(
+      31px,
+      3.2vw,
+      40px
+    );
+
+  line-height: 1.1;
+}
+
+.superadmin-dashboard-hero-copy
+  > p {
+  max-width: 670px;
+
+  margin-top: 14px;
+
+  font-size: 13px;
+
+  line-height: 1.7;
+}
+
+.superadmin-dashboard-hero-meta {
+  gap: 10px;
+
+  margin-top: 20px;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   HERO BUTTONS
+========================================================= */
+
+.superadmin-dashboard-primary-button,
+.superadmin-dashboard-secondary-button {
+  min-height: 44px;
+
+  padding: 0 18px;
+
+  border-radius: 9px;
+
+  font-size: 11px;
+}
+
+.superadmin-dashboard-hero-actions {
+  gap: 11px;
+
+  margin-top: 24px;
+}
+
+/* =========================================================
+   HERO SEAL
+========================================================= */
+
+.superadmin-dashboard-hero-seal {
+  right: 52px;
+
+  width: 145px;
+  height: 145px;
+
+  padding: 16px;
+}
+
+/* =========================================================
+   WARNING
+========================================================= */
+
+.superadmin-dashboard-warning {
+  gap: 14px;
+
+  padding: 16px 18px;
+}
+
+.superadmin-dashboard-warning
+  > span {
+  width: 29px;
+  height: 29px;
+
+  flex-basis: 29px;
+
+  font-size: 12px;
+}
+
+.superadmin-dashboard-warning
+  strong {
+  font-size: 12px;
+}
+
+.superadmin-dashboard-warning
+  p {
+  font-size: 10px;
+}
+
+.superadmin-dashboard-warning
+  button {
+  min-height: 36px;
+
+  padding: 0 14px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   KPI GRID
+========================================================= */
+
+.superadmin-dashboard-kpi-grid {
+  gap: 17px;
+}
+
+/* =========================================================
+   KPI CARDS
+========================================================= */
+
+.superadmin-dashboard-kpi-card {
+  min-height: 185px;
+
+  padding: 23px;
+}
+
+.superadmin-dashboard-kpi-header {
+  margin-bottom: 19px;
+}
+
+/* =========================================================
+   KPI ICON
+========================================================= */
+
+.superadmin-dashboard-kpi-icon {
+  width: 44px;
+  height: 44px;
+
+  flex-basis: 44px;
+
+  border-radius: 10px;
+
+  font-size: 17px;
+}
+
+.superadmin-dashboard-kpi-tag {
+  font-size: 8px;
+
+  letter-spacing: 0.13em;
+}
+
+/* =========================================================
+   KPI TYPOGRAPHY
+========================================================= */
+
+.superadmin-dashboard-kpi-value {
+  font-size: 34px;
+}
+
+.superadmin-dashboard-kpi-card
+  h3 {
+  margin-top: 10px;
+
+  font-size: 13px;
+}
+
+.superadmin-dashboard-kpi-card
+  p {
+  margin-top: 8px;
+
+  font-size: 10.5px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   MAIN GRIDS
+========================================================= */
+
+.superadmin-dashboard-operational-grid,
+.superadmin-dashboard-directory-grid {
+  gap: 19px;
+}
+
+/* =========================================================
+   PANEL HEADER
+========================================================= */
+
+.superadmin-dashboard-panel-header {
+  min-height: 108px;
+
+  gap: 20px;
+
+  padding: 22px 24px;
+}
+
+.superadmin-dashboard-panel-eyebrow {
+  margin-bottom: 6px;
+
+  font-size: 8.5px;
+}
+
+.superadmin-dashboard-panel-header
+  h2 {
+  font-size: 18px;
+}
+
+.superadmin-dashboard-panel-header
+  p {
+  max-width: 430px;
+
+  margin-top: 6px;
+
+  font-size: 10.5px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   PANEL ACTION BUTTONS
+========================================================= */
+
+.superadmin-dashboard-panel-action,
+.superadmin-dashboard-refresh-button {
+  min-height: 36px;
+
+  padding: 0 13px;
+
+  font-size: 9.5px;
+}
+
+/* =========================================================
+   COVERAGE BODY
+========================================================= */
+
+.superadmin-dashboard-coverage-body {
+  gap: 25px;
+
+  padding: 25px 24px;
+}
+
+.superadmin-dashboard-coverage-score {
+  gap: 23px;
+}
+
+/* =========================================================
+   COVERAGE RING
+========================================================= */
+
+.superadmin-dashboard-coverage-ring {
+  width: 118px;
+  height: 118px;
+
+  flex-basis: 118px;
+
+  border-width: 10px;
+}
+
+.superadmin-dashboard-coverage-ring
+  strong {
+  font-size: 21px;
+}
+
+.superadmin-dashboard-coverage-ring
+  span {
+  margin-top: 3px;
+
+  font-size: 7.5px;
+}
+
+/* =========================================================
+   COVERAGE COPY
+========================================================= */
+
+.superadmin-dashboard-coverage-copy
+  > span {
+  font-size: 8px;
+}
+
+.superadmin-dashboard-coverage-copy
+  > strong {
+  margin-top: 6px;
+
+  font-size: 19px;
+}
+
+.superadmin-dashboard-coverage-copy
+  p {
+  margin-top: 7px;
+
+  font-size: 10.5px;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.superadmin-dashboard-progress-head {
+  margin-bottom: 10px;
+}
+
+.superadmin-dashboard-progress-head
+  span,
+.superadmin-dashboard-progress-head
+  strong {
+  font-size: 10px;
+}
+
+.superadmin-dashboard-progress-track,
+.superadmin-dashboard-readiness-progress {
+  height: 8px;
+}
+
+/* =========================================================
+   COVERAGE MINI STATS
+========================================================= */
+
+.superadmin-dashboard-coverage-stats {
+  gap: 11px;
+}
+
+.superadmin-dashboard-coverage-stats
+  > div {
+  padding: 14px;
+}
+
+.superadmin-dashboard-coverage-stats
+  span {
+  font-size: 8px;
+}
+
+.superadmin-dashboard-coverage-stats
+  strong {
+  margin-top: 6px;
+
+  font-size: 20px;
+}
+
+/* =========================================================
+   READINESS
+========================================================= */
+
+.superadmin-dashboard-readiness {
+  gap: 22px;
+
+  padding:
+    25px 24px 21px;
+}
+
+.superadmin-dashboard-readiness-head {
+  gap: 16px;
+
+  margin-bottom: 10px;
+}
+
+.superadmin-dashboard-readiness-head
+  span {
+  font-size: 11px;
+}
+
+.superadmin-dashboard-readiness-head
+  small {
+  margin-top: 3px;
+
+  font-size: 8.5px;
+}
+
+.superadmin-dashboard-readiness-head
+  strong {
+  font-size: 11px;
+}
+
+/* =========================================================
+   QUICK ACTIONS
+========================================================= */
+
+.superadmin-dashboard-quick-actions {
+  gap: 11px;
+
+  padding:
+    0 24px 25px;
+}
+
+.superadmin-dashboard-quick-actions
+  button {
+  min-height: 78px;
+
+  gap: 12px;
+
+  padding: 13px 14px;
+}
+
+.superadmin-dashboard-quick-actions
+  button
+  > span:first-child {
+  width: 37px;
+  height: 37px;
+
+  font-size: 15px;
+}
+
+.superadmin-dashboard-quick-actions
+  strong {
+  font-size: 11px;
+}
+
+.superadmin-dashboard-quick-actions
+  small {
+  margin-top: 3px;
+
+  font-size: 8.5px;
+}
+
+.superadmin-dashboard-quick-actions
+  button
+  > span:last-child {
+  font-size: 15px;
+}
+
+/* =========================================================
+   DIRECTORY ROWS
+========================================================= */
+
+.superadmin-dashboard-department-row,
+.superadmin-dashboard-councilor-row {
+  min-height: 79px;
+
+  gap: 14px;
+
+  padding: 14px 24px;
+}
+
+/* =========================================================
+   DEPARTMENT / COUNCILOR IDENTITY
+========================================================= */
+
+.superadmin-dashboard-department-identity,
+.superadmin-dashboard-councilor-person {
+  gap: 13px;
+}
+
+.superadmin-dashboard-department-code {
+  width: 48px;
+  height: 48px;
+
+  flex-basis: 48px;
+
+  border-radius: 10px;
+
+  font-size: 10px;
+}
+
+.superadmin-dashboard-councilor-avatar {
+  width: 44px;
+  height: 44px;
+
+  flex-basis: 44px;
+
+  font-size: 13px;
+}
+
+.superadmin-dashboard-department-identity
+  strong,
+.superadmin-dashboard-councilor-person
+  strong {
+  font-size: 11.5px;
+}
+
+.superadmin-dashboard-department-identity
+  span,
+.superadmin-dashboard-councilor-person
+  span {
+  margin-top: 4px;
+
+  font-size: 9px;
+}
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.superadmin-dashboard-department-badge {
+  min-height: 29px;
+
+  padding: 0 10px;
+
+  font-size: 8.5px;
+}
+
+.superadmin-dashboard-status {
+  min-height: 29px;
+
+  gap: 6px;
+
+  padding: 0 10px;
+
+  font-size: 8.5px;
+}
+
+.superadmin-dashboard-status
+  > span {
+  width: 6px;
+  height: 6px;
+}
+
+/* =========================================================
+   PANEL FOOTER
+========================================================= */
+
+.superadmin-dashboard-panel-footer {
+  min-height: 54px;
+
+  padding: 13px 24px;
+}
+
+.superadmin-dashboard-panel-footer
+  > span,
+.superadmin-dashboard-panel-footer
+  button {
+  font-size: 9px;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.superadmin-dashboard-empty {
+  min-height: 285px;
+
+  padding: 36px;
+}
+
+.superadmin-dashboard-empty
+  > span {
+  width: 55px;
+  height: 55px;
+
+  font-size: 21px;
+}
+
+.superadmin-dashboard-empty
+  strong {
+  margin-top: 15px;
+
+  font-size: 13px;
+}
+
+.superadmin-dashboard-empty
+  p {
+  max-width: 330px;
+
+  margin-top: 7px;
+
+  font-size: 10px;
+}
+
+.superadmin-dashboard-empty
+  button {
+  min-height: 38px;
+
+  padding: 0 14px;
+
+  font-size: 9.5px;
+}
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1450px) {
+  .superadmin-dashboard-hero {
+    min-height: 280px;
+
+    padding:
+      43px 48px;
+  }
+
+  .superadmin-dashboard-hero
+    h2 {
+    font-size: 42px;
+  }
+
+  .superadmin-dashboard-hero-copy
+    > p {
+    font-size: 13.5px;
+  }
+
+  .superadmin-dashboard-kpi-card {
+    min-height: 195px;
+
+    padding: 25px;
+  }
+
+  .superadmin-dashboard-kpi-value {
+    font-size: 36px;
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1120px) {
+  .superadmin-dashboard-hero {
+    min-height: 250px;
+
+    padding:
+      35px 32px;
+  }
+
+  .superadmin-dashboard-hero-seal {
+    width: 120px;
+    height: 120px;
+
+    right: 32px;
+  }
+
+  .superadmin-dashboard-kpi-card {
+    min-height: 175px;
+  }
+}
+
+/* =========================================================
+   SMALL TABLET
+========================================================= */
+
+@media (max-width: 880px) {
+  .superadmin-dashboard-hero {
+    min-height: 245px;
+
+    padding:
+      32px 28px;
+  }
+
+  .superadmin-dashboard-hero
+    h2 {
+    font-size: 30px;
+  }
+
+  .superadmin-dashboard-hero-copy
+    > p {
+    font-size: 12px;
+  }
+
+  .superadmin-dashboard-panel-header {
+    min-height: auto;
+  }
+
+  .superadmin-dashboard-department-row,
+  .superadmin-dashboard-councilor-row {
+    min-height: 74px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+
+   We still improve readability but avoid making the
+   interface excessively large on smaller screens.
+========================================================= */
+
+@media (max-width: 680px) {
+  .superadmin-dashboard {
+    gap: 18px;
+  }
+
+  .superadmin-dashboard-hero {
+    min-height: 270px;
+
+    padding:
+      29px 23px;
+  }
+
+  .superadmin-dashboard-hero-kicker {
+    font-size: 8.5px;
+  }
+
+  .superadmin-dashboard-hero
+    h2 {
+    font-size: 27px;
+  }
+
+  .superadmin-dashboard-hero-copy
+    > p {
+    font-size: 11px;
+  }
+
+  .superadmin-dashboard-hero-meta {
+    font-size: 9.5px;
+  }
+
+  .superadmin-dashboard-primary-button,
+  .superadmin-dashboard-secondary-button {
+    min-height: 42px;
+
+    font-size: 10px;
+  }
+
+  .superadmin-dashboard-kpi-card {
+    min-height: 158px;
+
+    padding: 20px;
+  }
+
+  .superadmin-dashboard-kpi-icon {
+    width: 41px;
+    height: 41px;
+
+    flex-basis: 41px;
+  }
+
+  .superadmin-dashboard-kpi-value {
+    font-size: 31px;
+  }
+
+  .superadmin-dashboard-kpi-card
+    h3 {
+    font-size: 12px;
+  }
+
+  .superadmin-dashboard-kpi-card
+    p {
+    font-size: 9.5px;
+  }
+
+  .superadmin-dashboard-panel-header {
+    padding:
+      19px 18px;
+  }
+
+  .superadmin-dashboard-panel-header
+    h2 {
+    font-size: 17px;
+  }
+
+  .superadmin-dashboard-panel-header
+    p {
+    font-size: 9.5px;
+  }
+
+  .superadmin-dashboard-coverage-body,
+  .superadmin-dashboard-readiness {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .superadmin-dashboard-quick-actions {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .superadmin-dashboard-department-row,
+  .superadmin-dashboard-councilor-row {
+    min-height: 72px;
+
+    padding:
+      13px 18px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .superadmin-dashboard-hero {
+    min-height: 285px;
+
+    padding:
+      27px 20px;
+  }
+
+  .superadmin-dashboard-hero
+    h2 {
+    font-size: 26px;
+  }
+
+  .superadmin-dashboard-primary-button,
+  .superadmin-dashboard-secondary-button {
+    width: 100%;
+  }
+
+  .superadmin-dashboard-coverage-ring {
+    width: 100px;
+    height: 100px;
+
+    flex-basis: 100px;
+  }
+
+  .superadmin-dashboard-department-identity
+    strong,
+  .superadmin-dashboard-councilor-person
+    strong {
+    font-size: 10.5px;
+  }
+
+  .superadmin-dashboard-department-identity
+    span,
+  .superadmin-dashboard-councilor-person
+    span {
+    font-size: 8.5px;
+  }
+}

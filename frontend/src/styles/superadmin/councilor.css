@@ -34,27 +34,16 @@
 
   padding: 24px 26px;
 
-  border: 1px solid
-    var(--c-border-soft);
+  border: 1px solid var(--c-border-soft);
 
   border-radius: 14px;
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 
-  box-shadow:
-    var(--c-card-shadow);
+  box-shadow: var(--c-card-shadow);
 
-  animation:
-    superadmin-councilor-header-enter
-    0.46s
-    cubic-bezier(
-      0.22,
-      1,
-      0.36,
-      1
-    )
-    both;
+  animation: superadmin-councilor-header-enter 0.46s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .superadmin-councilors-header::before {
@@ -66,12 +55,7 @@
 
   width: 4px;
 
-  background:
-    linear-gradient(
-      180deg,
-      var(--c-blue-800),
-      var(--c-red-600)
-    );
+  background: linear-gradient(180deg, var(--c-blue-800), var(--c-red-600));
 }
 
 .superadmin-councilors-header::after {
@@ -85,24 +69,13 @@
   width: 230px;
   height: 230px;
 
-  border: 38px solid
-    rgba(
-      28,
-      83,
-      145,
-      0.04
-    );
+  border: 38px solid rgba(28, 83, 145, 0.04);
 
   border-radius: 50%;
 
   pointer-events: none;
 
-  animation:
-    superadmin-councilor-orbit
-    13s
-    ease-in-out
-    infinite
-    alternate;
+  animation: superadmin-councilor-orbit 13s ease-in-out infinite alternate;
 }
 
 .superadmin-councilors-header-copy {
@@ -118,8 +91,7 @@
 
   margin-bottom: 5px;
 
-  color:
-    var(--c-blue-800);
+  color: var(--c-blue-800);
 
   font-size: 7px;
   font-weight: 900;
@@ -127,33 +99,24 @@
   letter-spacing: 0.14em;
 }
 
-.superadmin-councilors-header-copy
-  h2 {
+.superadmin-councilors-header-copy h2 {
   margin: 0;
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
-  font-size:
-    clamp(
-      20px,
-      2.4vw,
-      26px
-    );
+  font-size: clamp(20px, 2.4vw, 26px);
 
   font-weight: 830;
 
   letter-spacing: -0.45px;
 }
 
-.superadmin-councilors-header-copy
-  p {
+.superadmin-councilors-header-copy p {
   max-width: 690px;
 
   margin: 7px 0 0;
 
-  color:
-    var(--c-text-body);
+  color: var(--c-text-body);
 
   font-size: 9px;
 
@@ -207,37 +170,21 @@
 }
 
 .superadmin-councilors-refresh {
-  border: 1px solid
-    var(--c-secondary-border);
+  border: 1px solid var(--c-secondary-border);
 
-  background:
-    var(--c-secondary-bg);
+  background: var(--c-secondary-bg);
 
-  color:
-    var(--c-secondary-text);
+  color: var(--c-secondary-text);
 }
 
 .superadmin-councilors-create {
-  border: 1px solid
-    var(--c-blue-900);
+  border: 1px solid var(--c-blue-900);
 
-  background:
-    linear-gradient(
-      135deg,
-      var(--c-blue-900),
-      var(--c-blue-800)
-    );
+  background: linear-gradient(135deg, var(--c-blue-900), var(--c-blue-800));
 
   color: #ffffff;
 
-  box-shadow:
-    0 6px 16px
-      rgba(
-        11,
-        45,
-        89,
-        0.18
-      );
+  box-shadow: 0 6px 16px rgba(11, 45, 89, 0.18);
 }
 
 .superadmin-councilors-refresh:disabled {
@@ -247,23 +194,13 @@
 }
 
 @media (hover: hover) {
-  .superadmin-councilors-refresh:hover:not(
-      :disabled
-    ),
+  .superadmin-councilors-refresh:hover:not(:disabled),
   .superadmin-councilors-create:hover {
-    transform:
-      translateY(-2px);
+    transform: translateY(-2px);
   }
 
   .superadmin-councilors-create:hover {
-    box-shadow:
-      0 10px 22px
-        rgba(
-          11,
-          45,
-          89,
-          0.24
-        );
+    box-shadow: 0 10px 22px rgba(11, 45, 89, 0.24);
   }
 }
 
@@ -287,37 +224,26 @@
 
   border-radius: 10px;
 
-  animation:
-    superadmin-councilor-alert-enter
-    0.34s
-    ease-out
-    both;
+  animation: superadmin-councilor-alert-enter 0.34s ease-out both;
 }
 
 .superadmin-councilors-alert.success {
-  border: 1px solid
-    var(--c-success-border);
+  border: 1px solid var(--c-success-border);
 
-  background:
-    var(--c-success-bg);
+  background: var(--c-success-bg);
 
-  color:
-    var(--c-success-text);
+  color: var(--c-success-text);
 }
 
 .superadmin-councilors-alert.error {
-  border: 1px solid
-    var(--c-error-border);
+  border: 1px solid var(--c-error-border);
 
-  background:
-    var(--c-error-bg);
+  background: var(--c-error-bg);
 
-  color:
-    var(--c-error-text);
+  color: var(--c-error-text);
 }
 
-.superadmin-councilors-alert
-  > span {
+.superadmin-councilors-alert > span {
   width: 25px;
   height: 25px;
 
@@ -326,8 +252,7 @@
 
   border-radius: 50%;
 
-  background:
-    currentColor;
+  background: currentColor;
 
   color: #ffffff;
 
@@ -335,16 +260,14 @@
   font-weight: 900;
 }
 
-.superadmin-councilors-alert
-  strong {
+.superadmin-councilors-alert strong {
   display: block;
 
   font-size: 9px;
   font-weight: 820;
 }
 
-.superadmin-councilors-alert
-  p {
+.superadmin-councilors-alert p {
   margin: 2px 0 0;
 
   font-size: 8px;
@@ -352,8 +275,7 @@
   line-height: 1.45;
 }
 
-.superadmin-councilors-alert
-  > button {
+.superadmin-councilors-alert > button {
   width: 28px;
   height: 28px;
 
@@ -363,8 +285,7 @@
   border: 0;
   border-radius: 6px;
 
-  background:
-    transparent;
+  background: transparent;
 
   color: currentColor;
 
@@ -382,17 +303,12 @@
 .superadmin-councilors-summary {
   display: grid;
 
-  grid-template-columns:
-    repeat(
-      4,
-      minmax(0, 1fr)
-    );
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 
   gap: 13px;
 }
 
-.superadmin-councilors-summary
-  article {
+.superadmin-councilors-summary article {
   position: relative;
 
   min-width: 0;
@@ -407,56 +323,40 @@
 
   padding: 17px;
 
-  border: 1px solid
-    var(--c-border-soft);
+  border: 1px solid var(--c-border-soft);
 
   border-radius: 12px;
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 
-  box-shadow:
-    var(--c-card-shadow);
+  box-shadow: var(--c-card-shadow);
 
   transition:
     transform 0.18s ease,
     border-color 0.18s ease,
     box-shadow 0.18s ease;
 
-  animation:
-    superadmin-councilor-card-enter
-    0.42s
-    cubic-bezier(
-      0.22,
-      1,
-      0.36,
-      1
-    )
-    both;
+  animation: superadmin-councilor-card-enter 0.42s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.superadmin-councilors-summary
-  article:nth-child(1) {
+.superadmin-councilors-summary article:nth-child(1) {
   animation-delay: 0.05s;
 }
 
-.superadmin-councilors-summary
-  article:nth-child(2) {
+.superadmin-councilors-summary article:nth-child(2) {
   animation-delay: 0.09s;
 }
 
-.superadmin-councilors-summary
-  article:nth-child(3) {
+.superadmin-councilors-summary article:nth-child(3) {
   animation-delay: 0.13s;
 }
 
-.superadmin-councilors-summary
-  article:nth-child(4) {
+.superadmin-councilors-summary article:nth-child(4) {
   animation-delay: 0.17s;
 }
 
-.superadmin-councilors-summary
-  article::after {
+.superadmin-councilors-summary article::after {
   content: "";
 
   position: absolute;
@@ -466,41 +366,29 @@
   width: 3px;
 }
 
-.superadmin-councilors-summary
-  article:nth-child(1)::after {
-  background:
-    var(--c-blue-800);
+.superadmin-councilors-summary article:nth-child(1)::after {
+  background: var(--c-blue-800);
 }
 
-.superadmin-councilors-summary
-  article:nth-child(2)::after {
-  background:
-    var(--c-success-dot);
+.superadmin-councilors-summary article:nth-child(2)::after {
+  background: var(--c-success-dot);
 }
 
-.superadmin-councilors-summary
-  article:nth-child(3)::after {
-  background:
-    var(--c-red-600);
+.superadmin-councilors-summary article:nth-child(3)::after {
+  background: var(--c-red-600);
 }
 
-.superadmin-councilors-summary
-  article:nth-child(4)::after {
-  background:
-    var(--c-gold);
+.superadmin-councilors-summary article:nth-child(4)::after {
+  background: var(--c-gold);
 }
 
 @media (hover: hover) {
-  .superadmin-councilors-summary
-    article:hover {
-    transform:
-      translateY(-3px);
+  .superadmin-councilors-summary article:hover {
+    transform: translateY(-3px);
 
-    border-color:
-      var(--c-brand-border);
+    border-color: var(--c-brand-border);
 
-    box-shadow:
-      var(--c-card-hover-shadow);
+    box-shadow: var(--c-card-hover-shadow);
   }
 }
 
@@ -515,48 +403,30 @@
 
   border-radius: 10px;
 
-  background:
-    var(--c-icon-bg);
+  background: var(--c-icon-bg);
 
-  color:
-    var(--c-icon-text);
+  color: var(--c-icon-text);
 
   font-size: 15px;
   font-weight: 900;
 
-  transition:
-    transform 0.18s ease;
+  transition: transform 0.18s ease;
 }
 
 .superadmin-councilors-summary-icon.active {
-  background:
-    var(--c-success-bg);
+  background: var(--c-success-bg);
 
-  color:
-    var(--c-success-text);
+  color: var(--c-success-text);
 }
 
 .superadmin-councilors-summary-icon.inactive {
-  background:
-    rgba(
-      197,
-      31,
-      45,
-      0.08
-    );
+  background: rgba(197, 31, 45, 0.08);
 
-  color:
-    var(--c-red-600);
+  color: var(--c-red-600);
 }
 
 .superadmin-councilors-summary-icon.available {
-  background:
-    rgba(
-      241,
-      191,
-      61,
-      0.14
-    );
+  background: rgba(241, 191, 61, 0.14);
 
   color: #9d7308;
 }
@@ -565,25 +435,18 @@
   .superadmin-councilors-summary
     article:hover
     .superadmin-councilors-summary-icon {
-    transform:
-      translateY(-1px)
-      scale(1.045);
+    transform: translateY(-1px) scale(1.045);
   }
 }
 
-.superadmin-councilors-summary
-  article
-  > div:last-child {
+.superadmin-councilors-summary article > div:last-child {
   min-width: 0;
 }
 
-.superadmin-councilors-summary
-  article
-  span {
+.superadmin-councilors-summary article span {
   display: block;
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-size: 6px;
   font-weight: 900;
@@ -591,15 +454,12 @@
   letter-spacing: 0.12em;
 }
 
-.superadmin-councilors-summary
-  article
-  strong {
+.superadmin-councilors-summary article strong {
   display: block;
 
   margin-top: 2px;
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
   font-size: 24px;
   font-weight: 850;
@@ -607,13 +467,10 @@
   line-height: 1;
 }
 
-.superadmin-councilors-summary
-  article
-  p {
+.superadmin-councilors-summary article p {
   margin: 5px 0 0;
 
-  color:
-    var(--c-text-body);
+  color: var(--c-text-body);
 
   font-size: 7.5px;
 }
@@ -625,28 +482,16 @@
 .superadmin-councilors-panel {
   overflow: hidden;
 
-  border: 1px solid
-    var(--c-border-soft);
+  border: 1px solid var(--c-border-soft);
 
   border-radius: 14px;
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 
-  box-shadow:
-    var(--c-panel-shadow);
+  box-shadow: var(--c-panel-shadow);
 
-  animation:
-    superadmin-councilor-panel-enter
-    0.48s
-    0.18s
-    cubic-bezier(
-      0.22,
-      1,
-      0.36,
-      1
-    )
-    both;
+  animation: superadmin-councilor-panel-enter 0.48s 0.18s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* =========================================================
@@ -664,19 +509,15 @@
 
   padding: 18px 21px;
 
-  border-bottom: 1px solid
-    var(--c-border-soft);
+  border-bottom: 1px solid var(--c-border-soft);
 }
 
-.superadmin-councilors-panel-header
-  > div:first-child
-  > span {
+.superadmin-councilors-panel-header > div:first-child > span {
   display: block;
 
   margin-bottom: 4px;
 
-  color:
-    var(--c-blue-800);
+  color: var(--c-blue-800);
 
   font-size: 6.5px;
   font-weight: 900;
@@ -684,23 +525,19 @@
   letter-spacing: 0.14em;
 }
 
-.superadmin-councilors-panel-header
-  h3 {
+.superadmin-councilors-panel-header h3 {
   margin: 0;
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
   font-size: 15px;
   font-weight: 810;
 }
 
-.superadmin-councilors-panel-header
-  p {
+.superadmin-councilors-panel-header p {
   margin: 4px 0 0;
 
-  color:
-    var(--c-text-body);
+  color: var(--c-text-body);
 
   font-size: 8px;
 
@@ -712,16 +549,13 @@
 
   padding: 7px 9px;
 
-  border: 1px solid
-    var(--c-border-soft);
+  border: 1px solid var(--c-border-soft);
 
   border-radius: 7px;
 
-  background:
-    var(--c-surface-soft);
+  background: var(--c-surface-soft);
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-size: 7px;
   font-weight: 750;
@@ -745,11 +579,9 @@
 
   padding: 14px 21px;
 
-  border-bottom: 1px solid
-    var(--c-border-soft);
+  border-bottom: 1px solid var(--c-border-soft);
 
-  background:
-    var(--c-surface-soft);
+  background: var(--c-surface-soft);
 }
 
 .superadmin-councilors-search {
@@ -761,40 +593,33 @@
   max-width: 470px;
 }
 
-.superadmin-councilors-search
-  > span {
+.superadmin-councilors-search > span {
   position: absolute;
 
   left: 12px;
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-size: 14px;
 
   pointer-events: none;
 }
 
-.superadmin-councilors-search
-  input {
+.superadmin-councilors-search input {
   width: 100%;
   height: 38px;
 
-  padding:
-    0 38px 0 35px;
+  padding: 0 38px 0 35px;
 
-  border: 1px solid
-    var(--c-border);
+  border: 1px solid var(--c-border);
 
   border-radius: 8px;
 
   outline: none;
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
   font-family: inherit;
 
@@ -805,29 +630,17 @@
     box-shadow 0.17s ease;
 }
 
-.superadmin-councilors-search
-  input:focus {
-  border-color:
-    var(--c-blue-600);
+.superadmin-councilors-search input:focus {
+  border-color: var(--c-blue-600);
 
-  box-shadow:
-    0 0 0 3px
-      rgba(
-        47,
-        111,
-        174,
-        0.11
-      );
+  box-shadow: 0 0 0 3px rgba(47, 111, 174, 0.11);
 }
 
-.superadmin-councilors-search
-  input::placeholder {
-  color:
-    var(--c-text-muted);
+.superadmin-councilors-search input::placeholder {
+  color: var(--c-text-muted);
 }
 
-.superadmin-councilors-search
-  button {
+.superadmin-councilors-search button {
   position: absolute;
 
   right: 7px;
@@ -841,11 +654,9 @@
   border: 0;
   border-radius: 6px;
 
-  background:
-    transparent;
+  background: transparent;
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-family: inherit;
 
@@ -862,10 +673,8 @@
   gap: 5px;
 }
 
-.superadmin-councilors-filter
-  label {
-  color:
-    var(--c-text-muted);
+.superadmin-councilors-filter label {
+  color: var(--c-text-muted);
 
   font-size: 6.5px;
   font-weight: 850;
@@ -873,25 +682,21 @@
   letter-spacing: 0.08em;
 }
 
-.superadmin-councilors-filter
-  select {
+.superadmin-councilors-filter select {
   width: 100%;
   height: 38px;
 
   padding: 0 10px;
 
-  border: 1px solid
-    var(--c-border);
+  border: 1px solid var(--c-border);
 
   border-radius: 8px;
 
   outline: none;
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 
-  color:
-    var(--c-text-secondary);
+  color: var(--c-text-secondary);
 
   font-family: inherit;
 
@@ -919,21 +724,16 @@
   table-layout: fixed;
 }
 
-.superadmin-councilors-table
-  thead {
-  background:
-    var(--c-surface-soft);
+.superadmin-councilors-table thead {
+  background: var(--c-surface-soft);
 }
 
-.superadmin-councilors-table
-  th {
+.superadmin-councilors-table th {
   padding: 11px 15px;
 
-  border-bottom: 1px solid
-    var(--c-border-soft);
+  border-bottom: 1px solid var(--c-border-soft);
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-size: 6.3px;
   font-weight: 900;
@@ -945,86 +745,52 @@
   text-transform: uppercase;
 }
 
-.superadmin-councilors-table
-  th:nth-child(1) {
+.superadmin-councilors-table th:nth-child(1) {
   width: 31%;
 }
 
-.superadmin-councilors-table
-  th:nth-child(2) {
+.superadmin-councilors-table th:nth-child(2) {
   width: 25%;
 }
 
-.superadmin-councilors-table
-  th:nth-child(3) {
+.superadmin-councilors-table th:nth-child(3) {
   width: 13%;
 }
 
-.superadmin-councilors-table
-  th:nth-child(4) {
+.superadmin-councilors-table th:nth-child(4) {
   width: 31%;
 }
 
-.superadmin-councilors-table
-  td {
+.superadmin-councilors-table td {
   padding: 13px 15px;
 
-  border-bottom: 1px solid
-    var(--c-border-soft);
+  border-bottom: 1px solid var(--c-border-soft);
 
   vertical-align: middle;
 
-  color:
-    var(--c-text-body);
+  color: var(--c-text-body);
 
   font-size: 8px;
 }
 
-.superadmin-councilors-table
-  tbody
-  tr {
-  background:
-    var(--c-surface);
+.superadmin-councilors-table tbody tr {
+  background: var(--c-surface);
 
-  animation:
-    superadmin-councilor-row-enter
-    0.34s
-    cubic-bezier(
-      0.22,
-      1,
-      0.36,
-      1
-    )
+  animation: superadmin-councilor-row-enter 0.34s cubic-bezier(0.22, 1, 0.36, 1)
     both;
 
-  animation-delay:
-    calc(
-      min(
-          var(
-            --councilor-row-index
-          ),
-          8
-        ) *
-        0.035s
-    );
+  animation-delay: calc(min(var(--councilor-row-index), 8) * 0.035s);
 
-  transition:
-    background 0.16s ease;
+  transition: background 0.16s ease;
 }
 
-.superadmin-councilors-table
-  tbody
-  tr:last-child
-  td {
+.superadmin-councilors-table tbody tr:last-child td {
   border-bottom: 0;
 }
 
 @media (hover: hover) {
-  .superadmin-councilors-table
-    tbody
-    tr:hover {
-    background:
-      var(--c-table-hover);
+  .superadmin-councilors-table tbody tr:hover {
+    background: var(--c-table-hover);
   }
 }
 
@@ -1051,42 +817,30 @@
   display: grid;
   place-items: center;
 
-  border: 1px solid
-    var(--c-brand-border);
+  border: 1px solid var(--c-brand-border);
 
   border-radius: 50%;
 
-  background:
-    linear-gradient(
-      135deg,
-      var(--c-icon-bg),
-      var(--c-surface-soft)
-    );
+  background: linear-gradient(135deg, var(--c-icon-bg), var(--c-surface-soft));
 
-  color:
-    var(--c-blue-900);
+  color: var(--c-blue-900);
 
   font-size: 11px;
   font-weight: 900;
 }
 
-.superadmin-councilors-identity
-  > div:last-child,
-.superadmin-councilors-department
-  > div:last-child {
+.superadmin-councilors-identity > div:last-child,
+.superadmin-councilors-department > div:last-child {
   min-width: 0;
 }
 
-.superadmin-councilors-identity
-  strong,
-.superadmin-councilors-department
-  strong {
+.superadmin-councilors-identity strong,
+.superadmin-councilors-department strong {
   display: block;
 
   overflow: hidden;
 
-  color:
-    var(--c-table-title);
+  color: var(--c-table-title);
 
   font-size: 8.8px;
   font-weight: 790;
@@ -1096,18 +850,15 @@
   white-space: nowrap;
 }
 
-.superadmin-councilors-identity
-  span,
-.superadmin-councilors-department
-  span {
+.superadmin-councilors-identity span,
+.superadmin-councilors-department span {
   display: block;
 
   margin-top: 2px;
 
   overflow: hidden;
 
-  color:
-    var(--c-table-muted);
+  color: var(--c-table-muted);
 
   font-size: 7px;
 
@@ -1133,11 +884,9 @@
 
   border-radius: 7px;
 
-  background:
-    var(--c-role-bg);
+  background: var(--c-role-bg);
 
-  color:
-    var(--c-role-text);
+  color: var(--c-role-text);
 
   font-size: 7px;
   font-weight: 900;
@@ -1167,8 +916,7 @@
   white-space: nowrap;
 }
 
-.superadmin-councilors-status
-  > span {
+.superadmin-councilors-status > span {
   width: 5px;
   height: 5px;
 
@@ -1176,37 +924,27 @@
 }
 
 .superadmin-councilors-status.active {
-  border: 1px solid
-    var(--c-success-border);
+  border: 1px solid var(--c-success-border);
 
-  background:
-    var(--c-success-bg);
+  background: var(--c-success-bg);
 
-  color:
-    var(--c-success-text);
+  color: var(--c-success-text);
 }
 
-.superadmin-councilors-status.active
-  > span {
-  background:
-    var(--c-success-dot);
+.superadmin-councilors-status.active > span {
+  background: var(--c-success-dot);
 }
 
 .superadmin-councilors-status.inactive {
-  border: 1px solid
-    var(--c-border);
+  border: 1px solid var(--c-border);
 
-  background:
-    var(--c-inactive-bg);
+  background: var(--c-inactive-bg);
 
-  color:
-    var(--c-inactive-text);
+  color: var(--c-inactive-text);
 }
 
-.superadmin-councilors-status.inactive
-  > span {
-  background:
-    var(--c-inactive-dot);
+.superadmin-councilors-status.inactive > span {
+  background: var(--c-inactive-dot);
 }
 
 /* =========================================================
@@ -1222,8 +960,7 @@
   flex-wrap: wrap;
 }
 
-.superadmin-councilors-actions
-  button {
+.superadmin-councilors-actions button {
   min-height: 29px;
 
   padding: 0 8px;
@@ -1244,79 +981,41 @@
     color 0.16s ease;
 }
 
-.superadmin-councilors-actions
-  .edit {
-  border: 1px solid
-    var(--c-secondary-border);
+.superadmin-councilors-actions .edit {
+  border: 1px solid var(--c-secondary-border);
 
-  background:
-    var(--c-secondary-bg);
+  background: var(--c-secondary-bg);
 
-  color:
-    var(--c-secondary-text);
+  color: var(--c-secondary-text);
 }
 
-.superadmin-councilors-actions
-  .password {
-  border: 1px solid
-    rgba(
-      47,
-      111,
-      174,
-      0.2
-    );
+.superadmin-councilors-actions .password {
+  border: 1px solid rgba(47, 111, 174, 0.2);
 
-  background:
-    rgba(
-      47,
-      111,
-      174,
-      0.06
-    );
+  background: rgba(47, 111, 174, 0.06);
 
-  color:
-    var(--c-blue-800);
+  color: var(--c-blue-800);
 }
 
-.superadmin-councilors-actions
-  .deactivate {
-  border: 1px solid
-    rgba(
-      197,
-      31,
-      45,
-      0.2
-    );
+.superadmin-councilors-actions .deactivate {
+  border: 1px solid rgba(197, 31, 45, 0.2);
 
-  background:
-    rgba(
-      197,
-      31,
-      45,
-      0.055
-    );
+  background: rgba(197, 31, 45, 0.055);
 
-  color:
-    var(--c-red-600);
+  color: var(--c-red-600);
 }
 
-.superadmin-councilors-actions
-  .activate {
-  border: 1px solid
-    var(--c-success-border);
+.superadmin-councilors-actions .activate {
+  border: 1px solid var(--c-success-border);
 
-  background:
-    var(--c-success-bg);
+  background: var(--c-success-bg);
 
-  color:
-    var(--c-success-text);
+  color: var(--c-success-text);
 }
 
 @media (hover: hover) {
-  .superadmin-councilors-actions
-    button:hover {
-    transform:
-      translateY(-1px);
+  .superadmin-councilors-actions button:hover {
+    transform: translateY(-1px);
   }
 }
 
@@ -1335,33 +1034,27 @@
 
   padding: 11px 21px;
 
-  border-top: 1px solid
-    var(--c-border-soft);
+  border-top: 1px solid var(--c-border-soft);
 
-  background:
-    var(--c-surface-soft);
+  background: var(--c-surface-soft);
 }
 
-.superadmin-councilors-panel-footer
-  > div {
+.superadmin-councilors-panel-footer > div {
   display: flex;
   align-items: center;
 
   gap: 6px;
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-size: 7px;
   font-weight: 720;
 }
 
-.superadmin-councilors-panel-footer
-  p {
+.superadmin-councilors-panel-footer p {
   margin: 0;
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-size: 7px;
 
@@ -1390,19 +1083,13 @@
   width: 32px;
   height: 32px;
 
-  border: 3px solid
-    var(--c-icon-bg);
+  border: 3px solid var(--c-icon-bg);
 
-  border-top-color:
-    var(--c-blue-800);
+  border-top-color: var(--c-blue-800);
 
   border-radius: 50%;
 
-  animation:
-    superadmin-councilor-spin
-    0.75s
-    linear
-    infinite;
+  animation: superadmin-councilor-spin 0.75s linear infinite;
 }
 
 .superadmin-councilors-empty-icon {
@@ -1414,60 +1101,49 @@
 
   border-radius: 12px;
 
-  background:
-    var(--c-icon-bg);
+  background: var(--c-icon-bg);
 
-  color:
-    var(--c-icon-text);
+  color: var(--c-icon-text);
 
   font-size: 18px;
   font-weight: 900;
 }
 
-.superadmin-councilors-loading
-  strong,
-.superadmin-councilors-empty
-  strong {
+.superadmin-councilors-loading strong,
+.superadmin-councilors-empty strong {
   margin-top: 12px;
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
   font-size: 10px;
   font-weight: 810;
 }
 
-.superadmin-councilors-loading
-  p,
-.superadmin-councilors-empty
-  p {
+.superadmin-councilors-loading p,
+.superadmin-councilors-empty p {
   max-width: 330px;
 
   margin: 5px 0 0;
 
-  color:
-    var(--c-text-body);
+  color: var(--c-text-body);
 
   font-size: 8px;
 
   line-height: 1.5;
 }
 
-.superadmin-councilors-empty
-  button {
+.superadmin-councilors-empty button {
   min-height: 35px;
 
   margin-top: 14px;
 
   padding: 0 12px;
 
-  border: 1px solid
-    var(--c-blue-800);
+  border: 1px solid var(--c-blue-800);
 
   border-radius: 7px;
 
-  background:
-    var(--c-blue-800);
+  background: var(--c-blue-800);
 
   color: #ffffff;
 
@@ -1498,22 +1174,11 @@
 
   padding: 24px;
 
-  background:
-    rgba(
-      5,
-      16,
-      32,
-      0.64
-    );
+  background: rgba(5, 16, 32, 0.64);
 
-  backdrop-filter:
-    blur(5px);
+  backdrop-filter: blur(5px);
 
-  animation:
-    superadmin-councilor-backdrop-enter
-    0.2s
-    ease-out
-    both;
+  animation: superadmin-councilor-backdrop-enter 0.2s ease-out both;
 }
 
 /* =========================================================
@@ -1521,40 +1186,20 @@
 ========================================================= */
 
 .superadmin-councilors-modal {
-  width: min(
-    100%,
-    540px
-  );
+  width: min(100%, 540px);
 
   overflow: hidden;
 
-  border: 1px solid
-    var(--c-border);
+  border: 1px solid var(--c-border);
 
   border-radius: 15px;
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 
-  box-shadow:
-    0 24px 70px
-      rgba(
-        0,
-        0,
-        0,
-        0.25
-      );
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
 
-  animation:
-    superadmin-councilor-modal-enter
-    0.3s
-    cubic-bezier(
-      0.22,
-      1,
-      0.36,
-      1
-    )
-    both;
+  animation: superadmin-councilor-modal-enter 0.3s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .superadmin-councilors-modal-header {
@@ -1568,15 +1213,9 @@
 
   padding: 21px 22px;
 
-  border-bottom: 1px solid
-    var(--c-border-soft);
+  border-bottom: 1px solid var(--c-border-soft);
 
-  background:
-    linear-gradient(
-      135deg,
-      var(--c-surface),
-      var(--c-surface-soft)
-    );
+  background: linear-gradient(135deg, var(--c-surface), var(--c-surface-soft));
 }
 
 .superadmin-councilors-modal-header::before {
@@ -1588,32 +1227,23 @@
 
   height: 3px;
 
-  background:
-    linear-gradient(
-      90deg,
-      var(--c-red-600)
-        0%,
-      var(--c-red-600)
-        35%,
-      var(--c-gold)
-        35%,
-      var(--c-gold)
-        48%,
-      var(--c-blue-800)
-        48%,
-      var(--c-blue-800)
-        100%
-    );
+  background: linear-gradient(
+    90deg,
+    var(--c-red-600) 0%,
+    var(--c-red-600) 35%,
+    var(--c-gold) 35%,
+    var(--c-gold) 48%,
+    var(--c-blue-800) 48%,
+    var(--c-blue-800) 100%
+  );
 }
 
-.superadmin-councilors-modal-header
-  span {
+.superadmin-councilors-modal-header span {
   display: block;
 
   margin-bottom: 4px;
 
-  color:
-    var(--c-blue-800);
+  color: var(--c-blue-800);
 
   font-size: 6.5px;
   font-weight: 900;
@@ -1621,33 +1251,28 @@
   letter-spacing: 0.14em;
 }
 
-.superadmin-councilors-modal-header
-  h2 {
+.superadmin-councilors-modal-header h2 {
   margin: 0;
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
   font-size: 18px;
   font-weight: 820;
 }
 
-.superadmin-councilors-modal-header
-  p {
+.superadmin-councilors-modal-header p {
   max-width: 405px;
 
   margin: 5px 0 0;
 
-  color:
-    var(--c-text-body);
+  color: var(--c-text-body);
 
   font-size: 8px;
 
   line-height: 1.5;
 }
 
-.superadmin-councilors-modal-header
-  > button {
+.superadmin-councilors-modal-header > button {
   width: 30px;
   height: 30px;
 
@@ -1656,16 +1281,13 @@
   display: grid;
   place-items: center;
 
-  border: 1px solid
-    var(--c-border-soft);
+  border: 1px solid var(--c-border-soft);
 
   border-radius: 7px;
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-family: inherit;
 
@@ -1683,8 +1305,7 @@
 
   gap: 16px;
 
-  padding:
-    21px 22px 22px;
+  padding: 21px 22px 22px;
 }
 
 .superadmin-councilors-form-notice,
@@ -1703,40 +1324,22 @@
 
 .superadmin-councilors-form-notice,
 .superadmin-councilors-status-notice {
-  border: 1px solid
-    rgba(
-      47,
-      111,
-      174,
-      0.16
-    );
+  border: 1px solid rgba(47, 111, 174, 0.16);
 
-  background:
-    rgba(
-      47,
-      111,
-      174,
-      0.055
-    );
+  background: rgba(47, 111, 174, 0.055);
 }
 
 .superadmin-councilors-security-notice,
 .superadmin-councilors-blocked {
-  border: 1px solid
-    var(--c-error-border);
+  border: 1px solid var(--c-error-border);
 
-  background:
-    var(--c-error-bg);
+  background: var(--c-error-bg);
 }
 
-.superadmin-councilors-form-notice
-  > span,
-.superadmin-councilors-status-notice
-  > span,
-.superadmin-councilors-security-notice
-  > span,
-.superadmin-councilors-blocked
-  > span {
+.superadmin-councilors-form-notice > span,
+.superadmin-councilors-status-notice > span,
+.superadmin-councilors-security-notice > span,
+.superadmin-councilors-blocked > span {
   width: 22px;
   height: 22px;
 
@@ -1751,61 +1354,43 @@
   font-weight: 900;
 }
 
-.superadmin-councilors-form-notice
-  > span,
-.superadmin-councilors-status-notice
-  > span {
-  background:
-    var(--c-blue-800);
+.superadmin-councilors-form-notice > span,
+.superadmin-councilors-status-notice > span {
+  background: var(--c-blue-800);
 
   color: #ffffff;
 }
 
-.superadmin-councilors-security-notice
-  > span,
-.superadmin-councilors-blocked
-  > span {
-  background:
-    var(--c-error-text);
+.superadmin-councilors-security-notice > span,
+.superadmin-councilors-blocked > span {
+  background: var(--c-error-text);
 
   color: #ffffff;
 }
 
-.superadmin-councilors-form-notice
-  strong,
-.superadmin-councilors-security-notice
-  strong,
-.superadmin-councilors-blocked
-  strong {
+.superadmin-councilors-form-notice strong,
+.superadmin-councilors-security-notice strong,
+.superadmin-councilors-blocked strong {
   display: block;
 
-  color:
-    var(--c-text-secondary);
+  color: var(--c-text-secondary);
 
   font-size: 8px;
   font-weight: 800;
 }
 
-.superadmin-councilors-security-notice
-  strong,
-.superadmin-councilors-blocked
-  strong {
-  color:
-    var(--c-error-text);
+.superadmin-councilors-security-notice strong,
+.superadmin-councilors-blocked strong {
+  color: var(--c-error-text);
 }
 
-.superadmin-councilors-form-notice
-  p,
-.superadmin-councilors-status-notice
-  p,
-.superadmin-councilors-security-notice
-  p,
-.superadmin-councilors-blocked
-  p {
+.superadmin-councilors-form-notice p,
+.superadmin-councilors-status-notice p,
+.superadmin-councilors-security-notice p,
+.superadmin-councilors-blocked p {
   margin: 2px 0 0;
 
-  color:
-    var(--c-text-body);
+  color: var(--c-text-body);
 
   font-size: 7.5px;
 
@@ -1822,36 +1407,29 @@
   gap: 6px;
 }
 
-.superadmin-councilors-field
-  label {
-  color:
-    var(--c-text-secondary);
+.superadmin-councilors-field label {
+  color: var(--c-text-secondary);
 
   font-size: 7.5px;
   font-weight: 800;
 }
 
-.superadmin-councilors-field
-  input,
-.superadmin-councilors-field
-  select {
+.superadmin-councilors-field input,
+.superadmin-councilors-field select {
   width: 100%;
   height: 42px;
 
   padding: 0 12px;
 
-  border: 1px solid
-    var(--c-border);
+  border: 1px solid var(--c-border);
 
   border-radius: 8px;
 
   outline: none;
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
   font-family: inherit;
 
@@ -1862,49 +1440,32 @@
     box-shadow 0.17s ease;
 }
 
-.superadmin-councilors-field
-  select {
+.superadmin-councilors-field select {
   cursor: pointer;
 }
 
-.superadmin-councilors-field
-  input:focus,
-.superadmin-councilors-field
-  select:focus {
-  border-color:
-    var(--c-blue-600);
+.superadmin-councilors-field input:focus,
+.superadmin-councilors-field select:focus {
+  border-color: var(--c-blue-600);
 
-  box-shadow:
-    0 0 0 3px
-      rgba(
-        47,
-        111,
-        174,
-        0.11
-      );
+  box-shadow: 0 0 0 3px rgba(47, 111, 174, 0.11);
 }
 
-.superadmin-councilors-field
-  input:disabled,
-.superadmin-councilors-field
-  select:disabled {
+.superadmin-councilors-field input:disabled,
+.superadmin-councilors-field select:disabled {
   opacity: 0.65;
 
   cursor: not-allowed;
 }
 
-.superadmin-councilors-field
-  > span {
-  color:
-    var(--c-text-muted);
+.superadmin-councilors-field > span {
+  color: var(--c-text-muted);
 
   font-size: 6.8px;
 }
 
-.superadmin-councilors-field
-  .superadmin-councilors-field-warning {
-  color:
-    #9a6b00;
+.superadmin-councilors-field .superadmin-councilors-field-warning {
+  color: #9a6b00;
 
   font-weight: 750;
 }
@@ -1920,13 +1481,11 @@
   align-items: center;
 }
 
-.superadmin-councilors-password-input
-  input {
+.superadmin-councilors-password-input input {
   padding-right: 45px;
 }
 
-.superadmin-councilors-password-input
-  button {
+.superadmin-councilors-password-input button {
   position: absolute;
 
   right: 6px;
@@ -1940,18 +1499,14 @@
   border: 0;
   border-radius: 6px;
 
-  background:
-    transparent;
+  background: transparent;
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   cursor: pointer;
 }
 
-.superadmin-councilors-password-input
-  button
-  svg {
+.superadmin-councilors-password-input button svg {
   width: 17px;
   height: 17px;
 }
@@ -1974,13 +1529,11 @@
 
   padding: 12px;
 
-  border: 1px solid
-    var(--c-border-soft);
+  border: 1px solid var(--c-border-soft);
 
   border-radius: 10px;
 
-  background:
-    var(--c-surface-soft);
+  background: var(--c-surface-soft);
 }
 
 .superadmin-councilors-account-avatar {
@@ -1992,28 +1545,22 @@
 
   border-radius: 50%;
 
-  background:
-    var(--c-icon-bg);
+  background: var(--c-icon-bg);
 
-  color:
-    var(--c-icon-text);
+  color: var(--c-icon-text);
 
   font-size: 11px;
   font-weight: 900;
 }
 
-.superadmin-councilors-account-card
-  > div:nth-child(2) {
+.superadmin-councilors-account-card > div:nth-child(2) {
   min-width: 0;
 }
 
-.superadmin-councilors-account-card
-  > div:nth-child(2)
-  span {
+.superadmin-councilors-account-card > div:nth-child(2) span {
   display: block;
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-size: 5.8px;
   font-weight: 900;
@@ -2021,17 +1568,14 @@
   letter-spacing: 0.1em;
 }
 
-.superadmin-councilors-account-card
-  > div:nth-child(2)
-  strong {
+.superadmin-councilors-account-card > div:nth-child(2) strong {
   display: block;
 
   margin-top: 2px;
 
   overflow: hidden;
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
   font-size: 8.8px;
   font-weight: 810;
@@ -2041,16 +1585,14 @@
   white-space: nowrap;
 }
 
-.superadmin-councilors-account-card
-  small {
+.superadmin-councilors-account-card small {
   display: block;
 
   margin-top: 2px;
 
   overflow: hidden;
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-size: 7px;
 
@@ -2071,26 +1613,18 @@
 
   padding: 10px 11px;
 
-  border: 1px solid
-    var(--c-error-border);
+  border: 1px solid var(--c-error-border);
 
   border-radius: 8px;
 
-  background:
-    var(--c-error-bg);
+  background: var(--c-error-bg);
 
-  color:
-    var(--c-error-text);
+  color: var(--c-error-text);
 
-  animation:
-    superadmin-councilor-alert-enter
-    0.24s
-    ease-out
-    both;
+  animation: superadmin-councilor-alert-enter 0.24s ease-out both;
 }
 
-.superadmin-councilors-form-error
-  > span {
+.superadmin-councilors-form-error > span {
   width: 21px;
   height: 21px;
 
@@ -2101,8 +1635,7 @@
 
   border-radius: 50%;
 
-  background:
-    currentColor;
+  background: currentColor;
 
   color: #ffffff;
 
@@ -2110,8 +1643,7 @@
   font-weight: 900;
 }
 
-.superadmin-councilors-form-error
-  p {
+.superadmin-councilors-form-error p {
   margin: 2px 0 0;
 
   font-size: 7.5px;
@@ -2134,10 +1666,8 @@
   padding-top: 2px;
 }
 
-.superadmin-councilors-modal-actions
-  button,
-.superadmin-councilors-status-actions
-  button {
+.superadmin-councilors-modal-actions button,
+.superadmin-councilors-status-actions button {
   min-height: 37px;
 
   display: inline-flex;
@@ -2164,68 +1694,43 @@
     box-shadow 0.17s ease;
 }
 
-.superadmin-councilors-modal-actions
-  .secondary,
-.superadmin-councilors-status-actions
-  .secondary {
-  border: 1px solid
-    var(--c-secondary-border);
+.superadmin-councilors-modal-actions .secondary,
+.superadmin-councilors-status-actions .secondary {
+  border: 1px solid var(--c-secondary-border);
 
-  background:
-    var(--c-secondary-bg);
+  background: var(--c-secondary-bg);
 
-  color:
-    var(--c-secondary-text);
+  color: var(--c-secondary-text);
 }
 
-.superadmin-councilors-modal-actions
-  .primary,
-.superadmin-councilors-status-actions
-  .primary {
-  border: 1px solid
-    var(--c-blue-900);
+.superadmin-councilors-modal-actions .primary,
+.superadmin-councilors-status-actions .primary {
+  border: 1px solid var(--c-blue-900);
 
-  background:
-    linear-gradient(
-      135deg,
-      var(--c-blue-900),
-      var(--c-blue-800)
-    );
+  background: linear-gradient(135deg, var(--c-blue-900), var(--c-blue-800));
 
   color: #ffffff;
 }
 
-.superadmin-councilors-status-actions
-  .danger {
-  border: 1px solid
-    var(--c-red-600);
+.superadmin-councilors-status-actions .danger {
+  border: 1px solid var(--c-red-600);
 
-  background:
-    var(--c-red-600);
+  background: var(--c-red-600);
 
   color: #ffffff;
 }
 
-.superadmin-councilors-modal-actions
-  button:disabled,
-.superadmin-councilors-status-actions
-  button:disabled {
+.superadmin-councilors-modal-actions button:disabled,
+.superadmin-councilors-status-actions button:disabled {
   opacity: 0.58;
 
   cursor: default;
 }
 
 @media (hover: hover) {
-  .superadmin-councilors-modal-actions
-    button:hover:not(
-      :disabled
-    ),
-  .superadmin-councilors-status-actions
-    button:hover:not(
-      :disabled
-    ) {
-    transform:
-      translateY(-1px);
+  .superadmin-councilors-modal-actions button:hover:not(:disabled),
+  .superadmin-councilors-status-actions button:hover:not(:disabled) {
+    transform: translateY(-1px);
   }
 }
 
@@ -2237,24 +1742,13 @@
   width: 13px;
   height: 13px;
 
-  border: 2px solid
-    rgba(
-      255,
-      255,
-      255,
-      0.35
-    );
+  border: 2px solid rgba(255, 255, 255, 0.35);
 
-  border-top-color:
-    #ffffff;
+  border-top-color: #ffffff;
 
   border-radius: 50%;
 
-  animation:
-    superadmin-councilor-spin
-    0.7s
-    linear
-    infinite;
+  animation: superadmin-councilor-spin 0.7s linear infinite;
 }
 
 /* =========================================================
@@ -2262,10 +1756,7 @@
 ========================================================= */
 
 .superadmin-councilors-status-modal {
-  width: min(
-    100%,
-    450px
-  );
+  width: min(100%, 450px);
 
   display: flex;
   align-items: center;
@@ -2273,35 +1764,18 @@
 
   padding: 27px;
 
-  border: 1px solid
-    var(--c-border);
+  border: 1px solid var(--c-border);
 
   border-radius: 15px;
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 
-  box-shadow:
-    0 24px 70px
-      rgba(
-        0,
-        0,
-        0,
-        0.25
-      );
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
 
   text-align: center;
 
-  animation:
-    superadmin-councilor-modal-enter
-    0.3s
-    cubic-bezier(
-      0.22,
-      1,
-      0.36,
-      1
-    )
-    both;
+  animation: superadmin-councilor-modal-enter 0.3s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .superadmin-councilors-status-modal-icon {
@@ -2316,45 +1790,26 @@
   font-size: 18px;
   font-weight: 900;
 
-  animation:
-    superadmin-councilor-status-icon-enter
-    0.4s
-    0.05s
-    cubic-bezier(
-      0.22,
-      1,
-      0.36,
-      1
-    )
-    both;
+  animation: superadmin-councilor-status-icon-enter 0.4s 0.05s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .superadmin-councilors-status-modal-icon.deactivate {
-  background:
-    rgba(
-      197,
-      31,
-      45,
-      0.09
-    );
+  background: rgba(197, 31, 45, 0.09);
 
-  color:
-    var(--c-red-600);
+  color: var(--c-red-600);
 }
 
 .superadmin-councilors-status-modal-icon.activate {
-  background:
-    var(--c-success-bg);
+  background: var(--c-success-bg);
 
-  color:
-    var(--c-success-text);
+  color: var(--c-success-text);
 }
 
 .superadmin-councilors-status-modal-kicker {
   margin-top: 15px;
 
-  color:
-    var(--c-blue-800);
+  color: var(--c-blue-800);
 
   font-size: 6.5px;
   font-weight: 900;
@@ -2362,23 +1817,19 @@
   letter-spacing: 0.14em;
 }
 
-.superadmin-councilors-status-modal
-  > h2 {
+.superadmin-councilors-status-modal > h2 {
   margin: 5px 0 0;
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
   font-size: 19px;
   font-weight: 830;
 }
 
-.superadmin-councilors-status-modal
-  > p {
+.superadmin-councilors-status-modal > p {
   margin: 7px 0 0;
 
-  color:
-    var(--c-text-body);
+  color: var(--c-text-body);
 
   font-size: 8.5px;
 
@@ -2390,36 +1841,27 @@
 
   display: grid;
 
-  grid-template-columns:
-    repeat(
-      2,
-      minmax(0, 1fr)
-    );
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
   gap: 8px;
 
   margin-top: 18px;
 }
 
-.superadmin-councilors-status-summary
-  > div {
+.superadmin-councilors-status-summary > div {
   padding: 11px;
 
-  border: 1px solid
-    var(--c-border-soft);
+  border: 1px solid var(--c-border-soft);
 
   border-radius: 8px;
 
-  background:
-    var(--c-surface-soft);
+  background: var(--c-surface-soft);
 }
 
-.superadmin-councilors-status-summary
-  span {
+.superadmin-councilors-status-summary span {
   display: block;
 
-  color:
-    var(--c-text-muted);
+  color: var(--c-text-muted);
 
   font-size: 6px;
   font-weight: 900;
@@ -2427,14 +1869,12 @@
   letter-spacing: 0.08em;
 }
 
-.superadmin-councilors-status-summary
-  strong {
+.superadmin-councilors-status-summary strong {
   display: block;
 
   margin-top: 4px;
 
-  color:
-    var(--c-text-primary);
+  color: var(--c-text-primary);
 
   font-size: 9px;
   font-weight: 820;
@@ -2459,33 +1899,22 @@
    DARK MODE
 ========================================================= */
 
-html[data-theme="dark"]
-  .superadmin-councilors-header,
-html[data-theme="dark"]
-  .superadmin-councilors-summary
-  article,
-html[data-theme="dark"]
-  .superadmin-councilors-panel,
-html[data-theme="dark"]
-  .superadmin-councilors-modal,
-html[data-theme="dark"]
-  .superadmin-councilors-status-modal {
-  border-color:
-    var(--c-border);
+html[data-theme="dark"] .superadmin-councilors-header,
+html[data-theme="dark"] .superadmin-councilors-summary article,
+html[data-theme="dark"] .superadmin-councilors-panel,
+html[data-theme="dark"] .superadmin-councilors-modal,
+html[data-theme="dark"] .superadmin-councilors-status-modal {
+  border-color: var(--c-border);
 
-  background:
-    var(--c-surface);
+  background: var(--c-surface);
 }
 
-html[data-theme="dark"]
-  .superadmin-councilors-summary-icon.available {
+html[data-theme="dark"] .superadmin-councilors-summary-icon.available {
   color: #f4d46f;
 }
 
-html[data-theme="dark"]
-  .superadmin-councilors-avatar,
-html[data-theme="dark"]
-  .superadmin-councilors-account-avatar {
+html[data-theme="dark"] .superadmin-councilors-avatar,
+html[data-theme="dark"] .superadmin-councilors-account-avatar {
   color: #9dccff;
 }
 
@@ -2495,23 +1924,13 @@ html[data-theme="dark"]
 
 @media (max-width: 1100px) {
   .superadmin-councilors-summary {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(0, 1fr)
-      );
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .superadmin-councilors-toolbar {
     grid-template-columns:
       minmax(0, 1fr)
-      repeat(
-        2,
-        minmax(
-          145px,
-          190px
-        )
-      );
+      repeat(2, minmax(145px, 190px));
   }
 
   .superadmin-councilors-table {
@@ -2529,11 +1948,9 @@ html[data-theme="dark"]
   }
 
   .superadmin-councilors-header {
-    align-items:
-      flex-start;
+    align-items: flex-start;
 
-    flex-direction:
-      column;
+    flex-direction: column;
 
     padding: 21px;
   }
@@ -2548,8 +1965,7 @@ html[data-theme="dark"]
   }
 
   .superadmin-councilors-toolbar {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
   .superadmin-councilors-search {
@@ -2557,28 +1973,22 @@ html[data-theme="dark"]
   }
 
   .superadmin-councilors-panel-header {
-    align-items:
-      flex-start;
+    align-items: flex-start;
 
-    flex-direction:
-      column;
+    flex-direction: column;
   }
 
   .superadmin-councilors-result-count {
-    align-self:
-      flex-start;
+    align-self: flex-start;
   }
 
   .superadmin-councilors-panel-footer {
-    align-items:
-      flex-start;
+    align-items: flex-start;
 
-    flex-direction:
-      column;
+    flex-direction: column;
   }
 
-  .superadmin-councilors-panel-footer
-    p {
+  .superadmin-councilors-panel-footer p {
     text-align: left;
   }
 }
@@ -2589,12 +1999,10 @@ html[data-theme="dark"]
 
 @media (max-width: 620px) {
   .superadmin-councilors-summary {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
-  .superadmin-councilors-summary
-    article {
+  .superadmin-councilors-summary article {
     min-height: 98px;
   }
 
@@ -2607,51 +2015,34 @@ html[data-theme="dark"]
   .superadmin-councilors-table {
     min-width: 0;
 
-    border-collapse:
-      separate;
+    border-collapse: separate;
 
-    border-spacing:
-      0 10px;
+    border-spacing: 0 10px;
   }
 
-  .superadmin-councilors-table
-    thead {
+  .superadmin-councilors-table thead {
     display: none;
   }
 
-  .superadmin-councilors-table
-    tbody,
-  .superadmin-councilors-table
-    tr,
-  .superadmin-councilors-table
-    td {
+  .superadmin-councilors-table tbody,
+  .superadmin-councilors-table tr,
+  .superadmin-councilors-table td {
     display: block;
 
     width: 100%;
   }
 
-  .superadmin-councilors-table
-    tbody
-    tr {
+  .superadmin-councilors-table tbody tr {
     overflow: hidden;
 
-    border: 1px solid
-      var(--c-border-soft);
+    border: 1px solid var(--c-border-soft);
 
     border-radius: 11px;
 
-    box-shadow:
-      0 4px 14px
-        rgba(
-          15,
-          32,
-          63,
-          0.045
-        );
+    box-shadow: 0 4px 14px rgba(15, 32, 63, 0.045);
   }
 
-  .superadmin-councilors-table
-    td {
+  .superadmin-councilors-table td {
     display: grid;
 
     grid-template-columns:
@@ -2664,43 +2055,32 @@ html[data-theme="dark"]
 
     padding: 11px 13px;
 
-    border-bottom: 1px solid
-      var(--c-border-soft);
+    border-bottom: 1px solid var(--c-border-soft);
   }
 
-  .superadmin-councilors-table
-    td::before {
-    content:
-      attr(
-        data-label
-      );
+  .superadmin-councilors-table td::before {
+    content: attr(data-label);
 
-    color:
-      var(--c-text-muted);
+    color: var(--c-text-muted);
 
     font-size: 6.2px;
     font-weight: 900;
 
-    letter-spacing:
-      0.08em;
+    letter-spacing: 0.08em;
 
-    text-transform:
-      uppercase;
+    text-transform: uppercase;
   }
 
-  .superadmin-councilors-table
-    td:last-child {
+  .superadmin-councilors-table td:last-child {
     border-bottom: 0;
   }
 
   .superadmin-councilors-actions {
-    justify-content:
-      flex-start;
+    justify-content: flex-start;
   }
 
   .superadmin-councilors-modal-backdrop {
-    align-items:
-      flex-end;
+    align-items: flex-end;
 
     padding: 12px;
   }
@@ -2709,19 +2089,13 @@ html[data-theme="dark"]
   .superadmin-councilors-status-modal {
     width: 100%;
 
-    max-height:
-      calc(
-        100vh -
-        24px
-      );
+    max-height: calc(100vh - 24px);
 
     overflow-y: auto;
   }
 
   .superadmin-councilors-modal {
-    border-radius:
-      15px 15px
-      10px 10px;
+    border-radius: 15px 15px 10px 10px;
   }
 }
 
@@ -2733,21 +2107,17 @@ html[data-theme="dark"]
   .superadmin-councilors-header-actions {
     display: grid;
 
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
-  .superadmin-councilors-table
-    td {
-    grid-template-columns:
-      1fr;
+  .superadmin-councilors-table td {
+    grid-template-columns: 1fr;
 
     gap: 7px;
   }
 
   .superadmin-councilors-status-summary {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
   .superadmin-councilors-account-card {
@@ -2756,13 +2126,10 @@ html[data-theme="dark"]
       minmax(0, 1fr);
   }
 
-  .superadmin-councilors-account-card
-    > .superadmin-councilors-status {
-    grid-column:
-      1 / -1;
+  .superadmin-councilors-account-card > .superadmin-councilors-status {
+    grid-column: 1 / -1;
 
-    justify-self:
-      flex-start;
+    justify-self: flex-start;
   }
 
   .superadmin-councilors-modal-header,
@@ -2779,14 +2146,11 @@ html[data-theme="dark"]
   .superadmin-councilors-status-actions {
     display: grid;
 
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
-  .superadmin-councilors-modal-actions
-    button,
-  .superadmin-councilors-status-actions
-    button {
+  .superadmin-councilors-modal-actions button,
+  .superadmin-councilors-status-actions button {
     width: 100%;
   }
 }
@@ -2795,19 +2159,12 @@ html[data-theme="dark"]
    FOCUS
 ========================================================= */
 
-.superadmin-councilors
-  button:focus-visible,
-.superadmin-councilors
-  input:focus-visible,
-.superadmin-councilors
-  select:focus-visible,
-.superadmin-councilors-modal
-  button:focus-visible,
-.superadmin-councilors-status-modal
-  button:focus-visible {
-  outline:
-    3px solid
-      var(--c-focus-ring);
+.superadmin-councilors button:focus-visible,
+.superadmin-councilors input:focus-visible,
+.superadmin-councilors select:focus-visible,
+.superadmin-councilors-modal button:focus-visible,
+.superadmin-councilors-status-modal button:focus-visible {
+  outline: 3px solid var(--c-focus-ring);
 
   outline-offset: 2px;
 }
@@ -2820,15 +2177,13 @@ html[data-theme="dark"]
   from {
     opacity: 0;
 
-    transform:
-      translateY(9px);
+    transform: translateY(9px);
   }
 
   to {
     opacity: 1;
 
-    transform:
-      translateY(0);
+    transform: translateY(0);
   }
 }
 
@@ -2836,17 +2191,13 @@ html[data-theme="dark"]
   from {
     opacity: 0;
 
-    transform:
-      translateY(8px)
-      scale(0.994);
+    transform: translateY(8px) scale(0.994);
   }
 
   to {
     opacity: 1;
 
-    transform:
-      translateY(0)
-      scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -2854,15 +2205,13 @@ html[data-theme="dark"]
   from {
     opacity: 0;
 
-    transform:
-      translateY(10px);
+    transform: translateY(10px);
   }
 
   to {
     opacity: 1;
 
-    transform:
-      translateY(0);
+    transform: translateY(0);
   }
 }
 
@@ -2870,15 +2219,13 @@ html[data-theme="dark"]
   from {
     opacity: 0;
 
-    transform:
-      translateY(5px);
+    transform: translateY(5px);
   }
 
   to {
     opacity: 1;
 
-    transform:
-      translateY(0);
+    transform: translateY(0);
   }
 }
 
@@ -2886,15 +2233,13 @@ html[data-theme="dark"]
   from {
     opacity: 0;
 
-    transform:
-      translateY(-5px);
+    transform: translateY(-5px);
   }
 
   to {
     opacity: 1;
 
-    transform:
-      translateY(0);
+    transform: translateY(0);
   }
 }
 
@@ -2912,17 +2257,13 @@ html[data-theme="dark"]
   from {
     opacity: 0;
 
-    transform:
-      translateY(12px)
-      scale(0.975);
+    transform: translateY(12px) scale(0.975);
   }
 
   to {
     opacity: 1;
 
-    transform:
-      translateY(0)
-      scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -2930,44 +2271,29 @@ html[data-theme="dark"]
   from {
     opacity: 0;
 
-    transform:
-      scale(0.75)
-      rotate(-5deg);
+    transform: scale(0.75) rotate(-5deg);
   }
 
   to {
     opacity: 1;
 
-    transform:
-      scale(1)
-      rotate(0);
+    transform: scale(1) rotate(0);
   }
 }
 
 @keyframes superadmin-councilor-orbit {
   from {
-    transform:
-      translate3d(
-        0,
-        0,
-        0
-      );
+    transform: translate3d(0, 0, 0);
   }
 
   to {
-    transform:
-      translate3d(
-        -9px,
-        7px,
-        0
-      );
+    transform: translate3d(-9px, 7px, 0);
   }
 }
 
 @keyframes superadmin-councilor-spin {
   to {
-    transform:
-      rotate(360deg);
+    transform: rotate(360deg);
   }
 }
 
@@ -2975,58 +2301,1164 @@ html[data-theme="dark"]
    REDUCED MOTION
 ========================================================= */
 
-@media (
-  prefers-reduced-motion:
-    reduce
-) {
+@media (prefers-reduced-motion: reduce) {
   .superadmin-councilors-header,
   .superadmin-councilors-header::after,
-  .superadmin-councilors-summary
-    article,
+  .superadmin-councilors-summary article,
   .superadmin-councilors-panel,
   .superadmin-councilors-alert,
-  .superadmin-councilors-table
-    tbody
-    tr,
+  .superadmin-councilors-table tbody tr,
   .superadmin-councilors-modal-backdrop,
   .superadmin-councilors-modal,
   .superadmin-councilors-status-modal,
   .superadmin-councilors-status-modal-icon {
-    animation:
-      none !important;
+    animation: none !important;
   }
 
   .superadmin-councilors-spinner,
   .superadmin-councilors-button-spinner {
-    animation-duration:
-      1.2s;
+    animation-duration: 1.2s;
   }
 
-  .superadmin-councilors-header-actions
-    button,
-  .superadmin-councilors-summary
-    article,
-  .superadmin-councilors-actions
-    button,
-  .superadmin-councilors-modal-actions
-    button,
-  .superadmin-councilors-status-actions
-    button {
-    transition:
-      none !important;
+  .superadmin-councilors-header-actions button,
+  .superadmin-councilors-summary article,
+  .superadmin-councilors-actions button,
+  .superadmin-councilors-modal-actions button,
+  .superadmin-councilors-status-actions button {
+    transition: none !important;
   }
 
-  .superadmin-councilors-header-actions
-    button:hover,
-  .superadmin-councilors-summary
-    article:hover,
-  .superadmin-councilors-actions
-    button:hover,
-  .superadmin-councilors-modal-actions
-    button:hover,
-  .superadmin-councilors-status-actions
-    button:hover {
-    transform:
-      none !important;
+  .superadmin-councilors-header-actions button:hover,
+  .superadmin-councilors-summary article:hover,
+  .superadmin-councilors-actions button:hover,
+  .superadmin-councilors-modal-actions button:hover,
+  .superadmin-councilors-status-actions button:hover {
+    transform: none !important;
+  }
+} /* =========================================================
+   SUPERADMIN COUNCILORS
+   UI SIZE ENHANCEMENT
+
+   Purpose:
+   - Improve readability
+   - Make desktop UI less zoomed-out
+   - Match enlarged Dashboard and Departments
+   - Preserve current theme, layout and animations
+========================================================= */
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.superadmin-councilors {
+  gap: 24px;
+
+  padding-bottom: 42px;
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.superadmin-councilors-header {
+  gap: 28px;
+
+  padding: 29px 31px;
+
+  border-radius: 15px;
+}
+
+.superadmin-councilors-kicker {
+  margin-bottom: 7px;
+
+  font-size: 9px;
+}
+
+.superadmin-councilors-header-copy h2 {
+  font-size: clamp(24px, 2.6vw, 31px);
+}
+
+.superadmin-councilors-header-copy p {
+  max-width: 740px;
+
+  margin-top: 9px;
+
+  font-size: 11.5px;
+
+  line-height: 1.65;
+}
+
+/* =========================================================
+   HEADER ACTIONS
+========================================================= */
+
+.superadmin-councilors-header-actions {
+  gap: 11px;
+}
+
+.superadmin-councilors-refresh,
+.superadmin-councilors-create {
+  min-height: 43px;
+
+  gap: 8px;
+
+  padding: 0 17px;
+
+  font-size: 10.5px;
+}
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.superadmin-councilors-alert {
+  gap: 13px;
+
+  padding: 15px 17px;
+}
+
+.superadmin-councilors-alert > span {
+  width: 29px;
+  height: 29px;
+
+  font-size: 12px;
+}
+
+.superadmin-councilors-alert strong {
+  font-size: 11px;
+}
+
+.superadmin-councilors-alert p {
+  margin-top: 3px;
+
+  font-size: 9.5px;
+}
+
+.superadmin-councilors-alert > button {
+  width: 31px;
+  height: 31px;
+
+  font-size: 20px;
+}
+
+/* =========================================================
+   SUMMARY GRID
+========================================================= */
+
+.superadmin-councilors-summary {
+  gap: 16px;
+}
+
+.superadmin-councilors-summary article {
+  min-height: 135px;
+
+  gap: 17px;
+
+  padding: 21px;
+}
+
+.superadmin-councilors-summary-icon {
+  width: 49px;
+  height: 49px;
+
+  flex-basis: 49px;
+
+  font-size: 18px;
+}
+
+.superadmin-councilors-summary article span {
+  font-size: 8px;
+}
+
+.superadmin-councilors-summary article strong {
+  margin-top: 4px;
+
+  font-size: 30px;
+}
+
+.superadmin-councilors-summary article p {
+  margin-top: 7px;
+
+  font-size: 9.5px;
+}
+
+/* =========================================================
+   DIRECTORY PANEL
+========================================================= */
+
+.superadmin-councilors-panel {
+  border-radius: 15px;
+}
+
+/* =========================================================
+   PANEL HEADER
+========================================================= */
+
+.superadmin-councilors-panel-header {
+  min-height: 108px;
+
+  gap: 24px;
+
+  padding: 21px 25px;
+}
+
+.superadmin-councilors-panel-header > div:first-child > span {
+  margin-bottom: 6px;
+
+  font-size: 8px;
+}
+
+.superadmin-councilors-panel-header h3 {
+  font-size: 18px;
+}
+
+.superadmin-councilors-panel-header p {
+  margin-top: 6px;
+
+  font-size: 10px;
+
+  line-height: 1.55;
+}
+
+.superadmin-councilors-result-count {
+  padding: 9px 11px;
+
+  font-size: 9px;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.superadmin-councilors-toolbar {
+  grid-template-columns:
+    minmax(0, 1fr)
+    230px
+    180px;
+
+  gap: 15px;
+
+  padding: 17px 25px;
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.superadmin-councilors-search {
+  max-width: 530px;
+}
+
+.superadmin-councilors-search > span {
+  left: 14px;
+
+  font-size: 16px;
+}
+
+.superadmin-councilors-search input {
+  height: 43px;
+
+  padding: 0 41px 0 39px;
+
+  font-size: 10.5px;
+}
+
+.superadmin-councilors-search button {
+  right: 8px;
+
+  width: 29px;
+  height: 29px;
+
+  font-size: 18px;
+}
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+.superadmin-councilors-filter {
+  gap: 6px;
+}
+
+.superadmin-councilors-filter label {
+  font-size: 8px;
+}
+
+.superadmin-councilors-filter select {
+  height: 43px;
+
+  padding: 0 12px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.superadmin-councilors-table th {
+  padding: 14px 18px;
+
+  font-size: 8px;
+}
+
+.superadmin-councilors-table td {
+  padding: 16px 18px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   COUNCILOR IDENTITY
+========================================================= */
+
+.superadmin-councilors-identity,
+.superadmin-councilors-department {
+  gap: 12px;
+}
+
+.superadmin-councilors-avatar {
+  width: 46px;
+  height: 46px;
+
+  flex-basis: 46px;
+
+  font-size: 13px;
+}
+
+.superadmin-councilors-identity strong,
+.superadmin-councilors-department strong {
+  font-size: 11px;
+}
+
+.superadmin-councilors-identity span,
+.superadmin-councilors-department span {
+  margin-top: 3px;
+
+  font-size: 8.5px;
+}
+
+/* =========================================================
+   DEPARTMENT CODE
+========================================================= */
+
+.superadmin-councilors-department-code {
+  min-width: 30px;
+  height: 15px;
+
+  padding: 0 10px;
+
+  font-size: 30px;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.superadmin-councilors-status {
+  min-height: 31px;
+
+  gap: 6px;
+
+  padding: 0 11px;
+
+  font-size: 9px;
+}
+
+.superadmin-councilors-status > span {
+  width: 6px;
+  height: 6px;
+}
+
+/* =========================================================
+   ROW ACTIONS
+========================================================= */
+
+.superadmin-councilors-actions {
+  gap: 8px;
+}
+
+.superadmin-councilors-actions button {
+  min-height: 34px;
+
+  padding: 0 11px;
+
+  font-size: 9px;
+}
+
+/* Give Reset Password a little more room */
+.superadmin-councilors-actions .password {
+  padding: 0 12px;
+}
+
+/* =========================================================
+   PANEL FOOTER
+========================================================= */
+
+.superadmin-councilors-panel-footer {
+  min-height: 57px;
+
+  gap: 22px;
+
+  padding: 13px 25px;
+}
+
+.superadmin-councilors-panel-footer > div {
+  gap: 7px;
+
+  font-size: 9px;
+}
+
+.superadmin-councilors-panel-footer p {
+  font-size: 8.5px;
+}
+
+/* =========================================================
+   LOADING / EMPTY
+========================================================= */
+
+.superadmin-councilors-loading,
+.superadmin-councilors-empty {
+  min-height: 340px;
+
+  padding: 40px;
+}
+
+.superadmin-councilors-spinner {
+  width: 38px;
+  height: 38px;
+
+  border-width: 4px;
+}
+
+.superadmin-councilors-empty-icon {
+  width: 58px;
+  height: 58px;
+
+  font-size: 21px;
+}
+
+.superadmin-councilors-loading strong,
+.superadmin-councilors-empty strong {
+  margin-top: 15px;
+
+  font-size: 12px;
+}
+
+.superadmin-councilors-loading p,
+.superadmin-councilors-empty p {
+  max-width: 360px;
+
+  margin-top: 7px;
+
+  font-size: 10px;
+
+  line-height: 1.55;
+}
+
+.superadmin-councilors-empty button {
+  min-height: 40px;
+
+  margin-top: 17px;
+
+  padding: 0 15px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   CREATE / EDIT / PASSWORD MODAL
+========================================================= */
+
+.superadmin-councilors-modal {
+  width: min(100%, 605px);
+
+  border-radius: 16px;
+}
+
+.superadmin-councilors-modal-header {
+  gap: 21px;
+
+  padding: 25px 26px;
+}
+
+.superadmin-councilors-modal-header span {
+  margin-bottom: 6px;
+
+  font-size: 8px;
+}
+
+.superadmin-councilors-modal-header h2 {
+  font-size: 22px;
+}
+
+.superadmin-councilors-modal-header p {
+  max-width: 455px;
+
+  margin-top: 7px;
+
+  font-size: 10px;
+
+  line-height: 1.55;
+}
+
+.superadmin-councilors-modal-header > button {
+  width: 35px;
+  height: 35px;
+
+  flex-basis: 35px;
+
+  font-size: 20px;
+}
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.superadmin-councilors-form {
+  gap: 19px;
+
+  padding: 25px 26px 26px;
+}
+
+/* =========================================================
+   INFO / SECURITY / STATUS NOTICES
+========================================================= */
+
+.superadmin-councilors-form-notice,
+.superadmin-councilors-security-notice,
+.superadmin-councilors-status-notice,
+.superadmin-councilors-blocked {
+  gap: 12px;
+
+  padding: 13px 14px;
+}
+
+.superadmin-councilors-form-notice > span,
+.superadmin-councilors-status-notice > span,
+.superadmin-councilors-security-notice > span,
+.superadmin-councilors-blocked > span {
+  width: 26px;
+  height: 26px;
+
+  flex-basis: 26px;
+
+  font-size: 10px;
+}
+
+.superadmin-councilors-form-notice strong,
+.superadmin-councilors-security-notice strong,
+.superadmin-councilors-blocked strong {
+  font-size: 10px;
+}
+
+.superadmin-councilors-form-notice p,
+.superadmin-councilors-status-notice p,
+.superadmin-councilors-security-notice p,
+.superadmin-councilors-blocked p {
+  margin-top: 3px;
+
+  font-size: 9px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   FORM FIELDS
+========================================================= */
+
+.superadmin-councilors-field {
+  gap: 8px;
+}
+
+.superadmin-councilors-field label {
+  font-size: 9.5px;
+}
+
+.superadmin-councilors-field input,
+.superadmin-councilors-field select {
+  height: 47px;
+
+  padding: 0 14px;
+
+  font-size: 11px;
+}
+
+.superadmin-councilors-field > span {
+  font-size: 8.5px;
+}
+
+.superadmin-councilors-field .superadmin-councilors-field-warning {
+  font-size: 8.8px;
+}
+
+/* =========================================================
+   PASSWORD INPUT
+========================================================= */
+
+.superadmin-councilors-password-input input {
+  padding-right: 51px;
+}
+
+.superadmin-councilors-password-input button {
+  right: 7px;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 7px;
+}
+
+.superadmin-councilors-password-input button svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* =========================================================
+   ACCOUNT CARD
+========================================================= */
+
+.superadmin-councilors-account-card {
+  gap: 14px;
+
+  padding: 15px;
+
+  border-radius: 11px;
+}
+
+.superadmin-councilors-account-avatar {
+  width: 46px;
+  height: 46px;
+
+  font-size: 13px;
+}
+
+.superadmin-councilors-account-card > div:nth-child(2) span {
+  font-size: 7.5px;
+}
+
+.superadmin-councilors-account-card > div:nth-child(2) strong {
+  margin-top: 4px;
+
+  font-size: 11px;
+}
+
+.superadmin-councilors-account-card small {
+  margin-top: 3px;
+
+  font-size: 8.5px;
+}
+
+/* =========================================================
+   FORM ERROR
+========================================================= */
+
+.superadmin-councilors-form-error {
+  gap: 10px;
+
+  padding: 12px 13px;
+}
+
+.superadmin-councilors-form-error > span {
+  width: 25px;
+  height: 25px;
+
+  flex-basis: 25px;
+
+  font-size: 9px;
+}
+
+.superadmin-councilors-form-error p {
+  margin-top: 3px;
+
+  font-size: 9px;
+}
+
+/* =========================================================
+   MODAL ACTION BUTTONS
+========================================================= */
+
+.superadmin-councilors-modal-actions,
+.superadmin-councilors-status-actions {
+  gap: 10px;
+
+  padding-top: 4px;
+}
+
+.superadmin-councilors-modal-actions button,
+.superadmin-councilors-status-actions button {
+  min-height: 42px;
+
+  gap: 8px;
+
+  padding: 0 16px;
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   BUTTON SPINNER
+========================================================= */
+
+.superadmin-councilors-button-spinner {
+  width: 15px;
+  height: 15px;
+}
+
+/* =========================================================
+   STATUS MODAL
+========================================================= */
+
+.superadmin-councilors-status-modal {
+  width: min(100%, 505px);
+
+  padding: 32px;
+
+  border-radius: 16px;
+}
+
+.superadmin-councilors-status-modal-icon {
+  width: 61px;
+  height: 61px;
+
+  font-size: 21px;
+}
+
+.superadmin-councilors-status-modal-kicker {
+  margin-top: 18px;
+
+  font-size: 8px;
+}
+
+.superadmin-councilors-status-modal > h2 {
+  margin-top: 7px;
+
+  font-size: 23px;
+}
+
+.superadmin-councilors-status-modal > p {
+  margin-top: 9px;
+
+  font-size: 10.5px;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   STATUS SUMMARY
+========================================================= */
+
+.superadmin-councilors-status-summary {
+  gap: 10px;
+
+  margin-top: 21px;
+}
+
+.superadmin-councilors-status-summary > div {
+  padding: 14px;
+}
+
+.superadmin-councilors-status-summary span {
+  font-size: 7.5px;
+}
+
+.superadmin-councilors-status-summary strong {
+  margin-top: 5px;
+
+  font-size: 11px;
+}
+
+.superadmin-councilors-status-notice,
+.superadmin-councilors-blocked {
+  margin-top: 17px;
+}
+
+.superadmin-councilors-status-actions {
+  margin-top: 21px;
+}
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1450px) {
+  .superadmin-councilors-header {
+    padding: 31px 34px;
+  }
+
+  .superadmin-councilors-header-copy h2 {
+    font-size: 33px;
+  }
+
+  .superadmin-councilors-header-copy p {
+    font-size: 12px;
+  }
+
+  .superadmin-councilors-summary article {
+    min-height: 142px;
+
+    padding: 23px;
+  }
+
+  .superadmin-councilors-summary article strong {
+    font-size: 32px;
+  }
+
+  .superadmin-councilors-table td {
+    padding: 17px 19px;
+  }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+  .superadmin-councilors-summary article {
+    min-height: 125px;
+  }
+
+  .superadmin-councilors-toolbar {
+    grid-template-columns:
+      minmax(0, 1fr)
+      repeat(2, minmax(170px, 210px));
+  }
+
+  .superadmin-councilors-table {
+    min-width: 980px;
+  }
+}
+
+/* =========================================================
+   SMALL TABLET
+========================================================= */
+
+@media (max-width: 760px) {
+  .superadmin-councilors {
+    gap: 18px;
+  }
+
+  .superadmin-councilors-header {
+    padding: 24px;
+  }
+
+  .superadmin-councilors-header-copy h2 {
+    font-size: 25px;
+  }
+
+  .superadmin-councilors-header-copy p {
+    font-size: 10.5px;
+  }
+
+  .superadmin-councilors-toolbar {
+    grid-template-columns: 1fr;
+
+    padding: 16px 22px;
+  }
+
+  .superadmin-councilors-panel-header {
+    padding: 20px 22px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 620px) {
+  .superadmin-councilors-summary article {
+    min-height: 108px;
+
+    padding: 18px;
+  }
+
+  .superadmin-councilors-summary-icon {
+    width: 44px;
+    height: 44px;
+
+    flex-basis: 44px;
+
+    font-size: 16px;
+  }
+
+  .superadmin-councilors-summary article strong {
+    font-size: 27px;
+  }
+
+  .superadmin-councilors-summary article p {
+    font-size: 9px;
+  }
+
+  .superadmin-councilors-table td {
+    grid-template-columns:
+      125px
+      minmax(0, 1fr);
+
+    gap: 11px;
+
+    padding: 13px 14px;
+
+    font-size: 9.5px;
+  }
+
+  .superadmin-councilors-table td::before {
+    font-size: 7.3px;
+  }
+
+  .superadmin-councilors-actions button {
+    min-height: 33px;
+
+    font-size: 8.5px;
+  }
+
+  .superadmin-councilors-modal {
+    width: 100%;
+  }
+
+  .superadmin-councilors-modal-header {
+    padding: 22px 20px;
+  }
+
+  .superadmin-councilors-form {
+    padding: 22px 20px 23px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 450px) {
+  .superadmin-councilors-header-copy h2 {
+    font-size: 23px;
+  }
+
+  .superadmin-councilors-refresh,
+  .superadmin-councilors-create {
+    min-height: 42px;
+
+    font-size: 10px;
+  }
+
+  .superadmin-councilors-table td {
+    grid-template-columns: 1fr;
+
+    gap: 8px;
+  }
+
+  .superadmin-councilors-account-card {
+    gap: 12px;
+  }
+
+  .superadmin-councilors-account-avatar {
+    width: 43px;
+    height: 43px;
+  }
+
+  .superadmin-councilors-status-modal {
+    padding: 27px 20px;
+  }
+
+  .superadmin-councilors-status-modal > h2 {
+    font-size: 21px;
+  }
+
+  .superadmin-councilors-modal-actions button,
+  .superadmin-councilors-status-actions button {
+    min-height: 42px;
+
+    font-size: 10px;
+  }
+}
+
+/* =========================================================
+   COUNCILOR PAGINATION
+========================================================= */
+
+.superadmin-councilors-pagination {
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 14px 25px;
+
+  border-top: 1px solid var(--c-border-soft);
+
+  background: var(--c-surface);
+}
+
+.superadmin-councilors-pagination-info {
+  color: var(--c-text-muted);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.superadmin-councilors-pagination-info strong {
+  color: var(--c-text-secondary);
+
+  font-weight: 850;
+}
+
+.superadmin-councilors-pagination-controls {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+.superadmin-councilors-pagination-pages {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+.superadmin-councilors-pagination button {
+  min-width: 36px;
+  height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--c-border);
+
+  border-radius: 8px;
+
+  background: var(--c-surface);
+
+  color: var(--c-text-secondary);
+
+  font-family: inherit;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.superadmin-councilors-pagination .pagination-nav {
+  min-width: 94px;
+
+  gap: 7px;
+
+  padding: 0 12px;
+}
+
+.superadmin-councilors-pagination .pagination-page.active {
+  border-color: var(--c-blue-800);
+
+  background: var(--c-blue-800);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 5px 13px
+    rgba(18, 61, 126, 0.18);
+}
+
+.superadmin-councilors-pagination button:disabled {
+  opacity: 0.42;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+.superadmin-councilors-pagination .pagination-ellipsis {
+  min-width: 26px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--c-text-muted);
+
+  font-size: 13px;
+
+  user-select: none;
+}
+
+@media (hover: hover) {
+  .superadmin-councilors-pagination
+    button:hover:not(:disabled):not(.active) {
+    transform: translateY(-1px);
+
+    border-color: var(--c-brand-border);
+
+    background: var(--c-surface-soft);
+
+    color: var(--c-blue-800);
+  }
+}
+
+/* =========================================================
+   TABLET / MOBILE
+========================================================= */
+
+@media (max-width: 680px) {
+  .superadmin-councilors-pagination {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 12px;
+
+    padding: 14px 18px;
+  }
+
+  .superadmin-councilors-pagination-info {
+    text-align: center;
+  }
+
+  .superadmin-councilors-pagination-controls {
+    width: 100%;
+
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .superadmin-councilors-pagination-controls {
+    justify-content: space-between;
+
+    gap: 5px;
+  }
+
+  .superadmin-councilors-pagination-pages {
+    gap: 3px;
+  }
+
+  .superadmin-councilors-pagination button {
+    min-width: 33px;
+    height: 33px;
+  }
+
+  .superadmin-councilors-pagination .pagination-nav {
+    min-width: 39px;
+
+    padding: 0 9px;
+  }
+
+  .superadmin-councilors-pagination .pagination-nav span {
+    display: none;
+  }
+
+  .superadmin-councilors-pagination .pagination-ellipsis {
+    min-width: 18px;
   }
 }

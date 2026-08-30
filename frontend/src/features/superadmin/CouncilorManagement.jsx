@@ -49,6 +49,8 @@ const STATUS_FILTERS = [
   },
 ];
 
+const PAGE_SIZE = 10;
+
 /* =========================================================
    HELPERS
 ========================================================= */
@@ -92,6 +94,57 @@ const sortDepartments = (
           "",
       ),
   );
+
+
+const getPaginationItems = (
+  currentPage,
+  totalPages,
+) => {
+  if (totalPages <= 5) {
+    return Array.from(
+      {
+        length: totalPages,
+      },
+      (_, index) =>
+        index + 1,
+    );
+  }
+
+  if (currentPage <= 3) {
+    return [
+      1,
+      2,
+      3,
+      4,
+      "end-ellipsis",
+      totalPages,
+    ];
+  }
+
+  if (
+    currentPage >=
+    totalPages - 2
+  ) {
+    return [
+      1,
+      "start-ellipsis",
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ];
+  }
+
+  return [
+    1,
+    "start-ellipsis",
+    currentPage - 1,
+    currentPage,
+    currentPage + 1,
+    "end-ellipsis",
+    totalPages,
+  ];
+};
 
 /* =========================================================
    PASSWORD VISIBILITY ICON
@@ -212,11 +265,6 @@ function CouncilorManagement() {
     setSuccess,
   ] = useState("");
 
-  const [
-    reloadKey,
-    setReloadKey,
-  ] = useState(0);
-
   /* =======================================================
      FILTERS
   ======================================================= */
@@ -235,6 +283,16 @@ function CouncilorManagement() {
     departmentFilter,
     setDepartmentFilter,
   ] = useState("ALL");
+
+
+  /* =======================================================
+     PAGINATION
+  ======================================================= */
+
+  const [
+    currentPage,
+    setCurrentPage,
+  ] = useState(1);
 
   /* =======================================================
      CREATE MODAL
@@ -442,9 +500,7 @@ function CouncilorManagement() {
     return () => {
       cancelled = true;
     };
-  }, [
-    reloadKey,
-  ]);
+  }, []);
 
   /* =======================================================
      AUTO-HIDE SUCCESS
@@ -791,23 +847,117 @@ function CouncilorManagement() {
     );
 
   /* =======================================================
-     REFRESH
+     PAGINATION
   ======================================================= */
 
-  const handleRefresh = () => {
-    if (loading) {
-      return;
-    }
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        filteredCouncilors.length /
+          PAGE_SIZE,
+      ),
+    );
 
-    setLoading(true);
-    setError("");
-    setSuccess("");
+  const safeCurrentPage =
+    Math.min(
+      currentPage,
+      totalPages,
+    );
 
-    setReloadKey(
-      (current) =>
-        current + 1,
+  const pageStartIndex =
+    (
+      safeCurrentPage - 1
+    ) * PAGE_SIZE;
+
+  const pageEndIndex =
+    pageStartIndex +
+    PAGE_SIZE;
+
+  const paginatedCouncilors =
+    useMemo(
+      () =>
+        filteredCouncilors.slice(
+          pageStartIndex,
+          pageEndIndex,
+        ),
+      [
+        filteredCouncilors,
+        pageStartIndex,
+        pageEndIndex,
+      ],
+    );
+
+  const firstVisibleItem =
+    filteredCouncilors.length > 0
+      ? pageStartIndex + 1
+      : 0;
+
+  const lastVisibleItem =
+    Math.min(
+      pageEndIndex,
+      filteredCouncilors.length,
+    );
+
+  const paginationItems =
+    useMemo(
+      () =>
+        getPaginationItems(
+          safeCurrentPage,
+          totalPages,
+        ),
+      [
+        safeCurrentPage,
+        totalPages,
+      ],
+    );
+
+  const goToPage = (
+    page,
+  ) => {
+    const nextPage =
+      Math.min(
+        Math.max(page, 1),
+        totalPages,
+      );
+
+    setCurrentPage(
+      nextPage,
     );
   };
+
+  const handleSearchChange = (
+    event,
+  ) => {
+    setSearchTerm(
+      event.target.value,
+    );
+
+    setCurrentPage(1);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const handleDepartmentFilterChange =
+    (event) => {
+      setDepartmentFilter(
+        event.target.value,
+      );
+
+      setCurrentPage(1);
+    };
+
+  const handleStatusFilterChange =
+    (event) => {
+      setStatusFilter(
+        event.target.value,
+      );
+
+      setCurrentPage(1);
+    };
 
   /* =======================================================
      CREATE MODAL
@@ -1688,27 +1838,6 @@ function CouncilorManagement() {
           <div className="superadmin-councilors-header-actions">
             <button
               type="button"
-              className="superadmin-councilors-refresh"
-              onClick={
-                handleRefresh
-              }
-              disabled={
-                loading
-              }
-            >
-              <span
-                aria-hidden="true"
-              >
-                ↻
-              </span>
-
-              {loading
-                ? "Loading..."
-                : "Refresh"}
-            </button>
-
-            <button
-              type="button"
               className="superadmin-councilors-create"
               onClick={
                 openCreateModal
@@ -1921,7 +2050,12 @@ function CouncilorManagement() {
             <div className="superadmin-councilors-result-count">
               {loading
                 ? "Loading Councilors..."
-                : `${filteredCouncilors.length} of ${councilors.length} shown`}
+                : `${filteredCouncilors.length} result${
+                    filteredCouncilors.length ===
+                    1
+                      ? ""
+                      : "s"
+                  }`}
             </div>
           </div>
 
@@ -1942,13 +2076,8 @@ function CouncilorManagement() {
                 value={
                   searchTerm
                 }
-                onChange={(
-                  event,
-                ) =>
-                  setSearchTerm(
-                    event.target
-                      .value,
-                  )
+                onChange={
+                  handleSearchChange
                 }
                 placeholder="Search name, email, or department..."
                 aria-label="Search Councilors"
@@ -1957,8 +2086,8 @@ function CouncilorManagement() {
               {searchTerm && (
                 <button
                   type="button"
-                  onClick={() =>
-                    setSearchTerm("")
+                  onClick={
+                    clearSearch
                   }
                   aria-label="Clear Councilor search"
                 >
@@ -1977,13 +2106,8 @@ function CouncilorManagement() {
                 value={
                   departmentFilter
                 }
-                onChange={(
-                  event,
-                ) =>
-                  setDepartmentFilter(
-                    event.target
-                      .value,
-                  )
+                onChange={
+                  handleDepartmentFilterChange
                 }
               >
                 <option value="ALL">
@@ -2018,13 +2142,8 @@ function CouncilorManagement() {
                 value={
                   statusFilter
                 }
-                onChange={(
-                  event,
-                ) =>
-                  setStatusFilter(
-                    event.target
-                      .value,
-                  )
+                onChange={
+                  handleStatusFilterChange
                 }
               >
                 {STATUS_FILTERS.map(
@@ -2066,10 +2185,6 @@ function CouncilorManagement() {
             </div>
           ) : filteredCouncilors.length ===
             0 ? (
-            /* =============================================
-               EMPTY STATE
-            ============================================== */
-
             <div className="superadmin-councilors-empty">
               <div className="superadmin-councilors-empty-icon">
                 ♙
@@ -2102,11 +2217,8 @@ function CouncilorManagement() {
               )}
             </div>
           ) : (
-            /* =============================================
-               TABLE
-            ============================================== */
-
-            <div className="superadmin-councilors-table-wrapper">
+            <>
+              <div className="superadmin-councilors-table-wrapper">
               <table className="superadmin-councilors-table">
                 <thead>
                   <tr>
@@ -2129,7 +2241,7 @@ function CouncilorManagement() {
                 </thead>
 
                 <tbody>
-                  {filteredCouncilors.map(
+                  {paginatedCouncilors.map(
                     (
                       councilor,
                       index,
@@ -2148,10 +2260,6 @@ function CouncilorManagement() {
                               index,
                           }}
                         >
-                          {/* =================================
-                              COUNCILOR
-                          ================================== */}
-
                           <td
                             data-label="Councilor"
                           >
@@ -2182,10 +2290,6 @@ function CouncilorManagement() {
                             </div>
                           </td>
 
-                          {/* =================================
-                              DEPARTMENT
-                          ================================== */}
-
                           <td
                             data-label="Department"
                           >
@@ -2209,10 +2313,6 @@ function CouncilorManagement() {
                             </div>
                           </td>
 
-                          {/* =================================
-                              STATUS
-                          ================================== */}
-
                           <td
                             data-label="Status"
                           >
@@ -2232,10 +2332,6 @@ function CouncilorManagement() {
                                 : "Inactive"}
                             </span>
                           </td>
-
-                          {/* =================================
-                              ACTIONS
-                          ================================== */}
 
                           <td
                             data-label="Actions"
@@ -2291,11 +2387,128 @@ function CouncilorManagement() {
                 </tbody>
               </table>
             </div>
-          )}
 
-          {/* ===============================================
-              FOOTER
-          ================================================ */}
+              <nav
+                className="superadmin-councilors-pagination"
+                aria-label="Councilor pagination"
+              >
+                <div className="superadmin-councilors-pagination-info">
+                  Showing{" "}
+                  <strong>
+                    {firstVisibleItem}
+                  </strong>
+                  {" – "}
+                  <strong>
+                    {lastVisibleItem}
+                  </strong>{" "}
+                  of{" "}
+                  <strong>
+                    {
+                      filteredCouncilors.length
+                    }
+                  </strong>
+                </div>
+
+                <div className="superadmin-councilors-pagination-controls">
+                  <button
+                    type="button"
+                    className="pagination-nav"
+                    onClick={() =>
+                      goToPage(
+                        safeCurrentPage -
+                          1,
+                      )
+                    }
+                    disabled={
+                      safeCurrentPage ===
+                      1
+                    }
+                    aria-label="Previous page"
+                  >
+                    ‹
+
+                    <span>
+                      Previous
+                    </span>
+                  </button>
+
+                  <div className="superadmin-councilors-pagination-pages">
+                    {paginationItems.map(
+                      (item) => {
+                        if (
+                          typeof item !==
+                          "number"
+                        ) {
+                          return (
+                            <span
+                              key={
+                                item
+                              }
+                              className="pagination-ellipsis"
+                              aria-hidden="true"
+                            >
+                              …
+                            </span>
+                          );
+                        }
+
+                        return (
+                          <button
+                            key={
+                              item
+                            }
+                            type="button"
+                            className={`pagination-page ${
+                              item ===
+                              safeCurrentPage
+                                ? "active"
+                                : ""
+                            }`}
+                            onClick={() =>
+                              goToPage(
+                                item,
+                              )
+                            }
+                            aria-label={`Go to page ${item}`}
+                            aria-current={
+                              item ===
+                              safeCurrentPage
+                                ? "page"
+                                : undefined
+                            }
+                          >
+                            {item}
+                          </button>
+                        );
+                      },
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="pagination-nav"
+                    onClick={() =>
+                      goToPage(
+                        safeCurrentPage +
+                          1,
+                      )
+                    }
+                    disabled={
+                      safeCurrentPage ===
+                      totalPages
+                    }
+                    aria-label="Next page"
+                  >
+                    <span>
+                      Next
+                    </span>
+
+                    ›
+                  </button>
+                </div>
+              </nav>
+            </>
+          )}
 
           {!loading &&
             councilors.length >
@@ -2424,8 +2637,6 @@ function CouncilorManagement() {
                 </div>
               </div>
 
-              {/* NAME */}
-
               <div className="superadmin-councilors-field">
                 <label htmlFor="create-councilor-name">
                   Full Name
@@ -2451,8 +2662,6 @@ function CouncilorManagement() {
                 />
               </div>
 
-              {/* EMAIL */}
-
               <div className="superadmin-councilors-field">
                 <label htmlFor="create-councilor-email">
                   Email Address
@@ -2475,8 +2684,6 @@ function CouncilorManagement() {
                   }
                 />
               </div>
-
-              {/* DEPARTMENT */}
 
               <div className="superadmin-councilors-field">
                 <label htmlFor="create-councilor-department">
@@ -2552,8 +2759,6 @@ function CouncilorManagement() {
                   )}
               </div>
 
-              {/* PASSWORD */}
-
               <div className="superadmin-councilors-field">
                 <label htmlFor="create-councilor-password">
                   Temporary Password
@@ -2585,9 +2790,7 @@ function CouncilorManagement() {
                     type="button"
                     onClick={() =>
                       setShowCreatePassword(
-                        (
-                          current,
-                        ) =>
+                        (current) =>
                           !current,
                       )
                     }
@@ -3013,8 +3216,6 @@ function CouncilorManagement() {
                   </strong>
                 </div>
               </div>
-
-              {/* BLOCKED */}
 
               {!statusTargetIsActive &&
                 activationBlocked && (

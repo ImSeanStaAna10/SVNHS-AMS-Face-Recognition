@@ -73,6 +73,205 @@ const scopeStudentsToSection = (students, sectionId) => {
   );
 };
 
+const normalizeStudentNumberInput = (value) =>
+  String(value ?? "")
+    .replace(/\D/g, "")
+    .slice(0, 12);
+
+const isValidStudentNumber = (value) => /^\d{12}$/.test(String(value ?? ""));
+
+const isFaceConflictResult = (result) => result?.outcome === "FACE_CONFLICT";
+
+const getFaceSimilarityPercentage = (value) => {
+  const numericValue = Number(value);
+
+  if (!Number.isFinite(numericValue)) {
+    return null;
+  }
+
+  /*
+   * Backend returns cosine distance.
+   * Convert it only for user-facing presentation:
+   * similarity = (1 - distance) * 100
+   *
+   * This is a similarity score, not a probability or identity confidence.
+   */
+  return Math.min(100, Math.max(0, (1 - numericValue) * 100));
+};
+
+const formatFaceSimilarity = (value) => {
+  const percentage = getFaceSimilarityPercentage(value);
+
+  if (percentage === null) {
+    return "Unavailable";
+  }
+
+  return `${percentage.toFixed(1)}%`;
+};
+
+const formatFaceSimilarityDifference = (firstDistance, secondDistance) => {
+  const first = getFaceSimilarityPercentage(firstDistance);
+  const second = getFaceSimilarityPercentage(secondDistance);
+
+  if (first === null || second === null) {
+    return "Unavailable";
+  }
+
+  return `${Math.abs(first - second).toFixed(1)} pts`;
+};
+
+const getFaceConflictStatusLabel = (status) => {
+  const normalizedStatus = String(status || "PENDING").toUpperCase();
+
+  if (normalizedStatus === "VERIFIED_DIFFERENT_PEOPLE") {
+    return "Verified different";
+  }
+
+  if (normalizedStatus === "CONFIRMED_SAME_PERSON") {
+    return "Same person confirmed";
+  }
+
+  return "Review needed";
+};
+
+function FaceSimilarityMeter({
+  distance,
+  label = "Face similarity",
+  compact = false,
+}) {
+  const percentage = getFaceSimilarityPercentage(distance);
+  const displayValue = formatFaceSimilarity(distance);
+  const meterValue = percentage ?? 0;
+
+  return (
+    <div
+      className={`student-face-similarity-meter ${compact ? "is-compact" : ""}`}
+    >
+      <div className="student-face-similarity-meter-header">
+        <span>{label}</span>
+        <strong>{displayValue}</strong>
+      </div>
+
+      <div
+        className="student-face-similarity-meter-track"
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percentage === null ? undefined : Math.round(percentage)}
+      >
+        <i style={{ width: `${meterValue}%` }} />
+      </div>
+
+      {!compact && (
+        <small>
+          Higher percentage means a closer facial embedding match. It is not an
+          identity confidence probability.
+        </small>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================
+   FACE CONFLICT NOTICE
+========================================================= */
+
+function FaceConflictNotice({ conflict, compact = false }) {
+  if (!conflict) {
+    return null;
+  }
+
+  const confirmedSamePerson =
+    conflict?.conflictStatus === "CONFIRMED_SAME_PERSON";
+
+  const conflictStatus = getFaceConflictStatusLabel(conflict?.conflictStatus);
+
+  return (
+    <div
+      className={`student-face-conflict-card student-face-conflict-card-v2 ${
+        compact ? "is-compact" : ""
+      } ${confirmedSamePerson ? "is-confirmed-same-person" : ""}`}
+      role="alert"
+      aria-live="polite"
+    >
+      <div className="student-face-conflict-hero">
+        <div className="student-face-conflict-icon" aria-hidden="true">
+          {confirmedSamePerson ? "×" : "!"}
+        </div>
+
+        <div className="student-face-conflict-heading">
+          <span className="student-face-conflict-eyebrow">
+            {confirmedSamePerson
+              ? "IDENTITY REVIEW COMPLETE"
+              : "IDENTITY REVIEW NEEDED"}
+          </span>
+
+          <strong>
+            {confirmedSamePerson
+              ? "Separate face enrollment is blocked"
+              : "A very similar enrolled face was found"}
+          </strong>
+
+          <p>
+            {confirmedSamePerson
+              ? "The identity review confirmed that these records represent the same physical person. A separate face record will not be created."
+              : "The current face was not saved. Review the possible match and complete a fresh second capture before making any identity decision."}
+          </p>
+        </div>
+
+        <span
+          className={`student-face-conflict-status ${
+            confirmedSamePerson ? "is-blocked" : "is-review"
+          }`}
+        >
+          {confirmedSamePerson ? "BLOCKED" : conflictStatus}
+        </span>
+      </div>
+
+      <div className="student-face-conflict-match">
+        <div className="student-face-conflict-match-person">
+          <span
+            className="student-face-conflict-match-avatar"
+            aria-hidden="true"
+          >
+            {conflict.conflictingStudentName?.charAt(0)?.toUpperCase() || "S"}
+          </span>
+
+          <div>
+            <span>SIMILAR ENROLLED FACE</span>
+            <strong>
+              {conflict.conflictingStudentName || "Existing student"}
+            </strong>
+            <small>
+              {conflict.conflictingSectionName || "Section unavailable"}
+              {conflict.conflictingDepartmentName
+                ? ` • ${conflict.conflictingDepartmentName}`
+                : ""}
+            </small>
+          </div>
+        </div>
+
+        <FaceSimilarityMeter
+          distance={conflict.distance}
+          label="Face similarity"
+          compact={compact}
+        />
+      </div>
+
+      <div className="student-face-conflict-safety-note">
+        <span aria-hidden="true">i</span>
+
+        <p>
+          {confirmedSamePerson
+            ? "This stored decision remains authoritative for this face-conflict pair."
+            : "Similarity percentage is provided only to make the comparison easier to understand. It does not by itself prove that two records are the same person."}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /* =========================================================
    CAMERA STATUS
 ========================================================= */
@@ -126,15 +325,22 @@ function FaceCapturePanel({
   onCameraReady,
   onEnableCamera,
   onManualCapture,
+  captureMode = "enrollment",
 }) {
+  const verificationMode = captureMode === "verification";
+
   const scannerActive = cameraActive && !capturedFacePreview;
 
   const scannerCopy = useMemo(() => {
     if (scanPhase === "capturing" || capturingFace) {
       return {
-        eyebrow: "CAPTURING ENROLLMENT PHOTO",
+        eyebrow: verificationMode
+          ? "CAPTURING VERIFICATION PHOTO"
+          : "CAPTURING ENROLLMENT PHOTO",
         title: "Hold still",
-        description: "Creating the face image used for attendance recognition.",
+        description: verificationMode
+          ? "Creating the second face image used to verify the similarity conflict."
+          : "Creating the face image used for attendance recognition.",
       };
     }
 
@@ -157,7 +363,9 @@ function FaceCapturePanel({
 
     if (scanPhase === "positioning") {
       return {
-        eyebrow: "AUTO CAPTURE ACTIVE",
+        eyebrow: verificationMode
+          ? "SECOND CAPTURE ACTIVE"
+          : "AUTO CAPTURE ACTIVE",
         title: "Center your face",
         description:
           "Keep one face inside the guide and look directly at the camera.",
@@ -167,28 +375,45 @@ function FaceCapturePanel({
     if (scanPhase === "preparing" || (cameraActive && !cameraReady)) {
       return {
         eyebrow: "PREPARING CAMERA",
-        title: "Starting enrollment scanner",
+        title: verificationMode
+          ? "Starting verification scanner"
+          : "Starting enrollment scanner",
         description: "The camera will be ready in a moment.",
       };
     }
 
     if (cameraActive && cameraReady) {
       return {
-        eyebrow: "FACE ENROLLMENT READY",
+        eyebrow: verificationMode
+          ? "IDENTITY VERIFICATION READY"
+          : "FACE ENROLLMENT READY",
         title: scanMessage || "Position one student in frame",
         description: "Auto capture is enabled. You can also use Capture Now.",
       };
     }
 
     return {
-      eyebrow: "FACE ENROLLMENT",
+      eyebrow: verificationMode ? "IDENTITY VERIFICATION" : "FACE ENROLLMENT",
       title: "Camera unavailable",
-      description: "Enable the camera to begin guided face enrollment.",
+      description: verificationMode
+        ? "Enable the camera to capture the required second verification photo."
+        : "Enable the camera to begin guided face enrollment.",
     };
-  }, [cameraActive, cameraReady, capturingFace, scanMessage, scanPhase]);
+  }, [
+    cameraActive,
+    cameraReady,
+    capturingFace,
+    scanMessage,
+    scanPhase,
+    verificationMode,
+  ]);
 
   return (
-    <div className="student-face-camera-content">
+    <div
+      className={`student-face-camera-content ${
+        verificationMode ? "is-verification-mode" : ""
+      }`}
+    >
       <div
         className={`student-face-camera-shell is-${scanPhase} scanner-${scanPhase}`}
       >
@@ -204,7 +429,9 @@ function FaceCapturePanel({
 
             <div className="student-face-captured-label">
               <span aria-hidden="true">✓</span>
-              ENROLLMENT PHOTO READY
+              {verificationMode
+                ? "VERIFICATION PHOTO READY"
+                : "ENROLLMENT PHOTO READY"}
             </div>
 
             <div className="student-face-captured-summary">
@@ -213,10 +440,15 @@ function FaceCapturePanel({
               </span>
 
               <div>
-                <strong>Capture complete</strong>
+                <strong>
+                  {verificationMode
+                    ? "Second capture complete"
+                    : "Capture complete"}
+                </strong>
                 <p>
-                  Review the student's face photo. Retake it if needed, then
-                  save the enrollment.
+                  {verificationMode
+                    ? "Review this second photo, then submit it for identity verification."
+                    : "Review the student's face photo. Retake it if needed, then save the enrollment."}
                 </p>
               </div>
             </div>
@@ -248,11 +480,16 @@ function FaceCapturePanel({
                   CAMERA OFF
                 </span>
 
-                <strong>Start the face enrollment scanner</strong>
+                <strong>
+                  {verificationMode
+                    ? "Start the identity verification scanner"
+                    : "Start the face enrollment scanner"}
+                </strong>
 
                 <p>
-                  Allow camera access to capture the student's registered face
-                  identity for attendance recognition.
+                  {verificationMode
+                    ? "Capture a fresh second image of the student so the backend can verify whether the original face conflict is reproduced."
+                    : "Allow camera access to capture the student's registered face identity for attendance recognition."}
                 </p>
 
                 <button
@@ -291,7 +528,7 @@ function FaceCapturePanel({
 
                 <div className="student-face-auto-badge">
                   <span aria-hidden="true">◎</span>
-                  AUTO CAPTURE
+                  {verificationMode ? "SECOND CAPTURE" : "AUTO CAPTURE"}
                 </div>
 
                 {cameraReady && scanPhase !== "countdown" && (
@@ -322,7 +559,11 @@ function FaceCapturePanel({
                   <div className="student-face-processing-overlay">
                     <div className="student-face-processing-spinner" />
                     <strong>Capturing face</strong>
-                    <span>Preparing enrollment photo...</span>
+                    <span>
+                      {verificationMode
+                        ? "Preparing verification photo..."
+                        : "Preparing enrollment photo..."}
+                    </span>
                   </div>
                 )}
               </>
@@ -363,7 +604,9 @@ function FaceCapturePanel({
           <span aria-hidden="true">!</span>
 
           <div>
-            <strong>Face registration</strong>
+            <strong>
+              {verificationMode ? "Identity verification" : "Face registration"}
+            </strong>
             <p>{faceError}</p>
           </div>
         </div>
@@ -373,8 +616,14 @@ function FaceCapturePanel({
         <span aria-hidden="true">▣</span>
 
         <p>
-          <strong>Face enrollment photo</strong>
-          The captured image is submitted only when you complete enrollment.
+          <strong>
+            {verificationMode
+              ? "Second verification photo"
+              : "Face enrollment photo"}
+          </strong>
+          {verificationMode
+            ? " The image is submitted only to evaluate this existing face conflict."
+            : " The captured image is submitted only when you complete enrollment."}
         </p>
       </div>
 
@@ -432,6 +681,8 @@ function StudentManagement() {
   const filterMenuRef = useRef(null);
 
   const enrollmentBodyRef = useRef(null);
+
+  const preVerificationCaptureFileRef = useRef(null);
 
   /* =======================================================
      DATA STATE
@@ -522,6 +773,23 @@ function StudentManagement() {
   const [capturedFacePreview, setCapturedFacePreview] = useState("");
 
   const [faceError, setFaceError] = useState("");
+
+  const [faceConflict, setFaceConflict] = useState(null);
+
+  const [faceVerificationOpen, setFaceVerificationOpen] = useState(false);
+
+  const [faceVerificationStage, setFaceVerificationStage] = useState("CAPTURE");
+
+  const [faceVerificationResult, setFaceVerificationResult] = useState(null);
+
+  const [faceResolutionResult, setFaceResolutionResult] = useState(null);
+
+  const [verifyingFaceConflict, setVerifyingFaceConflict] = useState(false);
+
+  const [resolvingFaceConflict, setResolvingFaceConflict] = useState(false);
+
+  const [pendingResolutionDecision, setPendingResolutionDecision] =
+    useState(null);
 
   const [scanPhase, setScanPhase] = useState("idle");
 
@@ -628,7 +896,10 @@ function StudentManagement() {
   ======================================================= */
 
   const modalOpen =
-    showAddModal || Boolean(selectedStudent) || Boolean(editingStudent);
+    showAddModal ||
+    Boolean(selectedStudent) ||
+    Boolean(editingStudent) ||
+    faceVerificationOpen;
 
   useEffect(() => {
     if (!modalOpen) {
@@ -1093,6 +1364,24 @@ function StudentManagement() {
 
     setFaceError("");
 
+    setFaceConflict(null);
+
+    setFaceVerificationOpen(false);
+
+    setFaceVerificationStage("CAPTURE");
+
+    setFaceVerificationResult(null);
+
+    setFaceResolutionResult(null);
+
+    setVerifyingFaceConflict(false);
+
+    setResolvingFaceConflict(false);
+
+    setPendingResolutionDecision(null);
+
+    preVerificationCaptureFileRef.current = null;
+
     setCapturingFace(false);
 
     autoCaptureStartedRef.current = false;
@@ -1148,9 +1437,17 @@ function StudentManagement() {
 
       setScanPhase("capturing");
 
-      setScanMessage("Capturing enrollment photo...");
+      setScanMessage(
+        faceVerificationOpen
+          ? "Capturing verification photo..."
+          : "Capturing enrollment photo...",
+      );
 
       setFaceError("");
+
+      if (!faceVerificationOpen) {
+        setFaceConflict(null);
+      }
 
       canvas.width = video.videoWidth;
 
@@ -1190,7 +1487,11 @@ function StudentManagement() {
 
       setScanPhase("captured");
 
-      setScanMessage("Enrollment photo ready");
+      setScanMessage(
+        faceVerificationOpen
+          ? "Verification photo ready"
+          : "Enrollment photo ready",
+      );
 
       stopFaceCamera();
     } catch (captureError) {
@@ -1293,7 +1594,12 @@ function StudentManagement() {
   ======================================================= */
 
   const handleRetakeFace = async () => {
-    if (registeringFace || creatingStudent) {
+    if (
+      registeringFace ||
+      creatingStudent ||
+      verifyingFaceConflict ||
+      resolvingFaceConflict
+    ) {
       return;
     }
 
@@ -1301,13 +1607,21 @@ function StudentManagement() {
 
     setFaceError("");
 
+    if (!faceVerificationOpen) {
+      setFaceConflict(null);
+    }
+
     setCameraError("");
 
     autoCaptureStartedRef.current = false;
 
     setScanPhase("preparing");
 
-    setScanMessage("Preparing camera...");
+    setScanMessage(
+      faceVerificationOpen
+        ? "Preparing verification camera..."
+        : "Preparing camera...",
+    );
 
     await startFaceCamera();
   };
@@ -1322,6 +1636,8 @@ function StudentManagement() {
     setStudentName("");
 
     setCreateError("");
+
+    setFaceConflict(null);
 
     setCreatedStudentRecord(null);
 
@@ -1376,6 +1692,12 @@ function StudentManagement() {
 
     if (!cleanStudentNumber || !cleanName) {
       setCreateError("Student number and student name are required.");
+
+      return false;
+    }
+
+    if (!isValidStudentNumber(cleanStudentNumber)) {
+      setCreateError("Student number must contain exactly 12 digits.");
 
       return false;
     }
@@ -1478,6 +1800,12 @@ function StudentManagement() {
       return;
     }
 
+    if (!isValidStudentNumber(cleanStudentNumber)) {
+      setCreateError("Student number must contain exactly 12 digits.");
+
+      return;
+    }
+
     if (!section?.id) {
       setCreateError("No assigned section is available.");
 
@@ -1549,10 +1877,30 @@ function StudentManagement() {
 
       operationStage = "face";
 
-      await adviserService.registerStudentFace(
+      const faceRegistrationResult = await adviserService.registerStudentFace(
         studentRecord.id,
         capturedFaceFile,
       );
+
+      if (isFaceConflictResult(faceRegistrationResult)) {
+        setFaceConflict(faceRegistrationResult);
+
+        setFaceVerificationStage("CAPTURE");
+
+        setFaceVerificationResult(null);
+
+        setFaceResolutionResult(null);
+
+        setPendingResolutionDecision(null);
+
+        setFaceError("");
+
+        setEnrollmentStep(3);
+
+        return;
+      }
+
+      setFaceConflict(null);
 
       setLocallyRegisteredFaceIds((currentIds) => {
         const updatedIds = new Set(currentIds);
@@ -1670,6 +2018,12 @@ function StudentManagement() {
 
     if (!cleanStudentNumber || !cleanName) {
       setEditError("Student number and student name are required.");
+
+      return;
+    }
+
+    if (!isValidStudentNumber(cleanStudentNumber)) {
+      setEditError("Student number must contain exactly 12 digits.");
 
       return;
     }
@@ -1795,7 +2149,28 @@ function StudentManagement() {
 
       setFaceError("");
 
-      await adviserService.registerStudentFace(studentId, capturedFaceFile);
+      const faceRegistrationResult = await adviserService.registerStudentFace(
+        studentId,
+        capturedFaceFile,
+      );
+
+      if (isFaceConflictResult(faceRegistrationResult)) {
+        setFaceConflict(faceRegistrationResult);
+
+        setFaceVerificationStage("CAPTURE");
+
+        setFaceVerificationResult(null);
+
+        setFaceResolutionResult(null);
+
+        setPendingResolutionDecision(null);
+
+        setFaceError("");
+
+        return;
+      }
+
+      setFaceConflict(null);
 
       setLocallyRegisteredFaceIds((currentIds) => {
         const updatedIds = new Set(currentIds);
@@ -1827,6 +2202,545 @@ function StudentManagement() {
       setRegisteringFace(false);
     }
   };
+
+  /* =======================================================
+     FACE CONFLICT WORKFLOW
+  ======================================================= */
+
+  const getFaceConflictTarget = () => {
+    const targetId =
+      faceConflict?.studentId ||
+      createdStudentRecord?.id ||
+      selectedStudent?.id ||
+      "";
+
+    const targetName = showAddModal
+      ? studentName.trim() || createdStudentRecord?.name || "Student"
+      : selectedStudent?.name || createdStudentRecord?.name || "Student";
+
+    return {
+      id: targetId,
+      name: targetName,
+      context: showAddModal ? "ADD" : "EXISTING",
+    };
+  };
+
+  const restorePreVerificationCapture = () => {
+    const originalFile = preVerificationCaptureFileRef.current;
+
+    clearCapturedFace();
+
+    if (!originalFile) {
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(originalFile);
+
+    previewUrlRef.current = previewUrl;
+
+    setCapturedFaceFile(originalFile);
+
+    setCapturedFacePreview(previewUrl);
+
+    setScanPhase("captured");
+
+    setScanMessage("Enrollment photo ready");
+  };
+
+  const openFaceConflictVerification = () => {
+    const target = getFaceConflictTarget();
+
+    if (!target.id || !faceConflict?.conflictId) {
+      setFaceError(
+        "Face conflict information is incomplete. Please retry face registration.",
+      );
+
+      return;
+    }
+
+    if (faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON") {
+      setFaceError(
+        "This face conflict was already confirmed as the same physical person. Separate face enrollment remains blocked.",
+      );
+
+      return;
+    }
+
+    preVerificationCaptureFileRef.current = capturedFaceFile;
+
+    stopFaceCamera();
+
+    clearCapturedFace();
+
+    setCameraError("");
+
+    setFaceError("");
+
+    setFaceVerificationResult(null);
+
+    setFaceResolutionResult(null);
+
+    setPendingResolutionDecision(null);
+
+    setFaceVerificationStage("CAPTURE");
+
+    setFaceVerificationOpen(true);
+
+    setScanPhase("preparing");
+
+    setScanMessage("Preparing verification camera...");
+
+    autoCaptureStartedRef.current = false;
+
+    scheduleCameraStart();
+  };
+
+  const closeFaceConflictVerification = () => {
+    if (verifyingFaceConflict || resolvingFaceConflict) {
+      return;
+    }
+
+    if (faceResolutionResult?.conflictStatus === "VERIFIED_DIFFERENT_PEOPLE") {
+      returnToFreshEnrollmentCapture();
+
+      return;
+    }
+
+    stopFaceCamera();
+
+    restorePreVerificationCapture();
+
+    preVerificationCaptureFileRef.current = null;
+
+    setFaceVerificationOpen(false);
+
+    setFaceVerificationStage("CAPTURE");
+
+    setFaceVerificationResult(null);
+
+    setFaceResolutionResult(null);
+
+    setPendingResolutionDecision(null);
+
+    setFaceError("");
+  };
+
+  const returnToFreshEnrollmentCapture = () => {
+    if (verifyingFaceConflict || resolvingFaceConflict) {
+      return;
+    }
+
+    stopFaceCamera();
+
+    clearCapturedFace();
+
+    preVerificationCaptureFileRef.current = null;
+
+    setFaceVerificationOpen(false);
+
+    setFaceVerificationStage("CAPTURE");
+
+    setFaceVerificationResult(null);
+
+    setFaceResolutionResult(null);
+
+    setPendingResolutionDecision(null);
+
+    setFaceConflict(null);
+
+    setFaceError("");
+
+    setCameraError("");
+
+    autoCaptureStartedRef.current = false;
+
+    if (showAddModal) {
+      setEnrollmentStep(2);
+    }
+
+    setScanPhase("preparing");
+
+    setScanMessage("Preparing camera...");
+
+    scheduleCameraStart();
+  };
+
+  const finishFaceRegistrationSuccess = async ({
+    studentId,
+    studentName: completedName,
+    verificationResolved = false,
+  }) => {
+    setLocallyRegisteredFaceIds((currentIds) => {
+      const updatedIds = new Set(currentIds);
+
+      updatedIds.add(studentId);
+
+      return updatedIds;
+    });
+
+    try {
+      await refreshStudents();
+    } catch (refreshError) {
+      console.warn(
+        "Unable to refresh students after verified face registration:",
+        refreshError,
+      );
+    }
+
+    const completedFromAdd = showAddModal;
+
+    const successCopy = completedFromAdd
+      ? verificationResolved
+        ? `${completedName} was added to ${sectionName}. Identity verification confirmed a separate person and the face was registered successfully.`
+        : `${completedName} was added to ${sectionName} and the face photo was registered successfully.`
+      : verificationResolved
+        ? `Identity verification was completed and the face registration for ${completedName} was saved successfully.`
+        : `Face registration completed for ${completedName}.`;
+
+    setSuccessMessage(successCopy);
+
+    setFaceVerificationOpen(false);
+
+    preVerificationCaptureFileRef.current = null;
+
+    if (completedFromAdd) {
+      resetAddStudentModal();
+    } else {
+      resetFaceRegistration();
+    }
+  };
+
+  const completeVerifiedDifferentEnrollment = async () => {
+    const target = getFaceConflictTarget();
+
+    if (!target.id) {
+      setFaceVerificationStage("ENROLLMENT_FAILED");
+
+      setFaceError(
+        "Student information is unavailable. Close verification and retry face registration.",
+      );
+
+      return false;
+    }
+
+    if (!capturedFaceFile) {
+      setFaceVerificationStage("ENROLLMENT_FAILED");
+
+      setFaceError(
+        "The verification photo is unavailable. Capture a fresh face image before completing enrollment.",
+      );
+
+      return false;
+    }
+
+    try {
+      const registrationResult = await adviserService.registerStudentFace(
+        target.id,
+        capturedFaceFile,
+      );
+
+      if (isFaceConflictResult(registrationResult)) {
+        setFaceConflict(registrationResult);
+
+        if (registrationResult?.conflictStatus === "CONFIRMED_SAME_PERSON") {
+          setFaceVerificationStage("SAME_PERSON");
+        } else {
+          setFaceVerificationStage("NEW_CONFLICT");
+        }
+
+        setFaceError("");
+
+        return false;
+      }
+
+      setFaceConflict(null);
+
+      await finishFaceRegistrationSuccess({
+        studentId: target.id,
+
+        studentName: target.name,
+
+        verificationResolved: true,
+      });
+
+      return true;
+    } catch (requestError) {
+      console.error(
+        "Unable to complete verified face enrollment:",
+        requestError,
+      );
+
+      setFaceVerificationStage("ENROLLMENT_FAILED");
+
+      setFaceError(
+        getErrorMessage(
+          requestError,
+          "The identity decision was saved, but face enrollment could not be completed. You can retry without repeating the identity decision.",
+        ),
+      );
+
+      return false;
+    }
+  };
+
+  const handleVerifyFaceConflict = async () => {
+    const target = getFaceConflictTarget();
+
+    if (!target.id || !faceConflict?.conflictId) {
+      setFaceError(
+        "Face conflict information is incomplete. Please close verification and retry.",
+      );
+
+      return;
+    }
+
+    if (!capturedFaceFile) {
+      setFaceError(
+        "Capture a fresh second face photo before submitting verification.",
+      );
+
+      return;
+    }
+
+    try {
+      setVerifyingFaceConflict(true);
+
+      setFaceError("");
+
+      const result = await adviserService.verifyStudentFaceConflictCapture(
+        target.id,
+        faceConflict.conflictId,
+        capturedFaceFile,
+      );
+
+      setFaceVerificationResult(result);
+
+      setPendingResolutionDecision(null);
+
+      if (result?.outcome === "MANUAL_REVIEW_REQUIRED") {
+        setFaceVerificationStage("MANUAL_REVIEW");
+
+        return;
+      }
+
+      if (result?.outcome === "CONFLICT_NOT_REPRODUCED") {
+        setFaceVerificationStage("NOT_REPRODUCED");
+
+        return;
+      }
+
+      if (result?.outcome === "CONFIRMED_SAME_PERSON") {
+        setFaceConflict((currentConflict) => ({
+          ...currentConflict,
+          conflictStatus: "CONFIRMED_SAME_PERSON",
+        }));
+
+        setFaceVerificationStage("SAME_PERSON");
+
+        return;
+      }
+
+      if (result?.outcome === "VERIFIED_DIFFERENT_PEOPLE") {
+        setFaceConflict((currentConflict) => ({
+          ...currentConflict,
+          conflictStatus: "VERIFIED_DIFFERENT_PEOPLE",
+        }));
+
+        setFaceVerificationStage("ENROLLING");
+
+        await completeVerifiedDifferentEnrollment();
+
+        return;
+      }
+
+      setFaceError(
+        result?.message ||
+          "Identity verification returned an unsupported result.",
+      );
+    } catch (requestError) {
+      console.error("Unable to verify face conflict:", requestError);
+
+      setFaceError(
+        getErrorMessage(
+          requestError,
+          "Unable to complete the second face verification.",
+        ),
+      );
+    } finally {
+      setVerifyingFaceConflict(false);
+    }
+  };
+
+  const requestFaceConflictDecision = (decision) => {
+    if (faceVerificationStage !== "MANUAL_REVIEW") {
+      return;
+    }
+
+    setFaceError("");
+
+    setPendingResolutionDecision(decision);
+  };
+
+  const cancelFaceConflictDecision = () => {
+    if (resolvingFaceConflict) {
+      return;
+    }
+
+    setPendingResolutionDecision(null);
+
+    setFaceError("");
+  };
+
+  const confirmFaceConflictDecision = async () => {
+    const decision = pendingResolutionDecision;
+
+    const target = getFaceConflictTarget();
+
+    if (!decision || !target.id || !faceConflict?.conflictId) {
+      setFaceError(
+        "The identity decision could not be prepared. Please try again.",
+      );
+
+      return;
+    }
+
+    try {
+      setResolvingFaceConflict(true);
+
+      setFaceError("");
+
+      const result = await adviserService.resolveStudentFaceConflict(
+        target.id,
+        faceConflict.conflictId,
+        decision,
+      );
+
+      setFaceResolutionResult(result);
+
+      setPendingResolutionDecision(null);
+
+      setFaceConflict((currentConflict) => ({
+        ...currentConflict,
+        conflictStatus:
+          result?.conflictStatus || currentConflict?.conflictStatus,
+      }));
+
+      if (result?.conflictStatus === "VERIFIED_DIFFERENT_PEOPLE") {
+        setFaceVerificationStage("ENROLLING");
+
+        await completeVerifiedDifferentEnrollment();
+
+        return;
+      }
+
+      if (result?.conflictStatus === "CONFIRMED_SAME_PERSON") {
+        setFaceVerificationStage("SAME_PERSON");
+
+        return;
+      }
+
+      setFaceError(
+        result?.message ||
+          "The face conflict was resolved with an unsupported status.",
+      );
+    } catch (requestError) {
+      console.error("Unable to resolve face conflict:", requestError);
+
+      setFaceError(
+        getErrorMessage(
+          requestError,
+          "Unable to save the manual identity decision.",
+        ),
+      );
+    } finally {
+      setResolvingFaceConflict(false);
+    }
+  };
+
+  const retryVerifiedDifferentEnrollment = async () => {
+    if (resolvingFaceConflict) {
+      return;
+    }
+
+    try {
+      setResolvingFaceConflict(true);
+
+      setFaceError("");
+
+      setFaceVerificationStage("ENROLLING");
+
+      await completeVerifiedDifferentEnrollment();
+    } finally {
+      setResolvingFaceConflict(false);
+    }
+  };
+
+  const restartVerificationForNewConflict = () => {
+    if (verifyingFaceConflict || resolvingFaceConflict) {
+      return;
+    }
+
+    clearCapturedFace();
+
+    setFaceVerificationResult(null);
+
+    setFaceResolutionResult(null);
+
+    setPendingResolutionDecision(null);
+
+    setFaceVerificationStage("CAPTURE");
+
+    setFaceError("");
+
+    setCameraError("");
+
+    autoCaptureStartedRef.current = false;
+
+    setScanPhase("preparing");
+
+    setScanMessage("Preparing verification camera...");
+
+    scheduleCameraStart();
+  };
+
+  const closeConfirmedSamePersonReview = async () => {
+    if (resolvingFaceConflict) {
+      return;
+    }
+
+    const target = getFaceConflictTarget();
+
+    try {
+      await refreshStudents();
+    } catch (refreshError) {
+      console.warn(
+        "Unable to refresh students after same-person resolution:",
+        refreshError,
+      );
+    }
+
+    setSuccessMessage(
+      `Identity review completed for ${target.name}. Separate face enrollment remains blocked because the records were confirmed as the same physical person.`,
+    );
+
+    setFaceVerificationOpen(false);
+
+    preVerificationCaptureFileRef.current = null;
+
+    if (showAddModal) {
+      resetAddStudentModal();
+    } else {
+      resetFaceRegistration();
+    }
+  };
+
+  const faceConflictTarget = getFaceConflictTarget();
+
+  const faceConflictBusy =
+    verifyingFaceConflict || resolvingFaceConflict || capturingFace;
+
+  const faceConflictConfirmedSamePerson =
+    faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON";
 
   /* =======================================================
      RENDER
@@ -2419,7 +3333,7 @@ function StudentManagement() {
           ADD STUDENT + FACE ENROLLMENT WIZARD
       ==================================================== */}
 
-      {showAddModal && (
+      {showAddModal && !faceVerificationOpen && (
         <div
           className="adviser-modal-backdrop student-modal-backdrop"
           role="presentation"
@@ -2573,14 +3487,23 @@ function StudentManagement() {
 
                         <input
                           type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={12}
                           value={studentNumber}
                           disabled={
                             creatingStudent || Boolean(createdStudentRecord)
                           }
                           autoComplete="off"
-                          placeholder="e.g. 2026-0001"
+                          placeholder="e.g. 123456789012"
+                          aria-invalid={
+                            studentNumber.length > 0 &&
+                            !isValidStudentNumber(studentNumber)
+                          }
                           onChange={(event) => {
-                            setStudentNumber(event.target.value);
+                            setStudentNumber(
+                              normalizeStudentNumberInput(event.target.value),
+                            );
 
                             if (createError) {
                               setCreateError("");
@@ -2588,7 +3511,9 @@ function StudentManagement() {
                           }}
                         />
 
-                        <small>Use the official school student number.</small>
+                        <small>
+                          Enter the official 12-digit school student number.
+                        </small>
                       </label>
 
                       <label className="student-form-field">
@@ -2713,6 +3638,10 @@ function StudentManagement() {
                         onEnableCamera={() => void startFaceCamera()}
                         onManualCapture={() => void handleCaptureFace()}
                       />
+
+                      {faceConflict && (
+                        <FaceConflictNotice conflict={faceConflict} compact />
+                      )}
                     </div>
 
                     <aside className="student-wizard-camera-guide">
@@ -2720,13 +3649,17 @@ function StudentManagement() {
 
                       <h3>
                         {capturedFacePreview
-                          ? "Review the captured photo"
+                          ? faceConflict
+                            ? "Face verification is required"
+                            : "Review the captured photo"
                           : "One clear face is enough"}
                       </h3>
 
                       <p>
                         {capturedFacePreview
-                          ? "If the face is clear and properly framed, continue to the final review."
+                          ? faceConflict
+                            ? "This photo matched another enrolled face unusually closely. Continue to review and use Verify Identity for a fresh second capture, or retake only if this photo is poor."
+                            : "If the face is clear and properly framed, continue to the final review."
                           : "Keep the student centered, facing forward, and evenly lit."}
                       </p>
 
@@ -2759,14 +3692,25 @@ function StudentManagement() {
                       )}
 
                       {capturedFacePreview && (
-                        <div className="student-wizard-captured-review">
-                          <span aria-hidden="true">✓</span>
+                        <div
+                          className={`student-wizard-captured-review ${
+                            faceConflict ? "is-conflict" : ""
+                          }`}
+                        >
+                          <span aria-hidden="true">
+                            {faceConflict ? "!" : "✓"}
+                          </span>
 
                           <div>
-                            <strong>Capture looks ready</strong>
+                            <strong>
+                              {faceConflict
+                                ? "Identity verification available"
+                                : "Capture looks ready"}
+                            </strong>
                             <p>
-                              Check the framing and clarity once. Use Retake
-                              Photo only if the image needs improvement.
+                              {faceConflict
+                                ? "The current photo triggered a highly similar face conflict and was not registered. Continue to Review Enrollment, then use Verify Identity to complete the protected verification flow."
+                                : "Check the framing and clarity once. Use Retake Photo only if the image needs improvement."}
                             </p>
                           </div>
                         </div>
@@ -2821,7 +3765,15 @@ function StudentManagement() {
 
                         <div>
                           <dt>Face Identity</dt>
-                          <dd className="is-ready">Ready to register</dd>
+                          <dd
+                            className={
+                              faceConflict ? "is-conflict" : "is-ready"
+                            }
+                          >
+                            {faceConflict
+                              ? "Verification required"
+                              : "Ready to register"}
+                          </dd>
                         </div>
                       </dl>
                     </article>
@@ -2861,18 +3813,22 @@ function StudentManagement() {
                     </article>
                   </div>
 
-                  <div className="student-wizard-final-note">
-                    <span aria-hidden="true">✓</span>
+                  {faceConflict ? (
+                    <FaceConflictNotice conflict={faceConflict} />
+                  ) : (
+                    <div className="student-wizard-final-note">
+                      <span aria-hidden="true">✓</span>
 
-                    <div>
-                      <strong>Ready to complete enrollment</strong>
+                      <div>
+                        <strong>Ready to complete enrollment</strong>
 
-                      <p>
-                        Saving will create the student record and register this
-                        face image for attendance recognition.
-                      </p>
+                        <p>
+                          Saving will create the student record and register
+                          this face image for attendance recognition.
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {createError && (
                     <div
@@ -2884,7 +3840,7 @@ function StudentManagement() {
                     </div>
                   )}
 
-                  {faceError && (
+                  {faceError && !faceConflict && (
                     <div
                       className="student-face-feedback is-error student-wizard-error"
                       role="alert"
@@ -2910,9 +3866,11 @@ function StudentManagement() {
                       ? capturedFacePreview
                         ? "Face photo ready"
                         : "Face photo required"
-                      : createdStudentRecord
-                        ? "Complete face registration"
-                        : "Ready to save"}
+                      : faceConflict
+                        ? "Face verification required"
+                        : createdStudentRecord
+                          ? "Complete face registration"
+                          : "Ready to save"}
                 </strong>
 
                 <span>
@@ -2922,9 +3880,11 @@ function StudentManagement() {
                       ? capturedFacePreview
                         ? "Review the photo or retake it before continuing."
                         : "Auto capture starts when the camera becomes ready."
-                      : createdStudentRecord
-                        ? "The student record already exists. Only face registration will be retried."
-                        : "Confirm the information, then save the student and face identity."}
+                      : faceConflict
+                        ? "The student record is safe, but this face was not registered. Choose Verify Identity to continue now, or retake the photo if the capture quality is poor."
+                        : createdStudentRecord
+                          ? "The student record already exists. Only face registration will be retried."
+                          : "Confirm the information, then save the student and face identity."}
                 </span>
               </div>
 
@@ -2945,7 +3905,7 @@ function StudentManagement() {
                       className="adviser-primary-button student-wizard-next-button"
                       disabled={
                         creatingStudent ||
-                        !studentNumber.trim() ||
+                        !isValidStudentNumber(studentNumber) ||
                         !studentName.trim() ||
                         !section?.id
                       }
@@ -3052,31 +4012,52 @@ function StudentManagement() {
                       Retake Photo
                     </button>
 
-                    <button
-                      type="submit"
-                      className="adviser-primary-button student-enrollment-submit"
-                      disabled={
-                        creatingStudent ||
-                        !capturedFaceFile ||
-                        !studentNumber.trim() ||
-                        !studentName.trim()
-                      }
-                    >
-                      {creatingStudent && (
-                        <span
-                          className="adviser-button-spinner"
-                          aria-hidden="true"
-                        />
-                      )}
+                    {faceConflict ? (
+                      <button
+                        type="button"
+                        className={`adviser-primary-button student-enrollment-submit ${
+                          faceConflictConfirmedSamePerson
+                            ? "student-conflict-blocked-button"
+                            : "student-conflict-verify-button"
+                        }`}
+                        disabled={
+                          creatingStudent ||
+                          faceConflictBusy ||
+                          faceConflictConfirmedSamePerson
+                        }
+                        onClick={openFaceConflictVerification}
+                      >
+                        {faceConflictConfirmedSamePerson
+                          ? "Enrollment Blocked"
+                          : "Verify Identity"}
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="adviser-primary-button student-enrollment-submit"
+                        disabled={
+                          creatingStudent ||
+                          !capturedFaceFile ||
+                          !isValidStudentNumber(studentNumber) ||
+                          !studentName.trim()
+                        }
+                      >
+                        {creatingStudent && (
+                          <span
+                            className="adviser-button-spinner"
+                            aria-hidden="true"
+                          />
+                        )}
 
-                      {creatingStudent
-                        ? createdStudentRecord
-                          ? "Registering Face..."
-                          : "Saving Enrollment..."
-                        : createdStudentRecord
-                          ? "Complete Face Registration"
-                          : "Save Student & Face"}
-                    </button>
+                        {creatingStudent
+                          ? createdStudentRecord
+                            ? "Registering Face..."
+                            : "Saving Enrollment..."
+                          : createdStudentRecord
+                            ? "Complete Face Registration"
+                            : "Save Student & Face"}
+                      </button>
+                    )}
                   </>
                 )}
               </div>
@@ -3160,16 +4141,32 @@ function StudentManagement() {
 
                   <input
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={12}
                     value={editStudentNumber}
                     disabled={updatingStudent}
                     autoFocus
-                    placeholder="Enter student number"
-                    onChange={(event) =>
-                      setEditStudentNumber(event.target.value)
+                    placeholder="Enter 12-digit student number"
+                    aria-invalid={
+                      editStudentNumber.length > 0 &&
+                      !isValidStudentNumber(editStudentNumber)
                     }
+                    onChange={(event) => {
+                      setEditStudentNumber(
+                        normalizeStudentNumberInput(event.target.value),
+                      );
+
+                      if (editError) {
+                        setEditError("");
+                      }
+                    }}
                   />
 
-                  <small>Must remain unique across student records.</small>
+                  <small>
+                    Must contain exactly 12 digits and remain unique across
+                    student records.
+                  </small>
                 </label>
 
                 <label className="student-form-field">
@@ -3228,7 +4225,7 @@ function StudentManagement() {
                 className="adviser-primary-button"
                 disabled={
                   updatingStudent ||
-                  !editStudentNumber.trim() ||
+                  !isValidStudentNumber(editStudentNumber) ||
                   !editStudentName.trim()
                 }
               >
@@ -3247,7 +4244,7 @@ function StudentManagement() {
           EXISTING STUDENT FACE MODAL
       ==================================================== */}
 
-      {selectedStudent && (
+      {selectedStudent && !faceVerificationOpen && (
         <div
           className="adviser-modal-backdrop student-modal-backdrop"
           role="presentation"
@@ -3347,18 +4344,28 @@ function StudentManagement() {
                 onEnableCamera={() => void startFaceCamera()}
                 onManualCapture={() => void handleCaptureFace()}
               />
+
+              {faceConflict && (
+                <FaceConflictNotice conflict={faceConflict} compact />
+              )}
             </div>
 
             <footer className="adviser-modal-actions student-face-modal-actions">
               <div className="student-face-footer-copy">
                 <strong>
-                  {capturedFacePreview ? "Photo ready" : "Position the student"}
+                  {faceConflict
+                    ? "Face verification required"
+                    : capturedFacePreview
+                      ? "Photo ready"
+                      : "Position the student"}
                 </strong>
 
                 <span>
-                  {capturedFacePreview
-                    ? "Review the image, then save the face identity."
-                    : "Auto capture starts once the camera is ready."}
+                  {faceConflict
+                    ? "This face was not saved. Choose Verify Identity for the required second capture, or retake if the current image quality is poor."
+                    : capturedFacePreview
+                      ? "Review the image, then save the face identity."
+                      : "Auto capture starts once the camera is ready."}
                 </span>
               </div>
 
@@ -3383,27 +4390,48 @@ function StudentManagement() {
                       Retake
                     </button>
 
-                    <button
-                      type="submit"
-                      className="adviser-primary-button"
-                      disabled={registeringFace || !capturedFaceFile}
-                    >
-                      {registeringFace && (
-                        <span
-                          className="adviser-button-spinner"
-                          aria-hidden="true"
-                        />
-                      )}
+                    {faceConflict ? (
+                      <button
+                        type="button"
+                        className={`adviser-primary-button ${
+                          faceConflictConfirmedSamePerson
+                            ? "student-conflict-blocked-button"
+                            : "student-conflict-verify-button"
+                        }`}
+                        disabled={
+                          registeringFace ||
+                          faceConflictBusy ||
+                          faceConflictConfirmedSamePerson
+                        }
+                        onClick={openFaceConflictVerification}
+                      >
+                        {faceConflictConfirmedSamePerson
+                          ? "Enrollment Blocked"
+                          : "Verify Identity"}
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="adviser-primary-button"
+                        disabled={registeringFace || !capturedFaceFile}
+                      >
+                        {registeringFace && (
+                          <span
+                            className="adviser-button-spinner"
+                            aria-hidden="true"
+                          />
+                        )}
 
-                      {registeringFace
-                        ? "Saving Face..."
-                        : hasFaceRegistered(
-                              selectedStudent,
-                              locallyRegisteredFaceIds,
-                            )
-                          ? "Update Face"
-                          : "Register Face"}
-                    </button>
+                        {registeringFace
+                          ? "Saving Face..."
+                          : hasFaceRegistered(
+                                selectedStudent,
+                                locallyRegisteredFaceIds,
+                              )
+                            ? "Update Face"
+                            : "Register Face"}
+                      </button>
+                    )}
                   </>
                 ) : (
                   <button
@@ -3423,6 +4451,777 @@ function StudentManagement() {
               </div>
             </footer>
           </form>
+        </div>
+      )}
+
+      {/* ===================================================
+          FACE CONFLICT IDENTITY VERIFICATION
+      ==================================================== */}
+
+      {faceVerificationOpen && faceConflict && (
+        <div
+          className="adviser-modal-backdrop student-modal-backdrop student-face-verification-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !faceConflictBusy) {
+              closeFaceConflictVerification();
+            }
+          }}
+        >
+          <section
+            className="adviser-modal student-face-verification-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="student-face-verification-title"
+          >
+            <header className="adviser-modal-header student-modal-header student-face-verification-header">
+              <div className="student-modal-heading">
+                <div
+                  className="adviser-modal-icon student-modal-icon student-face-verification-icon"
+                  aria-hidden="true"
+                >
+                  ◈
+                </div>
+
+                <div>
+                  <span>IDENTITY SAFEGUARD</span>
+
+                  <h2 id="student-face-verification-title">
+                    Verify face identity
+                  </h2>
+
+                  <p>
+                    Follow two short steps. Capture once more, then review the
+                    identity only if the similarity is reproduced.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="student-modal-close"
+                disabled={faceConflictBusy}
+                aria-label="Close identity verification"
+                onClick={closeFaceConflictVerification}
+              >
+                ×
+              </button>
+            </header>
+
+            <div className="student-face-verification-progress">
+              <div
+                className={`student-face-verification-progress-item ${
+                  faceVerificationStage === "CAPTURE"
+                    ? "is-current"
+                    : "is-complete"
+                }`}
+              >
+                <span>{faceVerificationStage === "CAPTURE" ? "1" : "✓"}</span>
+
+                <div>
+                  <strong>Second capture</strong>
+                  <small>Recheck the detected similarity</small>
+                </div>
+              </div>
+
+              <i aria-hidden="true" />
+
+              <div
+                className={`student-face-verification-progress-item ${
+                  faceVerificationStage === "MANUAL_REVIEW" ||
+                  faceVerificationStage === "ENROLLING" ||
+                  faceVerificationStage === "ENROLLMENT_FAILED" ||
+                  faceVerificationStage === "NEW_CONFLICT" ||
+                  faceVerificationStage === "SAME_PERSON"
+                    ? "is-current"
+                    : faceVerificationStage !== "CAPTURE"
+                      ? "is-complete"
+                      : ""
+                }`}
+              >
+                <span>2</span>
+
+                <div>
+                  <strong>Identity decision</strong>
+                  <small>Human review when still uncertain</small>
+                </div>
+              </div>
+            </div>
+
+            <div className="student-face-verification-body">
+              <div
+                className="student-face-verification-summary"
+                aria-label="Face conflict summary"
+              >
+                <div className="student-face-verification-summary-person is-target">
+                  <span
+                    className="student-face-student-avatar"
+                    aria-hidden="true"
+                  >
+                    {faceConflictTarget.name?.charAt(0)?.toUpperCase() || "S"}
+                  </span>
+
+                  <div>
+                    <span>VERIFYING</span>
+                    <strong>{faceConflictTarget.name}</strong>
+                    <small>
+                      {showAddModal
+                        ? studentNumber || "Student record"
+                        : selectedStudent?.studentNumber || "Student record"}
+                    </small>
+                  </div>
+                </div>
+
+                <div className="student-face-verification-summary-score">
+                  <span>FACE SIMILARITY</span>
+                  <strong>{formatFaceSimilarity(faceConflict.distance)}</strong>
+                  <small>Possible match</small>
+                </div>
+
+                <div className="student-face-verification-summary-person is-match">
+                  <span
+                    className="student-face-student-avatar"
+                    aria-hidden="true"
+                  >
+                    {faceConflict.conflictingStudentName
+                      ?.charAt(0)
+                      ?.toUpperCase() || "S"}
+                  </span>
+
+                  <div>
+                    <span>SIMILAR FACE</span>
+                    <strong>
+                      {faceConflict.conflictingStudentName ||
+                        "Existing student"}
+                    </strong>
+                    <small>
+                      {faceConflict.conflictingSectionName ||
+                        "Section unavailable"}
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              {faceVerificationStage === "CAPTURE" && (
+                <div className="student-face-verification-capture-layout is-calm-focus">
+                  <div className="student-face-verification-camera">
+                    <div className="student-face-verification-step-heading">
+                      <span>STEP 1 OF 2</span>
+
+                      <h3>Take one fresh photo</h3>
+
+                      <p>
+                        Keep the student centered and facing forward. The camera
+                        turns off after the photo is captured.
+                      </p>
+                    </div>
+
+                    <FaceCapturePanel
+                      subjectName={faceConflictTarget.name}
+                      videoRef={videoRef}
+                      canvasRef={canvasRef}
+                      cameraActive={cameraActive}
+                      cameraReady={cameraReady}
+                      cameraError={cameraError}
+                      capturedFacePreview={capturedFacePreview}
+                      faceError={faceError}
+                      registeringFace={verifyingFaceConflict}
+                      capturingFace={capturingFace}
+                      scanPhase={scanPhase}
+                      scanMessage={scanMessage}
+                      countdown={countdown}
+                      flashActive={flashActive}
+                      onCameraReady={handleCameraReady}
+                      onEnableCamera={() => void startFaceCamera()}
+                      onManualCapture={() => void handleCaptureFace()}
+                      captureMode="verification"
+                    />
+                  </div>
+
+                  <aside className="student-face-verification-help-card">
+                    <div
+                      className="student-face-verification-help-icon"
+                      aria-hidden="true"
+                    >
+                      i
+                    </div>
+
+                    <div className="student-face-verification-help-copy">
+                      <span>WHY THIS STEP?</span>
+                      <strong>Confirm the similarity once more</strong>
+                      <p>
+                        Similar faces can happen with twins, siblings, or
+                        duplicate records. A second live photo checks whether
+                        the same conflict appears again before any manual
+                        decision is allowed.
+                      </p>
+                    </div>
+
+                    <div className="student-face-verification-quick-facts">
+                      <div>
+                        <span>Initial similarity</span>
+                        <strong>
+                          {formatFaceSimilarity(faceConflict.distance)}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Face saved</span>
+                        <strong>No</strong>
+                      </div>
+                    </div>
+                  </aside>
+                </div>
+              )}
+
+              {faceVerificationStage === "MANUAL_REVIEW" && (
+                <div className="student-face-verification-review is-calm-focus">
+                  <div className="student-face-verification-step-heading">
+                    <span>STEP 2 OF 2</span>
+
+                    <h3>Confirm who the student is</h3>
+
+                    <p>
+                      The second photo reproduced the similarity conflict. The
+                      system will not choose automatically. Verify the student
+                      in front of you, then select one identity decision.
+                    </p>
+                  </div>
+
+                  <div className="student-face-verification-comparison-strip">
+                    <div className="student-face-verification-comparison-value">
+                      <span>FIRST PHOTO</span>
+                      <strong>
+                        {formatFaceSimilarity(faceConflict.distance)}
+                      </strong>
+                    </div>
+
+                    <span
+                      className="student-face-verification-comparison-arrow"
+                      aria-hidden="true"
+                    >
+                      →
+                    </span>
+
+                    <div className="student-face-verification-comparison-value">
+                      <span>SECOND PHOTO</span>
+                      <strong>
+                        {formatFaceSimilarity(faceVerificationResult?.distance)}
+                      </strong>
+                    </div>
+
+                    <div className="student-face-verification-comparison-result">
+                      <span aria-hidden="true">✓</span>
+
+                      <div>
+                        <strong>Manual review required</strong>
+                        <small>
+                          Difference:{" "}
+                          {formatFaceSimilarityDifference(
+                            faceConflict.distance,
+                            faceVerificationResult?.distance,
+                          )}
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="student-face-verification-safety-strip is-calm">
+                    <span aria-hidden="true">▣</span>
+
+                    <div>
+                      <strong>Camera is off. No face has been saved.</strong>
+                      <p>
+                        Check the student physically present and the official
+                        roster before choosing below.
+                      </p>
+                    </div>
+                  </div>
+
+                  {!pendingResolutionDecision ? (
+                    <div className="student-face-verification-decision-zone">
+                      <div className="student-face-verification-decision-zone-heading">
+                        <span>CHOOSE ONE</span>
+                        <strong>What did you verify?</strong>
+                      </div>
+
+                      <div className="student-face-verification-decisions is-calm">
+                        <button
+                          type="button"
+                          className="student-face-verification-decision is-different"
+                          disabled={faceConflictBusy}
+                          onClick={() =>
+                            requestFaceConflictDecision("DIFFERENT_PEOPLE")
+                          }
+                        >
+                          <span className="student-face-verification-decision-icon">
+                            ≠
+                          </span>
+
+                          <div>
+                            <strong>Two different students</strong>
+                            <small>Allow separate face enrollment</small>
+                          </div>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="student-face-verification-decision is-same"
+                          disabled={faceConflictBusy}
+                          onClick={() =>
+                            requestFaceConflictDecision("SAME_PERSON")
+                          }
+                        >
+                          <span className="student-face-verification-decision-icon">
+                            =
+                          </span>
+
+                          <div>
+                            <strong>Same physical person</strong>
+                            <small>Keep separate face enrollment blocked</small>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className={`student-face-verification-confirmation ${
+                        pendingResolutionDecision === "SAME_PERSON"
+                          ? "is-same"
+                          : "is-different"
+                      }`}
+                      role="alert"
+                    >
+                      <span
+                        className="student-face-verification-confirmation-icon"
+                        aria-hidden="true"
+                      >
+                        {pendingResolutionDecision === "SAME_PERSON"
+                          ? "="
+                          : "≠"}
+                      </span>
+
+                      <div>
+                        <span>FINAL CONFIRMATION</span>
+
+                        <h4>
+                          {pendingResolutionDecision === "SAME_PERSON"
+                            ? "Confirm this is the same physical person?"
+                            : "Confirm these are two different students?"}
+                        </h4>
+
+                        <p>
+                          {pendingResolutionDecision === "SAME_PERSON"
+                            ? "Separate face enrollment will remain blocked for this conflict pair."
+                            : "Separate face enrollment will be allowed for this student after the decision is saved."}
+                        </p>
+
+                        <div className="student-face-verification-confirmation-actions">
+                          <button
+                            type="button"
+                            className="adviser-secondary-button"
+                            disabled={resolvingFaceConflict}
+                            onClick={cancelFaceConflictDecision}
+                          >
+                            Go Back
+                          </button>
+
+                          <button
+                            type="button"
+                            className={`adviser-primary-button ${
+                              pendingResolutionDecision === "SAME_PERSON"
+                                ? "student-face-confirm-same"
+                                : ""
+                            }`}
+                            disabled={resolvingFaceConflict}
+                            onClick={() => void confirmFaceConflictDecision()}
+                          >
+                            {resolvingFaceConflict && (
+                              <span
+                                className="adviser-button-spinner"
+                                aria-hidden="true"
+                              />
+                            )}
+
+                            {resolvingFaceConflict
+                              ? "Saving Decision..."
+                              : pendingResolutionDecision === "SAME_PERSON"
+                                ? "Confirm Same Person"
+                                : "Confirm Different Students"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {faceError && (
+                    <div
+                      className="student-face-feedback is-error student-face-verification-error"
+                      role="alert"
+                    >
+                      <span aria-hidden="true">!</span>
+
+                      <div>
+                        <strong>Identity decision</strong>
+                        <p>{faceError}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {faceVerificationStage === "NOT_REPRODUCED" && (
+                <div className="student-face-verification-result is-neutral">
+                  <span
+                    className="student-face-verification-result-icon"
+                    aria-hidden="true"
+                  >
+                    ↻
+                  </span>
+
+                  <div>
+                    <span>SECOND CAPTURE COMPLETE</span>
+
+                    <h3>The original conflict was not reproduced</h3>
+
+                    <p>
+                      The backend did not reproduce the same face conflict from
+                      the second capture. No face was saved and no manual
+                      decision was recorded. Return to normal face capture and
+                      retry enrollment with a fresh photo.
+                    </p>
+
+                    <dl>
+                      <div>
+                        <dt>Original similarity</dt>
+                        <dd>{formatFaceSimilarity(faceConflict.distance)}</dd>
+                      </div>
+
+                      <div>
+                        <dt>Second similarity</dt>
+                        <dd>
+                          {formatFaceSimilarity(
+                            faceVerificationResult?.distance,
+                          )}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+              )}
+
+              {faceVerificationStage === "SAME_PERSON" && (
+                <div className="student-face-verification-result is-blocked">
+                  <span
+                    className="student-face-verification-result-icon"
+                    aria-hidden="true"
+                  >
+                    !
+                  </span>
+
+                  <div>
+                    <span>IDENTITY DECISION SAVED</span>
+
+                    <h3>Separate face enrollment is blocked</h3>
+
+                    <p>
+                      These student records were confirmed as the same physical
+                      person. The backend saved the decision and will continue
+                      blocking a separate face registration for this conflict
+                      pair.
+                    </p>
+
+                    <dl>
+                      <div>
+                        <dt>Status</dt>
+                        <dd>Same person confirmed</dd>
+                      </div>
+
+                      <div>
+                        <dt>Verified by</dt>
+                        <dd>
+                          {faceResolutionResult?.verifiedByName ||
+                            "Authorized Adviser"}
+                        </dd>
+                      </div>
+
+                      <div>
+                        <dt>Face saved</dt>
+                        <dd>No</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+              )}
+
+              {faceVerificationStage === "ENROLLING" && (
+                <div className="student-face-verification-result is-processing">
+                  <span
+                    className="student-face-verification-result-spinner"
+                    aria-hidden="true"
+                  />
+
+                  <div>
+                    <span>IDENTITY DECISION SAVED</span>
+
+                    <h3>Completing separate face enrollment</h3>
+
+                    <p>
+                      The students were verified as different people. The system
+                      is now saving this student's face record.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {faceVerificationStage === "ENROLLMENT_FAILED" && (
+                <div className="student-face-verification-result is-warning">
+                  <span
+                    className="student-face-verification-result-icon"
+                    aria-hidden="true"
+                  >
+                    !
+                  </span>
+
+                  <div>
+                    <span>DECISION SAVED — ENROLLMENT PENDING</span>
+
+                    <h3>The identity review is safe, but face saving failed</h3>
+
+                    <p>
+                      The students are already verified as different people. You
+                      do not need to repeat the manual decision. Retry the face
+                      save using the current verification capture.
+                    </p>
+
+                    {faceError && (
+                      <div className="student-face-verification-inline-error">
+                        {faceError}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {faceVerificationStage === "NEW_CONFLICT" && (
+                <div className="student-face-verification-result is-warning">
+                  <span
+                    className="student-face-verification-result-icon"
+                    aria-hidden="true"
+                  >
+                    !
+                  </span>
+
+                  <div>
+                    <span>ANOTHER SIMILAR FACE DETECTED</span>
+
+                    <h3>A new face conflict needs verification</h3>
+
+                    <p>
+                      The previous pair was resolved as different people, but
+                      the latest enrollment attempt returned another unresolved
+                      similar-face conflict. Start a fresh second capture for
+                      the new conflict before continuing.
+                    </p>
+
+                    <FaceConflictNotice conflict={faceConflict} compact />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <footer className="adviser-modal-actions student-face-verification-actions">
+              <div className="student-face-verification-footer-copy">
+                <strong>
+                  {faceVerificationStage === "CAPTURE"
+                    ? capturedFacePreview
+                      ? "Second photo ready"
+                      : "Fresh capture required"
+                    : faceVerificationStage === "MANUAL_REVIEW"
+                      ? "Identity check required"
+                      : faceVerificationStage === "NOT_REPRODUCED"
+                        ? "Retry normal enrollment"
+                        : faceVerificationStage === "SAME_PERSON"
+                          ? "Separate enrollment blocked"
+                          : faceVerificationStage === "ENROLLMENT_FAILED"
+                            ? "Identity verified — face save pending"
+                            : faceVerificationStage === "NEW_CONFLICT"
+                              ? "New conflict requires verification"
+                              : "Completing enrollment"}
+                </strong>
+
+                <span>
+                  {faceVerificationStage === "CAPTURE"
+                    ? "Use a new live image rather than reusing the original enrollment photo."
+                    : faceVerificationStage === "MANUAL_REVIEW"
+                      ? "Verify the student in front of you, then choose one clear decision."
+                      : faceVerificationStage === "NOT_REPRODUCED"
+                        ? "No identity decision was recorded from this second capture."
+                        : faceVerificationStage === "SAME_PERSON"
+                          ? "The backend will continue preventing a separate face record."
+                          : faceVerificationStage === "ENROLLMENT_FAILED"
+                            ? "The manual identity decision is already stored and does not need to be repeated."
+                            : faceVerificationStage === "NEW_CONFLICT"
+                              ? "A fresh second capture is required for the newly detected pair."
+                              : "Please wait while the face record is saved."}
+                </span>
+              </div>
+
+              <div className="student-face-verification-action-group">
+                {faceVerificationStage === "CAPTURE" && (
+                  <>
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      disabled={faceConflictBusy}
+                      onClick={closeFaceConflictVerification}
+                    >
+                      Back
+                    </button>
+
+                    {capturedFacePreview ? (
+                      <>
+                        <button
+                          type="button"
+                          className="adviser-secondary-button"
+                          disabled={faceConflictBusy}
+                          onClick={() => void handleRetakeFace()}
+                        >
+                          Retake Photo
+                        </button>
+
+                        <button
+                          type="button"
+                          className="adviser-primary-button student-conflict-verify-button"
+                          disabled={faceConflictBusy || !capturedFaceFile}
+                          onClick={() => void handleVerifyFaceConflict()}
+                        >
+                          {verifyingFaceConflict && (
+                            <span
+                              className="adviser-button-spinner"
+                              aria-hidden="true"
+                            />
+                          )}
+
+                          {verifyingFaceConflict
+                            ? "Verifying..."
+                            : "Verify Second Capture"}
+                        </button>
+                      </>
+                    ) : !cameraActive ? (
+                      <button
+                        type="button"
+                        className="adviser-primary-button"
+                        disabled={faceConflictBusy}
+                        onClick={() => void startFaceCamera()}
+                      >
+                        Enable Camera
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="adviser-primary-button"
+                        disabled={faceConflictBusy || !cameraReady}
+                        onClick={() => void handleCaptureFace()}
+                      >
+                        {capturingFace ? "Capturing..." : "Capture Now"}
+                      </button>
+                    )}
+                  </>
+                )}
+
+                {faceVerificationStage === "MANUAL_REVIEW" &&
+                  !pendingResolutionDecision && (
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      disabled={faceConflictBusy}
+                      onClick={closeFaceConflictVerification}
+                    >
+                      Review Later
+                    </button>
+                  )}
+
+                {faceVerificationStage === "NOT_REPRODUCED" && (
+                  <button
+                    type="button"
+                    className="adviser-primary-button"
+                    disabled={faceConflictBusy}
+                    onClick={returnToFreshEnrollmentCapture}
+                  >
+                    Return to Face Capture
+                  </button>
+                )}
+
+                {faceVerificationStage === "SAME_PERSON" && (
+                  <button
+                    type="button"
+                    className="adviser-primary-button"
+                    disabled={faceConflictBusy}
+                    onClick={() => void closeConfirmedSamePersonReview()}
+                  >
+                    Done
+                  </button>
+                )}
+
+                {faceVerificationStage === "ENROLLMENT_FAILED" && (
+                  <>
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      disabled={faceConflictBusy}
+                      onClick={closeFaceConflictVerification}
+                    >
+                      Close
+                    </button>
+
+                    <button
+                      type="button"
+                      className="adviser-primary-button"
+                      disabled={faceConflictBusy || !capturedFaceFile}
+                      onClick={() => void retryVerifiedDifferentEnrollment()}
+                    >
+                      {resolvingFaceConflict && (
+                        <span
+                          className="adviser-button-spinner"
+                          aria-hidden="true"
+                        />
+                      )}
+
+                      {resolvingFaceConflict
+                        ? "Retrying..."
+                        : "Retry Face Enrollment"}
+                    </button>
+                  </>
+                )}
+
+                {faceVerificationStage === "NEW_CONFLICT" && (
+                  <button
+                    type="button"
+                    className="adviser-primary-button student-conflict-verify-button"
+                    disabled={faceConflictBusy}
+                    onClick={restartVerificationForNewConflict}
+                  >
+                    Verify New Conflict
+                  </button>
+                )}
+
+                {faceVerificationStage === "ENROLLING" && (
+                  <button
+                    type="button"
+                    className="adviser-primary-button"
+                    disabled
+                  >
+                    <span
+                      className="adviser-button-spinner"
+                      aria-hidden="true"
+                    />
+                    Saving Face...
+                  </button>
+                )}
+              </div>
+            </footer>
+          </section>
         </div>
       )}
     </AdviserLayout>

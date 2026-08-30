@@ -12218,3 +12218,3434 @@ html[data-theme="dark"] .student-wizard-captured-review {
     transform: none !important;
   }
 }
+
+/* =========================================================
+   FACE CONFLICT UI
+   Structured FACE_CONFLICT enrollment outcome
+========================================================= */
+
+.student-face-conflict-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 15px;
+  border: 1px solid #f1c66a;
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(255, 251, 235, 0.96), rgba(255, 247, 237, 0.92));
+  color: #7c3f0c;
+  box-shadow:
+    inset 4px 0 0 #d97706,
+    0 8px 24px rgba(146, 64, 14, 0.06);
+}
+
+.student-face-conflict-card.is-compact {
+  padding: 12px 13px;
+  border-radius: 10px;
+}
+
+.student-face-conflict-icon {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #d97706;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 6px 14px rgba(217, 119, 6, 0.18);
+}
+
+.student-face-conflict-content {
+  min-width: 0;
+}
+
+.student-face-conflict-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: #b45309;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.student-face-conflict-content > strong {
+  display: block;
+  color: #78350f;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.student-face-conflict-content > p {
+  max-width: 780px;
+  margin: 5px 0 0;
+  color: #92400e;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.student-face-conflict-details {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+.student-face-conflict-details > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.student-face-conflict-details dt {
+  margin: 0;
+  color: #b45309;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.student-face-conflict-details dd {
+  margin: 4px 0 0;
+  overflow: hidden;
+  color: #78350f;
+  font-size: 10px;
+  font-weight: 780;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+}
+
+.student-face-conflict-content > small {
+  display: block;
+  margin-top: 10px;
+  color: #a16207;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.student-wizard-review-details dd.is-conflict {
+  color: #b45309;
+  font-weight: 850;
+}
+
+.student-wizard-captured-review.is-conflict {
+  border-color: #f1c66a;
+  background: rgba(255, 251, 235, 0.92);
+  color: #92400e;
+}
+
+.student-wizard-captured-review.is-conflict > span {
+  background: #d97706;
+  color: #ffffff;
+}
+
+.student-wizard-captured-review.is-conflict strong {
+  color: #78350f;
+}
+
+.student-wizard-captured-review.is-conflict p {
+  color: #92400e;
+}
+
+/*
+ * The final save button is intentionally disabled while a
+ * FACE_CONFLICT is unresolved. Existing disabled-button styles
+ * remain responsible for the visual state.
+ */
+
+html[data-theme="dark"] .student-face-conflict-card {
+  border-color: rgba(245, 158, 11, 0.4);
+  background:
+    linear-gradient(135deg, rgba(120, 53, 15, 0.28), rgba(69, 26, 3, 0.24));
+  color: #fde68a;
+  box-shadow:
+    inset 4px 0 0 #f59e0b,
+    0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="dark"] .student-face-conflict-icon {
+  background: #d97706;
+}
+
+html[data-theme="dark"] .student-face-conflict-eyebrow {
+  color: #fbbf24;
+}
+
+html[data-theme="dark"] .student-face-conflict-content > strong,
+html[data-theme="dark"] .student-face-conflict-details dd {
+  color: #fef3c7;
+}
+
+html[data-theme="dark"] .student-face-conflict-content > p,
+html[data-theme="dark"] .student-face-conflict-content > small {
+  color: #fcd34d;
+}
+
+html[data-theme="dark"] .student-face-conflict-details > div {
+  border-color: rgba(245, 158, 11, 0.24);
+  background: rgba(15, 23, 42, 0.36);
+}
+
+html[data-theme="dark"] .student-face-conflict-details dt {
+  color: #fbbf24;
+}
+
+html[data-theme="dark"] .student-wizard-captured-review.is-conflict {
+  border-color: rgba(245, 158, 11, 0.36);
+  background: rgba(120, 53, 15, 0.22);
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .student-wizard-captured-review.is-conflict strong {
+  color: #fef3c7;
+}
+
+html[data-theme="dark"] .student-wizard-captured-review.is-conflict p {
+  color: #fcd34d;
+}
+
+@media (max-width: 820px) {
+  .student-face-conflict-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .student-face-conflict-card {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-conflict-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .student-face-conflict-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   STUDENT FACE CONFLICT VERIFICATION V1
+   Backend-backed identity safeguard
+   ---------------------------------------------------------
+   Added for:
+   - second face capture
+   - MANUAL_REVIEW_REQUIRED
+   - DIFFERENT_PEOPLE / SAME_PERSON decisions
+   - retry / blocked / new-conflict states
+
+   Keep this block LAST so it safely extends the existing
+   Student Management design without changing older flows.
+========================================================= */
+
+/* =========================================================
+   CONFLICT CARD — RESOLVED SAME PERSON
+========================================================= */
+
+.student-face-conflict-card.is-confirmed-same-person {
+  border-color: rgba(220, 38, 38, 0.34);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(254, 242, 242, 0.98),
+      rgba(255, 247, 237, 0.94)
+    );
+  color: #991b1b;
+  box-shadow:
+    inset 4px 0 0 #dc2626,
+    0 8px 24px rgba(153, 27, 27, 0.07);
+}
+
+.student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-icon {
+  background: #dc2626;
+  box-shadow: 0 6px 14px rgba(220, 38, 38, 0.18);
+}
+
+.student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-eyebrow {
+  color: #b91c1c;
+}
+
+.student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-content > strong,
+.student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-details dd {
+  color: #7f1d1d;
+}
+
+.student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-content > p,
+.student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-content > small {
+  color: #991b1b;
+}
+
+.student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-details > div {
+  border-color: rgba(220, 38, 38, 0.16);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-details dt {
+  color: #b91c1c;
+}
+
+/* =========================================================
+   CONFLICT ACTION BUTTONS
+========================================================= */
+
+.student-conflict-verify-button {
+  position: relative;
+  border-color: color-mix(
+    in srgb,
+    var(--c-blue-800) 72%,
+    var(--c-brand-border)
+  ) !important;
+  background: var(--c-blue-900) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 20px rgba(18, 61, 126, 0.16);
+}
+
+.student-conflict-verify-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 24px rgba(18, 61, 126, 0.22);
+}
+
+.student-conflict-blocked-button {
+  border-color: rgba(220, 38, 38, 0.22) !important;
+  background: rgba(220, 38, 38, 0.08) !important;
+  color: #b91c1c !important;
+  box-shadow: none !important;
+}
+
+.student-conflict-blocked-button:disabled {
+  opacity: 1 !important;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   VERIFICATION BACKDROP / MODAL
+========================================================= */
+
+.student-face-verification-backdrop {
+  z-index: 1200;
+}
+
+.student-face-verification-modal {
+  width: min(1080px, calc(100vw - 48px));
+  max-height: calc(100dvh - 48px);
+  display: grid;
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr)
+    auto;
+  overflow: hidden;
+  border: 1px solid
+    color-mix(in srgb, var(--c-border) 78%, var(--c-blue-800));
+  border-radius: 18px;
+  background: var(--c-surface);
+  box-shadow:
+    0 34px 90px rgba(2, 8, 23, 0.3),
+    0 10px 28px rgba(2, 8, 23, 0.12);
+}
+
+.student-face-verification-header {
+  min-height: 78px;
+  padding: 17px 20px;
+  background:
+    radial-gradient(
+      circle at 0 0,
+      color-mix(in srgb, var(--c-icon-bg) 88%, transparent),
+      transparent 45%
+    ),
+    var(--c-surface);
+}
+
+.student-face-verification-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid
+    color-mix(in srgb, var(--c-brand-border) 75%, var(--c-blue-800));
+  border-radius: 12px;
+  background: var(--c-blue-900);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(18, 61, 126, 0.18);
+}
+
+/* =========================================================
+   VERIFICATION PROGRESS
+========================================================= */
+
+.student-face-verification-progress {
+  min-height: 62px;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    68px
+    minmax(0, 1fr);
+  align-items: center;
+  padding: 10px 22px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: var(--c-surface-soft);
+}
+
+.student-face-verification-progress > i {
+  height: 1px;
+  margin-inline: 12px;
+  background: var(--c-border);
+}
+
+.student-face-verification-progress-item {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  opacity: 0.52;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.student-face-verification-progress-item > span {
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.student-face-verification-progress-item strong {
+  display: block;
+  overflow: hidden;
+  color: var(--c-text-secondary);
+  font-size: 8px;
+  font-weight: 820;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-face-verification-progress-item small {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--c-text-muted);
+  font-size: 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-face-verification-progress-item.is-current,
+.student-face-verification-progress-item.is-complete {
+  opacity: 1;
+}
+
+.student-face-verification-progress-item.is-current {
+  transform: translateY(-1px);
+}
+
+.student-face-verification-progress-item.is-current > span {
+  border-color: var(--c-blue-800);
+  background: var(--c-blue-900);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.student-face-verification-progress-item.is-current strong {
+  color: var(--c-blue-800);
+}
+
+.student-face-verification-progress-item.is-complete > span {
+  border-color: var(--c-success-border);
+  background: var(--c-success-text);
+  color: #ffffff;
+}
+
+.student-face-verification-progress-item.is-complete strong {
+  color: var(--c-success-text);
+}
+
+/* =========================================================
+   VERIFICATION BODY
+========================================================= */
+
+.student-face-verification-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 22px 22px;
+  background: linear-gradient(
+    180deg,
+    var(--c-surface) 0%,
+    color-mix(in srgb, var(--c-surface-soft) 40%, var(--c-surface)) 100%
+  );
+  scrollbar-width: thin;
+}
+
+.student-face-verification-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.student-face-verification-body::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--c-border);
+  background-clip: padding-box;
+}
+
+/* =========================================================
+   STUDENT COMPARISON STRIP
+========================================================= */
+
+.student-face-verification-identity-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto
+    minmax(0, 1fr);
+  align-items: stretch;
+  gap: 10px;
+  margin-bottom: 17px;
+}
+
+.student-face-verification-person {
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+  background: var(--c-surface);
+  box-shadow: 0 8px 20px rgba(18, 35, 65, 0.045);
+}
+
+.student-face-verification-person.is-target {
+  border-color: color-mix(
+    in srgb,
+    var(--c-blue-800) 24%,
+    var(--c-border-soft)
+  );
+}
+
+.student-face-verification-person.is-match {
+  border-color: rgba(217, 119, 6, 0.24);
+}
+
+.student-face-verification-person-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--c-text-muted);
+  font-size: 5.8px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.student-face-verification-person.is-target
+  .student-face-verification-person-label {
+  color: var(--c-blue-800);
+}
+
+.student-face-verification-person.is-match
+  .student-face-verification-person-label {
+  color: #b45309;
+}
+
+.student-face-verification-person-main {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.student-face-verification-person-main > div {
+  min-width: 0;
+}
+
+.student-face-verification-person-main strong {
+  display: block;
+  overflow: hidden;
+  color: var(--c-text-primary);
+  font-size: 10px;
+  font-weight: 830;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-face-verification-person-main small {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--c-text-body);
+  font-size: 6.5px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-face-verification-compare-mark {
+  width: 34px;
+  height: 34px;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+  background: var(--c-surface-soft);
+  color: var(--c-text-muted);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+/* =========================================================
+   SECOND CAPTURE LAYOUT
+========================================================= */
+
+.student-face-verification-capture-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    300px;
+  align-items: start;
+  gap: 15px;
+}
+
+.student-face-verification-camera {
+  min-width: 0;
+}
+
+.student-face-verification-step-heading {
+  margin-bottom: 12px;
+}
+
+.student-face-verification-step-heading > span {
+  display: block;
+  color: var(--c-blue-800);
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.student-face-verification-step-heading h3 {
+  margin: 5px 0 0;
+  color: var(--c-text-primary);
+  font-size: 17px;
+  font-weight: 850;
+  line-height: 1.2;
+  letter-spacing: -0.2px;
+}
+
+.student-face-verification-step-heading p {
+  max-width: 720px;
+  margin: 5px 0 0;
+  color: var(--c-text-body);
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+.student-face-camera-content.is-verification-mode {
+  gap: 8px;
+}
+
+.student-face-verification-camera .student-face-camera-shell {
+  height: clamp(390px, 50vh, 520px);
+  min-height: 390px;
+  max-height: 520px;
+  aspect-ratio: auto;
+  border: 1px solid rgba(74, 112, 167, 0.64);
+  border-radius: 18px;
+  box-shadow:
+    0 24px 54px rgba(2, 8, 23, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.student-face-verification-camera .student-face-target {
+  width: clamp(205px, 23vw, 285px);
+  height: clamp(280px, 32vw, 365px);
+}
+
+.student-face-verification-camera .student-face-privacy-note,
+.student-face-verification-camera .student-face-capture-tips {
+  display: none;
+}
+
+.student-face-verification-context {
+  position: sticky;
+  top: 0;
+  padding: 17px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 13px;
+  background: var(--c-surface);
+  box-shadow: 0 12px 28px rgba(18, 35, 65, 0.06);
+}
+
+.student-face-verification-context > span {
+  display: block;
+  color: var(--c-blue-800);
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.student-face-verification-context h3 {
+  margin: 6px 0 0;
+  color: var(--c-text-primary);
+  font-size: 15px;
+  font-weight: 840;
+  line-height: 1.22;
+}
+
+.student-face-verification-context > p {
+  margin: 6px 0 0;
+  color: var(--c-text-body);
+  font-size: 7px;
+  line-height: 1.52;
+}
+
+.student-face-verification-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.student-face-verification-metrics > div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+}
+
+.student-face-verification-metrics span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.4px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.student-face-verification-metrics strong {
+  display: block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  color: var(--c-text-secondary);
+  font-size: 8px;
+  font-weight: 830;
+}
+
+.student-face-verification-rule {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--c-brand-border);
+  border-radius: 9px;
+  background: var(--c-icon-bg);
+}
+
+.student-face-verification-rule > span {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-blue-900);
+  color: #ffffff;
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.student-face-verification-rule p {
+  margin: 0;
+  color: var(--c-text-body);
+  font-size: 6.3px;
+  line-height: 1.45;
+}
+
+.student-face-verification-rule strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--c-text-secondary);
+  font-size: 6.8px;
+  font-weight: 820;
+}
+
+/* =========================================================
+   MANUAL REVIEW
+========================================================= */
+
+.student-face-verification-review {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.student-face-verification-review
+  .student-face-verification-step-heading {
+  max-width: 720px;
+  margin: 0 auto 16px;
+  text-align: center;
+}
+
+.student-face-verification-evidence {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto
+    minmax(0, 1fr)
+    minmax(210px, 0.9fr);
+  align-items: stretch;
+  gap: 9px;
+  margin-bottom: 15px;
+}
+
+.student-face-verification-evidence > div:not(
+    .student-face-verification-evidence-arrow
+  ) {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+  background: var(--c-surface);
+}
+
+.student-face-verification-evidence > div > span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.7px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+}
+
+.student-face-verification-evidence > div > strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--c-text-primary);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.student-face-verification-evidence > div > small {
+  display: block;
+  margin-top: 3px;
+  color: var(--c-text-muted);
+  font-size: 6px;
+}
+
+.student-face-verification-evidence-arrow {
+  align-self: center;
+  color: var(--c-text-muted);
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.student-face-verification-evidence-status {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  border-color: var(--c-success-border) !important;
+  background: var(--c-success-bg) !important;
+}
+
+.student-face-verification-evidence-status > span {
+  width: 25px;
+  height: 25px;
+  display: grid !important;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-success-text);
+  color: #ffffff !important;
+  font-size: 8px !important;
+  letter-spacing: 0 !important;
+}
+
+.student-face-verification-evidence-status > div {
+  min-width: 0;
+}
+
+.student-face-verification-evidence-status strong {
+  display: block;
+  margin: 0 !important;
+  color: var(--c-success-text) !important;
+  font-size: 7px !important;
+  font-weight: 830;
+}
+
+.student-face-verification-evidence-status small {
+  display: block;
+  margin-top: 2px;
+  color: var(--c-success-text) !important;
+  font-size: 6px;
+  line-height: 1.4;
+  opacity: 0.82;
+}
+
+/* =========================================================
+   MANUAL DECISION CARDS
+========================================================= */
+
+.student-face-verification-decisions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.student-face-verification-decision {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 11px;
+  padding: 15px;
+  border: 1px solid var(--c-border);
+  border-radius: 13px;
+  background: var(--c-surface);
+  color: var(--c-text-secondary);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.student-face-verification-decision:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.student-face-verification-decision.is-different {
+  border-color: rgba(37, 99, 235, 0.24);
+  background: color-mix(in srgb, var(--c-icon-bg) 44%, var(--c-surface));
+}
+
+.student-face-verification-decision.is-different:hover:not(:disabled) {
+  border-color: rgba(37, 99, 235, 0.54);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.1);
+}
+
+.student-face-verification-decision.is-same {
+  border-color: rgba(220, 38, 38, 0.22);
+  background: color-mix(in srgb, rgba(254, 226, 226, 0.5) 60%, var(--c-surface));
+}
+
+.student-face-verification-decision.is-same:hover:not(:disabled) {
+  border-color: rgba(220, 38, 38, 0.48);
+  box-shadow: 0 10px 24px rgba(220, 38, 38, 0.08);
+}
+
+.student-face-verification-decision:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.student-face-verification-decision-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.student-face-verification-decision.is-different
+  .student-face-verification-decision-icon {
+  background: var(--c-blue-900);
+  color: #ffffff;
+}
+
+.student-face-verification-decision.is-same
+  .student-face-verification-decision-icon {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.student-face-verification-decision > div {
+  min-width: 0;
+}
+
+.student-face-verification-decision strong {
+  display: block;
+  color: var(--c-text-primary);
+  font-size: 10px;
+  font-weight: 840;
+}
+
+.student-face-verification-decision p {
+  margin: 5px 0 0;
+  color: var(--c-text-body);
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+.student-face-verification-decision small {
+  display: block;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+  color: var(--c-text-muted);
+  font-size: 5.7px;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+}
+
+/* =========================================================
+   FINAL DECISION CONFIRMATION
+========================================================= */
+
+.student-face-verification-confirmation {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--c-icon-bg) 55%, var(--c-surface));
+  box-shadow: inset 4px 0 0 var(--c-blue-800);
+}
+
+.student-face-verification-confirmation.is-same {
+  border-color: rgba(220, 38, 38, 0.26);
+  background: color-mix(in srgb, rgba(254, 226, 226, 0.52) 62%, var(--c-surface));
+  box-shadow: inset 4px 0 0 #dc2626;
+}
+
+.student-face-verification-confirmation-icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--c-blue-900);
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.student-face-verification-confirmation.is-same
+  .student-face-verification-confirmation-icon {
+  background: #dc2626;
+}
+
+.student-face-verification-confirmation > div {
+  min-width: 0;
+}
+
+.student-face-verification-confirmation > div > span {
+  display: block;
+  color: var(--c-blue-800);
+  font-size: 5.8px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.student-face-verification-confirmation.is-same > div > span {
+  color: #b91c1c;
+}
+
+.student-face-verification-confirmation h4 {
+  margin: 5px 0 0;
+  color: var(--c-text-primary);
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.3;
+}
+
+.student-face-verification-confirmation p {
+  margin: 5px 0 0;
+  color: var(--c-text-body);
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+.student-face-verification-confirmation-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 13px;
+}
+
+.student-face-confirm-same {
+  border-color: #b91c1c !important;
+  background: #b91c1c !important;
+  color: #ffffff !important;
+  box-shadow: 0 7px 18px rgba(185, 28, 28, 0.16);
+}
+
+.student-face-confirm-same:hover:not(:disabled) {
+  background: #991b1b !important;
+}
+
+/* =========================================================
+   VERIFICATION RESULT CARDS
+========================================================= */
+
+.student-face-verification-result {
+  max-width: 760px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 13px;
+  margin: 18px auto 0;
+  padding: 18px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 14px;
+  background: var(--c-surface);
+  box-shadow: 0 12px 30px rgba(18, 35, 65, 0.07);
+}
+
+.student-face-verification-result-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.student-face-verification-result > div {
+  min-width: 0;
+}
+
+.student-face-verification-result > div > span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.8px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.student-face-verification-result h3 {
+  margin: 6px 0 0;
+  color: var(--c-text-primary);
+  font-size: 16px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.student-face-verification-result p {
+  margin: 6px 0 0;
+  color: var(--c-text-body);
+  font-size: 7px;
+  line-height: 1.55;
+}
+
+.student-face-verification-result dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 13px 0 0;
+}
+
+.student-face-verification-result dl > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+}
+
+.student-face-verification-result dt {
+  color: var(--c-text-muted);
+  font-size: 5.4px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.student-face-verification-result dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--c-text-secondary);
+  font-size: 7px;
+  font-weight: 820;
+}
+
+.student-face-verification-result.is-neutral {
+  border-color: color-mix(
+    in srgb,
+    var(--c-blue-800) 20%,
+    var(--c-border-soft)
+  );
+}
+
+.student-face-verification-result.is-neutral
+  .student-face-verification-result-icon {
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+}
+
+.student-face-verification-result.is-blocked {
+  border-color: rgba(220, 38, 38, 0.26);
+  background: color-mix(in srgb, rgba(254, 242, 242, 0.72) 58%, var(--c-surface));
+  box-shadow:
+    inset 4px 0 0 #dc2626,
+    0 12px 30px rgba(127, 29, 29, 0.06);
+}
+
+.student-face-verification-result.is-blocked
+  .student-face-verification-result-icon {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.student-face-verification-result.is-processing {
+  border-color: rgba(37, 99, 235, 0.25);
+  background: color-mix(in srgb, var(--c-icon-bg) 50%, var(--c-surface));
+  box-shadow:
+    inset 4px 0 0 var(--c-blue-800),
+    0 12px 30px rgba(37, 99, 235, 0.06);
+}
+
+.student-face-verification-result.is-warning {
+  border-color: #f1c66a;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 251, 235, 0.96),
+    rgba(255, 247, 237, 0.9)
+  );
+  box-shadow:
+    inset 4px 0 0 #d97706,
+    0 12px 30px rgba(146, 64, 14, 0.06);
+}
+
+.student-face-verification-result.is-warning
+  .student-face-verification-result-icon {
+  background: #d97706;
+  color: #ffffff;
+}
+
+.student-face-verification-result-spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid
+    color-mix(in srgb, var(--c-blue-800) 18%, var(--c-border-soft));
+  border-top-color: var(--c-blue-800);
+  border-radius: 50%;
+  animation: student-spin 0.75s linear infinite;
+}
+
+.student-face-verification-inline-error {
+  margin-top: 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--c-error-border);
+  border-radius: 8px;
+  background: var(--c-error-bg);
+  color: var(--c-error-text);
+  font-size: 6.5px;
+  line-height: 1.45;
+}
+
+.student-face-verification-error {
+  margin-top: 12px;
+}
+
+/* =========================================================
+   VERIFICATION FOOTER
+========================================================= */
+
+.student-face-verification-actions {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 20px;
+  border-top: 1px solid var(--c-border-soft);
+  background: var(--c-surface);
+  box-shadow: 0 -8px 20px rgba(2, 8, 23, 0.025);
+}
+
+.student-face-verification-footer-copy {
+  min-width: 0;
+}
+
+.student-face-verification-footer-copy strong {
+  display: block;
+  color: var(--c-text-primary);
+  font-size: 7.5px;
+  font-weight: 820;
+}
+
+.student-face-verification-footer-copy span {
+  display: block;
+  max-width: 520px;
+  margin-top: 2px;
+  color: var(--c-text-muted);
+  font-size: 6px;
+  line-height: 1.4;
+}
+
+.student-face-verification-action-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.student-face-verification-action-group button {
+  min-height: 37px;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   DARK MODE — FACE VERIFICATION
+========================================================= */
+
+html[data-theme="dark"] .student-face-verification-modal {
+  border-color: #2a3a54;
+}
+
+html[data-theme="dark"] .student-face-verification-header {
+  background:
+    radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.2), transparent 45%),
+    var(--c-surface);
+}
+
+html[data-theme="dark"] .student-face-verification-body {
+  background: linear-gradient(
+    180deg,
+    var(--c-surface) 0%,
+    rgba(15, 23, 42, 0.72) 100%
+  );
+}
+
+html[data-theme="dark"] .student-face-verification-person,
+html[data-theme="dark"] .student-face-verification-context,
+html[data-theme="dark"] .student-face-verification-evidence
+  > div:not(.student-face-verification-evidence-arrow),
+html[data-theme="dark"] .student-face-verification-decision,
+html[data-theme="dark"] .student-face-verification-result {
+  background: rgba(15, 23, 42, 0.58);
+}
+
+html[data-theme="dark"]
+  .student-face-verification-person.is-match {
+  border-color: rgba(245, 158, 11, 0.28);
+}
+
+html[data-theme="dark"]
+  .student-face-verification-person.is-match
+  .student-face-verification-person-label {
+  color: #fbbf24;
+}
+
+html[data-theme="dark"]
+  .student-face-verification-decision.is-different {
+  border-color: rgba(96, 165, 250, 0.26);
+  background: rgba(30, 64, 175, 0.16);
+}
+
+html[data-theme="dark"]
+  .student-face-verification-decision.is-same,
+html[data-theme="dark"]
+  .student-face-verification-confirmation.is-same,
+html[data-theme="dark"]
+  .student-face-verification-result.is-blocked {
+  border-color: rgba(248, 113, 113, 0.28);
+  background: rgba(127, 29, 29, 0.18);
+}
+
+html[data-theme="dark"]
+  .student-face-verification-result.is-warning {
+  border-color: rgba(245, 158, 11, 0.36);
+  background: rgba(120, 53, 15, 0.22);
+}
+
+html[data-theme="dark"]
+  .student-face-conflict-card.is-confirmed-same-person {
+  border-color: rgba(248, 113, 113, 0.34);
+  background: rgba(127, 29, 29, 0.2);
+  color: #fecaca;
+  box-shadow:
+    inset 4px 0 0 #ef4444,
+    0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="dark"]
+  .student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-content > strong,
+html[data-theme="dark"]
+  .student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-details dd {
+  color: #fee2e2;
+}
+
+html[data-theme="dark"]
+  .student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-content > p,
+html[data-theme="dark"]
+  .student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-content > small {
+  color: #fecaca;
+}
+
+html[data-theme="dark"]
+  .student-face-conflict-card.is-confirmed-same-person
+  .student-face-conflict-details > div {
+  border-color: rgba(248, 113, 113, 0.2);
+  background: rgba(15, 23, 42, 0.36);
+}
+
+/* =========================================================
+   RESPONSIVE — FACE VERIFICATION
+========================================================= */
+
+@media (max-width: 980px) {
+  .student-face-verification-modal {
+    width: calc(100vw - 28px);
+    max-height: calc(100dvh - 28px);
+  }
+
+  .student-face-verification-capture-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-context {
+    position: static;
+  }
+
+  .student-face-verification-camera .student-face-camera-shell {
+    height: auto;
+    min-height: 390px;
+    max-height: none;
+    aspect-ratio: 4 / 3;
+  }
+
+  .student-face-verification-evidence {
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto
+      minmax(0, 1fr);
+  }
+
+  .student-face-verification-evidence-status {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .student-face-verification-backdrop {
+    padding: 8px;
+  }
+
+  .student-face-verification-modal {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 14px;
+  }
+
+  .student-face-verification-header {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .student-face-verification-header .student-modal-heading p {
+    max-width: 420px;
+    font-size: 7px;
+  }
+
+  .student-face-verification-progress {
+    grid-template-columns:
+      minmax(0, 1fr)
+      30px
+      minmax(0, 1fr);
+    min-height: 58px;
+    padding: 8px 12px;
+  }
+
+  .student-face-verification-progress-item {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .student-face-verification-progress-item > span {
+    width: 25px;
+    height: 25px;
+  }
+
+  .student-face-verification-progress-item small {
+    display: none;
+  }
+
+  .student-face-verification-progress-item strong {
+    max-width: 110px;
+    font-size: 6px;
+  }
+
+  .student-face-verification-progress > i {
+    margin-inline: 3px;
+  }
+
+  .student-face-verification-body {
+    padding: 15px;
+  }
+
+  .student-face-verification-identity-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-compare-mark {
+    width: 30px;
+    height: 30px;
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .student-face-verification-camera .student-face-camera-shell {
+    min-height: 350px;
+  }
+
+  .student-face-verification-camera .student-face-target {
+    width: 175px;
+    height: 245px;
+  }
+
+  .student-face-verification-decisions {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-actions {
+    padding: 9px 11px;
+  }
+
+  .student-face-verification-footer-copy {
+    display: none;
+  }
+
+  .student-face-verification-action-group {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .student-face-verification-action-group button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 540px) {
+  .student-face-verification-modal {
+    width: calc(100vw - 8px);
+    max-height: calc(100dvh - 8px);
+    border-radius: 11px;
+  }
+
+  .student-face-verification-header {
+    padding: 12px;
+  }
+
+  .student-face-verification-header .student-face-verification-icon {
+    width: 35px;
+    height: 35px;
+    flex-basis: 35px;
+  }
+
+  .student-face-verification-header .student-modal-heading h2 {
+    font-size: 14px;
+  }
+
+  .student-face-verification-header .student-modal-heading p {
+    max-width: 205px;
+    font-size: 6.5px;
+  }
+
+  .student-face-verification-progress {
+    padding-inline: 8px;
+  }
+
+  .student-face-verification-body {
+    padding: 12px;
+  }
+
+  .student-face-verification-person {
+    padding: 10px;
+  }
+
+  .student-face-verification-camera .student-face-camera-shell {
+    min-height: 285px;
+    border-radius: 15px;
+  }
+
+  .student-face-verification-camera .student-face-target {
+    width: 150px;
+    height: 210px;
+  }
+
+  .student-face-verification-context {
+    padding: 13px;
+  }
+
+  .student-face-verification-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-evidence {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-evidence-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .student-face-verification-evidence-status {
+    grid-column: auto;
+  }
+
+  .student-face-verification-decision,
+  .student-face-verification-confirmation,
+  .student-face-verification-result {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-result {
+    padding: 14px;
+  }
+
+  .student-face-verification-result dl {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-confirmation-actions,
+  .student-face-verification-action-group {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-confirmation-actions button,
+  .student-face-verification-action-group button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION — FACE VERIFICATION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .student-face-verification-progress-item,
+  .student-face-verification-decision,
+  .student-conflict-verify-button {
+    transition: none;
+  }
+
+  .student-face-verification-progress-item.is-current,
+  .student-face-verification-decision:hover:not(:disabled),
+  .student-conflict-verify-button:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .student-face-verification-result-spinner {
+    animation: none;
+  }
+}
+
+/* =========================================================
+   STUDENT FACE CONFLICT UX V2
+   CALM IDENTITY REVIEW + USER-FACING SIMILARITY PERCENTAGES
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+   ---------------------------------------------------------
+   Notes:
+   - Backend cosine distance remains unchanged.
+   - Only the presentation layer converts distance into
+     similarity = (1 - distance) * 100.
+   - Similarity is NOT presented as identity confidence.
+========================================================= */
+
+/* =========================================================
+   SIMILARITY METER
+========================================================= */
+
+.student-face-similarity-meter {
+  width: 100%;
+  display: grid;
+  gap: 7px;
+  padding: 12px 13px;
+  border: 1px solid color-mix(in srgb, var(--c-blue-800) 18%, var(--c-border-soft));
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--c-icon-bg) 72%, var(--c-surface));
+}
+
+.student-face-similarity-meter.is-compact {
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.student-face-similarity-meter-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.student-face-similarity-meter-header span {
+  color: var(--c-text-secondary);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.student-face-similarity-meter-header strong {
+  color: var(--c-blue-800);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.3px;
+}
+
+.student-face-similarity-meter.is-compact
+  .student-face-similarity-meter-header span {
+  font-size: 10px;
+}
+
+.student-face-similarity-meter.is-compact
+  .student-face-similarity-meter-header strong {
+  font-size: 15px;
+}
+
+.student-face-similarity-meter-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c-border) 72%, var(--c-surface-soft));
+}
+
+.student-face-similarity-meter-track i {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 48%, #7c3aed 100%);
+  transition: width 0.28s ease;
+}
+
+.student-face-similarity-meter > small {
+  color: var(--c-text-muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   CONFLICT NOTICE — LESS ALARMING, MORE ACTIONABLE
+========================================================= */
+
+.student-face-conflict-card.student-face-conflict-card-v2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid #f2d28f;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 251, 235, 0.96), rgba(255, 255, 255, 0.98));
+  color: var(--c-text-primary);
+  box-shadow:
+    inset 4px 0 0 #f59e0b,
+    0 10px 24px rgba(146, 64, 14, 0.055);
+}
+
+.student-face-conflict-card-v2 .student-face-conflict-hero {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: flex-start;
+  gap: 11px;
+}
+
+.student-face-conflict-card-v2 .student-face-conflict-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  border-radius: 10px;
+  background: #f59e0b;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 6px 14px rgba(245, 158, 11, 0.18);
+}
+
+.student-face-conflict-heading {
+  min-width: 0;
+}
+
+.student-face-conflict-card-v2 .student-face-conflict-eyebrow {
+  display: block;
+  margin: 0;
+  color: #b45309;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.student-face-conflict-heading > strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--c-text-primary);
+  font-size: 15px;
+  font-weight: 880;
+  line-height: 1.25;
+}
+
+.student-face-conflict-heading > p {
+  max-width: 720px;
+  margin: 5px 0 0;
+  color: var(--c-text-body);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.student-face-conflict-status {
+  min-height: 27px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  border: 1px solid #f2d28f;
+  border-radius: 999px;
+  background: #fff7dc;
+  color: #92400e;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.student-face-conflict-status.is-blocked {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+.student-face-conflict-match {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.8fr);
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, #f59e0b 20%, var(--c-border-soft));
+  border-radius: 12px;
+  background: color-mix(in srgb, #fff7ed 52%, var(--c-surface));
+}
+
+.student-face-conflict-match-person {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.student-face-conflict-match-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #f3d29b;
+  border-radius: 11px;
+  background: #fff7ed;
+  color: #b45309;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.student-face-conflict-match-person > div {
+  min-width: 0;
+}
+
+.student-face-conflict-match-person span {
+  display: block;
+  color: #b45309;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.student-face-conflict-match-person strong {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--c-text-primary);
+  font-size: 13px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-face-conflict-match-person small {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--c-text-muted);
+  font-size: 10px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-face-conflict-safety-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--c-text-muted);
+}
+
+.student-face-conflict-safety-note > span {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 21px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--c-blue-800) 10%, var(--c-surface));
+  color: var(--c-blue-800);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.student-face-conflict-safety-note p {
+  margin: 2px 0 0;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.student-face-conflict-card-v2.is-compact {
+  padding: 13px;
+}
+
+.student-face-conflict-card-v2.is-compact .student-face-conflict-heading > p {
+  font-size: 11px;
+}
+
+.student-face-conflict-card-v2.is-confirmed-same-person {
+  border-color: #fecaca;
+  background:
+    linear-gradient(135deg, rgba(255, 241, 242, 0.98), rgba(255, 255, 255, 0.98));
+  box-shadow:
+    inset 4px 0 0 #dc2626,
+    0 10px 24px rgba(153, 27, 27, 0.055);
+}
+
+.student-face-conflict-card-v2.is-confirmed-same-person
+  .student-face-conflict-icon {
+  background: #dc2626;
+}
+
+.student-face-conflict-card-v2.is-confirmed-same-person
+  .student-face-conflict-eyebrow {
+  color: #b91c1c;
+}
+
+/* =========================================================
+   VERIFICATION MODAL — CLEANER VISUAL HIERARCHY
+========================================================= */
+
+.student-face-verification-modal {
+  width: min(1040px, calc(100vw - 40px));
+  max-height: calc(100dvh - 40px);
+  border-radius: 18px;
+}
+
+.student-face-verification-header {
+  padding: 18px 20px;
+}
+
+.student-face-verification-header .student-modal-heading > div:last-child > span {
+  font-size: 9px;
+}
+
+.student-face-verification-header .student-modal-heading h2 {
+  font-size: 20px;
+}
+
+.student-face-verification-header .student-modal-heading p {
+  max-width: 700px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.student-face-verification-progress {
+  min-height: 62px;
+  padding: 10px 20px;
+}
+
+.student-face-verification-progress-item strong {
+  font-size: 10px;
+}
+
+.student-face-verification-progress-item small {
+  font-size: 9px;
+}
+
+.student-face-verification-body {
+  padding: 18px 20px 20px;
+}
+
+.student-face-verification-identity-grid {
+  grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.student-face-verification-person {
+  min-height: 82px;
+  padding: 13px;
+  border-radius: 12px;
+}
+
+.student-face-verification-person-label {
+  font-size: 9px;
+}
+
+.student-face-verification-person-main strong {
+  font-size: 13px;
+}
+
+.student-face-verification-person-main small {
+  font-size: 10px;
+}
+
+.student-face-verification-similarity-bridge {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--c-blue-800) 18%, var(--c-border-soft));
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--c-icon-bg) 72%, var(--c-surface)),
+      var(--c-surface)
+    );
+  text-align: center;
+}
+
+.student-face-verification-similarity-bridge > span {
+  color: var(--c-text-muted);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.student-face-verification-similarity-bridge > strong {
+  color: var(--c-blue-800);
+  font-size: 23px;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -0.7px;
+}
+
+.student-face-verification-similarity-bridge > small {
+  color: var(--c-text-muted);
+  font-size: 8px;
+}
+
+/* =========================================================
+   SECOND CAPTURE — CAMERA + CONTEXT
+========================================================= */
+
+.student-face-verification-capture-layout {
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+}
+
+.student-face-verification-step-heading > span {
+  font-size: 9px;
+}
+
+.student-face-verification-step-heading h3 {
+  margin-top: 5px;
+  font-size: 20px;
+}
+
+.student-face-verification-step-heading p {
+  max-width: 760px;
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.student-face-verification-context {
+  padding: 15px;
+}
+
+.student-face-verification-context > span {
+  font-size: 9px;
+}
+
+.student-face-verification-context h3 {
+  font-size: 16px;
+}
+
+.student-face-verification-context > p {
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.student-face-verification-metrics {
+  gap: 8px;
+}
+
+.student-face-verification-metrics > div {
+  min-height: 66px;
+  padding: 10px;
+}
+
+.student-face-verification-metrics span {
+  font-size: 8px;
+}
+
+.student-face-verification-metrics strong {
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.student-face-verification-rule p {
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   MANUAL REVIEW — EVIDENCE FIRST, DECISION SECOND
+========================================================= */
+
+.student-face-verification-evidence-v2 {
+  grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.student-face-verification-evidence-card {
+  min-width: 0;
+  padding: 13px !important;
+  border: 1px solid var(--c-border-soft) !important;
+  border-radius: 12px !important;
+  background: var(--c-surface) !important;
+}
+
+.student-face-verification-evidence-card > span {
+  font-size: 9px;
+}
+
+.student-face-verification-evidence-card > strong {
+  margin-top: 5px;
+  color: var(--c-blue-800);
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: -0.5px;
+}
+
+.student-face-verification-evidence-card > small {
+  margin-top: 3px;
+  font-size: 9px;
+}
+
+.student-face-verification-evidence-v2
+  .student-face-verification-evidence-status {
+  grid-column: 1 / -1;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-success-border);
+  border-radius: 11px;
+  background: var(--c-success-bg);
+}
+
+.student-face-verification-evidence-v2
+  .student-face-verification-evidence-status strong {
+  font-size: 11px;
+}
+
+.student-face-verification-evidence-v2
+  .student-face-verification-evidence-status small {
+  font-size: 9px;
+}
+
+.student-face-verification-safety-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 13px;
+  border: 1px solid color-mix(in srgb, var(--c-blue-800) 20%, var(--c-border-soft));
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--c-icon-bg) 68%, var(--c-surface));
+}
+
+.student-face-verification-safety-strip > span {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--c-blue-900);
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.student-face-verification-safety-strip strong {
+  display: block;
+  color: var(--c-text-primary);
+  font-size: 11px;
+}
+
+.student-face-verification-safety-strip p {
+  margin: 3px 0 0;
+  color: var(--c-text-body);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.student-face-verification-review-checklist {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.student-face-verification-review-checklist > span {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+  color: var(--c-text-secondary);
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.student-face-verification-review-checklist i {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 21px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+  font-style: normal;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.student-face-verification-decisions {
+  gap: 10px;
+  margin-top: 13px;
+}
+
+.student-face-verification-decision {
+  min-height: 142px;
+  padding: 15px;
+  border-radius: 13px;
+}
+
+.student-face-verification-decision-icon {
+  width: 42px;
+  height: 42px;
+  flex-basis: 42px;
+  font-size: 18px;
+}
+
+.student-face-verification-decision strong {
+  font-size: 13px;
+}
+
+.student-face-verification-decision p {
+  margin-top: 5px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.student-face-verification-decision small {
+  margin-top: 8px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.student-face-verification-confirmation {
+  padding: 15px;
+  border-radius: 13px;
+}
+
+.student-face-verification-confirmation > div > span {
+  font-size: 9px;
+}
+
+.student-face-verification-confirmation h4 {
+  font-size: 16px;
+}
+
+.student-face-verification-confirmation p {
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   RESULT STATES
+========================================================= */
+
+.student-face-verification-result {
+  padding: 17px;
+  border-radius: 13px;
+}
+
+.student-face-verification-result > div > span {
+  font-size: 9px;
+}
+
+.student-face-verification-result h3 {
+  font-size: 18px;
+}
+
+.student-face-verification-result p {
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.student-face-verification-result dl dt {
+  font-size: 9px;
+}
+
+.student-face-verification-result dl dd {
+  font-size: 12px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.student-face-verification-actions {
+  min-height: 72px;
+  padding: 12px 18px;
+}
+
+.student-face-verification-footer-copy strong {
+  font-size: 10px;
+}
+
+.student-face-verification-footer-copy span {
+  margin-top: 3px;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.student-face-verification-action-group button {
+  min-height: 40px;
+  padding-inline: 14px;
+  font-size: 11px;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-face-conflict-card.student-face-conflict-card-v2 {
+  border-color: rgba(245, 158, 11, 0.32);
+  background:
+    linear-gradient(135deg, rgba(120, 53, 15, 0.22), rgba(15, 23, 42, 0.7));
+  box-shadow:
+    inset 4px 0 0 #f59e0b,
+    0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="dark"] .student-face-conflict-match {
+  border-color: rgba(245, 158, 11, 0.22);
+  background: rgba(120, 53, 15, 0.14);
+}
+
+html[data-theme="dark"] .student-face-conflict-match-avatar {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(120, 53, 15, 0.24);
+  color: #fbbf24;
+}
+
+html[data-theme="dark"] .student-face-conflict-heading > strong,
+html[data-theme="dark"] .student-face-conflict-match-person strong {
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .student-face-conflict-heading > p,
+html[data-theme="dark"] .student-face-conflict-safety-note,
+html[data-theme="dark"] .student-face-conflict-match-person small {
+  color: #aebdce;
+}
+
+html[data-theme="dark"] .student-face-similarity-meter {
+  border-color: #30445e;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+html[data-theme="dark"] .student-face-similarity-meter-track {
+  background: #26364b;
+}
+
+html[data-theme="dark"] .student-face-similarity-meter-header strong,
+html[data-theme="dark"] .student-face-verification-similarity-bridge > strong,
+html[data-theme="dark"] .student-face-verification-evidence-card > strong {
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .student-face-verification-similarity-bridge,
+html[data-theme="dark"] .student-face-verification-evidence-card,
+html[data-theme="dark"] .student-face-verification-safety-strip,
+html[data-theme="dark"] .student-face-verification-review-checklist > span {
+  border-color: #2d415b !important;
+  background: rgba(15, 23, 42, 0.64) !important;
+}
+
+html[data-theme="dark"] .student-face-verification-safety-strip strong {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .student-face-verification-safety-strip p,
+html[data-theme="dark"] .student-face-verification-review-checklist > span {
+  color: #aebdce;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 980px) {
+  .student-face-conflict-match {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-capture-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-context {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .student-face-verification-modal {
+    width: calc(100vw - 18px);
+    max-height: calc(100dvh - 18px);
+  }
+
+  .student-face-verification-identity-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-similarity-bridge {
+    min-height: 72px;
+  }
+
+  .student-face-verification-review-checklist {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-conflict-card-v2 .student-face-conflict-hero {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .student-face-conflict-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 540px) {
+  .student-face-verification-header .student-modal-heading h2 {
+    font-size: 16px;
+  }
+
+  .student-face-verification-header .student-modal-heading p {
+    max-width: 240px;
+    font-size: 9px;
+  }
+
+  .student-face-verification-body {
+    padding: 12px;
+  }
+
+  .student-face-verification-evidence-v2 {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-evidence-v2
+    .student-face-verification-evidence-status {
+    grid-column: auto;
+  }
+
+  .student-face-verification-evidence-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .student-face-verification-decision {
+    min-height: 0;
+  }
+
+  .student-face-conflict-match-person strong,
+  .student-face-conflict-match-person small {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-face-similarity-meter-track i {
+    transition: none;
+  }
+}
+
+/* =========================================================
+   STUDENT MANAGEMENT V8 — CALM STEP-BY-STEP UX
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   Intent:
+   - Preserve all existing student / camera / conflict logic.
+   - Reduce visual overload through progressive disclosure.
+   - Keep face similarity user-facing as percentages.
+   - Give each verification stage one obvious primary task.
+========================================================= */
+
+/* =========================================================
+   ENROLLMENT WIZARD — QUIETER HIERARCHY
+========================================================= */
+
+.student-enrollment-modal,
+.student-identity-modal,
+.student-face-verification-modal {
+  border-color: color-mix(in srgb, var(--c-border-soft) 86%, transparent);
+  box-shadow:
+    0 24px 64px rgba(2, 8, 23, 0.18),
+    0 6px 18px rgba(2, 8, 23, 0.07);
+}
+
+.student-wizard-header,
+.student-face-verification-header {
+  background: var(--c-surface);
+}
+
+.student-wizard-progress {
+  min-height: 54px;
+  padding-block: 9px;
+  background: color-mix(in srgb, var(--c-surface-soft) 70%, var(--c-surface));
+}
+
+.student-wizard-progress-item {
+  opacity: 0.72;
+}
+
+.student-wizard-progress-item.is-current,
+.student-wizard-progress-item.is-complete {
+  opacity: 1;
+}
+
+.student-wizard-step-intro {
+  max-width: 680px;
+  margin-bottom: 18px;
+}
+
+.student-wizard-step-intro h3 {
+  letter-spacing: -0.2px;
+}
+
+.student-wizard-form-card,
+.student-wizard-review-card,
+.student-wizard-review-photo-card {
+  box-shadow: none;
+}
+
+.student-wizard-camera-layout {
+  gap: 16px;
+}
+
+.student-wizard-camera-guide {
+  align-self: start;
+  padding: 16px;
+  border-color: var(--c-border-soft);
+  background: color-mix(in srgb, var(--c-surface-soft) 76%, var(--c-surface));
+  box-shadow: none;
+}
+
+.student-wizard-camera-guide > span {
+  font-size: 6.5px;
+  letter-spacing: 0.11em;
+}
+
+.student-wizard-camera-guide h3 {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.student-wizard-camera-guide > p {
+  margin-top: 6px;
+  font-size: 8px;
+  line-height: 1.55;
+}
+
+.student-wizard-guide-list {
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.student-wizard-guide-list > div {
+  padding: 9px;
+}
+
+.student-face-capture-tips {
+  gap: 6px;
+}
+
+.student-face-capture-tips > span {
+  min-height: 34px;
+  padding: 6px 8px;
+  background: transparent;
+}
+
+.student-wizard-actions,
+.student-face-verification-actions {
+  background: color-mix(in srgb, var(--c-surface) 96%, var(--c-surface-soft));
+}
+
+/* =========================================================
+   FACE CONFLICT NOTICE — LESS ALARMING, MORE ACTIONABLE
+========================================================= */
+
+.student-face-conflict-card.student-face-conflict-card-v2 {
+  gap: 12px;
+  padding: 14px;
+  border-radius: 13px;
+  box-shadow: none;
+}
+
+.student-face-conflict-card-v2 .student-face-conflict-hero {
+  gap: 11px;
+}
+
+.student-face-conflict-card-v2 .student-face-conflict-icon {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+}
+
+.student-face-conflict-card-v2 .student-face-conflict-heading > strong {
+  font-size: 12px;
+}
+
+.student-face-conflict-card-v2 .student-face-conflict-heading > p {
+  max-width: 680px;
+  margin-top: 4px;
+  font-size: 7.5px;
+  line-height: 1.5;
+}
+
+.student-face-conflict-match {
+  padding: 10px 11px;
+  border-radius: 10px;
+}
+
+.student-face-conflict-card-v2.is-compact {
+  padding: 12px;
+}
+
+.student-face-conflict-card-v2.is-compact .student-face-conflict-heading > p,
+.student-face-conflict-card-v2.is-compact .student-face-conflict-safety-note {
+  display: none;
+}
+
+.student-face-conflict-card-v2.is-compact .student-face-conflict-match {
+  margin-top: 0;
+}
+
+.student-face-similarity-meter {
+  box-shadow: none;
+}
+
+.student-face-similarity-meter-track {
+  height: 7px;
+}
+
+/* =========================================================
+   VERIFICATION MODAL — ONE TASK AT A TIME
+========================================================= */
+
+.student-face-verification-modal {
+  width: min(960px, calc(100vw - 40px));
+  max-height: min(820px, calc(100dvh - 40px));
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+
+.student-face-verification-header {
+  padding: 17px 19px;
+}
+
+.student-face-verification-header .student-modal-icon {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+}
+
+.student-face-verification-header .student-modal-heading h2 {
+  font-size: 17px;
+}
+
+.student-face-verification-header .student-modal-heading p {
+  max-width: 560px;
+  font-size: 8px;
+}
+
+.student-face-verification-progress {
+  min-height: 54px;
+  padding: 9px 18px;
+  border-bottom: 1px solid var(--c-border-soft);
+  background: color-mix(in srgb, var(--c-surface-soft) 72%, var(--c-surface));
+}
+
+.student-face-verification-progress-item {
+  min-height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.student-face-verification-progress-item > span {
+  width: 26px;
+  height: 26px;
+  flex-basis: 26px;
+}
+
+.student-face-verification-progress-item strong {
+  font-size: 8px;
+}
+
+.student-face-verification-progress-item small {
+  font-size: 6px;
+}
+
+.student-face-verification-progress > i {
+  background: var(--c-border);
+}
+
+.student-face-verification-body {
+  padding: 17px 18px 19px;
+  background: color-mix(in srgb, var(--c-surface-soft) 34%, var(--c-surface));
+}
+
+/* =========================================================
+   COMPACT IDENTITY SUMMARY
+========================================================= */
+
+.student-face-verification-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 8px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+  background: var(--c-surface);
+}
+
+.student-face-verification-summary-person {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 9px;
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+}
+
+.student-face-verification-summary-person .student-face-student-avatar {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+
+.student-face-verification-summary-person > div {
+  min-width: 0;
+}
+
+.student-face-verification-summary-person > div > span,
+.student-face-verification-summary-score > span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.8px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+}
+
+.student-face-verification-summary-person strong {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--c-text-primary);
+  font-size: 9px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-face-verification-summary-person small {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--c-text-muted);
+  font-size: 6.4px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-face-verification-summary-person.is-target {
+  background: color-mix(in srgb, var(--c-icon-bg) 52%, var(--c-surface));
+}
+
+.student-face-verification-summary-person.is-match {
+  background: color-mix(in srgb, #fff7ed 55%, var(--c-surface));
+}
+
+.student-face-verification-summary-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 6px;
+  border-inline: 1px solid var(--c-border-soft);
+  text-align: center;
+}
+
+.student-face-verification-summary-score strong {
+  display: block;
+  margin-top: 3px;
+  color: #b45309;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.student-face-verification-summary-score small {
+  margin-top: 3px;
+  color: var(--c-text-muted);
+  font-size: 6px;
+}
+
+/* Hide the older large identity comparison if stale markup survives. */
+.student-face-verification-identity-grid {
+  display: none !important;
+}
+
+/* =========================================================
+   STEP 1 — CAMERA FIRST
+========================================================= */
+
+.student-face-verification-capture-layout.is-calm-focus {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(220px, 0.45fr);
+  align-items: start;
+  gap: 14px;
+}
+
+.student-face-verification-camera {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.student-face-verification-step-heading {
+  margin-bottom: 11px;
+}
+
+.student-face-verification-step-heading > span {
+  font-size: 6.3px;
+  letter-spacing: 0.11em;
+}
+
+.student-face-verification-step-heading h3 {
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 1.22;
+}
+
+.student-face-verification-step-heading p {
+  max-width: 650px;
+  margin-top: 5px;
+  font-size: 7.6px;
+  line-height: 1.5;
+}
+
+.student-face-verification-camera .student-face-camera-shell {
+  min-height: 350px;
+  max-height: 455px;
+  border-radius: 15px;
+}
+
+.student-face-verification-camera .student-face-privacy-note,
+.student-face-verification-camera .student-face-capture-tips {
+  display: none;
+}
+
+.student-face-verification-help-card {
+  display: grid;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+  background: var(--c-surface);
+}
+
+.student-face-verification-help-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.student-face-verification-help-copy > span {
+  display: block;
+  color: var(--c-blue-800);
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.student-face-verification-help-copy strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--c-text-primary);
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.student-face-verification-help-copy p {
+  margin: 5px 0 0;
+  color: var(--c-text-body);
+  font-size: 7px;
+  line-height: 1.55;
+}
+
+.student-face-verification-quick-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+}
+
+.student-face-verification-quick-facts > div {
+  min-width: 0;
+  padding: 9px;
+}
+
+.student-face-verification-quick-facts > div + div {
+  border-left: 1px solid var(--c-border-soft);
+}
+
+.student-face-verification-quick-facts span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.6px;
+  font-weight: 800;
+}
+
+.student-face-verification-quick-facts strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--c-text-primary);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+/* Older verbose context is intentionally suppressed in calm mode. */
+.student-face-verification-context {
+  display: none !important;
+}
+
+/* =========================================================
+   STEP 2 — DECISION FIRST
+========================================================= */
+
+.student-face-verification-review.is-calm-focus {
+  max-width: 820px;
+  margin-inline: auto;
+  padding: 0;
+}
+
+.student-face-verification-review.is-calm-focus
+  .student-face-verification-step-heading {
+  text-align: center;
+}
+
+.student-face-verification-review.is-calm-focus
+  .student-face-verification-step-heading p {
+  margin-inline: auto;
+}
+
+.student-face-verification-comparison-strip {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) auto minmax(120px, 0.8fr) minmax(220px, 1.2fr);
+  align-items: center;
+  gap: 8px;
+  margin-top: 13px;
+  padding: 9px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+  background: var(--c-surface);
+}
+
+.student-face-verification-comparison-value {
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+  text-align: center;
+}
+
+.student-face-verification-comparison-value span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.7px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.student-face-verification-comparison-value strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--c-text-primary);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.student-face-verification-comparison-arrow {
+  color: var(--c-text-muted);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.student-face-verification-comparison-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--c-success-border);
+  border-radius: 9px;
+  background: var(--c-success-bg);
+  color: var(--c-success-text);
+}
+
+.student-face-verification-comparison-result > span {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-success-text);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.student-face-verification-comparison-result strong {
+  display: block;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.student-face-verification-comparison-result small {
+  display: block;
+  margin-top: 2px;
+  font-size: 6px;
+  opacity: 0.78;
+}
+
+/* The old detailed evidence cards are redundant in the calm layout. */
+.student-face-verification-evidence-v2,
+.student-face-verification-review-checklist {
+  display: none !important;
+}
+
+.student-face-verification-safety-strip.is-calm {
+  max-width: 680px;
+  margin: 11px auto 0;
+  padding: 9px 11px;
+  border-radius: 9px;
+}
+
+.student-face-verification-safety-strip.is-calm p {
+  margin-top: 2px;
+  font-size: 6.7px;
+}
+
+.student-face-verification-decision-zone {
+  margin-top: 15px;
+  padding-top: 14px;
+  border-top: 1px solid var(--c-border-soft);
+}
+
+.student-face-verification-decision-zone-heading {
+  margin-bottom: 9px;
+  text-align: center;
+}
+
+.student-face-verification-decision-zone-heading > span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.8px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.student-face-verification-decision-zone-heading strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--c-text-primary);
+  font-size: 11px;
+}
+
+.student-face-verification-decisions.is-calm {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.student-face-verification-decisions.is-calm
+  .student-face-verification-decision {
+  min-height: 88px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  padding: 12px;
+  border-radius: 11px;
+  text-align: left;
+  box-shadow: none;
+}
+
+.student-face-verification-decisions.is-calm
+  .student-face-verification-decision-icon {
+  width: 39px;
+  height: 39px;
+  flex-basis: 39px;
+  border-radius: 11px;
+  font-size: 17px;
+}
+
+.student-face-verification-decisions.is-calm
+  .student-face-verification-decision strong {
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.student-face-verification-decisions.is-calm
+  .student-face-verification-decision small {
+  display: block;
+  margin-top: 4px;
+  font-size: 6.5px;
+  line-height: 1.35;
+}
+
+.student-face-verification-decisions.is-calm
+  .student-face-verification-decision p {
+  display: none;
+}
+
+.student-face-verification-confirmation {
+  max-width: 680px;
+  margin: 15px auto 0;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.student-face-verification-confirmation h4 {
+  font-size: 13px;
+}
+
+.student-face-verification-confirmation p {
+  max-width: 540px;
+  font-size: 7px;
+}
+
+.student-face-verification-error {
+  max-width: 680px;
+  margin-inline: auto;
+}
+
+/* =========================================================
+   RESULT STATES — CENTERED, SCANNABLE
+========================================================= */
+
+.student-face-verification-result {
+  max-width: 720px;
+  margin: 10px auto;
+  padding: 20px;
+  box-shadow: none;
+}
+
+.student-face-verification-result h3 {
+  font-size: 16px;
+}
+
+.student-face-verification-result > div > p {
+  max-width: 590px;
+  font-size: 7.5px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   FOOTER — CLEAR PRIMARY ACTION
+========================================================= */
+
+.student-face-verification-actions {
+  min-height: 64px;
+  padding: 10px 18px;
+}
+
+.student-face-verification-footer-copy strong {
+  font-size: 7.5px;
+}
+
+.student-face-verification-footer-copy span {
+  font-size: 6.2px;
+}
+
+.student-face-verification-action-group {
+  gap: 8px;
+}
+
+.student-face-verification-action-group button {
+  min-height: 38px;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-face-verification-body,
+html[data-theme="dark"] .student-face-verification-summary,
+html[data-theme="dark"] .student-face-verification-help-card,
+html[data-theme="dark"] .student-face-verification-comparison-strip {
+  border-color: #2a3950;
+  background: #0d1727;
+}
+
+html[data-theme="dark"] .student-face-verification-summary-person {
+  background: #111f31;
+}
+
+html[data-theme="dark"] .student-face-verification-summary-person.is-target {
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .student-face-verification-summary-person.is-match {
+  background: rgba(146, 64, 14, 0.16);
+}
+
+html[data-theme="dark"] .student-face-verification-summary-score {
+  border-color: #2a3950;
+}
+
+html[data-theme="dark"] .student-face-verification-summary-score strong {
+  color: #fbbf24;
+}
+
+html[data-theme="dark"] .student-face-verification-quick-facts,
+html[data-theme="dark"] .student-face-verification-comparison-value {
+  border-color: #2a3950;
+  background: #111f31;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+  .student-face-verification-modal {
+    width: calc(100vw - 28px);
+    max-height: calc(100dvh - 28px);
+  }
+
+  .student-face-verification-summary {
+    grid-template-columns: 1fr 112px 1fr;
+  }
+
+  .student-face-verification-capture-layout.is-calm-focus {
+    grid-template-columns: minmax(0, 1fr) 210px;
+  }
+
+  .student-face-verification-camera .student-face-camera-shell {
+    min-height: 320px;
+  }
+
+  .student-face-verification-comparison-strip {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .student-face-verification-comparison-result {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(100%, 350px);
+  }
+}
+
+@media (max-width: 720px) {
+  .student-face-verification-modal {
+    width: calc(100vw - 18px);
+    max-height: calc(100dvh - 18px);
+  }
+
+  .student-face-verification-body {
+    padding: 13px;
+  }
+
+  .student-face-verification-summary {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .student-face-verification-summary-score {
+    min-height: 58px;
+    border: 0;
+    border-block: 1px solid var(--c-border-soft);
+  }
+
+  .student-face-verification-capture-layout.is-calm-focus {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-help-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .student-face-verification-quick-facts {
+    grid-column: 1 / -1;
+  }
+
+  .student-face-verification-camera .student-face-camera-shell {
+    min-height: 300px;
+  }
+
+  .student-face-verification-decisions.is-calm {
+    grid-template-columns: 1fr;
+  }
+
+  .student-face-verification-comparison-strip {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .student-face-verification-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-face-verification-footer-copy {
+    display: none;
+  }
+
+  .student-face-verification-action-group {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-face-verification-header {
+    padding: 14px;
+  }
+
+  .student-face-verification-header .student-modal-heading p {
+    display: none;
+  }
+
+  .student-face-verification-progress {
+    padding-inline: 12px;
+  }
+
+  .student-face-verification-progress-item small {
+    display: none;
+  }
+
+  .student-face-verification-summary-person {
+    padding: 7px;
+  }
+
+  .student-face-verification-camera .student-face-camera-shell {
+    min-height: 260px;
+  }
+
+  .student-face-verification-comparison-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .student-face-verification-comparison-arrow {
+    display: none;
+  }
+
+  .student-face-verification-comparison-result {
+    grid-column: 1 / -1;
+  }
+
+  .student-face-verification-confirmation-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-face-verification-summary,
+  .student-face-verification-help-card,
+  .student-face-verification-comparison-strip,
+  .student-face-verification-decision-zone {
+    animation: none !important;
+    transition: none !important;
+  }
+}
