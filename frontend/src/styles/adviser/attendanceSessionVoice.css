@@ -1,0 +1,136 @@
+/* =========================================================
+   SVNHS ATTENDANCE SESSION — VOICE + STABILITY CAPTURE
+   ADDITIVE ONLY. KEEP attendanceSession.css UNCHANGED.
+========================================================= */
+
+.attendance-voice-toggle {
+  min-height: 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid #c9d6e5;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #54667d;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 850;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform var(--c-motion-fast, 140ms) ease,
+    border-color var(--c-motion-base, 180ms) ease,
+    background var(--c-motion-base, 180ms) ease,
+    color var(--c-motion-base, 180ms) ease,
+    box-shadow var(--c-motion-base, 180ms) ease;
+}
+
+.attendance-voice-toggle-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: #eef2f7;
+  color: #5f7086;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.attendance-voice-toggle.is-on {
+  border-color: #b9def0;
+  background: #eef9fe;
+  color: #0f668e;
+}
+
+.attendance-voice-toggle.is-on .attendance-voice-toggle-icon {
+  background: #dff4fd;
+  color: #03678f;
+}
+
+.attendance-voice-toggle:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .attendance-voice-toggle:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: #9ebfd5;
+    background: #f5fbfe;
+    box-shadow: 0 7px 17px rgba(14, 102, 143, 0.08);
+  }
+}
+
+.attendance-voice-toggle:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+/* 3-frame fast capture state */
+.attendance-face-target.scanner-capturing .attendance-face-target-line {
+  opacity: 1;
+  animation: attendance-scan-line 0.9s ease-in-out infinite;
+}
+
+.attendance-live-camera-shell.scanner-capturing .attendance-face-target-oval {
+  border-color: #7dd3fc;
+  box-shadow:
+    0 0 0 999px rgba(5, 10, 22, 0.1),
+    0 0 42px rgba(56, 189, 248, 0.24);
+}
+
+.attendance-live-camera-shell.scanner-capturing .attendance-scanner-message {
+  border-color: rgba(125, 211, 252, 0.28);
+  background: rgba(7, 46, 76, 0.74);
+}
+
+.attendance-live-camera-shell.scanner-capturing .attendance-scanner-message > span {
+  color: #bae6fd;
+}
+
+html[data-theme="dark"] .attendance-voice-toggle {
+  border-color: #34475f;
+  background: #0c1727;
+  color: #cbd7e5;
+}
+
+html[data-theme="dark"] .attendance-voice-toggle-icon {
+  background: #152338;
+  color: #9aabc0;
+}
+
+html[data-theme="dark"] .attendance-voice-toggle.is-on {
+  border-color: #28566e;
+  background: rgba(14, 102, 143, 0.17);
+  color: #8ed3f2;
+}
+
+html[data-theme="dark"] .attendance-voice-toggle.is-on .attendance-voice-toggle-icon {
+  background: rgba(14, 102, 143, 0.24);
+  color: #bae6fd;
+}
+
+@media (max-width: 900px) {
+  .attendance-voice-toggle {
+    flex: 1;
+  }
+}
+
+@media (max-width: 650px) {
+  .attendance-voice-toggle {
+    width: 100%;
+    min-height: 44px;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attendance-voice-toggle,
+  .attendance-face-target.scanner-capturing .attendance-face-target-line {
+    animation: none;
+    transition: none;
+  }
+}

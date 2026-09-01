@@ -1,0 +1,908 @@
+/* =========================================================
+   SVNHS STUDENT MANAGEMENT — PRODUCTION FACE REVIEW UX
+   Import AFTER studentManagementLiveness.css
+
+   Goals
+   - Calm, non-overwhelming enrollment modal
+   - Deliberate 10+ second guided camera experience
+   - Review / Retake before verification submission
+   - Presentable error handling
+   - Preserve current roster / conflict / dark-mode behavior
+========================================================= */
+
+/* =========================================================
+   MODAL — CALMER FRAME
+========================================================= */
+
+.student-enrollment-modal {
+  width: min(860px, calc(100vw - 36px)) !important;
+  height: auto !important;
+  max-height: min(820px, calc(100dvh - 36px)) !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  box-shadow:
+    0 26px 70px rgba(2, 8, 23, 0.24),
+    0 8px 24px rgba(2, 8, 23, 0.09) !important;
+}
+
+.student-enrollment-modal .student-modal-header {
+  min-height: 0 !important;
+  padding: 17px 19px !important;
+  background: var(--c-surface) !important;
+}
+
+.student-enrollment-modal .student-modal-icon {
+  width: 38px !important;
+  height: 38px !important;
+  flex-basis: 38px !important;
+  border-radius: 11px !important;
+}
+
+.student-enrollment-modal .student-modal-heading > div:last-child > span {
+  margin-bottom: 3px !important;
+  font-size: 7px !important;
+}
+
+.student-enrollment-modal .student-modal-heading h2 {
+  font-size: 18px !important;
+  line-height: 1.2 !important;
+}
+
+.student-enrollment-modal .student-modal-heading p {
+  max-width: 560px !important;
+  margin-top: 4px !important;
+  font-size: 9px !important;
+  line-height: 1.5 !important;
+}
+
+/* Compact progress. Keep context without turning it into a dashboard. */
+.student-enrollment-modal .student-enrollment-progress {
+  min-height: 48px !important;
+  padding: 8px 18px !important;
+  background: var(--c-surface-soft) !important;
+}
+
+.student-enrollment-modal .student-enrollment-progress > div > span {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.student-enrollment-modal .student-enrollment-progress > div strong {
+  font-size: 7px !important;
+}
+
+.student-enrollment-modal .student-enrollment-progress > div small {
+  display: none !important;
+}
+
+.student-live-enrollment-body {
+  padding: 18px !important;
+  background: var(--c-surface) !important;
+}
+
+.student-live-detail-step {
+  width: min(100%, 570px) !important;
+  gap: 15px !important;
+}
+
+.student-live-scan-step,
+.student-live-result-step {
+  width: min(100%, 760px) !important;
+  gap: 12px !important;
+}
+
+.student-liveness-student-strip {
+  padding: 10px 12px !important;
+  border-radius: 11px !important;
+  background: color-mix(in srgb, var(--c-surface-soft) 75%, var(--c-surface)) !important;
+}
+
+.student-liveness-avatar {
+  width: 38px !important;
+  height: 38px !important;
+  flex-basis: 38px !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+}
+
+.student-liveness-security-badge {
+  min-height: 25px !important;
+  padding-inline: 8px !important;
+  font-size: 5px !important;
+  letter-spacing: 0.07em !important;
+}
+
+/* =========================================================
+   SCANNER — ONE PRIMARY SURFACE
+========================================================= */
+
+.student-production-scanner,
+.student-production-review-shell {
+  gap: 10px !important;
+  padding: 12px !important;
+  border-color: var(--c-border-soft) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 28px rgba(2, 8, 23, 0.055) !important;
+}
+
+.student-production-scanner-toolbar,
+.student-production-review-toolbar {
+  min-height: 36px;
+}
+
+.student-production-scanner-toolbar > div > span,
+.student-production-review-toolbar > div > span {
+  color: var(--c-blue-800);
+  font-size: 6px !important;
+  letter-spacing: 0.1em !important;
+}
+
+.student-production-scanner-toolbar > div > strong,
+.student-production-review-toolbar > div > strong {
+  margin-top: 3px;
+  font-size: 11px !important;
+}
+
+.student-production-scanner .student-live-camera {
+  min-height: 410px !important;
+  aspect-ratio: 16 / 10 !important;
+  border-radius: 16px !important;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(37, 99, 235, 0.18), transparent 38%),
+    linear-gradient(145deg, #09162e 0%, #040a15 100%) !important;
+}
+
+.student-production-scanner .student-live-face-guide {
+  width: 190px !important;
+  height: 245px !important;
+}
+
+.student-production-scanner .student-live-face-oval {
+  border-width: 1.5px !important;
+}
+
+.student-production-camera-security {
+  position: absolute;
+  z-index: 6;
+  top: 14px;
+  right: 14px;
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid rgba(147, 197, 253, 0.2);
+  border-radius: 999px;
+  background: rgba(30, 64, 175, 0.45);
+  color: #dbeafe;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
+}
+
+.student-production-camera-placeholder {
+  padding: 28px !important;
+}
+
+.student-production-camera-placeholder > span {
+  width: 62px !important;
+  height: 62px !important;
+  margin-bottom: 13px !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.student-production-camera-placeholder strong {
+  font-size: 15px !important;
+}
+
+.student-production-camera-placeholder p {
+  max-width: 360px !important;
+  margin-top: 7px !important;
+  font-size: 9px !important;
+  line-height: 1.55 !important;
+}
+
+/* =========================================================
+   5-SECOND PREPARATION — CALM COUNTDOWN
+========================================================= */
+
+.student-production-prep-overlay {
+  position: absolute;
+  z-index: 11;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  padding: 24px;
+  background: rgba(3, 10, 24, 0.35);
+  color: #ffffff;
+  text-align: center;
+  backdrop-filter: blur(1.5px);
+  pointer-events: none;
+}
+
+.student-production-prep-overlay small {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.student-production-prep-overlay strong {
+  margin-top: 3px;
+  font-size: clamp(70px, 9vw, 108px);
+  font-weight: 900;
+  line-height: 0.95;
+  text-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+  animation: student-production-count 0.5s ease-out both;
+}
+
+.student-production-prep-overlay p {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.student-live-camera.is-preparing .student-live-face-oval {
+  border-color: rgba(147, 197, 253, 0.92) !important;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.18) !important;
+}
+
+/* =========================================================
+   CHALLENGE — ONE LARGE INSTRUCTION ONLY
+========================================================= */
+
+.student-production-challenge {
+  width: min(360px, calc(100% - 40px)) !important;
+  padding: 18px 20px !important;
+  border-radius: 16px !important;
+  background: rgba(5, 46, 22, 0.78) !important;
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.student-production-challenge > span {
+  width: 52px !important;
+  height: 52px !important;
+  font-size: 24px !important;
+}
+
+.student-production-challenge small {
+  margin-top: 9px !important;
+  font-size: 7px !important;
+}
+
+.student-production-challenge strong {
+  margin-top: 5px !important;
+  font-size: 20px !important;
+}
+
+.student-production-challenge p {
+  max-width: 270px;
+  margin: 7px auto 0 !important;
+  font-size: 9px !important;
+  line-height: 1.5 !important;
+}
+
+/* Caption stays quiet. */
+.student-production-caption {
+  right: 14px !important;
+  bottom: 14px !important;
+  left: 14px !important;
+  padding: 10px 12px !important;
+  border-radius: 10px !important;
+  background: rgba(2, 8, 23, 0.66) !important;
+}
+
+.student-production-caption > span:first-child {
+  width: 27px !important;
+  height: 27px !important;
+  flex-basis: 27px !important;
+}
+
+.student-production-caption strong {
+  font-size: 9px !important;
+}
+
+.student-production-caption div > span {
+  font-size: 6.5px !important;
+  line-height: 1.4 !important;
+}
+
+.student-production-processing {
+  background: rgba(3, 10, 24, 0.58) !important;
+}
+
+/* =========================================================
+   PROGRESS — SIMPLE FOUR PHASES
+========================================================= */
+
+.student-production-progress {
+  height: 4px !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  background: var(--c-border-soft) !important;
+}
+
+.student-production-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb, #16a34a);
+  transition: width 0.28s ease;
+}
+
+.student-production-phase-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.student-production-phase-row > span {
+  min-height: 31px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 8px;
+  background: var(--c-surface-soft);
+  color: var(--c-text-muted);
+  font-size: 6px;
+  font-weight: 800;
+}
+
+.student-production-phase-row i {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+  background: var(--c-surface);
+  font-size: 5px;
+  font-style: normal;
+}
+
+.student-production-phase-row > span.is-active {
+  border-color: color-mix(in srgb, var(--c-blue-800) 28%, var(--c-border-soft));
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+}
+
+.student-production-phase-row > span.is-active i {
+  border-color: var(--c-blue-800);
+  background: var(--c-blue-900);
+  color: #ffffff;
+}
+
+.student-production-guidance-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px 12px;
+  padding: 4px 2px 0;
+  color: var(--c-text-muted);
+}
+
+.student-production-guidance-line > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 6px;
+  font-weight: 700;
+}
+
+.student-production-guidance-line i {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 50%;
+  background: var(--c-surface-soft);
+  color: var(--c-blue-800);
+  font-size: 5px;
+  font-style: normal;
+}
+
+.student-production-scanner-actions {
+  min-height: 40px;
+  justify-content: flex-end !important;
+}
+
+.student-production-scanner-actions button {
+  min-height: 38px;
+}
+
+.student-production-privacy-note {
+  padding: 8px 9px !important;
+}
+
+.student-production-privacy-note p {
+  font-size: 6px !important;
+}
+
+/* =========================================================
+   REVIEW BEFORE SUBMITTING
+========================================================= */
+
+.student-production-review-shell {
+  padding: 14px !important;
+}
+
+.student-production-review-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.05fr) minmax(260px, 0.95fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.student-production-review-preview {
+  position: relative;
+  min-height: 350px;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 14px;
+  background: #07101f;
+}
+
+.student-production-review-preview img {
+  width: 100%;
+  height: 100%;
+  min-height: 350px;
+  display: block;
+  object-fit: cover;
+}
+
+.student-production-review-placeholder {
+  min-height: 350px;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 44px;
+}
+
+.student-production-review-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 64%, rgba(2, 8, 23, 0.58) 100%);
+}
+
+.student-production-review-badge {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 12px;
+  min-height: 27px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(2, 8, 23, 0.66);
+  color: #ffffff;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  backdrop-filter: blur(7px);
+}
+
+.student-production-review-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 4px 2px;
+}
+
+.student-production-review-copy > small {
+  color: var(--c-blue-800);
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.student-production-review-copy h3 {
+  margin: 6px 0 0;
+  color: var(--c-text-primary);
+  font-size: 19px;
+  font-weight: 850;
+  line-height: 1.2;
+  letter-spacing: -0.2px;
+}
+
+.student-production-review-copy > p {
+  margin: 8px 0 0;
+  color: var(--c-text-body);
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.student-production-review-facts {
+  display: grid;
+  gap: 0;
+  margin-top: 15px;
+  overflow: hidden;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+  background: var(--c-surface-soft);
+}
+
+.student-production-review-facts > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+}
+
+.student-production-review-facts > div + div {
+  border-top: 1px solid var(--c-border-soft);
+}
+
+.student-production-review-facts span {
+  color: var(--c-text-muted);
+  font-size: 6px;
+  font-weight: 750;
+}
+
+.student-production-review-facts strong {
+  color: var(--c-text-secondary);
+  font-size: 7px;
+  font-weight: 850;
+  text-align: right;
+}
+
+.student-production-review-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid var(--c-brand-border);
+  border-radius: 9px;
+  background: var(--c-icon-bg);
+}
+
+.student-production-review-note > span {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--c-blue-900);
+  color: #ffffff;
+  font-size: 8px;
+}
+
+.student-production-review-note p {
+  margin: 0;
+  color: var(--c-text-body);
+  font-size: 6.5px;
+  line-height: 1.5;
+}
+
+.student-production-review-note strong {
+  color: var(--c-text-primary);
+}
+
+.student-production-review-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.student-production-review-actions button {
+  min-height: 39px;
+}
+
+.student-production-submit-button {
+  min-width: 150px;
+}
+
+/* =========================================================
+   PRESENTABLE ERROR HANDLING
+========================================================= */
+
+.student-production-error {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--c-error-border);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--c-error-bg) 82%, var(--c-surface));
+  color: var(--c-error-text);
+}
+
+.student-production-error.is-compact {
+  padding: 10px 11px;
+}
+
+.student-production-error-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--c-error-text);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.student-production-error-copy {
+  min-width: 0;
+}
+
+.student-production-error-copy small {
+  display: block;
+  color: currentColor;
+  font-size: 5.5px;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  opacity: 0.72;
+}
+
+.student-production-error-copy strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.student-production-error-copy p {
+  margin: 4px 0 0;
+  color: currentColor;
+  font-size: 7px;
+  line-height: 1.5;
+  opacity: 0.88;
+}
+
+.student-production-error-copy ul {
+  display: grid;
+  gap: 3px;
+  margin: 7px 0 0;
+  padding-left: 15px;
+}
+
+.student-production-error-copy li {
+  font-size: 6px;
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+.student-production-error > button {
+  align-self: center;
+  white-space: nowrap;
+}
+
+/* Existing error cards become cleaner inside enrollment modal. */
+.student-enrollment-modal .student-face-feedback.is-error {
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+/* =========================================================
+   EXISTING-STUDENT / CONFLICT MODALS
+========================================================= */
+
+.student-liveness-face-modal,
+.student-liveness-conflict-modal {
+  width: min(820px, calc(100vw - 36px)) !important;
+  max-height: calc(100dvh - 36px) !important;
+  border-radius: 18px !important;
+}
+
+.student-identity-camera,
+.student-liveness-conflict-body {
+  scrollbar-width: thin;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-production-review-facts {
+  background: rgba(15, 23, 42, 0.64);
+}
+
+html[data-theme="dark"] .student-production-review-note {
+  border-color: rgba(96, 165, 250, 0.22);
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .student-production-error {
+  background: rgba(127, 29, 29, 0.15);
+}
+
+html[data-theme="dark"] .student-production-camera-security {
+  border-color: rgba(96, 165, 250, 0.22);
+  background: rgba(30, 64, 175, 0.48);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 860px) {
+  .student-enrollment-modal,
+  .student-liveness-face-modal,
+  .student-liveness-conflict-modal {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+  }
+
+  .student-production-review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-production-review-preview,
+  .student-production-review-preview img,
+  .student-production-review-placeholder {
+    min-height: 330px;
+  }
+
+  .student-production-review-copy {
+    padding: 0 2px;
+  }
+}
+
+@media (max-width: 650px) {
+  .student-enrollment-modal,
+  .student-liveness-face-modal,
+  .student-liveness-conflict-modal {
+    width: calc(100vw - 14px) !important;
+    max-height: calc(100dvh - 14px) !important;
+    border-radius: 14px !important;
+  }
+
+  .student-enrollment-modal .student-modal-header {
+    padding: 14px !important;
+  }
+
+  .student-enrollment-modal .student-modal-heading p {
+    display: none;
+  }
+
+  .student-live-enrollment-body {
+    padding: 11px !important;
+  }
+
+  .student-liveness-student-strip {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+  }
+
+  .student-liveness-security-badge {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .student-production-scanner .student-live-camera {
+    min-height: 320px !important;
+    aspect-ratio: 4 / 3 !important;
+  }
+
+  .student-production-scanner .student-live-face-guide {
+    width: 158px !important;
+    height: 210px !important;
+  }
+
+  .student-production-phase-row {
+    gap: 4px;
+  }
+
+  .student-production-phase-row > span {
+    justify-content: center;
+    padding-inline: 4px;
+    font-size: 5px;
+  }
+
+  .student-production-guidance-line {
+    display: none;
+  }
+
+  .student-production-review-preview,
+  .student-production-review-preview img,
+  .student-production-review-placeholder {
+    min-height: 290px;
+  }
+
+  .student-production-review-copy h3 {
+    font-size: 17px;
+  }
+
+  .student-production-review-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .student-production-review-actions button,
+  .student-production-submit-button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .student-production-error {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .student-production-error > button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+@media (max-width: 430px) {
+  .student-enrollment-modal,
+  .student-liveness-face-modal,
+  .student-liveness-conflict-modal {
+    width: calc(100vw - 8px) !important;
+    max-height: calc(100dvh - 8px) !important;
+    border-radius: 12px !important;
+  }
+
+  .student-production-scanner .student-live-camera {
+    min-height: 285px !important;
+  }
+
+  .student-production-prep-overlay strong {
+    font-size: 68px;
+  }
+
+  .student-production-challenge {
+    width: calc(100% - 24px) !important;
+    padding: 15px !important;
+  }
+
+  .student-production-challenge strong {
+    font-size: 17px !important;
+  }
+
+  .student-production-phase-row > span {
+    min-height: 28px;
+  }
+
+  .student-production-phase-row i {
+    display: none;
+  }
+
+  .student-production-review-preview,
+  .student-production-review-preview img,
+  .student-production-review-placeholder {
+    min-height: 250px;
+  }
+}
+
+/* =========================================================
+   MOTION
+========================================================= */
+
+@keyframes student-production-count {
+  from {
+    opacity: 0;
+    transform: scale(0.84);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-production-prep-overlay strong,
+  .student-production-progress > span {
+    animation: none !important;
+    transition: none !important;
+  }
+}

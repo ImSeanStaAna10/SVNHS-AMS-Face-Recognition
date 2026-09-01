@@ -1,0 +1,917 @@
+/* =========================================================
+   SVNHS STUDENT FACE ENROLLMENT — AUTO GUIDED UX
+   Additive production layer. Import LAST.
+========================================================= */
+
+/* =========================================================
+   SCANNER SHELL
+========================================================= */
+
+.student-auto-scanner,
+.student-auto-review-shell {
+  gap: 13px;
+  padding: 16px;
+  border-radius: 16px;
+}
+
+.student-auto-scanner-toolbar,
+.student-auto-review-toolbar {
+  align-items: center;
+}
+
+.student-auto-scanner-toolbar > div:first-child > span,
+.student-auto-review-toolbar > div:first-child > span {
+  font-size: 7px;
+}
+
+.student-auto-scanner-toolbar > div:first-child > strong,
+.student-auto-review-toolbar > div:first-child > strong {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.student-auto-toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   AUTO MODE TOGGLE
+========================================================= */
+
+.student-auto-mode {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+  color: var(--c-text-body);
+  cursor: pointer;
+  user-select: none;
+}
+
+.student-auto-mode input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.student-auto-mode > span {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  flex: 0 0 28px;
+  border-radius: 999px;
+  background: var(--c-border);
+  transition: background 0.18s ease;
+}
+
+.student-auto-mode > span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(2, 8, 23, 0.16);
+  transition: transform 0.18s ease;
+}
+
+.student-auto-mode strong {
+  color: inherit;
+  font-size: 7px;
+  font-weight: 820;
+  white-space: nowrap;
+}
+
+.student-auto-mode.is-on {
+  border-color: var(--c-success-border);
+  background: var(--c-success-bg);
+  color: var(--c-success-text);
+}
+
+.student-auto-mode.is-on > span {
+  background: var(--c-success-text);
+}
+
+.student-auto-mode.is-on > span::after {
+  transform: translateX(12px);
+}
+
+.student-auto-mode:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+.student-auto-camera {
+  min-height: 430px;
+  aspect-ratio: 16 / 9;
+  border-radius: 17px;
+}
+
+.student-auto-camera .student-live-face-guide {
+  top: 45%;
+  width: 190px;
+  height: 246px;
+}
+
+.student-auto-camera.is-face-ready .student-live-face-oval {
+  border-color: #86efac;
+  box-shadow:
+    0 0 0 1px rgba(134, 239, 172, 0.14),
+    0 0 34px rgba(34, 197, 94, 0.24);
+}
+
+.student-auto-local-badge {
+  position: absolute;
+  z-index: 7;
+  top: 13px;
+  right: 13px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid rgba(147, 197, 253, 0.18);
+  border-radius: 999px;
+  background: rgba(30, 64, 175, 0.5);
+  color: #dbeafe;
+  font-size: 5.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
+}
+
+.student-auto-camera-placeholder {
+  z-index: 10;
+}
+
+/* =========================================================
+   READINESS — ONE MAIN MESSAGE, THREE SECONDARY METRICS
+========================================================= */
+
+.student-auto-readiness {
+  position: absolute;
+  z-index: 8;
+  right: 18px;
+  bottom: 78px;
+  left: 18px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 13px;
+  background: rgba(2, 8, 23, 0.72);
+  color: #fff;
+  backdrop-filter: blur(12px);
+}
+
+.student-auto-readiness-score {
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  text-align: center;
+  box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.025);
+}
+
+.student-auto-readiness-score strong {
+  color: #fff;
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.student-auto-readiness-score span {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 5px;
+  font-weight: 800;
+}
+
+.student-auto-readiness-score.is-ready {
+  border-color: rgba(134, 239, 172, 0.34);
+  background: rgba(22, 101, 52, 0.4);
+}
+
+.student-auto-readiness-score.is-ready strong {
+  color: #bbf7d0;
+}
+
+.student-auto-readiness-copy {
+  min-width: 0;
+}
+
+.student-auto-readiness-copy small {
+  display: block;
+  color: #93c5fd;
+  font-size: 5.5px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.student-auto-readiness-copy strong {
+  display: block;
+  margin-top: 4px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.28;
+}
+
+.student-auto-readiness-copy span {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 6.4px;
+  line-height: 1.45;
+}
+
+.student-auto-live-metrics {
+  position: absolute;
+  z-index: 8;
+  right: 18px;
+  bottom: 16px;
+  left: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.student-auto-metric {
+  min-width: 0;
+}
+
+.student-auto-live-metrics .student-auto-metric {
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 8px;
+  background: rgba(2, 8, 23, 0.52);
+  backdrop-filter: blur(8px);
+}
+
+.student-auto-metric > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.student-auto-metric span {
+  color: inherit;
+  font-size: 5.5px;
+  font-weight: 760;
+}
+
+.student-auto-metric strong {
+  color: inherit;
+  font-size: 6.5px;
+  font-weight: 900;
+}
+
+.student-auto-live-metrics .student-auto-metric {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.student-auto-metric-track {
+  height: 3px;
+  margin-top: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.student-auto-metric-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+  transition: width 0.18s ease;
+}
+
+.student-auto-hold-progress {
+  position: absolute;
+  z-index: 9;
+  right: 18px;
+  bottom: 70px;
+  left: 18px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.student-auto-hold-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #86efac;
+  transition: width 0.16s linear;
+}
+
+/* =========================================================
+   PREP / BASELINE
+========================================================= */
+
+.student-auto-prep-overlay,
+.student-auto-baseline-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 28px;
+  background: rgba(2, 8, 23, 0.48);
+  color: #fff;
+  text-align: center;
+  backdrop-filter: blur(2px);
+}
+
+.student-auto-prep-overlay small,
+.student-auto-baseline-overlay small {
+  color: #bfdbfe;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.student-auto-prep-overlay > strong {
+  margin-top: 5px;
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.student-auto-prep-overlay p,
+.student-auto-baseline-overlay p {
+  max-width: 360px;
+  margin: 7px 0 0;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+.student-auto-baseline-overlay > strong {
+  margin-top: 11px;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.student-auto-baseline-overlay .student-live-processing-spinner {
+  margin-bottom: 12px;
+}
+
+/* =========================================================
+   CHALLENGE — DOMINANT SINGLE TASK
+========================================================= */
+
+.student-auto-challenge {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 28px;
+  background: rgba(2, 8, 23, 0.66);
+  color: #fff;
+  text-align: center;
+  backdrop-filter: blur(3px);
+}
+
+.student-auto-challenge-icon {
+  width: 82px;
+  height: 82px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 38px;
+  font-weight: 800;
+}
+
+.student-auto-challenge > small {
+  margin-top: 14px;
+  color: #bfdbfe;
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.student-auto-challenge > strong {
+  margin-top: 5px;
+  font-size: 22px;
+  font-weight: 880;
+  line-height: 1.15;
+}
+
+.student-auto-challenge-score {
+  width: min(320px, 72%);
+  height: 7px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.student-auto-challenge-score span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #60a5fa, #86efac);
+  transition: width 0.16s linear;
+}
+
+.student-auto-challenge-percent {
+  margin-top: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.student-auto-challenge > p {
+  max-width: 390px;
+  margin: 7px 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.student-auto-processing {
+  z-index: 15;
+}
+
+/* =========================================================
+   DETECTOR FALLBACK / ACTIONS
+========================================================= */
+
+.student-auto-detector-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 9px;
+  background: var(--c-surface-soft);
+  color: var(--c-text-body);
+}
+
+.student-auto-detector-note > span {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.student-auto-detector-note p {
+  margin: 0;
+  font-size: 6.5px;
+  line-height: 1.45;
+}
+
+.student-auto-detector-note strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--c-text-secondary);
+  font-size: 7px;
+}
+
+.student-auto-scanner-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 2px;
+}
+
+.student-auto-scanner-actions > div {
+  min-width: 0;
+}
+
+.student-auto-scanner-actions > div strong {
+  display: block;
+  color: var(--c-text-secondary);
+  font-size: 7.5px;
+  font-weight: 820;
+}
+
+.student-auto-scanner-actions > div span {
+  display: block;
+  margin-top: 3px;
+  color: var(--c-text-muted);
+  font-size: 6.2px;
+  line-height: 1.4;
+}
+
+.student-auto-scanner-actions > button {
+  min-width: 128px;
+  flex: 0 0 auto;
+}
+
+.student-auto-privacy-note {
+  margin-top: 0;
+}
+
+/* =========================================================
+   REVIEW — NO PHOTO
+========================================================= */
+
+.student-auto-review-shell {
+  width: 100%;
+}
+
+.student-auto-review-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--c-success-border);
+  border-radius: 13px;
+  background: var(--c-success-bg);
+}
+
+.student-auto-review-check {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-success-text);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.student-auto-review-hero small {
+  color: var(--c-success-text);
+  font-size: 5.5px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.student-auto-review-hero h3 {
+  margin: 4px 0 0;
+  color: var(--c-text-primary);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.student-auto-review-hero p {
+  max-width: 640px;
+  margin: 5px 0 0;
+  color: var(--c-text-body);
+  font-size: 7px;
+  line-height: 1.5;
+}
+
+.student-auto-review-quality {
+  display: grid;
+  grid-template-columns: 155px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.student-auto-review-score,
+.student-auto-review-metrics {
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+  background: var(--c-surface-soft);
+}
+
+.student-auto-review-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 132px;
+  padding: 14px;
+  text-align: center;
+}
+
+.student-auto-review-score > span {
+  color: var(--c-text-muted);
+  font-size: 5.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.student-auto-review-score > strong {
+  margin-top: 6px;
+  color: var(--c-blue-800);
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.student-auto-review-score > small {
+  margin-top: 5px;
+  color: var(--c-text-body);
+  font-size: 6.5px;
+  font-weight: 800;
+}
+
+.student-auto-review-metrics {
+  display: grid;
+  align-content: center;
+  gap: 11px;
+  padding: 14px;
+}
+
+.student-auto-review-metrics .student-auto-metric {
+  color: var(--c-blue-800);
+}
+
+.student-auto-review-metrics .student-auto-metric > div:first-child span {
+  color: var(--c-text-secondary);
+  font-size: 7px;
+}
+
+.student-auto-review-metrics .student-auto-metric > div:first-child strong {
+  font-size: 7px;
+}
+
+.student-auto-review-metrics .student-auto-metric-track {
+  background: var(--c-border-soft);
+}
+
+.student-auto-review-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.student-auto-review-facts > div {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+  background: var(--c-surface);
+}
+
+.student-auto-review-facts span {
+  display: block;
+  color: var(--c-text-muted);
+  font-size: 5.5px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+.student-auto-review-facts strong {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--c-text-secondary);
+  font-size: 7px;
+  font-weight: 820;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+}
+
+.student-auto-review-facts strong.is-success {
+  color: var(--c-success-text);
+}
+
+.student-auto-review-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 9px;
+  padding: 10px 11px;
+  border: 1px solid var(--c-brand-border);
+  border-radius: 10px;
+  background: var(--c-icon-bg);
+}
+
+.student-auto-review-note > span {
+  color: var(--c-blue-800);
+  font-size: 10px;
+}
+
+.student-auto-review-note p {
+  margin: 0;
+  color: var(--c-text-body);
+  font-size: 6.5px;
+  line-height: 1.5;
+}
+
+.student-auto-review-note strong {
+  color: var(--c-text-secondary);
+}
+
+.student-auto-review-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.student-auto-submit-button {
+  min-width: 145px;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-auto-mode {
+  border-color: #2d3d55;
+  background: #101d2e;
+}
+
+html[data-theme="dark"] .student-auto-mode.is-on {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.16);
+  color: #86efac;
+}
+
+html[data-theme="dark"] .student-auto-review-hero {
+  border-color: #2e6843;
+  background: rgba(22, 101, 52, 0.16);
+}
+
+html[data-theme="dark"] .student-auto-review-score,
+html[data-theme="dark"] .student-auto-review-metrics,
+html[data-theme="dark"] .student-auto-review-facts > div,
+html[data-theme="dark"] .student-auto-detector-note {
+  border-color: #2d3d55;
+  background: #101d2e;
+}
+
+html[data-theme="dark"] .student-auto-review-note {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .student-auto-review-score > strong {
+  color: #93c5fd;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 820px) {
+  .student-auto-camera {
+    min-height: 380px;
+  }
+
+  .student-auto-review-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .student-auto-scanner-toolbar,
+  .student-auto-review-toolbar,
+  .student-auto-scanner-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-auto-toolbar-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .student-auto-mode,
+  .student-voice-toggle {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .student-auto-camera {
+    min-height: 340px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .student-auto-readiness {
+    right: 10px;
+    bottom: 72px;
+    left: 10px;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .student-auto-readiness-score {
+    width: 58px;
+    height: 58px;
+  }
+
+  .student-auto-readiness-score strong {
+    font-size: 16px;
+  }
+
+  .student-auto-live-metrics {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .student-auto-live-metrics .student-auto-metric {
+    padding: 6px;
+  }
+
+  .student-auto-review-quality {
+    grid-template-columns: 1fr;
+  }
+
+  .student-auto-review-score {
+    min-height: 110px;
+  }
+
+  .student-auto-review-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .student-auto-review-actions button,
+  .student-auto-scanner-actions > button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 440px) {
+  .student-auto-camera {
+    min-height: 300px;
+  }
+
+  .student-auto-camera .student-live-face-guide {
+    width: 142px;
+    height: 188px;
+  }
+
+  .student-auto-local-badge {
+    top: 10px;
+    right: 10px;
+  }
+
+  .student-auto-readiness {
+    bottom: 68px;
+  }
+
+  .student-auto-readiness-copy span {
+    display: none;
+  }
+
+  .student-auto-live-metrics {
+    gap: 4px;
+  }
+
+  .student-auto-live-metrics .student-auto-metric > div:first-child span {
+    font-size: 4.8px;
+  }
+
+  .student-auto-challenge-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 19px;
+    font-size: 31px;
+  }
+
+  .student-auto-challenge > strong {
+    font-size: 19px;
+  }
+
+  .student-auto-review-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-auto-mode > span,
+  .student-auto-mode > span::after,
+  .student-auto-metric-track i,
+  .student-auto-hold-progress span,
+  .student-auto-challenge-score span {
+    transition: none;
+  }
+}

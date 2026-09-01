@@ -1,0 +1,1125 @@
+/* =========================================================
+   SVNHS STUDENT MANAGEMENT
+   ATTENDANCE-STYLE FACE ENROLLMENT
+   Load this LAST after the existing student management CSS.
+========================================================= */
+
+.student-enrollment-step-2.student-enrollment-modal {
+  width: min(1180px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+}
+
+.student-enrollment-step-1.student-enrollment-modal,
+.student-enrollment-step-3.student-enrollment-modal {
+  width: min(860px, calc(100vw - 32px));
+}
+
+.student-wizard-header {
+  padding-bottom: 16px;
+}
+
+.student-enrollment-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr) 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(248, 250, 252, 0.92);
+}
+
+.student-enrollment-progress > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.student-enrollment-progress > div > span {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d7e0ea;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.student-enrollment-progress > div > div {
+  min-width: 0;
+}
+
+.student-enrollment-progress strong {
+  display: block;
+  color: #172033;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.student-enrollment-progress small {
+  display: block;
+  margin-top: 2px;
+  color: #7a8798;
+  font-size: 11px;
+}
+
+.student-enrollment-progress > div.is-current > span {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.student-enrollment-progress > div.is-current strong {
+  color: #1d4ed8;
+}
+
+.student-enrollment-progress > div.is-complete > span {
+  border-color: #86d49a;
+  background: #effbf3;
+  color: #15803d;
+}
+
+.student-enrollment-progress > i {
+  height: 2px;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.student-live-enrollment-body {
+  padding: 20px 22px 22px;
+}
+
+.student-live-detail-step {
+  display: grid;
+  gap: 18px;
+}
+
+.student-enrollment-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.student-enrollment-section-heading > span {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.student-enrollment-section-heading strong {
+  display: block;
+  color: #172033;
+  font-size: 17px;
+}
+
+.student-enrollment-section-heading p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.student-enrollment-form {
+  padding: 18px;
+  border: 1px solid #dfe6ee;
+  border-radius: 16px;
+  background: #fbfdff;
+}
+
+.student-live-explainer {
+  border: 1px solid #c8dcf4;
+  background: #f3f8ff;
+}
+
+.student-live-scan-step {
+  display: grid;
+  gap: 14px;
+}
+
+.student-liveness-student-strip {
+  border: 1px solid #d7e0eb;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.student-liveness-security-badge {
+  border-color: #b9e5c7;
+  background: #effbf3;
+  color: #166534;
+}
+
+/* =========================================================
+   SCANNER HEADER
+========================================================= */
+
+.student-enroll-scanner {
+  display: grid;
+  gap: 14px;
+}
+
+.student-enroll-scanner-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 2px 2px 0;
+}
+
+.student-enroll-scanner-heading {
+  min-width: 0;
+}
+
+.student-enroll-scanner-heading > span {
+  display: block;
+  color: #17427f;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.student-enroll-scanner-heading h3 {
+  margin: 5px 0 0;
+  color: #10213c;
+  font-size: clamp(25px, 3vw, 36px);
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  line-height: 1.08;
+}
+
+.student-enroll-scanner-heading p {
+  max-width: 640px;
+  margin: 7px 0 0;
+  color: #62738b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.student-enroll-scanner-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.student-enroll-auto-toggle,
+.student-enroll-scan-now {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.student-enroll-auto-toggle {
+  border: 1px solid #d8c7f5;
+  background: #faf8ff;
+  color: #6d28d9;
+}
+
+.student-enroll-auto-toggle > span {
+  position: relative;
+  width: 29px;
+  height: 17px;
+  flex: 0 0 29px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition: background 180ms ease;
+}
+
+.student-enroll-auto-toggle > span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 180ms ease;
+}
+
+.student-enroll-auto-toggle.is-on {
+  border-color: #9fd5ae;
+  background: #effbf3;
+  color: #166534;
+}
+
+.student-enroll-auto-toggle.is-on > span {
+  background: #22c55e;
+}
+
+.student-enroll-auto-toggle.is-on > span::after {
+  transform: translateX(12px);
+}
+
+.student-enroll-scan-now {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.student-enroll-auto-toggle:disabled,
+.student-enroll-scan-now:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  .student-enroll-auto-toggle:hover:not(:disabled),
+  .student-enroll-scan-now:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .student-enroll-scan-now:hover:not(:disabled) {
+    border-color: #1d4ed8;
+    background: #1d4ed8;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.16);
+  }
+}
+
+/* =========================================================
+   CAMERA-FIRST WORKSPACE
+========================================================= */
+
+.student-enroll-scanner-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+  gap: 14px;
+  min-width: 0;
+}
+
+.student-enroll-camera-column {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.student-enroll-camera-shell {
+  position: relative;
+  width: 100%;
+  min-height: 500px;
+  overflow: hidden;
+  border: 1px solid rgba(42, 61, 94, 0.62);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 50% 45%, #17284a 0%, #091326 54%, #050b16 100%);
+  box-shadow:
+    0 26px 60px rgba(10, 26, 53, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.student-enroll-camera-shell video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scaleX(-1);
+  transition: opacity 220ms ease;
+}
+
+.student-enroll-camera-shell video.is-active {
+  opacity: 1;
+}
+
+.student-enroll-camera-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(3, 8, 18, 0.42) 0%,
+    transparent 22%,
+    transparent 64%,
+    rgba(3, 8, 18, 0.74) 100%
+  );
+  pointer-events: none;
+}
+
+.student-enroll-camera-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 30px;
+  text-align: center;
+}
+
+.student-enroll-placeholder-icon {
+  width: 74px;
+  height: 74px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font-size: 30px;
+}
+
+.student-enroll-camera-placeholder > span {
+  color: #f2c75c;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.student-enroll-camera-placeholder h4 {
+  margin: 8px 0 0;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.student-enroll-camera-placeholder p {
+  max-width: 430px;
+  margin: 9px 0 18px;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.student-enroll-camera-placeholder > button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #ffffff;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0c2d63;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.student-enroll-camera-placeholder.is-complete .student-enroll-placeholder-icon {
+  border-color: rgba(134, 239, 172, 0.35);
+  background: rgba(22, 101, 52, 0.38);
+  color: #bbf7d0;
+}
+
+/* =========================================================
+   FACE TARGET
+========================================================= */
+
+.student-enroll-face-target {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  width: clamp(205px, 24vw, 295px);
+  height: clamp(290px, 34vw, 390px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.student-enroll-face-target-oval {
+  position: absolute;
+  inset: 10px 18px;
+  border: 2px solid rgba(255, 255, 255, 0.58);
+  border-radius: 48% 48% 46% 46%;
+  box-shadow:
+    0 0 0 999px rgba(5, 10, 22, 0.11),
+    0 0 32px rgba(255, 255, 255, 0.07);
+}
+
+.student-enroll-face-target-line {
+  position: absolute;
+  top: 12%;
+  left: 17%;
+  width: 66%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #69b7ff, transparent);
+  box-shadow: 0 0 12px rgba(105, 183, 255, 0.9);
+  opacity: 0;
+}
+
+.student-enroll-face-target.phase-baseline .student-enroll-face-target-line,
+.student-enroll-face-target.phase-requesting-challenge .student-enroll-face-target-line,
+.student-enroll-face-target.phase-challenge .student-enroll-face-target-line {
+  opacity: 1;
+  animation: student-enroll-scan-line 1.55s ease-in-out infinite;
+}
+
+.student-enroll-face-target .corner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-color: rgba(255, 255, 255, 0.94);
+  border-style: solid;
+}
+
+.student-enroll-face-target .corner-one {
+  top: 0;
+  left: 0;
+  border-width: 3px 0 0 3px;
+  border-radius: 13px 0 0 0;
+}
+
+.student-enroll-face-target .corner-two {
+  top: 0;
+  right: 0;
+  border-width: 3px 3px 0 0;
+  border-radius: 0 13px 0 0;
+}
+
+.student-enroll-face-target .corner-three {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 3px 3px;
+  border-radius: 0 0 0 13px;
+}
+
+.student-enroll-face-target .corner-four {
+  right: 0;
+  bottom: 0;
+  border-width: 0 3px 3px 0;
+  border-radius: 0 0 13px 0;
+}
+
+/* =========================================================
+   CAMERA HUD
+========================================================= */
+
+.student-enroll-live-badge,
+.student-enroll-mode-badge {
+  position: absolute;
+  z-index: 7;
+  top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(7, 27, 66, 0.7);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  backdrop-filter: blur(9px);
+}
+
+.student-enroll-live-badge {
+  left: 16px;
+}
+
+.student-enroll-live-badge > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.16);
+}
+
+.student-enroll-mode-badge {
+  right: 16px;
+}
+
+.student-enroll-mode-badge.is-auto {
+  border-color: rgba(134, 239, 172, 0.26);
+  background: rgba(20, 83, 45, 0.68);
+  color: #dcfce7;
+}
+
+.student-enroll-mode-badge.is-manual {
+  border-color: rgba(196, 181, 253, 0.28);
+  background: rgba(76, 29, 149, 0.58);
+  color: #ede9fe;
+}
+
+.student-enroll-scanner-message {
+  position: absolute;
+  z-index: 7;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 13px;
+  background: rgba(4, 12, 27, 0.77);
+  color: #ffffff;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+
+.student-enroll-scanner-message > span {
+  display: block;
+  color: #f2c75c;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.student-enroll-scanner-message strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.student-enroll-scanner-message small {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.student-enroll-challenge-prompt {
+  position: absolute;
+  z-index: 8;
+  top: 50%;
+  left: 50%;
+  width: min(420px, calc(100% - 40px));
+  transform: translate(-50%, -52%);
+  padding: 22px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.19);
+  border-radius: 18px;
+  background: rgba(4, 12, 27, 0.74);
+  color: #ffffff;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.student-enroll-challenge-icon {
+  display: block;
+  color: #ffffff;
+  font-size: clamp(42px, 8vw, 70px);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.student-enroll-challenge-prompt strong {
+  display: block;
+  margin-top: 12px;
+  font-size: clamp(20px, 3vw, 28px);
+}
+
+.student-enroll-challenge-prompt small {
+  display: block;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.student-enroll-processing {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: rgba(4, 10, 24, 0.62);
+  color: #ffffff;
+  backdrop-filter: blur(3px);
+}
+
+.student-enroll-processing strong {
+  margin-top: 12px;
+  font-size: 18px;
+}
+
+.student-enroll-processing small {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+}
+
+/* =========================================================
+   CAMERA FOOTER
+========================================================= */
+
+.student-enroll-camera-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 2px;
+}
+
+.student-enroll-camera-footer > span {
+  color: #6d7e94;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.student-enroll-camera-footer > button {
+  border: 0;
+  background: transparent;
+  color: #17427f;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+/* =========================================================
+   REVIEW / STATUS PANEL
+========================================================= */
+
+.student-enroll-review-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #bfd7f5;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.52), #ffffff 26%);
+  box-shadow: 0 20px 46px rgba(19, 42, 77, 0.1);
+}
+
+.student-enroll-review-panel.is-ready {
+  border-color: #b9e5c7;
+  background: linear-gradient(180deg, rgba(240, 253, 244, 0.72), #ffffff 26%);
+}
+
+.student-enroll-review-header {
+  padding: 16px 17px;
+  border-bottom: 1px solid #e4e9f0;
+  background: #eff6ff;
+}
+
+.student-enroll-review-panel.is-ready .student-enroll-review-header {
+  background: #f0fdf4;
+}
+
+.student-enroll-review-header span {
+  display: block;
+  color: #6c7c91;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.student-enroll-review-header strong {
+  display: block;
+  margin-top: 4px;
+  color: #10213c;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.student-enroll-review-panel.is-ready .student-enroll-review-header strong {
+  color: #166534;
+}
+
+.student-enroll-review-empty,
+.student-enroll-review-content {
+  flex: 1;
+  padding: 22px 18px;
+}
+
+.student-enroll-review-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.student-enroll-review-empty-icon,
+.student-enroll-review-icon {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #bfdbfe;
+  border-radius: 23px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 29px;
+}
+
+.student-enroll-review-icon {
+  margin: 0 auto;
+  border-color: #bbebc9;
+  background: #dcfce7;
+  color: #15803d;
+  border-radius: 50%;
+}
+
+.student-enroll-review-empty h3,
+.student-enroll-review-content h3 {
+  margin: 14px 0 0;
+  color: #10213c;
+  font-size: 19px;
+  font-weight: 900;
+}
+
+.student-enroll-review-empty > p,
+.student-enroll-review-content > p {
+  margin: 7px auto 0;
+  color: #687990;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.student-enroll-review-steps {
+  width: 100%;
+  display: grid;
+  gap: 7px;
+  margin-top: 20px;
+}
+
+.student-enroll-review-steps > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid #dce5ef;
+  border-radius: 9px;
+  background: #fafbfd;
+  text-align: left;
+}
+
+.student-enroll-review-steps > div:nth-child(1) {
+  border-color: #bfd7f5;
+  background: #eff6ff;
+}
+
+.student-enroll-review-steps > div:nth-child(2) {
+  border-color: #d8c7f5;
+  background: #f5f3ff;
+}
+
+.student-enroll-review-steps > div:nth-child(3) {
+  border-color: #f1d89a;
+  background: #fffbeb;
+}
+
+.student-enroll-review-steps > div:nth-child(4) {
+  border-color: #b9e5c7;
+  background: #f0fdf4;
+}
+
+.student-enroll-review-steps span {
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #27415f;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.student-enroll-review-steps p {
+  margin: 0;
+  color: #52657d;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.student-enroll-review-content {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+}
+
+.student-enroll-review-content > span {
+  display: block;
+  margin-top: 13px;
+  color: #15803d;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.student-enroll-review-note {
+  margin-top: 18px;
+  padding: 13px;
+  border: 1px solid #dbe5ef;
+  border-radius: 11px;
+  background: #f8fafc;
+  text-align: left;
+}
+
+.student-enroll-review-note strong {
+  display: block;
+  color: #273a53;
+  font-size: 12px;
+}
+
+.student-enroll-review-note span {
+  display: block;
+  margin-top: 4px;
+  color: #687990;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.student-enroll-review-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.student-enroll-review-actions button {
+  min-height: 42px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.student-enroll-review-actions .is-secondary {
+  border: 1px solid #cbd6e3;
+  background: #ffffff;
+  color: #40566f;
+}
+
+.student-enroll-review-actions .is-primary {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.student-enroll-review-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   RESULT STEP
+========================================================= */
+
+.student-live-result-step {
+  display: grid;
+  gap: 14px;
+}
+
+.student-liveness-result-card {
+  border-radius: 16px;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-enrollment-progress {
+  border-color: #26354b;
+  background: #101c2e;
+}
+
+html[data-theme="dark"] .student-enrollment-progress strong,
+html[data-theme="dark"] .student-enrollment-section-heading strong,
+html[data-theme="dark"] .student-enroll-scanner-heading h3,
+html[data-theme="dark"] .student-enroll-review-header strong,
+html[data-theme="dark"] .student-enroll-review-empty h3,
+html[data-theme="dark"] .student-enroll-review-content h3 {
+  color: #eef4fb;
+}
+
+html[data-theme="dark"] .student-enrollment-progress small,
+html[data-theme="dark"] .student-enrollment-section-heading p,
+html[data-theme="dark"] .student-enroll-scanner-heading p {
+  color: #95a5b9;
+}
+
+html[data-theme="dark"] .student-enrollment-form,
+html[data-theme="dark"] .student-liveness-student-strip,
+html[data-theme="dark"] .student-enroll-review-panel {
+  border-color: #2d3d55;
+  background: #0d1727;
+}
+
+html[data-theme="dark"] .student-enroll-review-header {
+  border-color: #26354b;
+  background: #101c2e;
+}
+
+html[data-theme="dark"] .student-enroll-review-panel.is-ready .student-enroll-review-header {
+  background: rgba(22, 101, 52, 0.16);
+}
+
+html[data-theme="dark"] .student-enroll-review-empty > p,
+html[data-theme="dark"] .student-enroll-review-content > p,
+html[data-theme="dark"] .student-enroll-review-note span,
+html[data-theme="dark"] .student-enroll-camera-footer > span {
+  color: #95a5b9;
+}
+
+html[data-theme="dark"] .student-enroll-review-note,
+html[data-theme="dark"] .student-enroll-review-steps > div {
+  border-color: #2d3e55;
+  background: #101d2e;
+}
+
+html[data-theme="dark"] .student-enroll-review-note strong {
+  color: #dce6f2;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+  .student-enroll-scanner-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .student-enroll-review-panel {
+    min-height: 340px;
+  }
+
+  .student-enroll-review-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .student-enrollment-modal {
+    width: min(100% - 16px, 100%) !important;
+    max-height: calc(100vh - 16px);
+  }
+
+  .student-enrollment-progress {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .student-enrollment-progress > i {
+    display: none;
+  }
+
+  .student-enrollment-progress > div:not(.is-current):not(.is-complete) {
+    display: none;
+  }
+
+  .student-live-enrollment-body {
+    padding: 14px;
+  }
+
+  .student-enroll-scanner-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .student-enroll-scanner-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .student-enroll-scanner-actions > button,
+  .student-enroll-scanner-actions .student-voice-toggle {
+    flex: 1 1 auto;
+  }
+
+  .student-enroll-camera-shell {
+    min-height: 460px;
+    border-radius: 16px;
+  }
+
+  .student-enroll-face-target {
+    width: 190px;
+    height: 270px;
+  }
+
+  .student-enroll-live-badge,
+  .student-enroll-mode-badge {
+    top: 12px;
+  }
+
+  .student-enroll-live-badge {
+    left: 12px;
+  }
+
+  .student-enroll-mode-badge {
+    right: 12px;
+  }
+
+  .student-enroll-scanner-message {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .student-enroll-review-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .student-enroll-scanner-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .student-enroll-auto-toggle,
+  .student-enroll-scan-now,
+  .student-enroll-scanner-actions .student-voice-toggle {
+    width: 100%;
+  }
+
+  .student-enroll-camera-shell {
+    min-height: 430px;
+  }
+
+  .student-enroll-review-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .student-enroll-camera-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@keyframes student-enroll-scan-line {
+  0% { top: 12%; }
+  50% { top: 84%; }
+  100% { top: 12%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-enroll-face-target-line {
+    animation: none !important;
+  }
+
+  .student-enroll-auto-toggle,
+  .student-enroll-scan-now,
+  .student-enroll-camera-shell video {
+    transition: none;
+  }
+}

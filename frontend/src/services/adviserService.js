@@ -1,12 +1,133 @@
 import api from "./api";
 
 /* =========================================================
+   LIVENESS FRAME HELPERS
+========================================================= */
+
+const normalizeLivenessFrames = (...candidates) => {
+  for (const candidate of candidates) {
+    if (candidate == null) {
+      continue;
+    }
+
+    if (Array.isArray(candidate)) {
+      return candidate;
+    }
+
+    try {
+      return Array.from(candidate);
+    } catch {
+      // Try the next compatible property name.
+    }
+  }
+
+  return [];
+};
+
+const appendLivenessFrames = (
+  formData,
+  fieldName,
+  frames,
+  filenamePrefix,
+) => {
+  const normalizedFrames = normalizeLivenessFrames(frames).filter(Boolean);
+
+  if (normalizedFrames.length === 0) {
+    throw new Error(
+      `Cannot submit liveness verification because "${fieldName}" contains no captured images.`,
+    );
+  }
+
+  normalizedFrames.forEach((frame, index) => {
+    if (!(frame instanceof Blob)) {
+      throw new Error(
+        `Invalid ${fieldName} frame at index ${index}. Expected an image File or Blob.`,
+      );
+    }
+
+    const paddedIndex = String(index + 1).padStart(2, "0");
+
+    const isFile =
+      typeof File !== "undefined" &&
+      frame instanceof File &&
+      Boolean(frame.name);
+
+    const filename = isFile
+      ? frame.name
+      : `${filenamePrefix}_${paddedIndex}.jpg`;
+
+    formData.append(fieldName, frame, filename);
+  });
+
+  return normalizedFrames.length;
+};
+
+const buildLivenessFormData = ({
+  baselineFrames,
+  challengeFrames,
+  baselineImages,
+  challengeImages,
+}) => {
+  /*
+   * Compatibility:
+   *
+   * Current StudentManagement uses:
+   *   baselineImages
+   *   challengeImages
+   *
+   * Other/newer code may use:
+   *   baselineFrames
+   *   challengeFrames
+   *
+   * We support BOTH.
+   */
+
+  const resolvedBaselineFrames = normalizeLivenessFrames(
+    baselineFrames,
+    baselineImages,
+  );
+
+  const resolvedChallengeFrames = normalizeLivenessFrames(
+    challengeFrames,
+    challengeImages,
+  );
+
+  const formData = new FormData();
+
+  const baselineCount = appendLivenessFrames(
+    formData,
+    "baseline_images",
+    resolvedBaselineFrames,
+    "baseline",
+  );
+
+  const challengeCount = appendLivenessFrames(
+    formData,
+    "challenge_images",
+    resolvedChallengeFrames,
+    "challenge",
+  );
+
+  if (import.meta.env?.DEV) {
+    console.debug("[LIVENESS] Multipart payload prepared", {
+      baselineCount,
+      challengeCount,
+
+      baselineFormDataCount:
+        formData.getAll("baseline_images").length,
+
+      challengeFormDataCount:
+        formData.getAll("challenge_images").length,
+    });
+  }
+
+  return formData;
+};
+
+/* =========================================================
    SECTIONS
 ========================================================= */
 
-/**
- * Returns the sections accessible to the logged-in adviser.
- */
 const getSections = async () => {
   const response = await api.get("/sections");
 
@@ -17,18 +138,12 @@ const getSections = async () => {
    STUDENTS
 ========================================================= */
 
-/**
- * Returns students accessible to the logged-in adviser.
- */
 const getStudents = async () => {
   const response = await api.get("/students");
 
   return response.data;
 };
 
-/**
- * Creates a student inside the Adviser's assigned section.
- */
 const createStudent = async ({
   studentNumber,
   name,
@@ -43,13 +158,6 @@ const createStudent = async ({
   return response.data;
 };
 
-/**
- * Updates a student's basic information.
- *
- * Backend:
- *
- * PATCH /api/students/{studentId}
- */
 const updateStudent = async (
   studentId,
   {
@@ -68,50 +176,178 @@ const updateStudent = async (
   return response.data;
 };
 
-/**
- * Deactivates a student.
- *
- * Backend:
- *
- * DELETE /api/students/{studentId}
- *
- * Backend performs a soft delete.
- */
-const deleteStudent = async (
-  studentId,
-) => {
+const deleteStudent = async (studentId) => {
   await api.delete(
     `/students/${studentId}`,
   );
 };
 
 /* =========================================================
-   STUDENT FACE REGISTRATION
+   STUDENT VERIFICATION SETTINGS
+========================================================= */
+
+const getStudentVerificationSettings = async (
+  studentId,
+) => {
+  const response = await api.get(
+    `/students/${studentId}/verification-settings`,
+  );
+
+  return response.data;
+};
+
+const updateStudentVerificationSettings = async (
+  studentId,
+  settings,
+) => {
+  const response = await api.patch(
+    `/students/${studentId}/verification-settings`,
+    settings,
+  );
+
+  return response.data;
+};
+
+/* =========================================================
+   SECURE ENROLLMENT LIVENESS
+========================================================= */
+
+const createEnrollmentLivenessChallenge = async (
+  studentId,
+) => {
+  const response = await api.post(
+    `/students/${studentId}/liveness-challenges/enrollment`,
+  );
+
+  return response.data;
+};
+
+/**
+ * Supports BOTH:
+ *
+ * baselineImages / challengeImages
+ *
+ * and
+ *
+ * baselineFrames / challengeFrames
+ *
+ * This prevents frontend version mismatches.
+ */
+const verifyEnrollmentLiveness = async ({
+  studentId,
+  challengeId,
+
+  baselineFrames,
+  challengeFrames,
+
+  baselineImages,
+  challengeImages,
+}) => {
+  if (!studentId) {
+    throw new Error(
+      "Student ID is required for liveness verification.",
+    );
+  }
+
+  if (!challengeId) {
+    throw new Error(
+      "Challenge ID is required for liveness verification.",
+    );
+  }
+
+  const formData = buildLivenessFormData({
+    baselineFrames,
+    challengeFrames,
+
+    baselineImages,
+    challengeImages,
+  });
+
+  /*
+   * DO NOT manually set:
+   *
+   * Content-Type: multipart/form-data
+   *
+   * Browser/Axios must create the multipart boundary.
+   */
+  const response = await api.post(
+    `/students/${studentId}/liveness-challenges/${challengeId}/verify`,
+    formData,
+  );
+
+  return response.data;
+};
+
+/* =========================================================
+   SECURE FACE-CONFLICT LIVENESS
+========================================================= */
+
+const createFaceConflictLivenessChallenge = async (
+  studentId,
+  conflictId,
+) => {
+  const response = await api.post(
+    `/students/${studentId}/liveness-challenges/face-conflicts/${conflictId}`,
+  );
+
+  return response.data;
+};
+
+const verifyFaceConflictLiveness = async ({
+  studentId,
+  conflictId,
+  challengeId,
+
+  baselineFrames,
+  challengeFrames,
+
+  baselineImages,
+  challengeImages,
+}) => {
+  if (!studentId) {
+    throw new Error(
+      "Student ID is required for face-conflict verification.",
+    );
+  }
+
+  if (!conflictId) {
+    throw new Error(
+      "Conflict ID is required for face-conflict verification.",
+    );
+  }
+
+  if (!challengeId) {
+    throw new Error(
+      "Challenge ID is required for face-conflict verification.",
+    );
+  }
+
+  const formData = buildLivenessFormData({
+    baselineFrames,
+    challengeFrames,
+
+    baselineImages,
+    challengeImages,
+  });
+
+  const response = await api.post(
+    `/students/${studentId}/liveness-challenges/face-conflicts/${conflictId}/${challengeId}/verify`,
+    formData,
+  );
+
+  return response.data;
+};
+
+/* =========================================================
+   LEGACY STUDENT FACE REGISTRATION
 ========================================================= */
 
 /**
- * Registers or updates a face image for a student.
+ * Retained for compatibility with other frontend pages.
  *
- * Backend expects multipart/form-data
- * with a file field named "image".
- *
- * Do not manually set Content-Type.
- *
- * POSSIBLE SUCCESSFUL BUSINESS OUTCOMES:
- *
- * ENROLLED
- * -> HTTP 200
- * -> face was saved successfully
- *
- * FACE_CONFLICT
- * -> HTTP 409
- * -> a highly similar enrolled face was detected
- * -> face was NOT saved
- *
- * FACE_CONFLICT is intentionally returned to the UI
- * instead of being treated as a generic Axios failure.
- *
- * Other 4xx/5xx errors are still thrown normally.
+ * New StudentManagement liveness enrollment should normally
+ * use createEnrollmentLivenessChallenge +
+ * verifyEnrollmentLiveness.
  */
 const registerStudentFace = async (
   studentId,
@@ -138,16 +374,6 @@ const registerStudentFace = async (
     const data =
       error?.response?.data;
 
-    /* =======================================================
-       EXPECTED FACE-CONFLICT OUTCOME
-
-       Backend intentionally returns HTTP 409 when another
-       globally enrolled face is unusually similar.
-
-       This is NOT converted into a normal JavaScript error
-       because the enrollment UI needs the conflict details.
-    ======================================================= */
-
     if (
       status === 409 &&
       data?.outcome === "FACE_CONFLICT"
@@ -155,60 +381,21 @@ const registerStudentFace = async (
       return data;
     }
 
-    /* =======================================================
-       REAL API ERROR
-
-       Examples:
-       - 400 invalid image
-       - 401 unauthenticated
-       - 403 wrong Adviser
-       - 404 student missing
-       - 500 backend error
-    ======================================================= */
-
     throw error;
   }
 };
 
 /* =========================================================
-   STUDENT FACE CONFLICT VERIFICATION
+   LEGACY FACE-CONFLICT CAPTURE
 ========================================================= */
 
-/**
- * Performs the required second face capture for a
- * persisted face conflict.
- *
- * Backend:
- *
- * POST
- * /api/students/{studentId}/face-conflicts/{conflictId}/verify-capture
- *
- * multipart/form-data:
- * image = File
- *
- * Possible outcomes:
- *
- * MANUAL_REVIEW_REQUIRED
- * -> the same conflict was reproduced
- * -> a human decision is now required
- *
- * CONFLICT_NOT_REPRODUCED
- * -> the second capture did not reproduce the original conflict
- * -> retry normal face enrollment with a fresh capture
- *
- * VERIFIED_DIFFERENT_PEOPLE
- * CONFIRMED_SAME_PERSON
- * -> the conflict had already been resolved previously
- *
- * Do not manually set Content-Type. Axios/browser will add
- * the multipart boundary.
- */
 const verifyStudentFaceConflictCapture = async (
   studentId,
   conflictId,
   imageFile,
 ) => {
-  const formData = new FormData();
+  const formData =
+    new FormData();
 
   formData.append(
     "image",
@@ -227,20 +414,6 @@ const verifyStudentFaceConflictCapture = async (
    STUDENT FACE CONFLICT RESOLUTION
 ========================================================= */
 
-/**
- * Performs the final human identity decision after
- * second-capture verification.
- *
- * decision:
- *
- * DIFFERENT_PEOPLE
- * SAME_PERSON
- *
- * Backend:
- *
- * POST
- * /api/students/{studentId}/face-conflicts/{conflictId}/resolve
- */
 const resolveStudentFaceConflict = async (
   studentId,
   conflictId,
@@ -260,13 +433,6 @@ const resolveStudentFaceConflict = async (
    ATTENDANCE SESSION
 ========================================================= */
 
-/**
- * Returns the active attendance session
- * for a section.
- *
- * A 404 means there is currently no
- * active session.
- */
 const getActiveSession = async (
   sectionId,
 ) => {
@@ -291,45 +457,14 @@ const getActiveSession = async (
    START ATTENDANCE SESSION
 ========================================================= */
 
-/**
- * Starts an attendance session.
- *
- * NEW API:
- *
- * POST /api/attendance-sessions
- *
- * {
- *   sectionId,
- *   lateAfterMinutes,
- *   scheduledEndTime
- * }
- *
- *
- * scheduledEndTime:
- *
- * "09:00" -> automatic ending
- * null    -> manual ending only
- *
- *
- * BACKWARD COMPATIBILITY:
- *
- * startAttendanceSession(sectionId)
- *
- * still uses the old query-param flow so the
- * current AdviserAttendance page will not break
- * while it is being migrated.
- */
 const startAttendanceSession = async (
   configuration,
 ) => {
-  /* =======================================================
-     LEGACY CALL
-
-     Example:
-
-     startAttendanceSession(section.id)
-  ======================================================= */
-
+  /*
+   * Legacy usage:
+   *
+   * startAttendanceSession(sectionId)
+   */
   if (
     typeof configuration === "string"
   ) {
@@ -338,7 +473,8 @@ const startAttendanceSession = async (
       null,
       {
         params: {
-          sectionId: configuration,
+          sectionId:
+            configuration,
         },
       },
     );
@@ -346,15 +482,22 @@ const startAttendanceSession = async (
     return response.data;
   }
 
-  /* =======================================================
-     NEW CONFIGURED SESSION
-  ======================================================= */
+  /*
+   * New configured session:
+   *
+   * {
+   *   sectionId,
+   *   lateAfterMinutes,
+   *   scheduledEndTime
+   * }
+   */
 
   const {
     sectionId,
     lateAfterMinutes,
     scheduledEndTime = null,
-  } = configuration || {};
+  } =
+    configuration || {};
 
   const response = await api.post(
     "/attendance-sessions",
@@ -372,16 +515,6 @@ const startAttendanceSession = async (
    END ATTENDANCE SESSION
 ========================================================= */
 
-/**
- * Manually ends an active attendance session.
- *
- * Automatic ending is handled by the backend
- * when scheduledEndAt has been configured.
- *
- * Backend:
- *
- * PATCH /api/attendance-sessions/{sessionId}/end
- */
 const endAttendanceSession = async (
   sessionId,
 ) => {
@@ -396,14 +529,6 @@ const endAttendanceSession = async (
    ATTENDANCE HISTORY
 ========================================================= */
 
-/**
- * Returns completed attendance sessions
- * belonging to the logged-in adviser.
- *
- * Backend:
- *
- * GET /api/attendance-sessions/history
- */
 const getAttendanceHistory = async ({
   fromDate,
   toDate,
@@ -429,16 +554,6 @@ const getAttendanceHistory = async ({
    ATTENDANCE RECORDS
 ========================================================= */
 
-/**
- * Returns all attendance records
- * for a session.
- *
- * Possible statuses:
- *
- * PRESENT
- * LATE
- * ABSENT
- */
 const getSessionRecords = async (
   sessionId,
 ) => {
@@ -446,7 +561,8 @@ const getSessionRecords = async (
     `/attendance-records/session/${sessionId}`,
   );
 
-  const data = response.data;
+  const data =
+    response.data;
 
   if (
     Array.isArray(data)
@@ -469,18 +585,6 @@ const getSessionRecords = async (
    MANUAL ATTENDANCE
 ========================================================= */
 
-/**
- * Records manual attendance.
- *
- * IMPORTANT:
- *
- * The backend now determines the status:
- *
- * PRESENT -> before late cutoff
- * LATE    -> at/after late cutoff
- *
- * The frontend does NOT choose the status.
- */
 const markManualAttendance = async ({
   sessionId,
   studentId,
@@ -503,20 +607,12 @@ const markManualAttendance = async ({
    FACE RECOGNITION ATTENDANCE
 ========================================================= */
 
-/**
- * Performs face recognition attendance.
- *
- * The backend automatically determines:
- *
- * PRESENT
- * or
- * LATE
- */
 const markFaceAttendance = async ({
   sessionId,
   imageFile,
 }) => {
-  const formData = new FormData();
+  const formData =
+    new FormData();
 
   formData.append(
     "sessionId",
@@ -540,10 +636,6 @@ const markFaceAttendance = async ({
    REMOVE ATTENDANCE RECORD
 ========================================================= */
 
-/**
- * Removes a student's attendance record
- * from a specific active session.
- */
 const removeAttendance = async ({
   sessionId,
   studentId,
@@ -565,10 +657,6 @@ const removeAttendance = async ({
    ACCOUNT SECURITY
 ========================================================= */
 
-/**
- * Changes the password of the currently
- * authenticated user.
- */
 const changePassword = async ({
   currentPassword,
   newPassword,
@@ -599,8 +687,29 @@ const adviserService = {
   createStudent,
   updateStudent,
   deleteStudent,
+
+  /* VERIFICATION SETTINGS */
+
+  getStudentVerificationSettings,
+  updateStudentVerificationSettings,
+
+  /* SECURE FACE ENROLLMENT */
+
+  createEnrollmentLivenessChallenge,
+  verifyEnrollmentLiveness,
+
+  /* SECURE FACE-CONFLICT VERIFICATION */
+
+  createFaceConflictLivenessChallenge,
+  verifyFaceConflictLiveness,
+
+  /* LEGACY FACE PATHS */
+
   registerStudentFace,
   verifyStudentFaceConflictCapture,
+
+  /* FACE-CONFLICT RESOLUTION */
+
   resolveStudentFaceConflict,
 
   /* ATTENDANCE SESSION */
