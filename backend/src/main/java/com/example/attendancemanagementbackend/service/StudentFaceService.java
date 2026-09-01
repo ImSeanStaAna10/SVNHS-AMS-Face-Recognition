@@ -95,14 +95,6 @@ public class StudentFaceService {
        LEGACY ENROLL / UPDATE ENTRY POINT
     ========================================================= */
 
-    /**
-     * Retained temporarily so existing code that still
-     * calls enrollFace(...) continues working.
-     *
-     * The structured StudentFaceController uses:
-     *
-     * enrollFaceWithConflictHandling(...)
-     */
     @Transactional
     public void enrollFace(
             String studentId,
@@ -128,46 +120,14 @@ public class StudentFaceService {
     }
 
     /* =========================================================
-       FACE-CONFLICT-AWARE ENROLLMENT / UPDATE
+       FACE-CONFLICT-AWARE LEGACY ENROLLMENT / UPDATE
     ========================================================= */
 
-    /**
-     * Registers OR updates a student's face.
-     *
-     * Flow:
-     *
-     * 1. Find Student
-     * 2. Verify Adviser ownership
-     * 3. Validate image
-     * 4. Determine REGISTER or UPDATE
-     * 5. Generate embedding using Python
-     * 6. Validate embedding
-     * 7. Search globally for nearest OTHER enrolled face
-     *
-     * 8. If distance <= FACE_CONFLICT_THRESHOLD:
-     *
-     *    Create or reuse persistent StudentFaceConflict.
-     *
-     *    PENDING
-     *    -> return FACE_CONFLICT
-     *
-     *    CONFIRMED_SAME_PERSON
-     *    -> return FACE_CONFLICT
-     *
-     *    VERIFIED_DIFFERENT_PEOPLE
-     *    -> allow separate enrollment
-     *
-     * 9. Otherwise save normally.
-     */
     @Transactional
     public FaceEnrollmentResult enrollFaceWithConflictHandling(
             String studentId,
             MultipartFile image
     ) throws IOException {
-
-        // =====================================================
-        // 1. FIND STUDENT
-        // =====================================================
 
         Student student =
                 studentRepository
@@ -181,35 +141,13 @@ public class StudentFaceService {
                                 )
                         );
 
-        // =====================================================
-        // 2. VERIFY ADVISER OWNERSHIP
-        // =====================================================
-
         String adviserId =
                 getAuthenticatedAdviserId();
 
-        Section section =
-                student.getSection();
-
-        if (
-                section == null ||
-                        section.getAdviser() == null ||
-                        !section.getAdviser()
-                                .getId()
-                                .equals(
-                                        adviserId
-                                )
-        ) {
-
-            throw new ApiException(
-                    HttpStatus.FORBIDDEN,
-                    "You are not allowed to manage this student's face"
-            );
-        }
-
-        // =====================================================
-        // 3. VALIDATE IMAGE
-        // =====================================================
+        verifyEnrollmentOwnership(
+                student,
+                adviserId
+        );
 
         if (
                 image == null ||
@@ -222,19 +160,11 @@ public class StudentFaceService {
             );
         }
 
-        // =====================================================
-        // 4. DETERMINE REGISTER OR UPDATE
-        // =====================================================
-
         boolean alreadyRegistered =
                 studentFaceRepository
                         .existsByStudentId(
                                 studentId
                         );
-
-        // =====================================================
-        // 5. GENERATE EMBEDDING USING PYTHON SERVICE
-        // =====================================================
 
         FaceRecognitionClient.FaceEnrollmentResult result =
                 faceRecognitionClient
@@ -243,10 +173,6 @@ public class StudentFaceService {
                                 image.getBytes(),
                                 image.getOriginalFilename()
                         );
-
-        // =====================================================
-        // 6. VALIDATE PYTHON RESPONSE
-        // =====================================================
 
         if (
                 result == null ||
@@ -260,21 +186,102 @@ public class StudentFaceService {
             );
         }
 
-        // =====================================================
-        // 7. CONVERT EMBEDDING TO PGVECTOR FORMAT
-        // =====================================================
+        return processFaceEmbeddingWithConflictHandling(
+                student,
+                studentId,
+                result.embedding(),
+                alreadyRegistered
+        );
+    }
+
+    /* =========================================================
+       ACTIVE-LIVENESS VERIFIED EMBEDDING ENROLLMENT
+    ========================================================= */
+
+    @Transactional
+    public FaceEnrollmentResult enrollFaceFromVerifiedEmbedding(
+            String studentId,
+            List<Double> verifiedEmbedding,
+            String adviserId
+    ) {
+
+        if (
+                studentId == null ||
+                        studentId.isBlank()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Student ID is required"
+            );
+        }
+
+        if (
+                adviserId == null ||
+                        adviserId.isBlank()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authenticated Adviser is required"
+            );
+        }
+
+        /*
+         * Validate trusted Python embedding before any
+         * StudentFace write.
+         */
+        toVectorString(
+                verifiedEmbedding
+        );
+
+        Student student =
+                studentRepository
+                        .findById(
+                                studentId
+                        )
+                        .orElseThrow(() ->
+                                new ApiException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Student not found"
+                                )
+                        );
+
+        verifyEnrollmentOwnership(
+                student,
+                adviserId
+        );
+
+        boolean alreadyRegistered =
+                studentFaceRepository
+                        .existsByStudentId(
+                                studentId
+                        );
+
+        return processFaceEmbeddingWithConflictHandling(
+                student,
+                studentId,
+                verifiedEmbedding,
+                alreadyRegistered
+        );
+    }
+
+    /* =========================================================
+       SHARED FACE EMBEDDING DECISION LAYER
+    ========================================================= */
+
+    private FaceEnrollmentResult
+    processFaceEmbeddingWithConflictHandling(
+            Student student,
+            String studentId,
+            List<Double> embeddingValues,
+            boolean alreadyRegistered
+    ) {
 
         String embedding =
                 toVectorString(
-                        result.embedding()
+                        embeddingValues
                 );
-
-        // =====================================================
-        // 8. GLOBAL SIMILAR-FACE SEARCH
-        //
-        // The current Student is excluded so updating their
-        // own face does not conflict with itself.
-        // =====================================================
 
         FaceMatchResult conflictMatch =
                 studentFaceRepository
@@ -286,19 +293,11 @@ public class StudentFaceService {
                                 null
                         );
 
-        // =====================================================
-        // 9. POSSIBLE FACE CONFLICT
-        // =====================================================
-
         if (
                 conflictMatch != null &&
                         conflictMatch.distance() <=
                                 FACE_CONFLICT_THRESHOLD
         ) {
-
-            // =================================================
-            // LOAD CONFLICTING STUDENT
-            // =================================================
 
             Student conflictingStudent =
                     studentRepository
@@ -312,10 +311,6 @@ public class StudentFaceService {
                                     )
                             );
 
-            // =================================================
-            // CREATE OR REUSE PERSISTENT CONFLICT
-            // =================================================
-
             StudentFaceConflict conflict =
                     studentFaceConflictService
                             .findOrCreateConflict(
@@ -323,10 +318,6 @@ public class StudentFaceService {
                                     conflictingStudent,
                                     conflictMatch.distance()
                             );
-
-            // =================================================
-            // ALREADY VERIFIED AS DIFFERENT PEOPLE
-            // =================================================
 
             if (
                     conflict.getStatus() ==
@@ -341,10 +332,6 @@ public class StudentFaceService {
                         alreadyRegistered
                 );
             }
-
-            // =================================================
-            // BUILD CONFLICT INFORMATION
-            // =================================================
 
             String conflictingStudentName =
                     conflictingStudent.getName();
@@ -364,10 +351,6 @@ public class StudentFaceService {
             Section conflictingSection =
                     conflictingStudent.getSection();
 
-            // =================================================
-            // SECTION INFORMATION
-            // =================================================
-
             if (conflictingSection != null) {
 
                 conflictingSectionId =
@@ -375,10 +358,6 @@ public class StudentFaceService {
 
                 conflictingSectionName =
                         conflictingSection.getName();
-
-                // =============================================
-                // DEPARTMENT INFORMATION
-                // =============================================
 
                 Department conflictingDepartment =
                         conflictingSection.getDepartment();
@@ -392,12 +371,6 @@ public class StudentFaceService {
                             conflictingDepartment.getName();
                 }
             }
-
-            // =================================================
-            // RETURN STRUCTURED FACE CONFLICT
-            //
-            // No StudentFace insert/update occurs here.
-            // =================================================
 
             return FaceEnrollmentResult.conflict(
                     studentId,
@@ -413,10 +386,6 @@ public class StudentFaceService {
             );
         }
 
-        // =====================================================
-        // 10. NO FACE CONFLICT
-        // =====================================================
-
         return saveFaceEmbedding(
                 student,
                 studentId,
@@ -426,13 +395,38 @@ public class StudentFaceService {
     }
 
     /* =========================================================
+       VERIFY ENROLLMENT OWNERSHIP
+    ========================================================= */
+
+    private void verifyEnrollmentOwnership(
+            Student student,
+            String adviserId
+    ) {
+
+        Section section =
+                student.getSection();
+
+        if (
+                section == null ||
+                        section.getAdviser() == null ||
+                        !section.getAdviser()
+                                .getId()
+                                .equals(
+                                        adviserId
+                                )
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not allowed to manage this student's face"
+            );
+        }
+    }
+
+    /* =========================================================
        SAVE FACE EMBEDDING
     ========================================================= */
 
-    /**
-     * Inserts or updates a StudentFace only after the
-     * enrollment decision layer allows the operation.
-     */
     private FaceEnrollmentResult saveFaceEmbedding(
             Student student,
             String studentId,
@@ -442,10 +436,6 @@ public class StudentFaceService {
 
         LocalDateTime now =
                 LocalDateTime.now();
-
-        // =====================================================
-        // UPDATE EXISTING FACE
-        // =====================================================
 
         if (alreadyRegistered) {
 
@@ -470,10 +460,6 @@ public class StudentFaceService {
             );
         }
 
-        // =====================================================
-        // INSERT NEW FACE
-        // =====================================================
-
         String faceId =
                 UUID.randomUUID()
                         .toString();
@@ -493,43 +479,22 @@ public class StudentFaceService {
     }
 
     /* =========================================================
-       VERIFY PENDING FACE CONFLICT
+       LEGACY VERIFY PENDING FACE CONFLICT
+
+       TEMPORARILY RETAINED.
+
+       This old path still accepts a single image and calls
+       the legacy Python enrollment endpoint.
+
+       Production frontend will later stop using this path.
     ========================================================= */
 
-    /**
-     * Performs a second automatic capture check for a
-     * previously detected face conflict.
-     *
-     * IMPORTANT:
-     *
-     * This method NEVER automatically marks two people
-     * as different.
-     *
-     * The second capture only checks whether the original
-     * highly-similar-face result can be reproduced.
-     *
-     * If reproduced:
-     *
-     * -> stores verification distance
-     * -> stores manual review timestamp
-     * -> returns MANUAL_REVIEW_REQUIRED
-     *
-     * If not reproduced:
-     *
-     * -> CONFLICT_NOT_REPRODUCED
-     *
-     * No new StudentFace embedding is saved here.
-     */
     @Transactional
     public FaceConflictVerificationResult verifyFaceConflictCapture(
             String studentId,
             String conflictId,
             MultipartFile image
     ) throws IOException {
-
-        // =====================================================
-        // 1. FIND STUDENT
-        // =====================================================
 
         Student student =
                 studentRepository
@@ -542,10 +507,6 @@ public class StudentFaceService {
                                         "Student not found"
                                 )
                         );
-
-        // =====================================================
-        // 2. VERIFY ADVISER OWNERSHIP
-        // =====================================================
 
         String adviserId =
                 getAuthenticatedAdviserId();
@@ -569,13 +530,6 @@ public class StudentFaceService {
             );
         }
 
-        // =====================================================
-        // 3. LOAD FACE CONFLICT
-        //
-        // This verifies that studentId actually belongs
-        // to the supplied conflict.
-        // =====================================================
-
         StudentFaceConflict conflict =
                 studentFaceConflictService
                         .getConflictForStudent(
@@ -589,10 +543,6 @@ public class StudentFaceService {
                                 conflict,
                                 studentId
                         );
-
-        // =====================================================
-        // 4. HANDLE ALREADY-RESOLVED CONFLICT
-        // =====================================================
 
         if (
                 conflict.getStatus() ==
@@ -624,10 +574,6 @@ public class StudentFaceService {
                     );
         }
 
-        // =====================================================
-        // 5. VALIDATE SECOND CAPTURE
-        // =====================================================
-
         if (
                 image == null ||
                         image.isEmpty()
@@ -638,10 +584,6 @@ public class StudentFaceService {
                     "Verification image is required"
             );
         }
-
-        // =====================================================
-        // 6. GENERATE SECOND EMBEDDING
-        // =====================================================
 
         FaceRecognitionClient.FaceEnrollmentResult result =
                 faceRecognitionClient
@@ -668,12 +610,6 @@ public class StudentFaceService {
                         result.embedding()
                 );
 
-        // =====================================================
-        // 7. GLOBAL SECOND SIMILAR-FACE CHECK
-        //
-        // Current Student is excluded.
-        // =====================================================
-
         FaceMatchResult verificationMatch =
                 studentFaceRepository
                         .findMostSimilarFaceExcludingStudent(
@@ -683,17 +619,6 @@ public class StudentFaceService {
                         .orElse(
                                 null
                         );
-
-        // =====================================================
-        // 8. ORIGINAL CONFLICT REPRODUCED
-        //
-        // Requirements:
-        //
-        // - nearest OTHER Student is still the same
-        //   conflicting Student
-        //
-        // - distance is still within threshold
-        // =====================================================
 
         if (
                 verificationMatch != null &&
@@ -705,21 +630,6 @@ public class StudentFaceService {
                         verificationMatch.distance() <=
                                 FACE_CONFLICT_THRESHOLD
         ) {
-
-            // =================================================
-            // IMPORTANT:
-            //
-            // Persist proof that the second verification
-            // capture reproduced the original conflict.
-            //
-            // This updates:
-            //
-            // verification_distance
-            // manual_review_required_at
-            // updated_at
-            //
-            // Status remains PENDING.
-            // =================================================
 
             StudentFaceConflict updatedConflict =
                     studentFaceConflictService
@@ -739,14 +649,310 @@ public class StudentFaceService {
                     );
         }
 
-        // =====================================================
-        // 9. ORIGINAL CONFLICT NOT REPRODUCED
-        //
-        // Still DO NOT save a StudentFace automatically.
-        //
-        // Frontend should tell the Adviser to retake and
-        // retry the normal enrollment flow.
-        // =====================================================
+        Double verificationDistance =
+                verificationMatch == null
+                        ? null
+                        : verificationMatch.distance();
+
+        return FaceConflictVerificationResult
+                .conflictNotReproduced(
+                        conflict.getId(),
+                        conflict.getStatus(),
+                        studentId,
+                        conflictingStudent.getId(),
+                        conflictingStudent.getName(),
+                        verificationDistance
+                );
+    }
+
+    /* =========================================================
+       ACTIVE-LIVENESS VERIFIED FACE-CONFLICT CHECK
+       NEW SECURE PATH
+    ========================================================= */
+
+    /**
+     * Performs the second face-conflict verification using
+     * an embedding that has ALREADY passed active liveness.
+     *
+     * IMPORTANT:
+     *
+     * This method DOES NOT:
+     *
+     * - accept an image
+     * - call Python /enrollment
+     * - trust React with an embedding
+     *
+     * Expected upstream flow:
+     *
+     * FACE_CONFLICT_VERIFICATION challenge
+     *      ->
+     * Python passive liveness
+     *      +
+     * random active challenge
+     *      +
+     * same-person continuity
+     *      ->
+     * trusted 512-D embedding
+     *      ->
+     * THIS METHOD
+     *
+     * Existing conflict semantics are retained:
+     *
+     * - nearest OTHER face must still be the same
+     *   conflicting Student
+     *
+     * - distance must still be <= 0.50
+     *
+     * If reproduced:
+     *
+     * verification_distance is stored
+     * manual_review_required_at is stored
+     * conflict status remains PENDING
+     *
+     * No StudentFace is inserted or updated.
+     */
+    @Transactional
+    public FaceConflictVerificationResult
+    verifyFaceConflictFromVerifiedEmbedding(
+            String studentId,
+            String conflictId,
+            List<Double> verifiedEmbedding,
+            String adviserId
+    ) {
+
+        /* =====================================================
+           1. VALIDATE INPUT
+        ===================================================== */
+
+        if (
+                studentId == null ||
+                        studentId.isBlank()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Student ID is required"
+            );
+        }
+
+        if (
+                conflictId == null ||
+                        conflictId.isBlank()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Face conflict ID is required"
+            );
+        }
+
+        if (
+                adviserId == null ||
+                        adviserId.isBlank()
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authenticated Adviser is required"
+            );
+        }
+
+        /*
+         * Validates:
+         *
+         * - non-null
+         * - exactly 512 dimensions
+         *
+         * Also converts once for pgvector query usage.
+         */
+        String embedding =
+                toVectorString(
+                        verifiedEmbedding
+                );
+
+        /* =====================================================
+           2. FIND TARGET STUDENT
+        ===================================================== */
+
+        Student student =
+                studentRepository
+                        .findById(
+                                studentId
+                        )
+                        .orElseThrow(() ->
+                                new ApiException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Student not found"
+                                )
+                        );
+
+        /* =====================================================
+           3. VERIFY ADVISER OWNERSHIP
+        ===================================================== */
+
+        Section section =
+                student.getSection();
+
+        if (
+                section == null ||
+                        section.getAdviser() == null ||
+                        !section.getAdviser()
+                                .getId()
+                                .equals(
+                                        adviserId
+                                )
+        ) {
+
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not allowed to verify this student's face"
+            );
+        }
+
+        /* =====================================================
+           4. LOAD SERVER-VALIDATED FACE CONFLICT
+
+           Also proves studentId belongs to the conflict.
+        ===================================================== */
+
+        StudentFaceConflict conflict =
+                studentFaceConflictService
+                        .getConflictForStudent(
+                                conflictId,
+                                studentId
+                        );
+
+        Student conflictingStudent =
+                studentFaceConflictService
+                        .getOtherStudent(
+                                conflict,
+                                studentId
+                        );
+
+        /* =====================================================
+           5. HANDLE ALREADY-RESOLVED CONFLICT
+        ===================================================== */
+
+        if (
+                conflict.getStatus() ==
+                        StudentFaceConflictStatus
+                                .VERIFIED_DIFFERENT_PEOPLE
+        ) {
+
+            return FaceConflictVerificationResult
+                    .verifiedDifferentPeople(
+                            conflict.getId(),
+                            studentId,
+                            conflictingStudent.getId(),
+                            conflictingStudent.getName()
+                    );
+        }
+
+        if (
+                conflict.getStatus() ==
+                        StudentFaceConflictStatus
+                                .CONFIRMED_SAME_PERSON
+        ) {
+
+            return FaceConflictVerificationResult
+                    .confirmedSamePerson(
+                            conflict.getId(),
+                            studentId,
+                            conflictingStudent.getId(),
+                            conflictingStudent.getName()
+                    );
+        }
+
+        /* =====================================================
+           6. DEFENSIVE IDEMPOTENCY
+
+           Normally LivenessChallengeService prevents creating
+           another second-verification challenge after manual
+           review proof exists.
+
+           This protects the service layer too.
+        ===================================================== */
+
+        if (
+                conflict.getManualReviewRequiredAt() != null &&
+                        conflict.getVerificationDistance() != null
+        ) {
+
+            return FaceConflictVerificationResult
+                    .manualReviewRequired(
+                            conflict.getId(),
+                            conflict.getStatus(),
+                            studentId,
+                            conflictingStudent.getId(),
+                            conflictingStudent.getName(),
+                            conflict.getVerificationDistance()
+                    );
+        }
+
+        /* =====================================================
+           7. SECOND SIMILAR-FACE CHECK
+
+           The target Student is excluded because Student B
+           may not have a stored face yet.
+
+           We expect the nearest OTHER face to reproduce the
+           original conflicting Student.
+        ===================================================== */
+
+        FaceMatchResult verificationMatch =
+                studentFaceRepository
+                        .findMostSimilarFaceExcludingStudent(
+                                embedding,
+                                studentId
+                        )
+                        .orElse(
+                                null
+                        );
+
+        /* =====================================================
+           8. ORIGINAL CONFLICT REPRODUCED
+        ===================================================== */
+
+        if (
+                verificationMatch != null &&
+                        verificationMatch
+                                .studentId()
+                                .equals(
+                                        conflictingStudent.getId()
+                                ) &&
+                        verificationMatch.distance() <=
+                                FACE_CONFLICT_THRESHOLD
+        ) {
+
+            StudentFaceConflict updatedConflict =
+                    studentFaceConflictService
+                            .markManualReviewRequired(
+                                    conflict,
+                                    verificationMatch.distance()
+                            );
+
+            return FaceConflictVerificationResult
+                    .manualReviewRequired(
+                            updatedConflict.getId(),
+                            updatedConflict.getStatus(),
+                            studentId,
+                            conflictingStudent.getId(),
+                            conflictingStudent.getName(),
+                            verificationMatch.distance()
+                    );
+        }
+
+        /* =====================================================
+           9. ORIGINAL CONFLICT NOT REPRODUCED
+
+           IMPORTANT:
+
+           No StudentFace is saved.
+
+           No manual decision is made automatically.
+
+           Adviser may retake/retry according to frontend flow.
+        ===================================================== */
 
         Double verificationDistance =
                 verificationMatch == null
@@ -764,30 +970,16 @@ public class StudentFaceService {
                 );
     }
 
-
-
-
     /* =========================================================
-   RESOLVE FACE CONFLICT
-========================================================= */
+       RESOLVE FACE CONFLICT
+    ========================================================= */
 
-    /**
-     * Performs the final human/manual decision for a face
-     * conflict after second-capture verification.
-     *
-     * Only the Adviser who owns the target Student's Section
-     * may resolve the conflict through this Student endpoint.
-     */
     @Transactional
     public FaceConflictResolutionResult resolveFaceConflict(
             String studentId,
             String conflictId,
             FaceConflictResolutionDecision decision
     ) {
-
-        // =====================================================
-        // 1. FIND TARGET STUDENT
-        // =====================================================
 
         Student student =
                 studentRepository
@@ -800,10 +992,6 @@ public class StudentFaceService {
                                         "Student not found"
                                 )
                         );
-
-        // =====================================================
-        // 2. VERIFY ADVISER OWNERSHIP
-        // =====================================================
 
         String adviserId =
                 getAuthenticatedAdviserId();
@@ -827,23 +1015,12 @@ public class StudentFaceService {
             );
         }
 
-        // =====================================================
-        // 3. LOAD CONFLICT
-        //
-        // Also verifies that the supplied Student belongs to
-        // this conflict.
-        // =====================================================
-
         StudentFaceConflict conflict =
                 studentFaceConflictService
                         .getConflictForStudent(
                                 conflictId,
                                 studentId
                         );
-
-        // =====================================================
-        // 4. GET OTHER STUDENT
-        // =====================================================
 
         Student conflictingStudent =
                 studentFaceConflictService
@@ -852,10 +1029,6 @@ public class StudentFaceService {
                                 studentId
                         );
 
-        // =====================================================
-        // 5. FINAL RESOLUTION
-        // =====================================================
-
         StudentFaceConflict resolvedConflict =
                 studentFaceConflictService
                         .resolveConflict(
@@ -863,10 +1036,6 @@ public class StudentFaceService {
                                 adviserId,
                                 decision
                         );
-
-        // =====================================================
-        // 6. BUILD RESULT
-        // =====================================================
 
         String verifiedByUserId =
                 resolvedConflict.getVerifiedBy() == null
@@ -898,10 +1067,6 @@ public class StudentFaceService {
        EMBEDDING CONVERSION
     ========================================================= */
 
-    /**
-     * Converts a 512-dimensional face embedding into
-     * PostgreSQL pgvector format.
-     */
     private String toVectorString(
             List<Double> embedding
     ) {
@@ -930,12 +1095,6 @@ public class StudentFaceService {
        LEGACY GLOBAL FACE MATCH
     ========================================================= */
 
-    /**
-     * Retained temporarily for compatibility.
-     *
-     * Attendance recognition should use the
-     * Section-scoped Top-2 method below.
-     */
     @Transactional(readOnly = true)
     public FaceMatchResult findMostSimilarFace(
             List<Double> embedding
@@ -962,29 +1121,11 @@ public class StudentFaceService {
        SECTION-SCOPED TOP-2 FACE MATCH
     ========================================================= */
 
-    /**
-     * Finds up to the two closest registered faces
-     * restricted to ACTIVE Students inside the
-     * supplied Section.
-     *
-     * This method does NOT decide:
-     *
-     * MATCH
-     * NO_MATCH
-     * AMBIGUOUS
-     *
-     * AttendanceRecordService remains responsible
-     * for that decision.
-     */
     @Transactional(readOnly = true)
     public List<FaceMatchResult> findTopSimilarFacesBySection(
             List<Double> embedding,
             String sectionId
     ) {
-
-        // =====================================================
-        // 1. VALIDATE SECTION
-        // =====================================================
 
         if (
                 sectionId == null ||
@@ -997,18 +1138,10 @@ public class StudentFaceService {
             );
         }
 
-        // =====================================================
-        // 2. VALIDATE AND CONVERT EMBEDDING
-        // =====================================================
-
         String vector =
                 toVectorString(
                         embedding
                 );
-
-        // =====================================================
-        // 3. FIND TOP TWO MATCHES INSIDE SECTION
-        // =====================================================
 
         return studentFaceRepository
                 .findTopSimilarFacesBySection(
@@ -1021,12 +1154,6 @@ public class StudentFaceService {
        GET AUTHENTICATED ADVISER ID
     ========================================================= */
 
-    /**
-     * Used for face enrollment/update/verification ownership.
-     *
-     * Attendance recognition gets its Section scope
-     * through the validated AttendanceSession instead.
-     */
     private String getAuthenticatedAdviserId() {
 
         Authentication authentication =

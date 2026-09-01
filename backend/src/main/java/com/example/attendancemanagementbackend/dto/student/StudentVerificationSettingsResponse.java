@@ -1,4 +1,15 @@
 package com.example.attendancemanagementbackend.dto.student;
 
-public class StudentVerificationSettingsResponse {
+import java.util.List;
+
+public record StudentVerificationSettingsResponse(
+
+        String studentId,
+        boolean blinkAllowed,
+        boolean turnLeftAllowed,
+        boolean turnRightAllowed,
+        boolean assistedVerificationRequired,
+        List<String> allowedChallenges
+
+) {
 }

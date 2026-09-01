@@ -1,4 +1,8 @@
 package com.example.attendancemanagementbackend.entity;
 
-public class LivenessChallengeType {
+public enum LivenessChallengeType {
+
+    BLINK,
+    TURN_LEFT,
+    TURN_RIGHT
 }

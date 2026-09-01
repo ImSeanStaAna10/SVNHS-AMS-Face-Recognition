@@ -1,4 +1,10 @@
 package com.example.attendancemanagementbackend.entity;
 
-public class LivenessChallengeStatus {
+public enum LivenessChallengeStatus {
+
+    PENDING,
+    VERIFYING,
+    PASSED,
+    FAILED,
+    EXPIRED
 }

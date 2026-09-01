@@ -1,4 +1,8 @@
 package com.example.attendancemanagementbackend.entity;
 
-public class LivenessChallengePurpose {
+public enum LivenessChallengePurpose {
+
+    ENROLLMENT,
+    ATTENDANCE,
+    FACE_CONFLICT_VERIFICATION
 }
