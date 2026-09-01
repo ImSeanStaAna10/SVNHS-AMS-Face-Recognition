@@ -5,19 +5,19 @@ import AdviserLayout from "../../layouts/AdviserLayout";
 import adviserService from "../../services/adviserService";
 import authService from "../../services/authService";
 import speechService from "../../services/speechService";
+import faceReadiness from "../../utils/FaceReadiness";
 import {
   captureFrameBurst,
   sleep,
   waitForVideoReady,
 } from "../../utils/livenessCapture";
-import faceReadiness from "../../utils/faceReadiness";
 
 import "../../styles/adviser/studentManagement.css";
+import "../../styles/adviser/studentManagementAttendanceScan.css";
+import "../../styles/adviser/studentManagementAutoGuided.css";
 import "../../styles/adviser/studentManagementLiveness.css";
 import "../../styles/adviser/studentManagementProductionReview.css";
-import "../../styles/adviser/studentManagementAutoGuided.css";
 import "../../styles/adviser/studentManagementSimpleScan.css";
-import "../../styles/adviser/studentManagementAttendanceScan.css";
 
 const BASELINE_COUNT = 8;
 const BASELINE_INTERVAL = 220;
@@ -35,20 +35,23 @@ const getErrorMessage = (error, fallback) =>
   error?.message ||
   fallback;
 const normalizeStudentNumberInput = (value) =>
-  String(value ?? "").replace(/\D/g, "").slice(0, 12);
+  String(value ?? "")
+    .replace(/\D/g, "")
+    .slice(0, 12);
 const isValidStudentNumber = (value) => /^\d{12}$/.test(String(value ?? ""));
-const stopMediaStream = (stream) => stream?.getTracks?.().forEach((track) => track.stop());
+const stopMediaStream = (stream) =>
+  stream?.getTracks?.().forEach((track) => track.stop());
 const scopeStudentsToSection = (students, sectionId) =>
   !sectionId
     ? students
-    : students.filter((student) => !student?.sectionId || student.sectionId === sectionId);
+    : students.filter(
+        (student) => !student?.sectionId || student.sectionId === sectionId,
+      );
 const hasFaceRegistered = (student, localIds) =>
   localIds.has(student?.id) ||
   student?.faceRegistered === true ||
   student?.hasFace === true ||
   student?.faceEnrolled === true;
-
-
 
 const clampPercent = (value) =>
   Math.min(100, Math.max(0, Math.round(Number(value) || 0)));
@@ -69,7 +72,6 @@ const DEFAULT_FACE_GUIDANCE = {
   noseRatio: 0.5,
   yawDegrees: null,
 };
-
 
 const getChallengeProgressCopy = (challengeType, progress, guidanceKey) => {
   const type = String(challengeType || "").toUpperCase();
@@ -95,48 +97,86 @@ const getChallengeProgressCopy = (challengeType, progress, guidanceKey) => {
     if (score >= 25) return "Blink once naturally.";
     return "Keep your eyes open until the prompt.";
   }
-  return score >= 75 ? "Almost there. Keep turning." : "Move slowly in the arrow direction.";
+  return score >= 75
+    ? "Almost there. Keep turning."
+    : "Move slowly in the arrow direction.";
 };
 
 const challengeUi = (challengeType) => {
   switch (String(challengeType || "").toUpperCase()) {
     case "BLINK":
-      return { icon: "◉", title: "Blink once now", text: "Keep facing the camera and make one natural blink." };
+      return {
+        icon: "◉",
+        title: "Blink once now",
+        text: "Keep facing the camera and make one natural blink.",
+      };
     case "TURN_LEFT":
-      return { icon: "←", title: "Turn your head left", text: "Slowly turn left while keeping your whole face visible." };
+      return {
+        icon: "←",
+        title: "Turn your head left",
+        text: "Slowly turn left while keeping your whole face visible.",
+      };
     case "TURN_RIGHT":
-      return { icon: "→", title: "Turn your head right", text: "Slowly turn right while keeping your whole face visible." };
+      return {
+        icon: "→",
+        title: "Turn your head right",
+        text: "Slowly turn right while keeping your whole face visible.",
+      };
     default:
-      return { icon: "◎", title: "Follow the live prompt", text: "Keep your face visible and follow the instruction." };
+      return {
+        icon: "◎",
+        title: "Follow the live prompt",
+        text: "Keep your face visible and follow the instruction.",
+      };
   }
 };
 
 const humanizeReason = (reason) => {
-  const key = String(reason || "").trim().toUpperCase();
+  const key = String(reason || "")
+    .trim()
+    .toUpperCase();
   const messages = {
     NO_FACE: "No clear face was detected. Center one student and try again.",
-    MULTIPLE_FACES: "More than one face was detected. Keep only the student being enrolled in view.",
-    PASSIVE_LIVENESS_FAILED: "A live face could not be confirmed. Improve lighting and try again.",
-    BLINK_NOT_DETECTED: "The blink was not detected clearly. Blink once only after the prompt.",
-    TURN_NOT_DETECTED: "The head turn was not detected clearly. Turn slowly only after the prompt.",
-    WRONG_TURN_DIRECTION: "The head moved in the opposite direction. Follow the arrow and retry.",
-    CONTINUITY_FAILED: "The face changed during verification. The same student must stay in frame.",
-    CHALLENGE_FAILED: "The guided live movement was not completed clearly enough. Please try again.",
+    MULTIPLE_FACES:
+      "More than one face was detected. Keep only the student being enrolled in view.",
+    PASSIVE_LIVENESS_FAILED:
+      "A live face could not be confirmed. Improve lighting and try again.",
+    BLINK_NOT_DETECTED:
+      "The blink was not detected clearly. Blink once only after the prompt.",
+    TURN_NOT_DETECTED:
+      "The head turn was not detected clearly. Turn slowly only after the prompt.",
+    WRONG_TURN_DIRECTION:
+      "The head moved in the opposite direction. Follow the arrow and retry.",
+    CONTINUITY_FAILED:
+      "The face changed during verification. The same student must stay in frame.",
+    CHALLENGE_FAILED:
+      "The guided live movement was not completed clearly enough. Please try again.",
     CHALLENGE_EXPIRED: "The secure live check expired. Start a fresh scan.",
-    LIVENESS_CHALLENGE_EXPIRED: "The secure live check expired. Start a fresh scan.",
+    LIVENESS_CHALLENGE_EXPIRED:
+      "The secure live check expired. Start a fresh scan.",
   };
   if (messages[key]) return messages[key];
-  if (!key) return "Live face verification could not be completed. Please try again.";
-  return key.toLowerCase().split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+  if (!key)
+    return "Live face verification could not be completed. Please try again.";
+  return key
+    .toLowerCase()
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 };
 
-
-const getFaceFlowError = (error, fallback = "Unable to complete secure face verification.") => {
+const getFaceFlowError = (
+  error,
+  fallback = "Unable to complete secure face verification.",
+) => {
   const status = error?.response?.status;
   const raw = getErrorMessage(error, "");
   const normalized = String(raw || "").toLowerCase();
 
-  if (!error?.response && (error?.code === "ERR_NETWORK" || normalized.includes("network"))) {
+  if (
+    !error?.response &&
+    (error?.code === "ERR_NETWORK" || normalized.includes("network"))
+  ) {
     return "The face scan could not reach the server. Check the connection and try again.";
   }
 
@@ -162,7 +202,10 @@ const getFaceFlowError = (error, fallback = "Unable to complete secure face veri
   }
 
   if (status === 422) {
-    return raw || "The captured frames could not be verified. Keep one clear face in frame and retake the secure scan.";
+    return (
+      raw ||
+      "The captured frames could not be verified. Keep one clear face in frame and retake the secure scan."
+    );
   }
 
   if ([500, 502, 503, 504].includes(status)) {
@@ -177,14 +220,18 @@ const normalizeConflict = (result) => ({
   studentId: result?.studentId || "",
   conflictStatus: result?.conflictStatus || "PENDING",
   conflictingStudentId: result?.conflictingStudentId || "",
-  conflictingStudentName: result?.conflictingStudentName || "Similar enrolled student",
+  conflictingStudentName:
+    result?.conflictingStudentName || "Similar enrolled student",
   conflictingSectionName: result?.conflictingSectionName || "",
   conflictingDepartmentName: result?.conflictingDepartmentName || "",
   distance: result?.distance,
 });
 
 const conflictVerificationOutcome = (result) =>
-  result?.faceConflictVerificationOutcome || result?.outcome || result?.verificationOutcome || "";
+  result?.faceConflictVerificationOutcome ||
+  result?.outcome ||
+  result?.verificationOutcome ||
+  "";
 
 function VoiceToggle({ enabled, onChange }) {
   const supported = speechService.isSupported();
@@ -194,7 +241,13 @@ function VoiceToggle({ enabled, onChange }) {
       className={`student-voice-toggle ${enabled ? "is-on" : ""}`}
       aria-pressed={enabled}
       disabled={!supported}
-      title={supported ? (enabled ? "Turn voice guidance off" : "Turn voice guidance on") : "Voice guidance unsupported"}
+      title={
+        supported
+          ? enabled
+            ? "Turn voice guidance off"
+            : "Turn voice guidance on"
+          : "Voice guidance unsupported"
+      }
       onClick={() => onChange(!enabled)}
     >
       <span aria-hidden="true">{enabled ? "🔊" : "🔇"}</span>
@@ -207,21 +260,43 @@ function FaceConflictCard({ conflict }) {
   if (!conflict) return null;
   const blocked = conflict.conflictStatus === "CONFIRMED_SAME_PERSON";
   return (
-    <div className={`student-liveness-conflict-card ${blocked ? "is-blocked" : ""}`} role="alert">
+    <div
+      className={`student-liveness-conflict-card ${blocked ? "is-blocked" : ""}`}
+      role="alert"
+    >
       <div className="student-liveness-conflict-head">
         <span aria-hidden="true">{blocked ? "×" : "!"}</span>
         <div>
-          <small>{blocked ? "SEPARATE ENROLLMENT BLOCKED" : "SIMILAR FACE FOUND"}</small>
-          <strong>{blocked ? "Same physical person confirmed" : "Identity verification is required"}</strong>
-          <p>{blocked ? "This identity decision is already saved for this pair." : "No face was saved. Run one more live scan before reviewing the match."}</p>
+          <small>
+            {blocked ? "SEPARATE ENROLLMENT BLOCKED" : "SIMILAR FACE FOUND"}
+          </small>
+          <strong>
+            {blocked
+              ? "Same physical person confirmed"
+              : "Identity verification is required"}
+          </strong>
+          <p>
+            {blocked
+              ? "This identity decision is already saved for this pair."
+              : "No face was saved. Run one more live scan before reviewing the match."}
+          </p>
         </div>
       </div>
       <div className="student-liveness-match-row">
-        <span className="student-liveness-match-avatar">{conflict.conflictingStudentName?.charAt(0)?.toUpperCase() || "S"}</span>
+        <span className="student-liveness-match-avatar">
+          {conflict.conflictingStudentName?.charAt(0)?.toUpperCase() || "S"}
+        </span>
         <div>
           <small>POSSIBLE MATCH</small>
-          <strong>{conflict.conflictingStudentName || "Existing student"}</strong>
-          <span>{conflict.conflictingSectionName || "Section unavailable"}{conflict.conflictingDepartmentName ? ` • ${conflict.conflictingDepartmentName}` : ""}</span>
+          <strong>
+            {conflict.conflictingStudentName || "Existing student"}
+          </strong>
+          <span>
+            {conflict.conflictingSectionName || "Section unavailable"}
+            {conflict.conflictingDepartmentName
+              ? ` • ${conflict.conflictingDepartmentName}`
+              : ""}
+          </span>
         </div>
       </div>
     </div>
@@ -240,7 +315,9 @@ function FriendlyErrorCard({ error, onRetry, compact = false }) {
       className={`student-production-error ${compact ? "is-compact" : ""}`}
       role="alert"
     >
-      <div className="student-production-error-icon" aria-hidden="true">!</div>
+      <div className="student-production-error-icon" aria-hidden="true">
+        !
+      </div>
       <div className="student-production-error-copy">
         <small>WE COULDN'T COMPLETE THIS STEP</small>
         <strong>{title}</strong>
@@ -254,7 +331,11 @@ function FriendlyErrorCard({ error, onRetry, compact = false }) {
         )}
       </div>
       {onRetry && (
-        <button type="button" className="adviser-secondary-button" onClick={onRetry}>
+        <button
+          type="button"
+          className="adviser-secondary-button"
+          onClick={onRetry}
+        >
           Try Again
         </button>
       )}
@@ -335,7 +416,8 @@ function LiveScanner({
       return {
         eyebrow: "SCAN UNSUCCESSFUL",
         title: "Please try again",
-        description: "Keep one student in frame and follow the live instruction.",
+        description:
+          "Keep one student in frame and follow the live instruction.",
       };
     }
 
@@ -409,14 +491,16 @@ function LiveScanner({
     : null;
 
   return (
-    <section className={`student-enroll-scanner ${reviewing ? "is-reviewing" : ""}`}>
+    <section
+      className={`student-enroll-scanner ${reviewing ? "is-reviewing" : ""}`}
+    >
       <header className="student-enroll-scanner-header">
         <div className="student-enroll-scanner-heading">
           <span>FACE ENROLLMENT</span>
           <h3>Face Scanner</h3>
           <p>
-            Use Scan Now for manual capture, or turn on Auto Capture when you want
-            the scan to begin automatically after one face is detected.
+            Use Scan Now for manual capture, or turn on Auto Capture when you
+            want the scan to begin automatically after one face is detected.
           </p>
         </div>
 
@@ -473,12 +557,17 @@ function LiveScanner({
 
             {!cameraActive && !reviewing && (
               <div className="student-enroll-camera-placeholder">
-                <div className="student-enroll-placeholder-icon" aria-hidden="true">◎</div>
+                <div
+                  className="student-enroll-placeholder-icon"
+                  aria-hidden="true"
+                >
+                  ◎
+                </div>
                 <span>CAMERA OFF</span>
                 <h4>Start the face scanner</h4>
                 <p>
-                  Enable the camera, keep one student inside the guide, then press
-                  Scan Now or turn on Auto Capture.
+                  Enable the camera, keep one student inside the guide, then
+                  press Scan Now or turn on Auto Capture.
                 </p>
                 <button
                   type="button"
@@ -492,11 +581,17 @@ function LiveScanner({
 
             {reviewing && (
               <div className="student-enroll-camera-placeholder is-complete">
-                <div className="student-enroll-placeholder-icon" aria-hidden="true">✓</div>
+                <div
+                  className="student-enroll-placeholder-icon"
+                  aria-hidden="true"
+                >
+                  ✓
+                </div>
                 <span>CAPTURE COMPLETE</span>
                 <h4>Ready for review</h4>
                 <p>
-                  The camera is paused while you decide whether to retake or continue.
+                  The camera is paused while you decide whether to retake or
+                  continue.
                 </p>
               </div>
             )}
@@ -505,7 +600,10 @@ function LiveScanner({
               <>
                 <div className="student-enroll-camera-shade" />
 
-                <div className={`student-enroll-face-target phase-${scan.phase}`} aria-hidden="true">
+                <div
+                  className={`student-enroll-face-target phase-${scan.phase}`}
+                  aria-hidden="true"
+                >
                   <div className="student-enroll-face-target-oval" />
                   <div className="student-enroll-face-target-line" />
                   <span className="corner corner-one" />
@@ -529,8 +627,14 @@ function LiveScanner({
                 </div>
 
                 {challengeActive && (
-                  <div className="student-enroll-challenge-prompt" aria-live="assertive">
-                    <span className="student-enroll-challenge-icon" aria-hidden="true">
+                  <div
+                    className="student-enroll-challenge-prompt"
+                    aria-live="assertive"
+                  >
+                    <span
+                      className="student-enroll-challenge-icon"
+                      aria-hidden="true"
+                    >
                       {challenge.icon}
                     </span>
                     <strong>{challenge.title}</strong>
@@ -546,7 +650,10 @@ function LiveScanner({
                   </div>
                 )}
 
-                <div className="student-enroll-scanner-message" aria-live="polite">
+                <div
+                  className="student-enroll-scanner-message"
+                  aria-live="polite"
+                >
                   <span>{scannerCopy.eyebrow}</span>
                   <strong>{scannerCopy.title}</strong>
                   <small>{scannerCopy.description}</small>
@@ -580,18 +687,28 @@ function LiveScanner({
             onRetry={onEnableCamera}
             compact
           />
-          <FriendlyErrorCard error={friendlyScanError} onRetry={onRetry} compact />
+          <FriendlyErrorCard
+            error={friendlyScanError}
+            onRetry={onRetry}
+            compact
+          />
         </div>
 
-        <aside className={`student-enroll-review-panel ${reviewing ? "is-ready" : ""}`}>
+        <aside
+          className={`student-enroll-review-panel ${reviewing ? "is-ready" : ""}`}
+        >
           <div className="student-enroll-review-header">
             <span>ENROLLMENT STATUS</span>
-            <strong>{reviewing ? "READY TO VERIFY" : "WAITING FOR SCAN"}</strong>
+            <strong>
+              {reviewing ? "READY TO VERIFY" : "WAITING FOR SCAN"}
+            </strong>
           </div>
 
           {reviewing && reviewData ? (
             <div className="student-enroll-review-content">
-              <div className="student-enroll-review-icon" aria-hidden="true">✓</div>
+              <div className="student-enroll-review-icon" aria-hidden="true">
+                ✓
+              </div>
               <span>SCAN COMPLETE</span>
               <h3>{studentName || "Student"}</h3>
               <p>
@@ -601,8 +718,8 @@ function LiveScanner({
               <div className="student-enroll-review-note">
                 <strong>Review before saving</strong>
                 <span>
-                  Retake creates a fresh scan. Verify &amp; Save sends this capture
-                  through the existing backend liveness verification.
+                  Retake creates a fresh scan. Verify &amp; Save sends this
+                  capture through the existing backend liveness verification.
                 </span>
               </div>
 
@@ -627,11 +744,16 @@ function LiveScanner({
             </div>
           ) : (
             <div className="student-enroll-review-empty">
-              <div className="student-enroll-review-empty-icon" aria-hidden="true">◎</div>
+              <div
+                className="student-enroll-review-empty-icon"
+                aria-hidden="true"
+              >
+                ◎
+              </div>
               <h3>Ready for face enrollment</h3>
               <p>
-                Keep one student inside the camera. Manual Capture is the default,
-                and Auto Capture can be enabled anytime.
+                Keep one student inside the camera. Manual Capture is the
+                default, and Auto Capture can be enabled anytime.
               </p>
 
               <div className="student-enroll-review-steps">
@@ -707,8 +829,12 @@ function StudentManagement() {
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraError, setCameraError] = useState("");
-  const [voiceEnabled, setVoiceEnabled] = useState(() => speechService.getEnabled());
-  const [locallyRegisteredFaceIds, setLocallyRegisteredFaceIds] = useState(() => new Set());
+  const [voiceEnabled, setVoiceEnabled] = useState(() =>
+    speechService.getEnabled(),
+  );
+  const [locallyRegisteredFaceIds, setLocallyRegisteredFaceIds] = useState(
+    () => new Set(),
+  );
   const [scan, setScan] = useState({
     busy: false,
     phase: "idle",
@@ -721,13 +847,16 @@ function StudentManagement() {
   const [pendingLiveness, setPendingLiveness] = useState(null);
   const [autoStartEnabled, setAutoStartEnabled] = useState(false);
   const [detectorStatus, setDetectorStatus] = useState("idle");
-  const [faceGuidanceState, setFaceGuidanceState] = useState(DEFAULT_FACE_GUIDANCE);
+  const [faceGuidanceState, setFaceGuidanceState] = useState(
+    DEFAULT_FACE_GUIDANCE,
+  );
 
   const [faceConflict, setFaceConflict] = useState(null);
   const [conflictOpen, setConflictOpen] = useState(false);
   const [conflictContext, setConflictContext] = useState(null);
   const [conflictStage, setConflictStage] = useState("READY");
-  const [conflictVerificationResult, setConflictVerificationResult] = useState(null);
+  const [conflictVerificationResult, setConflictVerificationResult] =
+    useState(null);
   const [pendingDecision, setPendingDecision] = useState("");
   const [conflictBusy, setConflictBusy] = useState(false);
 
@@ -735,100 +864,204 @@ function StudentManagement() {
     let mounted = true;
     const load = async () => {
       try {
-        setLoading(true); setError("");
-        const [sectionData, studentData] = await Promise.all([adviserService.getSections(), adviserService.getStudents()]);
+        setLoading(true);
+        setError("");
+        const [sectionData, studentData] = await Promise.all([
+          adviserService.getSections(),
+          adviserService.getStudents(),
+        ]);
         if (!mounted) return;
         const sections = normalizeArray(sectionData);
-        const assigned = sections.find((item) => item?.active !== false) || sections[0] || null;
+        const assigned =
+          sections.find((item) => item?.active !== false) ||
+          sections[0] ||
+          null;
         setSection(assigned);
-        setStudents(scopeStudentsToSection(normalizeArray(studentData), assigned?.id));
+        setStudents(
+          scopeStudentsToSection(normalizeArray(studentData), assigned?.id),
+        );
       } catch (requestError) {
-        if (mounted) setError(getErrorMessage(requestError, "Unable to load student records."));
+        if (mounted)
+          setError(
+            getErrorMessage(requestError, "Unable to load student records."),
+          );
       } finally {
         if (mounted) setLoading(false);
       }
     };
     void load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  useEffect(() => () => {
-    scanRunRef.current += 1;
-    if (cameraStartFrameRef.current) window.cancelAnimationFrame(cameraStartFrameRef.current);
-    stopMediaStream(streamRef.current);
-    speechService.stop();
-    if (faceMonitorTimerRef.current) window.clearTimeout(faceMonitorTimerRef.current);
-    faceReadiness.destroy();
-  }, []);
+  useEffect(
+    () => () => {
+      scanRunRef.current += 1;
+      if (cameraStartFrameRef.current)
+        window.cancelAnimationFrame(cameraStartFrameRef.current);
+      stopMediaStream(streamRef.current);
+      speechService.stop();
+      if (faceMonitorTimerRef.current)
+        window.clearTimeout(faceMonitorTimerRef.current);
+      faceReadiness.destroy();
+    },
+    [],
+  );
 
-  const modalOpen = showAddModal || Boolean(editingStudent) || Boolean(selectedStudent) || conflictOpen;
+  const modalOpen =
+    showAddModal ||
+    Boolean(editingStudent) ||
+    Boolean(selectedStudent) ||
+    conflictOpen;
   useEffect(() => {
     if (!modalOpen) return undefined;
     const before = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = before; };
+    return () => {
+      document.body.style.overflow = before;
+    };
   }, [modalOpen]);
 
   useEffect(() => {
     if (!filterMenuOpen) return undefined;
-    const outside = (event) => filterMenuRef.current && !filterMenuRef.current.contains(event.target) && setFilterMenuOpen(false);
+    const outside = (event) =>
+      filterMenuRef.current &&
+      !filterMenuRef.current.contains(event.target) &&
+      setFilterMenuOpen(false);
     const esc = (event) => event.key === "Escape" && setFilterMenuOpen(false);
-    document.addEventListener("mousedown", outside); document.addEventListener("keydown", esc);
-    return () => { document.removeEventListener("mousedown", outside); document.removeEventListener("keydown", esc); };
+    document.addEventListener("mousedown", outside);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("mousedown", outside);
+      document.removeEventListener("keydown", esc);
+    };
   }, [filterMenuOpen]);
 
   const adviserName = user?.name?.trim() || section?.adviserName || "Adviser";
   const sectionName = section?.name || "No assigned section";
-  const faceRegisteredCount = useMemo(() => students.filter((s) => hasFaceRegistered(s, locallyRegisteredFaceIds)).length, [students, locallyRegisteredFaceIds]);
+  const faceRegisteredCount = useMemo(
+    () =>
+      students.filter((s) => hasFaceRegistered(s, locallyRegisteredFaceIds))
+        .length,
+    [students, locallyRegisteredFaceIds],
+  );
   const facePendingCount = Math.max(0, students.length - faceRegisteredCount);
   const filteredStudents = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     let result = students.filter((student) => {
       const active = student?.active !== false;
-      const faceRegistered = hasFaceRegistered(student, locallyRegisteredFaceIds);
-      const matchSearch = !query || String(student?.name || "").toLowerCase().includes(query) || String(student?.studentNumber || "").toLowerCase().includes(query);
-      const matchStatus = statusFilter === "ALL" || (statusFilter === "ACTIVE" && active) || (statusFilter === "INACTIVE" && !active);
-      const matchFace = faceFilter === "ALL" || (faceFilter === "REGISTERED" && faceRegistered) || (faceFilter === "PENDING" && !faceRegistered);
+      const faceRegistered = hasFaceRegistered(
+        student,
+        locallyRegisteredFaceIds,
+      );
+      const matchSearch =
+        !query ||
+        String(student?.name || "")
+          .toLowerCase()
+          .includes(query) ||
+        String(student?.studentNumber || "")
+          .toLowerCase()
+          .includes(query);
+      const matchStatus =
+        statusFilter === "ALL" ||
+        (statusFilter === "ACTIVE" && active) ||
+        (statusFilter === "INACTIVE" && !active);
+      const matchFace =
+        faceFilter === "ALL" ||
+        (faceFilter === "REGISTERED" && faceRegistered) ||
+        (faceFilter === "PENDING" && !faceRegistered);
       return matchSearch && matchStatus && matchFace;
     });
-    if (sortOrder !== "DEFAULT") result = [...result].sort((a, b) => {
-      const an = String(a?.name || ""), bn = String(b?.name || "");
-      const ai = String(a?.studentNumber || ""), bi = String(b?.studentNumber || "");
-      if (sortOrder === "NAME_ASC") return an.localeCompare(bn, undefined, { sensitivity: "base" });
-      if (sortOrder === "NAME_DESC") return bn.localeCompare(an, undefined, { sensitivity: "base" });
-      if (sortOrder === "NUMBER_ASC") return ai.localeCompare(bi, undefined, { numeric: true });
-      if (sortOrder === "NUMBER_DESC") return bi.localeCompare(ai, undefined, { numeric: true });
-      return 0;
-    });
+    if (sortOrder !== "DEFAULT")
+      result = [...result].sort((a, b) => {
+        const an = String(a?.name || ""),
+          bn = String(b?.name || "");
+        const ai = String(a?.studentNumber || ""),
+          bi = String(b?.studentNumber || "");
+        if (sortOrder === "NAME_ASC")
+          return an.localeCompare(bn, undefined, { sensitivity: "base" });
+        if (sortOrder === "NAME_DESC")
+          return bn.localeCompare(an, undefined, { sensitivity: "base" });
+        if (sortOrder === "NUMBER_ASC")
+          return ai.localeCompare(bi, undefined, { numeric: true });
+        if (sortOrder === "NUMBER_DESC")
+          return bi.localeCompare(ai, undefined, { numeric: true });
+        return 0;
+      });
     return result;
-  }, [students, searchQuery, statusFilter, faceFilter, sortOrder, locallyRegisteredFaceIds]);
+  }, [
+    students,
+    searchQuery,
+    statusFilter,
+    faceFilter,
+    sortOrder,
+    locallyRegisteredFaceIds,
+  ]);
 
-  const activeFilterCount = [statusFilter !== "ALL", faceFilter !== "ALL", sortOrder !== "DEFAULT"].filter(Boolean).length;
-  const totalPages = Math.max(1, Math.ceil(filteredStudents.length / rowsPerPage));
+  const activeFilterCount = [
+    statusFilter !== "ALL",
+    faceFilter !== "ALL",
+    sortOrder !== "DEFAULT",
+  ].filter(Boolean).length;
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredStudents.length / rowsPerPage),
+  );
   const safePage = Math.min(currentPage, totalPages);
   const pageStartIndex = (safePage - 1) * rowsPerPage;
-  const paginatedStudents = filteredStudents.slice(pageStartIndex, pageStartIndex + rowsPerPage);
+  const paginatedStudents = filteredStudents.slice(
+    pageStartIndex,
+    pageStartIndex + rowsPerPage,
+  );
   const visibleStart = filteredStudents.length ? pageStartIndex + 1 : 0;
-  const visibleEnd = Math.min(pageStartIndex + rowsPerPage, filteredStudents.length);
+  const visibleEnd = Math.min(
+    pageStartIndex + rowsPerPage,
+    filteredStudents.length,
+  );
   const paginationItems = useMemo(() => {
-    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (totalPages <= 5)
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
     if (safePage <= 3) return [1, 2, 3, 4, "r", totalPages];
-    if (safePage >= totalPages - 2) return [1, "l", totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    if (safePage >= totalPages - 2)
+      return [
+        1,
+        "l",
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
     return [1, "l", safePage - 1, safePage, safePage + 1, "r", totalPages];
   }, [safePage, totalPages]);
 
-  useEffect(() => setCurrentPage(1), [searchQuery, statusFilter, faceFilter, sortOrder, rowsPerPage]);
-  useEffect(() => { if (currentPage > totalPages) setCurrentPage(totalPages); }, [currentPage, totalPages]);
+  useEffect(
+    () => setCurrentPage(1),
+    [searchQuery, statusFilter, faceFilter, sortOrder, rowsPerPage],
+  );
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+  }, [currentPage, totalPages]);
 
   const resetRosterView = () => {
-    setSearchQuery(""); setStatusFilter("ALL"); setFaceFilter("ALL"); setSortOrder("DEFAULT"); setRowsPerPage(10); setCurrentPage(1);
+    setSearchQuery("");
+    setStatusFilter("ALL");
+    setFaceFilter("ALL");
+    setSortOrder("DEFAULT");
+    setRowsPerPage(10);
+    setCurrentPage(1);
   };
   const refreshStudents = async () => {
-    const data = scopeStudentsToSection(normalizeArray(await adviserService.getStudents()), section?.id);
-    setStudents(data); return data;
+    const data = scopeStudentsToSection(
+      normalizeArray(await adviserService.getStudents()),
+      section?.id,
+    );
+    setStudents(data);
+    return data;
   };
   const handleVoiceChange = (enabled) => {
-    speechService.setEnabled(enabled); setVoiceEnabled(enabled);
+    speechService.setEnabled(enabled);
+    setVoiceEnabled(enabled);
     if (enabled) speechService.speak("Voice guidance enabled.");
   };
   const resetScan = () => {
@@ -849,26 +1082,44 @@ function StudentManagement() {
   };
   const stopCamera = ({ cancelScan = true } = {}) => {
     if (cancelScan) scanRunRef.current += 1;
-    stopMediaStream(streamRef.current); streamRef.current = null;
+    stopMediaStream(streamRef.current);
+    streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
     faceReadiness.resetTracking();
     autoReadyChecksRef.current = 0;
-    setCameraActive(false); setCameraReady(false);
+    setCameraActive(false);
+    setCameraReady(false);
   };
   const startCamera = async () => {
     try {
-      setCameraError(""); setScan((current) => ({ ...current, error: "" }));
-      if (!navigator.mediaDevices?.getUserMedia) throw new Error("Camera access is not supported by this browser.");
+      setCameraError("");
+      setScan((current) => ({ ...current, error: "" }));
+      if (!navigator.mediaDevices?.getUserMedia)
+        throw new Error("Camera access is not supported by this browser.");
       stopCamera({ cancelScan: false });
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+        audio: false,
+      });
       const video = videoRef.current;
-      if (!video) { stopMediaStream(stream); throw new Error("Camera preview is not ready yet."); }
-      streamRef.current = stream; video.srcObject = stream; setCameraActive(true);
+      if (!video) {
+        stopMediaStream(stream);
+        throw new Error("Camera preview is not ready yet.");
+      }
+      streamRef.current = stream;
+      video.srcObject = stream;
+      setCameraActive(true);
       await video.play();
       await waitForVideoReady(video);
       setCameraReady(true);
       faceReadiness.resetTracking();
-      setDetectorStatus(faceReadiness.isSupported() ? "loading" : "unavailable");
+      setDetectorStatus(
+        faceReadiness.isSupported() ? "loading" : "unavailable",
+      );
       if (faceReadiness.isSupported()) {
         void faceReadiness
           .ensureReady()
@@ -881,24 +1132,37 @@ function StudentManagement() {
       }
       return video;
     } catch (requestError) {
-      stopMediaStream(streamRef.current); streamRef.current = null; setCameraActive(false); setCameraReady(false);
+      stopMediaStream(streamRef.current);
+      streamRef.current = null;
+      setCameraActive(false);
+      setCameraReady(false);
       let message = requestError?.message || "Unable to access the camera.";
-      if (requestError?.name === "NotAllowedError") message = "Camera permission was denied. Allow camera access and try again.";
-      if (requestError?.name === "NotFoundError") message = "No camera was detected on this device.";
-      if (requestError?.name === "NotReadableError") message = "The camera is being used by another application or tab.";
-      setCameraError(message); throw requestError;
+      if (requestError?.name === "NotAllowedError")
+        message =
+          "Camera permission was denied. Allow camera access and try again.";
+      if (requestError?.name === "NotFoundError")
+        message = "No camera was detected on this device.";
+      if (requestError?.name === "NotReadableError")
+        message = "The camera is being used by another application or tab.";
+      setCameraError(message);
+      throw requestError;
     }
   };
   const ensureCamera = async () => {
     const video = videoRef.current;
-    if (streamRef.current && video?.srcObject && video.videoWidth > 0) { await waitForVideoReady(video); return video; }
+    if (streamRef.current && video?.srcObject && video.videoWidth > 0) {
+      await waitForVideoReady(video);
+      return video;
+    }
     return startCamera();
   };
   const scheduleCameraStart = () => {
-    if (cameraStartFrameRef.current) window.cancelAnimationFrame(cameraStartFrameRef.current);
+    if (cameraStartFrameRef.current)
+      window.cancelAnimationFrame(cameraStartFrameRef.current);
     cameraStartFrameRef.current = window.requestAnimationFrame(() => {
       cameraStartFrameRef.current = window.requestAnimationFrame(() => {
-        cameraStartFrameRef.current = null; void startCamera().catch(() => {});
+        cameraStartFrameRef.current = null;
+        void startCamera().catch(() => {});
       });
     });
   };
@@ -911,15 +1175,26 @@ function StudentManagement() {
   };
 
   const speakFaceGuidance = (analysis) => {
-    if (!voiceEnabled || !speechService.isSupported() || !analysis?.guidanceKey) return;
+    if (!voiceEnabled || !speechService.isSupported() || !analysis?.guidanceKey)
+      return;
 
     const now = Date.now();
     const previous = lastSpokenGuidanceRef.current;
-    const important = ["MULTIPLE_FACES", "READY", "WRONG_DIRECTION", "HOLD_CHALLENGE", "BLINK_COMPLETE"];
+    const important = [
+      "MULTIPLE_FACES",
+      "READY",
+      "WRONG_DIRECTION",
+      "HOLD_CHALLENGE",
+      "BLINK_COMPLETE",
+    ];
     const cooldown = important.includes(analysis.guidanceKey) ? 1300 : 2400;
 
-    if (previous.key === analysis.guidanceKey && now - previous.at < cooldown) return;
-    if (previous.key !== analysis.guidanceKey || now - previous.at >= cooldown) {
+    if (previous.key === analysis.guidanceKey && now - previous.at < cooldown)
+      return;
+    if (
+      previous.key !== analysis.guidanceKey ||
+      now - previous.at >= cooldown
+    ) {
       lastSpokenGuidanceRef.current = { key: analysis.guidanceKey, at: now };
       speechService.speak(analysis.guidance);
     }
@@ -927,7 +1202,12 @@ function StudentManagement() {
 
   const analyzeFaceNow = async (video = videoRef.current) => {
     if (!faceReadiness.isSupported()) {
-      return { ...DEFAULT_FACE_GUIDANCE, available: false, guidanceKey: "UNAVAILABLE", guidance: "Use manual secure scan." };
+      return {
+        ...DEFAULT_FACE_GUIDANCE,
+        available: false,
+        guidanceKey: "UNAVAILABLE",
+        guidance: "Use manual secure scan.",
+      };
     }
 
     try {
@@ -964,7 +1244,6 @@ function StudentManagement() {
 
     return { frames };
   };
-
 
   const captureChallengeWithGuidance = async ({
     video,
@@ -1005,7 +1284,6 @@ function StudentManagement() {
     };
   };
 
-
   /* =======================================================
      LIVE SCAN ENGINE
 
@@ -1015,7 +1293,11 @@ function StudentManagement() {
      the experience stays understandable without weakening the security flow.
   ======================================================= */
 
-  const runGuidedLiveness = async ({ student, mode = "ENROLLMENT", conflictId = "" }) => {
+  const runGuidedLiveness = async ({
+    student,
+    mode = "ENROLLMENT",
+    conflictId = "",
+  }) => {
     if (!student?.id) throw new Error("Student information is unavailable.");
 
     const normalizedMode = String(mode || "ENROLLMENT").toUpperCase();
@@ -1095,7 +1377,8 @@ function StudentManagement() {
 
       const baseline = await captureBaseline(video, runId);
 
-      if (scanRunRef.current !== runId) throw new Error("Liveness capture was cancelled.");
+      if (scanRunRef.current !== runId)
+        throw new Error("Liveness capture was cancelled.");
 
       setScan((current) => ({
         ...current,
@@ -1105,7 +1388,10 @@ function StudentManagement() {
 
       const challenge =
         normalizedMode === "CONFLICT"
-          ? await adviserService.createFaceConflictLivenessChallenge(student.id, conflictId)
+          ? await adviserService.createFaceConflictLivenessChallenge(
+              student.id,
+              conflictId,
+            )
           : await adviserService.createEnrollmentLivenessChallenge(student.id);
 
       if (challenge?.assistedVerificationRequired) {
@@ -1117,7 +1403,9 @@ function StudentManagement() {
       }
 
       if (!challenge?.challengeId || !challenge?.challengeType) {
-        throw new Error("The server did not return a usable liveness challenge.");
+        throw new Error(
+          "The server did not return a usable liveness challenge.",
+        );
       }
 
       const challengeType = String(challenge.challengeType).toUpperCase();
@@ -1126,11 +1414,15 @@ function StudentManagement() {
         phase: "challenge",
         challengeType,
         challengeProgress: 0,
-        challengeGuidanceKey: challengeType === "BLINK" ? "EYES_OPEN" : "FOLLOW_ARROW",
+        challengeGuidanceKey:
+          challengeType === "BLINK" ? "EYES_OPEN" : "FOLLOW_ARROW",
         progress: 48,
       }));
 
-      speechService.announceChallenge(student?.name || "Student", challengeType);
+      speechService.announceChallenge(
+        student?.name || "Student",
+        challengeType,
+      );
       await sleep(650);
 
       const challengeCapture = await captureChallengeWithGuidance({
@@ -1139,11 +1431,10 @@ function StudentManagement() {
         challengeType,
       });
 
-      if (scanRunRef.current !== runId) throw new Error("Liveness capture was cancelled.");
-
+      if (scanRunRef.current !== runId)
+        throw new Error("Liveness capture was cancelled.");
 
       stopCamera({ cancelScan: false });
-  
 
       setPendingLiveness({
         studentId: student.id,
@@ -1186,7 +1477,10 @@ function StudentManagement() {
         busy: false,
         phase: "failed",
         challengeProgress: 0,
-        error: getFaceFlowError(captureError, captureError?.message || "Unable to complete secure face capture."),
+        error: getFaceFlowError(
+          captureError,
+          captureError?.message || "Unable to complete secure face capture.",
+        ),
       }));
       throw captureError;
     }
@@ -1201,7 +1495,10 @@ function StudentManagement() {
     try {
       await refreshStudents();
     } catch (refreshError) {
-      console.warn("Unable to refresh students after face enrollment:", refreshError);
+      console.warn(
+        "Unable to refresh students after face enrollment:",
+        refreshError,
+      );
     }
   };
 
@@ -1210,7 +1507,9 @@ function StudentManagement() {
     if (result?.reviewPending) return { type: "REVIEW", result };
     if (result?.passed !== true) return { type: "FAILED", result };
 
-    const outcome = String(result?.faceEnrollmentOutcome || result?.outcome || "").toUpperCase();
+    const outcome = String(
+      result?.faceEnrollmentOutcome || result?.outcome || "",
+    ).toUpperCase();
     if (outcome === "FACE_CONFLICT") {
       const conflict = normalizeConflict(result);
       setFaceConflict(conflict);
@@ -1224,7 +1523,9 @@ function StudentManagement() {
       return { type: "ENROLLED", result };
     }
 
-    throw new Error("The backend returned an unsupported face-enrollment outcome.");
+    throw new Error(
+      "The backend returned an unsupported face-enrollment outcome.",
+    );
   };
 
   /* =======================================================
@@ -1302,21 +1603,31 @@ function StudentManagement() {
       let record = created;
       if (!record?.id) {
         const refreshed = await refreshStudents();
-        record = refreshed.find((student) => String(student?.studentNumber) === cleanNumber);
+        record = refreshed.find(
+          (student) => String(student?.studentNumber) === cleanNumber,
+        );
       } else {
         setStudents((current) =>
-          current.some((student) => student.id === record.id) ? current : [...current, record],
+          current.some((student) => student.id === record.id)
+            ? current
+            : [...current, record],
         );
       }
 
-      if (!record?.id) throw new Error("Student was created, but the new student ID could not be resolved.");
+      if (!record?.id)
+        throw new Error(
+          "Student was created, but the new student ID could not be resolved.",
+        );
       setCreatedStudentRecord(record);
       return record;
     } catch (requestError) {
       setCreateError(
         requestError?.response?.status === 409
           ? "That student number already exists."
-          : getErrorMessage(requestError, "Unable to create the student record."),
+          : getErrorMessage(
+              requestError,
+              "Unable to create the student record.",
+            ),
       );
       return null;
     } finally {
@@ -1356,7 +1667,10 @@ function StudentManagement() {
         ...current,
         busy: false,
         phase: "failed",
-        error: getFaceFlowError(requestError, "Unable to complete secure face enrollment."),
+        error: getFaceFlowError(
+          requestError,
+          "Unable to complete secure face enrollment.",
+        ),
       }));
     } finally {
       setRegisteringFace(false);
@@ -1373,8 +1687,11 @@ function StudentManagement() {
   };
 
   const finishAddEnrollment = () => {
-    const completedName = createdStudentRecord?.name || studentName.trim() || "Student";
-    setSuccessMessage(`${completedName} was added to ${sectionName} and secure face enrollment was completed successfully.`);
+    const completedName =
+      createdStudentRecord?.name || studentName.trim() || "Student";
+    setSuccessMessage(
+      `${completedName} was added to ${sectionName} and secure face enrollment was completed successfully.`,
+    );
     stopCamera();
     setShowAddModal(false);
     resetAddState();
@@ -1438,13 +1755,18 @@ function StudentManagement() {
       } catch (refreshError) {
         console.warn("Unable to refresh students after update:", refreshError);
       }
-      setSuccessMessage(`${cleanName}'s student information was updated successfully.`);
+      setSuccessMessage(
+        `${cleanName}'s student information was updated successfully.`,
+      );
       closeEditStudent();
     } catch (requestError) {
       setEditError(
         requestError?.response?.status === 409
           ? "That student number already belongs to another student."
-          : getErrorMessage(requestError, "Unable to update the student record."),
+          : getErrorMessage(
+              requestError,
+              "Unable to update the student record.",
+            ),
       );
     } finally {
       setUpdatingStudent(false);
@@ -1482,7 +1804,9 @@ function StudentManagement() {
       setRegisteringFace(true);
       const outcome = await performEnrollment(student);
       if (outcome.type === "ENROLLED") {
-        setSuccessMessage(`Secure face enrollment completed for ${student.name || "Student"}.`);
+        setSuccessMessage(
+          `Secure face enrollment completed for ${student.name || "Student"}.`,
+        );
         stopCamera();
         resetScan();
         setSelectedStudent(null);
@@ -1496,7 +1820,10 @@ function StudentManagement() {
         ...current,
         busy: false,
         phase: "failed",
-        error: getFaceFlowError(requestError, "Unable to complete secure face enrollment."),
+        error: getFaceFlowError(
+          requestError,
+          "Unable to complete secure face enrollment.",
+        ),
       }));
     } finally {
       setRegisteringFace(false);
@@ -1520,7 +1847,10 @@ function StudentManagement() {
   const openConflictVerification = () => {
     const target = getCurrentEnrollmentTarget();
     if (!target?.student?.id || !faceConflict?.conflictId) {
-      setScan((current) => ({ ...current, error: "Face conflict information is incomplete." }));
+      setScan((current) => ({
+        ...current,
+        error: "Face conflict information is incomplete.",
+      }));
       return;
     }
     if (faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON") {
@@ -1536,7 +1866,9 @@ function StudentManagement() {
     setConflictStage("READY");
     setConflictOpen(true);
     scheduleCameraStart();
-    speechService.speak(`${target.student.name || "Student"}, a fresh live identity verification is ready.`);
+    speechService.speak(
+      `${target.student.name || "Student"}, a fresh live identity verification is ready.`,
+    );
   };
 
   const closeConflictVerification = () => {
@@ -1580,14 +1912,22 @@ function StudentManagement() {
       }
       if (outcome === "CONFLICT_NOT_REPRODUCED") {
         setConflictStage("NOT_REPRODUCED");
-        speechService.speak("The original conflict was not reproduced. Please retry secure face enrollment.");
+        speechService.speak(
+          "The original conflict was not reproduced. Please retry secure face enrollment.",
+        );
         return;
       }
       if (outcome === "VERIFIED_DIFFERENT_PEOPLE") {
-        setFaceConflict((current) => ({ ...current, conflictStatus: "VERIFIED_DIFFERENT_PEOPLE" }));
+        setFaceConflict((current) => ({
+          ...current,
+          conflictStatus: "VERIFIED_DIFFERENT_PEOPLE",
+        }));
         setConflictContext((current) => ({
           ...current,
-          conflict: { ...current?.conflict, conflictStatus: "VERIFIED_DIFFERENT_PEOPLE" },
+          conflict: {
+            ...current?.conflict,
+            conflictStatus: "VERIFIED_DIFFERENT_PEOPLE",
+          },
         }));
         setConflictStage("FINAL_SCAN");
         speechService.announceDifferentPeople(student?.name);
@@ -1596,22 +1936,35 @@ function StudentManagement() {
         return;
       }
       if (outcome === "CONFIRMED_SAME_PERSON") {
-        setFaceConflict((current) => ({ ...current, conflictStatus: "CONFIRMED_SAME_PERSON" }));
+        setFaceConflict((current) => ({
+          ...current,
+          conflictStatus: "CONFIRMED_SAME_PERSON",
+        }));
         setConflictStage("SAME_PERSON");
         speechService.announceSamePerson(student?.name);
         return;
       }
 
       setConflictStage("FAILED");
-      setScan((current) => ({ ...current, error: "The server returned an unsupported conflict-verification outcome." }));
+      setScan((current) => ({
+        ...current,
+        error:
+          "The server returned an unsupported conflict-verification outcome.",
+      }));
     } catch (requestError) {
-      console.error("Unable to complete conflict liveness verification:", requestError);
+      console.error(
+        "Unable to complete conflict liveness verification:",
+        requestError,
+      );
       setConflictStage("FAILED");
       setScan((current) => ({
         ...current,
         busy: false,
         phase: "failed",
-        error: getFaceFlowError(requestError, "Unable to complete live identity verification."),
+        error: getFaceFlowError(
+          requestError,
+          "Unable to complete live identity verification.",
+        ),
       }));
     } finally {
       setConflictBusy(false);
@@ -1638,9 +1991,15 @@ function StudentManagement() {
       setPendingDecision("");
 
       if (result?.conflictStatus === "VERIFIED_DIFFERENT_PEOPLE") {
-        const nextConflict = { ...conflict, conflictStatus: "VERIFIED_DIFFERENT_PEOPLE" };
+        const nextConflict = {
+          ...conflict,
+          conflictStatus: "VERIFIED_DIFFERENT_PEOPLE",
+        };
         setFaceConflict(nextConflict);
-        setConflictContext((current) => ({ ...current, conflict: nextConflict }));
+        setConflictContext((current) => ({
+          ...current,
+          conflict: nextConflict,
+        }));
         setConflictStage("FINAL_SCAN");
         speechService.announceDifferentPeople(student?.name);
         resetScan();
@@ -1649,7 +2008,10 @@ function StudentManagement() {
       }
 
       if (result?.conflictStatus === "CONFIRMED_SAME_PERSON") {
-        setFaceConflict((current) => ({ ...current, conflictStatus: "CONFIRMED_SAME_PERSON" }));
+        setFaceConflict((current) => ({
+          ...current,
+          conflictStatus: "CONFIRMED_SAME_PERSON",
+        }));
         setConflictStage("SAME_PERSON");
         speechService.announceSamePerson(student?.name);
         return;
@@ -1659,7 +2021,10 @@ function StudentManagement() {
     } catch (requestError) {
       setScan((current) => ({
         ...current,
-        error: getErrorMessage(requestError, "Unable to save the identity decision."),
+        error: getErrorMessage(
+          requestError,
+          "Unable to save the identity decision.",
+        ),
       }));
     } finally {
       setConflictBusy(false);
@@ -1675,7 +2040,9 @@ function StudentManagement() {
       setConflictBusy(true);
       const outcome = await performEnrollment(student);
       if (outcome.type === "ENROLLED") {
-        setSuccessMessage(`Identity review completed and secure face enrollment was saved for ${student.name || "Student"}.`);
+        setSuccessMessage(
+          `Identity review completed and secure face enrollment was saved for ${student.name || "Student"}.`,
+        );
         setConflictOpen(false);
         setFaceConflict(null);
         stopCamera();
@@ -1691,7 +2058,10 @@ function StudentManagement() {
       }
 
       if (outcome.type === "FACE_CONFLICT") {
-        setConflictContext((current) => ({ ...current, conflict: outcome.conflict }));
+        setConflictContext((current) => ({
+          ...current,
+          conflict: outcome.conflict,
+        }));
         setFaceConflict(outcome.conflict);
         setConflictStage("READY");
         resetScan();
@@ -1699,12 +2069,18 @@ function StudentManagement() {
         speechService.announceConflict(student?.name);
       }
     } catch (requestError) {
-      console.error("Unable to complete final secure enrollment:", requestError);
+      console.error(
+        "Unable to complete final secure enrollment:",
+        requestError,
+      );
       setScan((current) => ({
         ...current,
         busy: false,
         phase: "failed",
-        error: getFaceFlowError(requestError, "Unable to complete the final secure face enrollment."),
+        error: getFaceFlowError(
+          requestError,
+          "Unable to complete the final secure face enrollment.",
+        ),
       }));
     } finally {
       setConflictBusy(false);
@@ -1734,11 +2110,20 @@ function StudentManagement() {
   };
 
   const getCurrentAutoStartAction = () => {
-    if (!cameraActive || !cameraReady || scan.busy || pendingLiveness || !autoStartEnabled) return null;
+    if (
+      !cameraActive ||
+      !cameraReady ||
+      scan.busy ||
+      pendingLiveness ||
+      !autoStartEnabled
+    )
+      return null;
 
     if (conflictOpen && conflictContext) {
-      if (["READY", "FAILED"].includes(conflictStage)) return () => void runConflictLiveness();
-      if (conflictStage === "FINAL_SCAN") return () => void completeFinalEnrollment();
+      if (["READY", "FAILED"].includes(conflictStage))
+        return () => void runConflictLiveness();
+      if (conflictStage === "FINAL_SCAN")
+        return () => void completeFinalEnrollment();
       return null;
     }
 
@@ -1778,7 +2163,11 @@ function StudentManagement() {
 
         const oneFaceDetected = analysis.faceCount === 1;
 
-        if (oneFaceDetected && autoStartEnabled && getCurrentAutoStartAction()) {
+        if (
+          oneFaceDetected &&
+          autoStartEnabled &&
+          getCurrentAutoStartAction()
+        ) {
           autoReadyChecksRef.current += 1;
 
           if (
@@ -1809,7 +2198,10 @@ function StudentManagement() {
         return;
       }
 
-      faceMonitorTimerRef.current = window.setTimeout(loop, FACE_MONITOR_INTERVAL_MS);
+      faceMonitorTimerRef.current = window.setTimeout(
+        loop,
+        FACE_MONITOR_INTERVAL_MS,
+      );
     };
 
     faceMonitorTimerRef.current = window.setTimeout(loop, 60);
@@ -1854,16 +2246,30 @@ function StudentManagement() {
       <section className="student-management">
         {error && (
           <div className="adviser-alert adviser-alert-error" role="alert">
-            <span className="adviser-alert-icon" aria-hidden="true">!</span>
-            <div><strong>Student records unavailable</strong><p>{error}</p></div>
+            <span className="adviser-alert-icon" aria-hidden="true">
+              !
+            </span>
+            <div>
+              <strong>Student records unavailable</strong>
+              <p>{error}</p>
+            </div>
           </div>
         )}
 
         {successMessage && (
           <div className="student-success-alert" role="status">
             <span aria-hidden="true">✓</span>
-            <div><strong>Operation successful</strong><p>{successMessage}</p></div>
-            <button type="button" aria-label="Dismiss notification" onClick={() => setSuccessMessage("")}>×</button>
+            <div>
+              <strong>Operation successful</strong>
+              <p>{successMessage}</p>
+            </div>
+            <button
+              type="button"
+              aria-label="Dismiss notification"
+              onClick={() => setSuccessMessage("")}
+            >
+              ×
+            </button>
           </div>
         )}
 
@@ -1872,7 +2278,10 @@ function StudentManagement() {
             <span aria-hidden="true">◎</span>
             <div>
               <strong>Secure Face Enrollment</strong>
-              <p>Enrollment uses silent anti-spoofing, one guided live movement, same-person continuity, and optional voice guidance.</p>
+              <p>
+                Enrollment uses silent anti-spoofing, one guided live movement,
+                same-person continuity, and optional voice guidance.
+              </p>
             </div>
           </div>
         )}
@@ -1881,40 +2290,77 @@ function StudentManagement() {
           <div className="student-section-heading">
             <span>ASSIGNED SECTION</span>
             <h2>{loading ? "Loading section..." : sectionName}</h2>
-            <p>Adviser: <strong>{adviserName}</strong></p>
+            <p>
+              Adviser: <strong>{adviserName}</strong>
+            </p>
           </div>
           <div className="student-section-stats">
-            <div><span>TOTAL STUDENTS</span><strong>{loading ? "—" : students.length}</strong></div>
-            <div><span>FACE PENDING</span><strong>{loading ? "—" : facePendingCount}</strong></div>
-            <div><span>FACE REGISTERED</span><strong>{loading ? "—" : faceRegisteredCount}</strong></div>
+            <div>
+              <span>TOTAL STUDENTS</span>
+              <strong>{loading ? "—" : students.length}</strong>
+            </div>
+            <div>
+              <span>FACE PENDING</span>
+              <strong>{loading ? "—" : facePendingCount}</strong>
+            </div>
+            <div>
+              <span>FACE REGISTERED</span>
+              <strong>{loading ? "—" : faceRegisteredCount}</strong>
+            </div>
           </div>
-          <span className={`student-section-badge ${section?.active === false ? "is-inactive" : ""}`}>
-            <span aria-hidden="true" />{section?.active === false ? "INACTIVE" : "ACTIVE"}
+          <span
+            className={`student-section-badge ${section?.active === false ? "is-inactive" : ""}`}
+          >
+            <span aria-hidden="true" />
+            {section?.active === false ? "INACTIVE" : "ACTIVE"}
           </span>
         </section>
 
         <section className="student-panel">
           <header className="student-panel-header">
-            <div><span>CLASS ROSTER</span><h2>Students</h2><p>Manage student records and secure face identities.</p></div>
-            <button type="button" className="adviser-primary-button" disabled={loading || !section?.id} onClick={openAddStudentModal}>
+            <div>
+              <span>CLASS ROSTER</span>
+              <h2>Students</h2>
+              <p>Manage student records and secure face identities.</p>
+            </div>
+            <button
+              type="button"
+              className="adviser-primary-button"
+              disabled={loading || !section?.id}
+              onClick={openAddStudentModal}
+            >
               <span aria-hidden="true">+</span> Add Student
             </button>
           </header>
 
           <div className="student-toolbar">
             <label className="student-search">
-              <span className="student-search-icon" aria-hidden="true">⌕</span>
+              <span className="student-search-icon" aria-hidden="true">
+                ⌕
+              </span>
               <input
                 type="search"
                 value={searchQuery}
                 placeholder="Search by student name or student number..."
                 onChange={(event) => setSearchQuery(event.target.value)}
               />
-              {searchQuery && <button type="button" aria-label="Clear search" onClick={() => setSearchQuery("")}>×</button>}
+              {searchQuery && (
+                <button
+                  type="button"
+                  aria-label="Clear search"
+                  onClick={() => setSearchQuery("")}
+                >
+                  ×
+                </button>
+              )}
             </label>
 
             <div className="student-toolbar-actions">
-              <span className="student-result-count"><strong>{filteredStudents.length}</strong> of <strong>{students.length}</strong> student{students.length === 1 ? "" : "s"}</span>
+              <span className="student-result-count">
+                <strong>{filteredStudents.length}</strong> of{" "}
+                <strong>{students.length}</strong> student
+                {students.length === 1 ? "" : "s"}
+              </span>
               <div className="student-filter-wrap" ref={filterMenuRef}>
                 <button
                   type="button"
@@ -1923,47 +2369,133 @@ function StudentManagement() {
                   aria-haspopup="dialog"
                   onClick={() => setFilterMenuOpen((current) => !current)}
                 >
-                  <span className="student-filter-button-icon" aria-hidden="true">≡</span>
+                  <span
+                    className="student-filter-button-icon"
+                    aria-hidden="true"
+                  >
+                    ≡
+                  </span>
                   Filters
-                  {activeFilterCount > 0 && <span className="student-filter-count">{activeFilterCount}</span>}
-                  <span className="student-filter-chevron" aria-hidden="true">{filterMenuOpen ? "⌃" : "⌄"}</span>
+                  {activeFilterCount > 0 && (
+                    <span className="student-filter-count">
+                      {activeFilterCount}
+                    </span>
+                  )}
+                  <span className="student-filter-chevron" aria-hidden="true">
+                    {filterMenuOpen ? "⌃" : "⌄"}
+                  </span>
                 </button>
 
                 {filterMenuOpen && (
-                  <div className="student-filter-menu" role="dialog" aria-label="Filter students">
+                  <div
+                    className="student-filter-menu"
+                    role="dialog"
+                    aria-label="Filter students"
+                  >
                     <header className="student-filter-menu-header">
-                      <div><strong>Filter students</strong><span>Refine the class roster</span></div>
-                      <button type="button" aria-label="Close filters" onClick={() => setFilterMenuOpen(false)}>×</button>
+                      <div>
+                        <strong>Filter students</strong>
+                        <span>Refine the class roster</span>
+                      </div>
+                      <button
+                        type="button"
+                        aria-label="Close filters"
+                        onClick={() => setFilterMenuOpen(false)}
+                      >
+                        ×
+                      </button>
                     </header>
                     <div className="student-filter-menu-body">
                       <label className="student-filter-row">
-                        <span className="student-filter-row-label"><i className="is-status" aria-hidden="true" />Status</span>
-                        <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-                          <option value="ALL">All statuses</option><option value="ACTIVE">Active only</option><option value="INACTIVE">Inactive only</option>
+                        <span className="student-filter-row-label">
+                          <i className="is-status" aria-hidden="true" />
+                          Status
+                        </span>
+                        <select
+                          value={statusFilter}
+                          onChange={(event) =>
+                            setStatusFilter(event.target.value)
+                          }
+                        >
+                          <option value="ALL">All statuses</option>
+                          <option value="ACTIVE">Active only</option>
+                          <option value="INACTIVE">Inactive only</option>
                         </select>
                       </label>
                       <label className="student-filter-row">
-                        <span className="student-filter-row-label"><i className="is-face" aria-hidden="true" />Face</span>
-                        <select value={faceFilter} onChange={(event) => setFaceFilter(event.target.value)}>
-                          <option value="ALL">All face records</option><option value="REGISTERED">Registered</option><option value="PENDING">Pending</option>
+                        <span className="student-filter-row-label">
+                          <i className="is-face" aria-hidden="true" />
+                          Face
+                        </span>
+                        <select
+                          value={faceFilter}
+                          onChange={(event) =>
+                            setFaceFilter(event.target.value)
+                          }
+                        >
+                          <option value="ALL">All face records</option>
+                          <option value="REGISTERED">Registered</option>
+                          <option value="PENDING">Pending</option>
                         </select>
                       </label>
                       <label className="student-filter-row">
-                        <span className="student-filter-row-label"><i className="is-sort" aria-hidden="true" />Sort by</span>
-                        <select value={sortOrder} onChange={(event) => setSortOrder(event.target.value)}>
-                          <option value="DEFAULT">Default</option><option value="NAME_ASC">Name A–Z</option><option value="NAME_DESC">Name Z–A</option><option value="NUMBER_ASC">Student no. ascending</option><option value="NUMBER_DESC">Student no. descending</option>
+                        <span className="student-filter-row-label">
+                          <i className="is-sort" aria-hidden="true" />
+                          Sort by
+                        </span>
+                        <select
+                          value={sortOrder}
+                          onChange={(event) => setSortOrder(event.target.value)}
+                        >
+                          <option value="DEFAULT">Default</option>
+                          <option value="NAME_ASC">Name A–Z</option>
+                          <option value="NAME_DESC">Name Z–A</option>
+                          <option value="NUMBER_ASC">
+                            Student no. ascending
+                          </option>
+                          <option value="NUMBER_DESC">
+                            Student no. descending
+                          </option>
                         </select>
                       </label>
                       <label className="student-filter-row">
-                        <span className="student-filter-row-label"><i className="is-rows" aria-hidden="true" />Rows</span>
-                        <select value={rowsPerPage} onChange={(event) => setRowsPerPage(Number(event.target.value))}>
-                          <option value={5}>5 per page</option><option value={10}>10 per page</option><option value={20}>20 per page</option><option value={50}>50 per page</option>
+                        <span className="student-filter-row-label">
+                          <i className="is-rows" aria-hidden="true" />
+                          Rows
+                        </span>
+                        <select
+                          value={rowsPerPage}
+                          onChange={(event) =>
+                            setRowsPerPage(Number(event.target.value))
+                          }
+                        >
+                          <option value={5}>5 per page</option>
+                          <option value={10}>10 per page</option>
+                          <option value={20}>20 per page</option>
+                          <option value={50}>50 per page</option>
                         </select>
                       </label>
                     </div>
                     <footer className="student-filter-menu-footer">
-                      <button type="button" className="student-filter-reset" disabled={!searchQuery && activeFilterCount === 0 && rowsPerPage === 10} onClick={resetRosterView}>Reset</button>
-                      <button type="button" className="student-filter-done" onClick={() => setFilterMenuOpen(false)}>Done</button>
+                      <button
+                        type="button"
+                        className="student-filter-reset"
+                        disabled={
+                          !searchQuery &&
+                          activeFilterCount === 0 &&
+                          rowsPerPage === 10
+                        }
+                        onClick={resetRosterView}
+                      >
+                        Reset
+                      </button>
+                      <button
+                        type="button"
+                        className="student-filter-done"
+                        onClick={() => setFilterMenuOpen(false)}
+                      >
+                        Done
+                      </button>
                     </footer>
                   </div>
                 )}
@@ -1973,31 +2505,136 @@ function StudentManagement() {
 
           <div className="student-table-shell">
             {loading ? (
-              <div className="student-loading-state"><span className="student-loading-spinner" /><strong>Loading students...</strong><p>Retrieving your assigned section roster.</p></div>
+              <div className="student-loading-state">
+                <span className="student-loading-spinner" />
+                <strong>Loading students...</strong>
+                <p>Retrieving your assigned section roster.</p>
+              </div>
             ) : !section ? (
-              <div className="student-empty-state"><span aria-hidden="true">◇</span><h3>No assigned section</h3><p>A Councilor must assign a section to your Adviser account before you can manage students.</p></div>
+              <div className="student-empty-state">
+                <span aria-hidden="true">◇</span>
+                <h3>No assigned section</h3>
+                <p>
+                  A Councilor must assign a section to your Adviser account
+                  before you can manage students.
+                </p>
+              </div>
             ) : students.length === 0 ? (
-              <div className="student-empty-state"><span aria-hidden="true">♙</span><h3>No students yet</h3><p>Add the first student to <strong>{sectionName}</strong>.</p><button type="button" className="adviser-primary-button" onClick={openAddStudentModal}>+ Add Student</button></div>
+              <div className="student-empty-state">
+                <span aria-hidden="true">♙</span>
+                <h3>No students yet</h3>
+                <p>
+                  Add the first student to <strong>{sectionName}</strong>.
+                </p>
+                <button
+                  type="button"
+                  className="adviser-primary-button"
+                  onClick={openAddStudentModal}
+                >
+                  + Add Student
+                </button>
+              </div>
             ) : filteredStudents.length === 0 ? (
-              <div className="student-empty-state"><span aria-hidden="true">⌕</span><h3>No matching students</h3><p>{searchQuery ? <>No student matched <strong>“{searchQuery}”</strong>.</> : <>No students match the selected filters.</>}</p><button type="button" className="adviser-secondary-button student-empty-reset" onClick={resetRosterView}>Reset view</button></div>
+              <div className="student-empty-state">
+                <span aria-hidden="true">⌕</span>
+                <h3>No matching students</h3>
+                <p>
+                  {searchQuery ? (
+                    <>
+                      No student matched <strong>“{searchQuery}”</strong>.
+                    </>
+                  ) : (
+                    <>No students match the selected filters.</>
+                  )}
+                </p>
+                <button
+                  type="button"
+                  className="adviser-secondary-button student-empty-reset"
+                  onClick={resetRosterView}
+                >
+                  Reset view
+                </button>
+              </div>
             ) : (
               <table className="student-table">
-                <thead><tr><th>#</th><th>Student Number</th><th>Student Name</th><th>Status</th><th>Face Registration</th><th>Actions</th></tr></thead>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Student Number</th>
+                    <th>Student Name</th>
+                    <th>Status</th>
+                    <th>Face Registration</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
                 <tbody>
                   {paginatedStudents.map((student, index) => {
-                    const faceRegistered = hasFaceRegistered(student, locallyRegisteredFaceIds);
+                    const faceRegistered = hasFaceRegistered(
+                      student,
+                      locallyRegisteredFaceIds,
+                    );
                     const active = student?.active !== false;
                     return (
                       <tr key={student.id || student.studentNumber}>
-                        <td className="student-table-index">{String(pageStartIndex + index + 1).padStart(2, "0")}</td>
-                        <td><span className="student-number">{student.studentNumber || "—"}</span></td>
-                        <td><div className="student-name-cell"><span className="student-avatar">{student.name?.charAt(0)?.toUpperCase() || "S"}</span><div><strong>{student.name || "Unnamed Student"}</strong><small>{sectionName}</small></div></div></td>
-                        <td><span className={`student-status-badge ${active ? "is-active" : "is-inactive"}`}><span aria-hidden="true" />{active ? "Active" : "Inactive"}</span></td>
-                        <td><span className={`student-face-badge ${faceRegistered ? "is-registered" : ""}`}><span aria-hidden="true">{faceRegistered ? "✓" : "◎"}</span>{faceRegistered ? "Registered" : "Not Registered"}</span></td>
-                        <td><div className="student-row-actions">
-                          <button type="button" className="student-face-action is-edit" disabled={!active} onClick={() => openEditStudent(student)}>Edit</button>
-                          <button type="button" className={`student-face-action is-face ${faceRegistered ? "is-registered" : ""}`} disabled={!active} onClick={() => openFaceRegistration(student)}>{faceRegistered ? "Update Face" : "Register Face"}</button>
-                        </div></td>
+                        <td className="student-table-index">
+                          {String(pageStartIndex + index + 1).padStart(2, "0")}
+                        </td>
+                        <td>
+                          <span className="student-number">
+                            {student.studentNumber || "—"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="student-name-cell">
+                            <span className="student-avatar">
+                              {student.name?.charAt(0)?.toUpperCase() || "S"}
+                            </span>
+                            <div>
+                              <strong>
+                                {student.name || "Unnamed Student"}
+                              </strong>
+                              <small>{sectionName}</small>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span
+                            className={`student-status-badge ${active ? "is-active" : "is-inactive"}`}
+                          >
+                            <span aria-hidden="true" />
+                            {active ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            className={`student-face-badge ${faceRegistered ? "is-registered" : ""}`}
+                          >
+                            <span aria-hidden="true">
+                              {faceRegistered ? "✓" : "◎"}
+                            </span>
+                            {faceRegistered ? "Registered" : "Not Registered"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="student-row-actions">
+                            <button
+                              type="button"
+                              className="student-face-action is-edit"
+                              disabled={!active}
+                              onClick={() => openEditStudent(student)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className={`student-face-action is-face ${faceRegistered ? "is-registered" : ""}`}
+                              disabled={!active}
+                              onClick={() => openFaceRegistration(student)}
+                            >
+                              {faceRegistered ? "Update Face" : "Register Face"}
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })}
@@ -2008,19 +2645,63 @@ function StudentManagement() {
 
           {!loading && section && filteredStudents.length > 0 && (
             <div className="student-pagination">
-              <div className="student-pagination-summary">Showing <strong>{visibleStart}–{visibleEnd}</strong> of <strong>{filteredStudents.length}</strong> student{filteredStudents.length === 1 ? "" : "s"}</div>
-              <nav className="student-pagination-controls" aria-label="Student list pagination">
-                <button type="button" className="student-pagination-nav" disabled={safePage === 1} aria-label="Previous page" onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}>‹</button>
+              <div className="student-pagination-summary">
+                Showing{" "}
+                <strong>
+                  {visibleStart}–{visibleEnd}
+                </strong>{" "}
+                of <strong>{filteredStudents.length}</strong> student
+                {filteredStudents.length === 1 ? "" : "s"}
+              </div>
+              <nav
+                className="student-pagination-controls"
+                aria-label="Student list pagination"
+              >
+                <button
+                  type="button"
+                  className="student-pagination-nav"
+                  disabled={safePage === 1}
+                  aria-label="Previous page"
+                  onClick={() =>
+                    setCurrentPage((page) => Math.max(1, page - 1))
+                  }
+                >
+                  ‹
+                </button>
                 <div className="student-pagination-pages">
                   {paginationItems.map((item, index) =>
                     typeof item === "string" ? (
-                      <span key={`${item}-${index}`} className="student-pagination-ellipsis" aria-hidden="true">…</span>
+                      <span
+                        key={`${item}-${index}`}
+                        className="student-pagination-ellipsis"
+                        aria-hidden="true"
+                      >
+                        …
+                      </span>
                     ) : (
-                      <button key={item} type="button" className={`student-pagination-page ${safePage === item ? "is-active" : ""}`} aria-current={safePage === item ? "page" : undefined} onClick={() => setCurrentPage(item)}>{item}</button>
+                      <button
+                        key={item}
+                        type="button"
+                        className={`student-pagination-page ${safePage === item ? "is-active" : ""}`}
+                        aria-current={safePage === item ? "page" : undefined}
+                        onClick={() => setCurrentPage(item)}
+                      >
+                        {item}
+                      </button>
                     ),
                   )}
                 </div>
-                <button type="button" className="student-pagination-nav" disabled={safePage === totalPages} aria-label="Next page" onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}>›</button>
+                <button
+                  type="button"
+                  className="student-pagination-nav"
+                  disabled={safePage === totalPages}
+                  aria-label="Next page"
+                  onClick={() =>
+                    setCurrentPage((page) => Math.min(totalPages, page + 1))
+                  }
+                >
+                  ›
+                </button>
               </nav>
             </div>
           )}
@@ -2031,48 +2712,186 @@ function StudentManagement() {
           ADD STUDENT + SECURE FACE ENROLLMENT
       ==================================================== */}
       {showAddModal && !conflictOpen && (
-        <div className="adviser-modal-backdrop student-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeAddModal(); }}>
-          <div className={`adviser-modal student-enrollment-modal student-enrollment-step-${enrollmentStep}`} role="dialog" aria-modal="true" aria-labelledby="student-enrollment-title">
+        <div
+          className="adviser-modal-backdrop student-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeAddModal();
+          }}
+        >
+          <div
+            className={`adviser-modal student-enrollment-modal student-enrollment-step-${enrollmentStep}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="student-enrollment-title"
+          >
             <header className="adviser-modal-header student-modal-header student-wizard-header">
               <div className="student-modal-heading">
-                <div className="adviser-modal-icon student-modal-icon" aria-hidden="true">{enrollmentStep === 1 ? "+" : enrollmentStep === 2 ? "◎" : "✓"}</div>
+                <div
+                  className="adviser-modal-icon student-modal-icon"
+                  aria-hidden="true"
+                >
+                  {enrollmentStep === 1
+                    ? "+"
+                    : enrollmentStep === 2
+                      ? "◎"
+                      : "✓"}
+                </div>
                 <div>
                   <span>STUDENT ENROLLMENT</span>
-                  <h2 id="student-enrollment-title">{enrollmentStep === 1 ? "Student information" : enrollmentStep === 2 ? "Face enrollment" : "Enrollment result"}</h2>
-                  <p>{enrollmentStep === 1 ? "Add the student to the class roster first. Face enrollment comes next." : enrollmentStep === 2 ? "Use Manual Capture or Auto Capture, follow the live instruction, then review before saving." : "Review the final enrollment result before closing."}</p>
+                  <h2 id="student-enrollment-title">
+                    {enrollmentStep === 1
+                      ? "Student information"
+                      : enrollmentStep === 2
+                        ? "Face enrollment"
+                        : "Enrollment result"}
+                  </h2>
+                  <p>
+                    {enrollmentStep === 1
+                      ? "Add the student to the class roster first. Face enrollment comes next."
+                      : enrollmentStep === 2
+                        ? "Use Manual Capture or Auto Capture, follow the live instruction, then review before saving."
+                        : "Review the final enrollment result before closing."}
+                  </p>
                 </div>
               </div>
-              <button type="button" className="student-modal-close" disabled={creatingStudent || registeringFace || scan.busy} onClick={closeAddModal}>×</button>
+              <button
+                type="button"
+                className="student-modal-close"
+                disabled={creatingStudent || registeringFace || scan.busy}
+                onClick={closeAddModal}
+              >
+                ×
+              </button>
             </header>
 
             <div className="student-enrollment-progress">
-              <div className={enrollmentStep === 1 ? "is-current" : "is-complete"}><span>{enrollmentStep > 1 ? "✓" : "1"}</span><div><strong>Student details</strong><small>Roster information</small></div></div>
+              <div
+                className={enrollmentStep === 1 ? "is-current" : "is-complete"}
+              >
+                <span>{enrollmentStep > 1 ? "✓" : "1"}</span>
+                <div>
+                  <strong>Student details</strong>
+                  <small>Roster information</small>
+                </div>
+              </div>
               <i />
-              <div className={enrollmentStep === 2 ? "is-current" : enrollmentStep > 2 ? "is-complete" : ""}><span>{enrollmentStep > 2 ? "✓" : "2"}</span><div><strong>Face scan</strong><small>Manual or auto</small></div></div>
+              <div
+                className={
+                  enrollmentStep === 2
+                    ? "is-current"
+                    : enrollmentStep > 2
+                      ? "is-complete"
+                      : ""
+                }
+              >
+                <span>{enrollmentStep > 2 ? "✓" : "2"}</span>
+                <div>
+                  <strong>Face scan</strong>
+                  <small>Manual or auto</small>
+                </div>
+              </div>
               <i />
-              <div className={enrollmentStep === 3 ? "is-current" : ""}><span>3</span><div><strong>Complete</strong><small>Final result</small></div></div>
+              <div className={enrollmentStep === 3 ? "is-current" : ""}>
+                <span>3</span>
+                <div>
+                  <strong>Complete</strong>
+                  <small>Final result</small>
+                </div>
+              </div>
             </div>
 
             <div className="student-live-enrollment-body">
               {enrollmentStep === 1 && (
                 <section className="student-live-detail-step">
-                  <div className="student-enrollment-section-heading"><span>01</span><div><strong>Student information</strong><p>Use the official student number and full name.</p></div></div>
-                  <div className="student-form student-enrollment-form">
-                    <label className="student-form-field"><span>Student Number</span><input value={studentNumber} inputMode="numeric" autoComplete="off" maxLength={12} placeholder="12-digit student number" disabled={creatingStudent} onChange={(event) => setStudentNumber(normalizeStudentNumberInput(event.target.value))} /><small>{studentNumber.length}/12 digits</small></label>
-                    <label className="student-form-field"><span>Student Name</span><input value={studentName} autoComplete="off" placeholder="Complete student name" disabled={creatingStudent} onChange={(event) => setStudentName(event.target.value)} /></label>
-                    <div className="student-form-field"><span>Assigned Section</span><div className="student-locked-field"><div><small>SECTION</small><strong>{sectionName}</strong></div><span className="student-locked-badge">LOCKED</span></div></div>
+                  <div className="student-enrollment-section-heading">
+                    <span>01</span>
+                    <div>
+                      <strong>Student information</strong>
+                      <p>Use the official student number and full name.</p>
+                    </div>
                   </div>
-                  <div className="student-live-explainer"><span>◎</span><div><strong>Face enrollment can be finished later</strong><p>The student record is saved first, so you can return to the face scan anytime.</p></div></div>
-                  {createError && <div className="student-face-feedback is-error" role="alert"><span>!</span><div><strong>Student details</strong><p>{createError}</p></div></div>}
+                  <div className="student-form student-enrollment-form">
+                    <label className="student-form-field">
+                      <span>Student Number</span>
+                      <input
+                        value={studentNumber}
+                        inputMode="numeric"
+                        autoComplete="off"
+                        maxLength={12}
+                        placeholder="12-digit student number"
+                        disabled={creatingStudent}
+                        onChange={(event) =>
+                          setStudentNumber(
+                            normalizeStudentNumberInput(event.target.value),
+                          )
+                        }
+                      />
+                      <small>{studentNumber.length}/12 digits</small>
+                    </label>
+                    <label className="student-form-field">
+                      <span>Student Name</span>
+                      <input
+                        value={studentName}
+                        autoComplete="off"
+                        placeholder="Complete student name"
+                        disabled={creatingStudent}
+                        onChange={(event) => setStudentName(event.target.value)}
+                      />
+                    </label>
+                    <div className="student-form-field">
+                      <span>Assigned Section</span>
+                      <div className="student-locked-field">
+                        <div>
+                          <small>SECTION</small>
+                          <strong>{sectionName}</strong>
+                        </div>
+                        <span className="student-locked-badge">LOCKED</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="student-live-explainer">
+                    <span>◎</span>
+                    <div>
+                      <strong>Face enrollment can be finished later</strong>
+                      <p>
+                        The student record is saved first, so you can return to
+                        the face scan anytime.
+                      </p>
+                    </div>
+                  </div>
+                  {createError && (
+                    <div
+                      className="student-face-feedback is-error"
+                      role="alert"
+                    >
+                      <span>!</span>
+                      <div>
+                        <strong>Student details</strong>
+                        <p>{createError}</p>
+                      </div>
+                    </div>
+                  )}
                 </section>
               )}
 
               {enrollmentStep === 2 && createdStudentRecord && (
                 <section className="student-live-scan-step">
                   <div className="student-liveness-student-strip">
-                    <span className="student-liveness-avatar">{createdStudentRecord.name?.charAt(0)?.toUpperCase() || "S"}</span>
-                    <div><small>ENROLLING STUDENT</small><strong>{createdStudentRecord.name}</strong><span>{createdStudentRecord.studentNumber} • {sectionName}</span></div>
-                    <span className="student-liveness-security-badge">SECURE FACE SCAN</span>
+                    <span className="student-liveness-avatar">
+                      {createdStudentRecord.name?.charAt(0)?.toUpperCase() ||
+                        "S"}
+                    </span>
+                    <div>
+                      <small>ENROLLING STUDENT</small>
+                      <strong>{createdStudentRecord.name}</strong>
+                      <span>
+                        {createdStudentRecord.studentNumber} • {sectionName}
+                      </span>
+                    </div>
+                    <span className="student-liveness-security-badge">
+                      SECURE FACE SCAN
+                    </span>
                   </div>
                   <LiveScanner
                     studentName={createdStudentRecord.name || "Student"}
@@ -2091,7 +2910,10 @@ function StudentManagement() {
                     disabled={registeringFace}
                     onEnableCamera={() => void startCamera().catch(() => {})}
                     onStartScan={() => void runAddEnrollment()}
-                    onRetry={() => { resetScan(); scheduleCameraStart(); }}
+                    onRetry={() => {
+                      resetScan();
+                      scheduleCameraStart();
+                    }}
                   />
                 </section>
               )}
@@ -2100,28 +2922,144 @@ function StudentManagement() {
                 <section className="student-live-result-step">
                   {addEnrollmentResult?.enrolled ? (
                     <div className="student-liveness-result-card is-success">
-                      <span aria-hidden="true">✓</span><div><small>FACE ENROLLMENT COMPLETE</small><h3>{createdStudentRecord?.name || studentName} is ready for face recognition</h3><p>Face verification passed and the face record was saved.</p></div>
+                      <span aria-hidden="true">✓</span>
+                      <div>
+                        <small>FACE ENROLLMENT COMPLETE</small>
+                        <h3>
+                          {createdStudentRecord?.name || studentName} is ready
+                          for face recognition
+                        </h3>
+                        <p>
+                          Face verification passed and the face record was
+                          saved.
+                        </p>
+                      </div>
                     </div>
                   ) : faceConflict ? (
                     <>
-                      <div className="student-liveness-result-card is-warning"><span aria-hidden="true">!</span><div><small>IDENTITY REVIEW NEEDED</small><h3>The student was added, but the face was not saved</h3><p>A similar enrolled face was found. Run the second face check before making an identity decision.</p></div></div>
+                      <div className="student-liveness-result-card is-warning">
+                        <span aria-hidden="true">!</span>
+                        <div>
+                          <small>IDENTITY REVIEW NEEDED</small>
+                          <h3>
+                            The student was added, but the face was not saved
+                          </h3>
+                          <p>
+                            A similar enrolled face was found. Run the second
+                            face check before making an identity decision.
+                          </p>
+                        </div>
+                      </div>
                       <FaceConflictCard conflict={faceConflict} />
                     </>
                   ) : (
-                    <div className="student-liveness-result-card is-neutral"><span aria-hidden="true">↻</span><div><small>FACE ENROLLMENT PENDING</small><h3>Retry face enrollment</h3><p>The student record is saved. Run a fresh face scan to finish enrollment.</p></div></div>
+                    <div className="student-liveness-result-card is-neutral">
+                      <span aria-hidden="true">↻</span>
+                      <div>
+                        <small>FACE ENROLLMENT PENDING</small>
+                        <h3>Retry face enrollment</h3>
+                        <p>
+                          The student record is saved. Run a fresh face scan to
+                          finish enrollment.
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </section>
               )}
             </div>
 
             <footer className="adviser-modal-actions student-enrollment-actions student-live-modal-footer">
-              <div className="student-face-footer-copy"><strong>{enrollmentStep === 1 ? "Student details" : enrollmentStep === 2 ? "Face scan with review" : addEnrollmentResult?.enrolled ? "Enrollment completed" : "Student remains Face Pending until completed"}</strong><span>You can finish face enrollment later if needed.</span></div>
+              <div className="student-face-footer-copy">
+                <strong>
+                  {enrollmentStep === 1
+                    ? "Student details"
+                    : enrollmentStep === 2
+                      ? "Face scan with review"
+                      : addEnrollmentResult?.enrolled
+                        ? "Enrollment completed"
+                        : "Student remains Face Pending until completed"}
+                </strong>
+                <span>You can finish face enrollment later if needed.</span>
+              </div>
               <div className="student-face-action-group">
-                {enrollmentStep === 1 && <><button type="button" className="adviser-secondary-button" disabled={creatingStudent} onClick={closeAddModal}>Cancel</button><button type="button" className="adviser-primary-button" disabled={creatingStudent} onClick={() => void goToLiveEnrollment()}>{creatingStudent ? "Creating Student…" : "Continue to Live Face"}</button></>}
-                {enrollmentStep === 2 && <><button type="button" className="adviser-secondary-button" disabled={registeringFace || scan.busy} onClick={closeAddModal}>Finish Later</button></>}
-                {enrollmentStep === 3 && addEnrollmentResult?.enrolled && <button type="button" className="adviser-primary-button" onClick={finishAddEnrollment}>Done</button>}
-                {enrollmentStep === 3 && !addEnrollmentResult?.enrolled && !faceConflict && <button type="button" className="adviser-primary-button" onClick={retryAddEnrollment}>Retry Live Enrollment</button>}
-                {enrollmentStep === 3 && faceConflict && <><button type="button" className="adviser-secondary-button" onClick={closeAddModal}>Review Later</button><button type="button" className="adviser-primary-button" disabled={faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON"} onClick={openConflictVerification}>{faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON" ? "Enrollment Blocked" : "Verify Identity"}</button></>}
+                {enrollmentStep === 1 && (
+                  <>
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      disabled={creatingStudent}
+                      onClick={closeAddModal}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="adviser-primary-button"
+                      disabled={creatingStudent}
+                      onClick={() => void goToLiveEnrollment()}
+                    >
+                      {creatingStudent
+                        ? "Creating Student…"
+                        : "Continue to Live Face"}
+                    </button>
+                  </>
+                )}
+                {enrollmentStep === 2 && (
+                  <>
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      disabled={registeringFace || scan.busy}
+                      onClick={closeAddModal}
+                    >
+                      Finish Later
+                    </button>
+                  </>
+                )}
+                {enrollmentStep === 3 && addEnrollmentResult?.enrolled && (
+                  <button
+                    type="button"
+                    className="adviser-primary-button"
+                    onClick={finishAddEnrollment}
+                  >
+                    Done
+                  </button>
+                )}
+                {enrollmentStep === 3 &&
+                  !addEnrollmentResult?.enrolled &&
+                  !faceConflict && (
+                    <button
+                      type="button"
+                      className="adviser-primary-button"
+                      onClick={retryAddEnrollment}
+                    >
+                      Retry Live Enrollment
+                    </button>
+                  )}
+                {enrollmentStep === 3 && faceConflict && (
+                  <>
+                    <button
+                      type="button"
+                      className="adviser-secondary-button"
+                      onClick={closeAddModal}
+                    >
+                      Review Later
+                    </button>
+                    <button
+                      type="button"
+                      className="adviser-primary-button"
+                      disabled={
+                        faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON"
+                      }
+                      onClick={openConflictVerification}
+                    >
+                      {faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON"
+                        ? "Enrollment Blocked"
+                        : "Verify Identity"}
+                    </button>
+                  </>
+                )}
               </div>
             </footer>
           </div>
@@ -2130,27 +3068,162 @@ function StudentManagement() {
 
       {/* EDIT STUDENT */}
       {editingStudent && (
-        <div className="adviser-modal-backdrop student-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeEditStudent(); }}>
-          <form className="adviser-modal student-edit-modal student-identity-modal" onSubmit={handleUpdateStudent} role="dialog" aria-modal="true" aria-labelledby="edit-student-title">
-            <header className="adviser-modal-header student-modal-header"><div className="student-modal-heading"><div className="adviser-modal-icon student-modal-icon" aria-hidden="true">✎</div><div><span>STUDENT RECORD</span><h2 id="edit-student-title">Edit student</h2><p>Update the student's roster information without changing face enrollment.</p></div></div><button type="button" className="student-modal-close" disabled={updatingStudent} onClick={closeEditStudent}>×</button></header>
-            <div className="student-live-edit-body"><div className="student-form"><label className="student-form-field"><span>Student Number</span><input value={editStudentNumber} maxLength={12} inputMode="numeric" disabled={updatingStudent} onChange={(event) => setEditStudentNumber(normalizeStudentNumberInput(event.target.value))} /></label><label className="student-form-field"><span>Student Name</span><input value={editStudentName} disabled={updatingStudent} onChange={(event) => setEditStudentName(event.target.value)} /></label>{editError && <div className="student-face-feedback is-error"><span>!</span><div><strong>Unable to update</strong><p>{editError}</p></div></div>}</div></div>
-            <footer className="adviser-modal-actions"><button type="button" className="adviser-secondary-button" disabled={updatingStudent} onClick={closeEditStudent}>Cancel</button><button type="submit" className="adviser-primary-button" disabled={updatingStudent}>{updatingStudent ? "Saving…" : "Save Changes"}</button></footer>
+        <div
+          className="adviser-modal-backdrop student-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeEditStudent();
+          }}
+        >
+          <form
+            className="adviser-modal student-edit-modal student-identity-modal"
+            onSubmit={handleUpdateStudent}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-student-title"
+          >
+            <header className="adviser-modal-header student-modal-header">
+              <div className="student-modal-heading">
+                <div
+                  className="adviser-modal-icon student-modal-icon"
+                  aria-hidden="true"
+                >
+                  ✎
+                </div>
+                <div>
+                  <span>STUDENT RECORD</span>
+                  <h2 id="edit-student-title">Edit student</h2>
+                  <p>
+                    Update the student's roster information without changing
+                    face enrollment.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="student-modal-close"
+                disabled={updatingStudent}
+                onClick={closeEditStudent}
+              >
+                ×
+              </button>
+            </header>
+            <div className="student-live-edit-body">
+              <div className="student-form">
+                <label className="student-form-field">
+                  <span>Student Number</span>
+                  <input
+                    value={editStudentNumber}
+                    maxLength={12}
+                    inputMode="numeric"
+                    disabled={updatingStudent}
+                    onChange={(event) =>
+                      setEditStudentNumber(
+                        normalizeStudentNumberInput(event.target.value),
+                      )
+                    }
+                  />
+                </label>
+                <label className="student-form-field">
+                  <span>Student Name</span>
+                  <input
+                    value={editStudentName}
+                    disabled={updatingStudent}
+                    onChange={(event) => setEditStudentName(event.target.value)}
+                  />
+                </label>
+                {editError && (
+                  <div className="student-face-feedback is-error">
+                    <span>!</span>
+                    <div>
+                      <strong>Unable to update</strong>
+                      <p>{editError}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <footer className="adviser-modal-actions">
+              <button
+                type="button"
+                className="adviser-secondary-button"
+                disabled={updatingStudent}
+                onClick={closeEditStudent}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="adviser-primary-button"
+                disabled={updatingStudent}
+              >
+                {updatingStudent ? "Saving…" : "Save Changes"}
+              </button>
+            </footer>
           </form>
         </div>
       )}
 
       {/* EXISTING STUDENT FACE */}
       {selectedStudent && !conflictOpen && (
-        <div className="adviser-modal-backdrop student-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) closeFaceRegistration(); }}>
-          <div className="adviser-modal student-face-modal student-identity-modal student-liveness-face-modal" role="dialog" aria-modal="true" aria-labelledby="student-face-title">
+        <div
+          className="adviser-modal-backdrop student-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeFaceRegistration();
+          }}
+        >
+          <div
+            className="adviser-modal student-face-modal student-identity-modal student-liveness-face-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="student-face-title"
+          >
             <header className="adviser-modal-header student-modal-header">
-              <div className="student-modal-heading"><div className="adviser-modal-icon student-modal-icon" aria-hidden="true">◎</div><div><span>FACE IDENTITY</span><h2 id="student-face-title">{hasFaceRegistered(selectedStudent, locallyRegisteredFaceIds) ? "Update secure face identity" : "Register secure face identity"}</h2><p>Complete the guided scan before saving the face record.</p></div></div>
-              <button type="button" className="student-modal-close" disabled={registeringFace || scan.busy} onClick={closeFaceRegistration}>×</button>
+              <div className="student-modal-heading">
+                <div
+                  className="adviser-modal-icon student-modal-icon"
+                  aria-hidden="true"
+                >
+                  ◎
+                </div>
+                <div>
+                  <span>FACE IDENTITY</span>
+                  <h2 id="student-face-title">
+                    {hasFaceRegistered(
+                      selectedStudent,
+                      locallyRegisteredFaceIds,
+                    )
+                      ? "Update secure face identity"
+                      : "Register secure face identity"}
+                  </h2>
+                  <p>Complete the guided scan before saving the face record.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="student-modal-close"
+                disabled={registeringFace || scan.busy}
+                onClick={closeFaceRegistration}
+              >
+                ×
+              </button>
             </header>
             <div className="student-liveness-student-strip student-liveness-existing-strip">
-              <span className="student-liveness-avatar">{selectedStudent?.name?.charAt(0)?.toUpperCase() || "S"}</span>
-              <div><small>STUDENT</small><strong>{selectedStudent?.name}</strong><span>{selectedStudent?.studentNumber || "No student number"} • {sectionName}</span></div>
-              <span className="student-liveness-security-badge">SECURE FACE SCAN</span>
+              <span className="student-liveness-avatar">
+                {selectedStudent?.name?.charAt(0)?.toUpperCase() || "S"}
+              </span>
+              <div>
+                <small>STUDENT</small>
+                <strong>{selectedStudent?.name}</strong>
+                <span>
+                  {selectedStudent?.studentNumber || "No student number"} •{" "}
+                  {sectionName}
+                </span>
+              </div>
+              <span className="student-liveness-security-badge">
+                SECURE FACE SCAN
+              </span>
             </div>
             <div className="student-identity-camera">
               <LiveScanner
@@ -2170,13 +3243,48 @@ function StudentManagement() {
                 disabled={registeringFace}
                 onEnableCamera={() => void startCamera().catch(() => {})}
                 onStartScan={() => void runExistingEnrollment()}
-                onRetry={() => { resetScan(); scheduleCameraStart(); }}
+                onRetry={() => {
+                  resetScan();
+                  scheduleCameraStart();
+                }}
               />
               {faceConflict && <FaceConflictCard conflict={faceConflict} />}
             </div>
             <footer className="adviser-modal-actions student-face-modal-actions">
-              <div className="student-face-footer-copy"><strong>{faceConflict ? "Identity verification required" : "Face enrollment"}</strong><span>Retake anytime before saving if needed.</span></div>
-              <div className="student-liveness-footer-actions"><button type="button" className="adviser-secondary-button" disabled={registeringFace || scan.busy} onClick={closeFaceRegistration}>Close</button>{faceConflict && <button type="button" className="adviser-primary-button" disabled={registeringFace || scan.busy || faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON"} onClick={openConflictVerification}>{faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON" ? "Enrollment Blocked" : "Verify Identity"}</button>}</div>
+              <div className="student-face-footer-copy">
+                <strong>
+                  {faceConflict
+                    ? "Identity verification required"
+                    : "Face enrollment"}
+                </strong>
+                <span>Retake anytime before saving if needed.</span>
+              </div>
+              <div className="student-liveness-footer-actions">
+                <button
+                  type="button"
+                  className="adviser-secondary-button"
+                  disabled={registeringFace || scan.busy}
+                  onClick={closeFaceRegistration}
+                >
+                  Close
+                </button>
+                {faceConflict && (
+                  <button
+                    type="button"
+                    className="adviser-primary-button"
+                    disabled={
+                      registeringFace ||
+                      scan.busy ||
+                      faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON"
+                    }
+                    onClick={openConflictVerification}
+                  >
+                    {faceConflict?.conflictStatus === "CONFIRMED_SAME_PERSON"
+                      ? "Enrollment Blocked"
+                      : "Verify Identity"}
+                  </button>
+                )}
+              </div>
             </footer>
           </div>
         </div>
@@ -2184,11 +3292,41 @@ function StudentManagement() {
 
       {/* FACE CONFLICT VERIFICATION */}
       {conflictOpen && conflictContext && (
-        <div className="adviser-modal-backdrop student-modal-backdrop" role="presentation">
-          <div className="adviser-modal student-face-verification-modal student-liveness-conflict-modal" role="dialog" aria-modal="true" aria-labelledby="face-conflict-title">
+        <div
+          className="adviser-modal-backdrop student-modal-backdrop"
+          role="presentation"
+        >
+          <div
+            className="adviser-modal student-face-verification-modal student-liveness-conflict-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="face-conflict-title"
+          >
             <header className="adviser-modal-header student-modal-header">
-              <div className="student-modal-heading"><div className="adviser-modal-icon student-modal-icon" aria-hidden="true">!</div><div><span>PROTECTED IDENTITY REVIEW</span><h2 id="face-conflict-title">Verify similar face</h2><p>A fresh guided live scan must reproduce the similar-face result before a manual identity decision is allowed.</p></div></div>
-              <button type="button" className="student-modal-close" disabled={conflictBusy || scan.busy} onClick={closeConflictVerification}>×</button>
+              <div className="student-modal-heading">
+                <div
+                  className="adviser-modal-icon student-modal-icon"
+                  aria-hidden="true"
+                >
+                  !
+                </div>
+                <div>
+                  <span>PROTECTED IDENTITY REVIEW</span>
+                  <h2 id="face-conflict-title">Verify similar face</h2>
+                  <p>
+                    A fresh guided live scan must reproduce the similar-face
+                    result before a manual identity decision is allowed.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="student-modal-close"
+                disabled={conflictBusy || scan.busy}
+                onClick={closeConflictVerification}
+              >
+                ×
+              </button>
             </header>
 
             <div className="student-liveness-conflict-body">
@@ -2212,39 +3350,166 @@ function StudentManagement() {
                   disabled={conflictBusy}
                   onEnableCamera={() => void startCamera().catch(() => {})}
                   onStartScan={() => void runConflictLiveness()}
-                  onRetry={() => { resetScan(); scheduleCameraStart(); }}
+                  onRetry={() => {
+                    resetScan();
+                    scheduleCameraStart();
+                  }}
                 />
               )}
 
               {conflictStage === "MANUAL_REVIEW" && (
                 <section className="student-liveness-manual-review">
-                  <div className="student-liveness-result-card is-warning"><span aria-hidden="true">!</span><div><small>LIVE CONFLICT REPRODUCED</small><h3>Human identity decision required</h3><p>The similar-face match appeared again. Check the actual students before choosing.</p></div></div>
-                  <div className="student-liveness-review-evidence"><div><small>CURRENT STUDENT</small><strong>{conflictContext?.student?.name}</strong></div><span>↔</span><div><small>SIMILAR ENROLLED FACE</small><strong>{conflictContext?.conflict?.conflictingStudentName}</strong></div></div>
+                  <div className="student-liveness-result-card is-warning">
+                    <span aria-hidden="true">!</span>
+                    <div>
+                      <small>LIVE CONFLICT REPRODUCED</small>
+                      <h3>Human identity decision required</h3>
+                      <p>
+                        The similar-face match appeared again. Check the actual
+                        students before choosing.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="student-liveness-review-evidence">
+                    <div>
+                      <small>CURRENT STUDENT</small>
+                      <strong>{conflictContext?.student?.name}</strong>
+                    </div>
+                    <span>↔</span>
+                    <div>
+                      <small>SIMILAR ENROLLED FACE</small>
+                      <strong>
+                        {conflictContext?.conflict?.conflictingStudentName}
+                      </strong>
+                    </div>
+                  </div>
                   {!pendingDecision ? (
                     <div className="student-liveness-decision-grid">
-                      <button type="button" className="student-liveness-decision is-different" disabled={conflictBusy} onClick={() => requestConflictDecision("DIFFERENT_PEOPLE")}><span>≠</span><div><strong>Two different students</strong><small>Allow separate face enrollment after one final live scan</small></div></button>
-                      <button type="button" className="student-liveness-decision is-same" disabled={conflictBusy} onClick={() => requestConflictDecision("SAME_PERSON")}><span>=</span><div><strong>Same physical person</strong><small>Keep separate face enrollment blocked</small></div></button>
+                      <button
+                        type="button"
+                        className="student-liveness-decision is-different"
+                        disabled={conflictBusy}
+                        onClick={() =>
+                          requestConflictDecision("DIFFERENT_PEOPLE")
+                        }
+                      >
+                        <span>≠</span>
+                        <div>
+                          <strong>Two different students</strong>
+                          <small>
+                            Allow separate face enrollment after one final live
+                            scan
+                          </small>
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        className="student-liveness-decision is-same"
+                        disabled={conflictBusy}
+                        onClick={() => requestConflictDecision("SAME_PERSON")}
+                      >
+                        <span>=</span>
+                        <div>
+                          <strong>Same physical person</strong>
+                          <small>Keep separate face enrollment blocked</small>
+                        </div>
+                      </button>
                     </div>
                   ) : (
-                    <div className={`student-liveness-confirmation ${pendingDecision === "SAME_PERSON" ? "is-same" : "is-different"}`} role="alert">
-                      <span aria-hidden="true">{pendingDecision === "SAME_PERSON" ? "=" : "≠"}</span>
-                      <div><small>FINAL CONFIRMATION</small><h4>{pendingDecision === "SAME_PERSON" ? "Confirm this is the same physical person?" : "Confirm these are two different students?"}</h4><p>{pendingDecision === "SAME_PERSON" ? "Separate face enrollment will remain blocked for this conflict pair." : "The decision will be saved, then one final face scan will finish enrollment."}</p><div><button type="button" className="adviser-secondary-button" disabled={conflictBusy} onClick={() => setPendingDecision("")}>Go Back</button><button type="button" className="adviser-primary-button" disabled={conflictBusy} onClick={() => void resolveConflict()}>{conflictBusy ? "Saving…" : pendingDecision === "SAME_PERSON" ? "Confirm Same Person" : "Confirm Different Students"}</button></div></div>
+                    <div
+                      className={`student-liveness-confirmation ${pendingDecision === "SAME_PERSON" ? "is-same" : "is-different"}`}
+                      role="alert"
+                    >
+                      <span aria-hidden="true">
+                        {pendingDecision === "SAME_PERSON" ? "=" : "≠"}
+                      </span>
+                      <div>
+                        <small>FINAL CONFIRMATION</small>
+                        <h4>
+                          {pendingDecision === "SAME_PERSON"
+                            ? "Confirm this is the same physical person?"
+                            : "Confirm these are two different students?"}
+                        </h4>
+                        <p>
+                          {pendingDecision === "SAME_PERSON"
+                            ? "Separate face enrollment will remain blocked for this conflict pair."
+                            : "The decision will be saved, then one final face scan will finish enrollment."}
+                        </p>
+                        <div>
+                          <button
+                            type="button"
+                            className="adviser-secondary-button"
+                            disabled={conflictBusy}
+                            onClick={() => setPendingDecision("")}
+                          >
+                            Go Back
+                          </button>
+                          <button
+                            type="button"
+                            className="adviser-primary-button"
+                            disabled={conflictBusy}
+                            onClick={() => void resolveConflict()}
+                          >
+                            {conflictBusy
+                              ? "Saving…"
+                              : pendingDecision === "SAME_PERSON"
+                                ? "Confirm Same Person"
+                                : "Confirm Different Students"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </section>
               )}
 
               {conflictStage === "NOT_REPRODUCED" && (
-                <div className="student-liveness-result-card is-neutral"><span aria-hidden="true">↻</span><div><small>CONFLICT NOT REPRODUCED</small><h3>Retry face enrollment</h3><p>No manual identity decision was recorded. Return to secure enrollment and run a new live scan.</p><button type="button" className="adviser-primary-button" onClick={retryConflictNotReproduced}>Return to Face Enrollment</button></div></div>
+                <div className="student-liveness-result-card is-neutral">
+                  <span aria-hidden="true">↻</span>
+                  <div>
+                    <small>CONFLICT NOT REPRODUCED</small>
+                    <h3>Retry face enrollment</h3>
+                    <p>
+                      No manual identity decision was recorded. Return to secure
+                      enrollment and run a new live scan.
+                    </p>
+                    <button
+                      type="button"
+                      className="adviser-primary-button"
+                      onClick={retryConflictNotReproduced}
+                    >
+                      Return to Face Enrollment
+                    </button>
+                  </div>
+                </div>
               )}
 
               {conflictStage === "SAME_PERSON" && (
-                <div className="student-liveness-result-card is-danger"><span aria-hidden="true">×</span><div><small>SAME PERSON CONFIRMED</small><h3>Separate face enrollment is blocked</h3><p>This identity decision is already saved for this pair.</p></div></div>
+                <div className="student-liveness-result-card is-danger">
+                  <span aria-hidden="true">×</span>
+                  <div>
+                    <small>SAME PERSON CONFIRMED</small>
+                    <h3>Separate face enrollment is blocked</h3>
+                    <p>
+                      This identity decision is already saved for this pair.
+                    </p>
+                  </div>
+                </div>
               )}
 
               {conflictStage === "FINAL_SCAN" && (
                 <section className="student-liveness-final-scan">
-                  <div className="student-liveness-result-card is-success"><span aria-hidden="true">✓</span><div><small>DIFFERENT PEOPLE VERIFIED</small><h3>One final face scan</h3><p>The identity decision is saved. Run one final fresh face scan to finish enrollment.</p></div></div>
+                  <div className="student-liveness-result-card is-success">
+                    <span aria-hidden="true">✓</span>
+                    <div>
+                      <small>DIFFERENT PEOPLE VERIFIED</small>
+                      <h3>One final face scan</h3>
+                      <p>
+                        The identity decision is saved. Run one final fresh face
+                        scan to finish enrollment.
+                      </p>
+                    </div>
+                  </div>
                   <LiveScanner
                     studentName={conflictContext?.student?.name || "Student"}
                     videoRef={videoRef}
@@ -2262,15 +3527,38 @@ function StudentManagement() {
                     disabled={conflictBusy}
                     onEnableCamera={() => void startCamera().catch(() => {})}
                     onStartScan={() => void completeFinalEnrollment()}
-                    onRetry={() => { resetScan(); scheduleCameraStart(); }}
+                    onRetry={() => {
+                      resetScan();
+                      scheduleCameraStart();
+                    }}
                   />
                 </section>
               )}
             </div>
 
             <footer className="adviser-modal-actions student-liveness-modal-actions">
-              <div className="student-liveness-footer-copy"><strong>{conflictStage === "MANUAL_REVIEW" ? "Adviser decision required" : conflictStage === "FINAL_SCAN" ? "Final face scan needed" : conflictStage === "SAME_PERSON" ? "Separate enrollment blocked" : "Second face check"}</strong><span>No face is saved until verification succeeds.</span></div>
-              <div className="student-liveness-footer-actions"><button type="button" className="adviser-secondary-button" disabled={conflictBusy || scan.busy} onClick={closeConflictVerification}>Close</button></div>
+              <div className="student-liveness-footer-copy">
+                <strong>
+                  {conflictStage === "MANUAL_REVIEW"
+                    ? "Adviser decision required"
+                    : conflictStage === "FINAL_SCAN"
+                      ? "Final face scan needed"
+                      : conflictStage === "SAME_PERSON"
+                        ? "Separate enrollment blocked"
+                        : "Second face check"}
+                </strong>
+                <span>No face is saved until verification succeeds.</span>
+              </div>
+              <div className="student-liveness-footer-actions">
+                <button
+                  type="button"
+                  className="adviser-secondary-button"
+                  disabled={conflictBusy || scan.busy}
+                  onClick={closeConflictVerification}
+                >
+                  Close
+                </button>
+              </div>
             </footer>
           </div>
         </div>
