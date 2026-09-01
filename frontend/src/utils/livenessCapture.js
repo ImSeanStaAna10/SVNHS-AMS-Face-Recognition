@@ -3,11 +3,13 @@ const sleep = (milliseconds) =>
 
 const waitForVideoReady = async (video, { timeoutMs = 5000 } = {}) => {
   if (!video) throw new Error("Camera preview is unavailable.");
-  if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) return;
+  if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0)
+    return;
 
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
-    if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) return;
+    if (video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0)
+      return;
     await sleep(50);
   }
   throw new Error("Camera is taking too long to become ready.");
@@ -15,10 +17,15 @@ const waitForVideoReady = async (video, { timeoutMs = 5000 } = {}) => {
 
 const canvasToFile = (canvas, filename, { quality = 0.86 } = {}) =>
   new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) return reject(new Error("Unable to capture a liveness frame."));
-      resolve(new File([blob], filename, { type: "image/jpeg" }));
-    }, "image/jpeg", quality);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob)
+          return reject(new Error("Unable to capture a liveness frame."));
+        resolve(new File([blob], filename, { type: "image/jpeg" }));
+      },
+      "image/jpeg",
+      quality,
+    );
   });
 
 const captureVideoFrame = async (
@@ -58,5 +65,11 @@ const captureFrameBurst = async (
 };
 
 const createPreviewUrl = (file) => (file ? URL.createObjectURL(file) : "");
-
-export { sleep, waitForVideoReady, captureVideoFrame, captureFrameBurst, createPreviewUrl };
+//e
+export {
+  captureFrameBurst,
+  captureVideoFrame,
+  createPreviewUrl,
+  sleep,
+  waitForVideoReady,
+};
