@@ -12,10 +12,23 @@ import "../../styles/adviser/attendanceSession.css";
 import "../../styles/adviser/attendanceSessionVoice.css";
 
 const PH_TIME_ZONE = "Asia/Manila";
-const AUTO_ALIGN_DELAY = 1400;
-const AUTO_COUNTDOWN_STEP = 700;
-const RESULT_HOLD_SUCCESS = 3600;
-const RESULT_HOLD_ERROR = 2200;
+
+/*
+ * Auto Capture UX timing.
+ *
+ * The student gets a short positioning period first, then a REAL
+ * five-second countdown: 5 → 4 → 3 → 2 → 1 → capture.
+ */
+const AUTO_ALIGN_DELAY = 1200;
+const AUTO_COUNTDOWN_SECONDS = 5;
+const AUTO_COUNTDOWN_STEP = 1000;
+
+/*
+ * Results stay visible long enough to be readable without making
+ * Auto Capture feel slow. The camera stream itself stays alive.
+ */
+const RESULT_HOLD_SUCCESS = 2800;
+const RESULT_HOLD_ERROR = 2400;
 
 /*
  * Current attendance backend still accepts one image at:
@@ -36,6 +49,172 @@ const getErrorMessage = (error, fallbackMessage) =>
   error?.response?.data?.detail ||
   error?.message ||
   fallbackMessage;
+
+
+const getCameraAccessErrorMessage = (error) => {
+  const name = String(error?.name || "").trim();
+
+  if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+    return "Camera access was blocked. Allow camera permission for this site, then try again.";
+  }
+
+  if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+    return "No usable camera was detected. Connect or enable a camera, then try again.";
+  }
+
+  if (name === "NotReadableError" || name === "TrackStartError") {
+    return "The camera could not be opened. It may already be in use by another application or browser tab.";
+  }
+
+  if (name === "OverconstrainedError" || name === "ConstraintNotSatisfiedError") {
+    return "The camera could not use the requested video settings. Try another camera or reload the page.";
+  }
+
+  if (name === "SecurityError") {
+    return "Camera access is blocked by the browser's security settings.";
+  }
+
+  if (name === "AbortError") {
+    return "Camera startup was interrupted. Please try again.";
+  }
+
+  return getErrorMessage(
+    error,
+    "Unable to start the camera. Check the camera connection and try again.",
+  );
+};
+
+const getRecognitionErrorPresentation = (error) => {
+  const status = error?.response?.status;
+  const serverMessage = getErrorMessage(error, "").trim();
+  const normalizedMessage = serverMessage.toLowerCase();
+
+  if (!error?.response) {
+    return {
+      title: "Connection Problem",
+      message:
+        "The attendance service could not be reached. Check the connection and try again. Your attendance session is still open.",
+      type: "error",
+      voice: "Connection problem. Please try again.",
+    };
+  }
+
+  if (
+    normalizedMessage.includes("multiple face") ||
+    normalizedMessage.includes("more than one face")
+  ) {
+    return {
+      title: "Multiple Faces Detected",
+      message: "Keep only one student inside the camera frame, then try again.",
+      type: "error",
+      voice: "Multiple faces detected. Keep only one student in the camera.",
+    };
+  }
+
+  if (
+    normalizedMessage.includes("no face") ||
+    normalizedMessage.includes("face not detected")
+  ) {
+    return {
+      title: "No Face Detected",
+      message: "Move closer and keep the student's full face clearly inside the guide.",
+      type: "error",
+      voice: "No face detected. Move closer and try again.",
+    };
+  }
+
+  if (normalizedMessage.includes("blur")) {
+    return {
+      title: "Image Too Blurry",
+      message: "Hold still for a moment and keep the student's face centered before capture.",
+      type: "error",
+      voice: "The image is blurry. Hold still and try again.",
+    };
+  }
+
+  if (
+    normalizedMessage.includes("lighting") ||
+    normalizedMessage.includes("too dark") ||
+    normalizedMessage.includes("low light")
+  ) {
+    return {
+      title: "Improve Lighting",
+      message: "Make sure the student's face is evenly lit and clearly visible to the camera.",
+      type: "error",
+      voice: "Please improve the lighting and try again.",
+    };
+  }
+
+  if (status === 409) {
+    return {
+      title: "Already Recorded",
+      message: "This student already has an attendance record for this session.",
+      type: "warning",
+      voice: "Attendance already recorded.",
+    };
+  }
+
+  if (status === 403) {
+    return {
+      title: "Wrong Section",
+      message: "The recognized student does not belong to this section.",
+      type: "error",
+      voice: "This student belongs to another section.",
+    };
+  }
+
+  if (
+    status === 422 ||
+    (status === 401 && normalizedMessage.includes("face not recognized"))
+  ) {
+    return {
+      title: "Face Not Recognized",
+      message:
+        "No registered student matched the captured face. Reposition the student and try again.",
+      type: "error",
+      voice: "Face not recognized. Please try again.",
+    };
+  }
+
+  if (status === 429) {
+    return {
+      title: "Scanner Busy",
+      message: "Too many recognition requests were received. Wait a moment and try again.",
+      type: "warning",
+      voice: "Scanner busy. Please wait and try again.",
+    };
+  }
+
+  if ([500, 502, 503, 504].includes(status)) {
+    return {
+      title: "Recognition Service Unavailable",
+      message:
+        "The recognition service is temporarily unavailable. The camera remains ready, so you can try again without leaving the session.",
+      type: "error",
+      voice: "Recognition service is temporarily unavailable. Please try again.",
+    };
+  }
+
+  if (status === 400) {
+    return {
+      title: "Unable to Read Face",
+      message:
+        serverMessage ||
+        "The captured image could not be processed. Reposition the student and try again.",
+      type: "error",
+      voice: "Unable to read the face. Please try again.",
+    };
+  }
+
+  return {
+    title: "Recognition Failed",
+    message:
+      serverMessage ||
+      "Unable to process the face attendance request. You can retry without leaving this session.",
+    type: "error",
+    voice: "Face recognition failed. Please try again.",
+  };
+};
 
 const getFaceSimilarityPercent = (distance) => {
   const value = Number(distance);
@@ -153,6 +332,15 @@ function AttendanceSession() {
   const resultTimerRef = useRef(null);
   const scanLockRef = useRef(false);
   const captureRunRef = useRef(0);
+
+  /*
+   * Tracks whether the camera SHOULD be running.
+   *
+   * This keeps Auto Capture continuous while also respecting an
+   * explicit Turn Camera Off action from the adviser.
+   */
+  const cameraRequestedRef = useRef(true);
+
   const filterMenuRef = useRef(null);
   const voiceCooldownRef = useRef({ key: "", time: 0 });
 
@@ -497,13 +685,17 @@ function AttendanceSession() {
     return records;
   }, [sessionId]);
 
-  const stopCamera = useCallback(() => {
+  const releaseCamera = useCallback(() => {
     captureRunRef.current += 1;
     clearAutoTimer();
+
     const stream = streamRef.current;
     if (stream) stream.getTracks().forEach((track) => track.stop());
+
     streamRef.current = null;
+
     if (videoRef.current) videoRef.current.srcObject = null;
+
     setCameraActive(false);
     setCameraReady(false);
     setCountdown(null);
@@ -511,18 +703,32 @@ function AttendanceSession() {
     setScannerState("idle");
   }, [clearAutoTimer]);
 
+  const stopCamera = useCallback(() => {
+    cameraRequestedRef.current = false;
+    setAutoScanEnabled(false);
+    releaseCamera();
+  }, [releaseCamera]);
+
   const startCamera = useCallback(async () => {
     try {
+      cameraRequestedRef.current = true;
       setCameraError("");
-      setScannerState("starting");
 
       if (!navigator.mediaDevices?.getUserMedia) {
+        cameraRequestedRef.current = false;
+        setAutoScanEnabled(false);
         setCameraError("Camera access is not supported by this browser.");
         setScannerState("idle");
         return;
       }
 
-      stopCamera();
+      /*
+       * Release a stale stream without changing the adviser's desired
+       * camera state. This prevents duplicate tracks after retrying.
+       */
+      releaseCamera();
+      setScannerState("starting");
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
@@ -532,58 +738,90 @@ function AttendanceSession() {
         audio: false,
       });
 
+      if (!cameraRequestedRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
       const video = videoRef.current;
       if (!video) {
         stream.getTracks().forEach((track) => track.stop());
+        cameraRequestedRef.current = false;
+        setAutoScanEnabled(false);
+        setCameraError("Camera preview is unavailable. Reload the page and try again.");
+        setScannerState("idle");
         return;
       }
 
       streamRef.current = stream;
       video.srcObject = stream;
       setCameraActive(true);
+
       await video.play();
       await waitForVideoReady(video);
+
+      if (!cameraRequestedRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+        video.srcObject = null;
+        setCameraActive(false);
+        setCameraReady(false);
+        setScannerState("idle");
+        return;
+      }
+
       setCameraReady(true);
+      setCameraError("");
       setScannerState("ready");
     } catch (requestError) {
       console.error("Unable to start camera:", requestError);
-      stopCamera();
-      if (requestError?.name === "NotAllowedError") {
-        setCameraError("Camera permission was denied. Please allow camera access in your browser.");
-        return;
-      }
-      if (requestError?.name === "NotFoundError") {
-        setCameraError("No camera was detected on this device.");
-        return;
-      }
-      if (requestError?.name === "NotReadableError") {
-        setCameraError("The camera is currently being used by another application.");
-        return;
-      }
-      setCameraError(getErrorMessage(requestError, "Unable to access the camera."));
+
+      cameraRequestedRef.current = false;
+      setAutoScanEnabled(false);
+      releaseCamera();
+      setCameraError(getCameraAccessErrorMessage(requestError));
+      setScannerState("idle");
     }
-  }, [stopCamera]);
+  }, [releaseCamera]);
 
   useEffect(() => {
     if (!scheduledEndReached) return;
+
     clearAutoTimer();
     clearResultTimer();
     scanLockRef.current = false;
+    cameraRequestedRef.current = false;
     setAutoScanEnabled(false);
     setRecognitionResult(null);
     setCameraHoldReason("");
-    stopCamera();
+    releaseCamera();
     setPageError(
       "This attendance session has reached its scheduled end time. Attendance recording is now closed.",
     );
     speakGuidance("session-ended", "Attendance session ended.", { cooldownMs: 10000 });
-  }, [scheduledEndReached, clearAutoTimer, clearResultTimer, stopCamera, speakGuidance]);
+  }, [scheduledEndReached, clearAutoTimer, clearResultTimer, releaseCamera, speakGuidance]);
 
   useEffect(() => {
-    if (loading || !sessionIsActive || cameraActive || cameraIsHeld) return undefined;
+    if (
+      loading ||
+      !sessionIsActive ||
+      cameraActive ||
+      cameraIsHeld ||
+      !cameraRequestedRef.current
+    ) {
+      return undefined;
+    }
+
     const timer = window.setTimeout(() => void startCamera(), 220);
     return () => window.clearTimeout(timer);
-  }, [loading, sessionIsActive, cameraActive, cameraIsHeld, startCamera]);
+  }, [
+    loading,
+    sessionIsActive,
+    cameraActive,
+    cameraIsHeld,
+    autoScanEnabled,
+    startCamera,
+  ]);
 
   const captureRecognitionImage = useCallback(async () => {
     const video = videoRef.current;
@@ -785,9 +1023,10 @@ function AttendanceSession() {
             similarityDifference: formatSimilarityDifference(responseData?.distanceGap),
           });
 
+          cameraRequestedRef.current = false;
           setAutoScanEnabled(false);
           setCameraHoldReason("AMBIGUOUS");
-          stopCamera();
+          releaseCamera();
           setScannerState("ambiguous");
           speakGuidance(
             "ambiguous-face",
@@ -799,48 +1038,42 @@ function AttendanceSession() {
           return;
         }
 
-        let title = "Face Not Recognized";
-        let message = "No registered student matched the captured face.";
-        let resultType = "error";
-        let voiceMessage = "Face not recognized. Please try again.";
+        let title;
+        let message;
+        let resultType;
+        let voiceMessage;
+        let resultOutcome = "RETRYABLE_ERROR";
 
         if (sessionEndedConflict) {
           title = "Session Ended";
           message = "Attendance recording is already closed for this session.";
+          resultType = "error";
           voiceMessage = "Attendance session ended.";
+          resultOutcome = "SESSION_ENDED";
+
           setPageError(responseMessage || message);
-          stopCamera();
-        } else if (status === 409) {
-          title = "Already Recorded";
-          message = "This student already has an attendance record for this session.";
-          resultType = "warning";
-          voiceMessage = "Attendance already recorded.";
-        } else if (status === 403) {
-          title = "Wrong Section";
-          message = "The recognized student does not belong to this section.";
-          voiceMessage = "This student belongs to another section.";
-        } else if (
-          status === 422 ||
-          (status === 401 && normalizedResponseMessage.includes("face not recognized"))
-        ) {
-          title = "Face Not Recognized";
-          message = "No registered student matched the captured face.";
-          voiceMessage = "Face not recognized. Please try again.";
+          cameraRequestedRef.current = false;
+          setAutoScanEnabled(false);
+          releaseCamera();
         } else {
-          title = "Recognition Failed";
-          message = "Unable to process the face attendance request.";
-          voiceMessage = "Face recognition failed. Please try again.";
+          const presentation = getRecognitionErrorPresentation(requestError);
+          title = presentation.title;
+          message = presentation.message;
+          resultType = presentation.type;
+          voiceMessage = presentation.voice;
         }
 
         setRecognitionResult({
           type: resultType,
+          outcome: resultOutcome,
+          retryable: !sessionEndedConflict,
           status: title.toUpperCase(),
           name: title,
           studentNumber: "—",
           sectionName,
           recordedAt: new Date(),
           method: "Face Recognition",
-          message: responseMessage || message,
+          message,
         });
 
         setScannerState(resultType === "warning" ? "warning" : "error");
@@ -848,7 +1081,13 @@ function AttendanceSession() {
           cooldownMs: resultType === "warning" ? 3500 : 2600,
         });
 
-        if (autoScanEnabled) {
+        if (autoScanEnabled && !sessionEndedConflict) {
+          /*
+           * IMPORTANT: keep the live camera stream running.
+           * Only the result card is held briefly before Auto Capture
+           * starts the next five-second countdown.
+           */
+          cameraRequestedRef.current = true;
           resultTimerRef.current = window.setTimeout(() => {
             setRecognitionResult(null);
             setScannerState("ready");
@@ -877,7 +1116,7 @@ function AttendanceSession() {
       refreshRecords,
       students,
       sectionName,
-      stopCamera,
+      releaseCamera,
       autoScanEnabled,
       voiceEnabled,
       speakGuidance,
@@ -892,6 +1131,7 @@ function AttendanceSession() {
       !sessionIsActive ||
       !cameraActive ||
       !cameraReady ||
+      cameraIsHeld ||
       recognizing ||
       recognitionResult ||
       scanLockRef.current
@@ -899,29 +1139,42 @@ function AttendanceSession() {
       return undefined;
     }
 
+    /* Auto Capture promises a continuously available camera. */
+    cameraRequestedRef.current = true;
+
     setScannerState("aligning");
     setCountdown(null);
 
     autoTimerRef.current = window.setTimeout(() => {
       setScannerState("countdown");
-      setCountdown(3);
-      speakGuidance("auto-hold-still", "Hold still and look straight at the camera.", {
-        cooldownMs: 4200,
-      });
+      setCountdown(AUTO_COUNTDOWN_SECONDS);
 
-      const runStep = (nextValue) => {
+      speakGuidance(
+        "auto-hold-still",
+        "Hold still and look straight at the camera. Capturing in five seconds.",
+        { cooldownMs: 6500 },
+      );
+
+      const runStep = (currentValue) => {
         autoTimerRef.current = window.setTimeout(() => {
-          if (nextValue > 0) {
-            setCountdown(nextValue);
-            runStep(nextValue - 1);
+          if (!cameraRequestedRef.current) {
+            setCountdown(null);
             return;
           }
+
+          if (currentValue > 1) {
+            const nextValue = currentValue - 1;
+            setCountdown(nextValue);
+            runStep(nextValue);
+            return;
+          }
+
           setCountdown(null);
           void captureAndRecognize();
         }, AUTO_COUNTDOWN_STEP);
       };
 
-      runStep(2);
+      runStep(AUTO_COUNTDOWN_SECONDS);
     }, AUTO_ALIGN_DELAY);
 
     return () => clearAutoTimer();
@@ -930,6 +1183,7 @@ function AttendanceSession() {
     sessionIsActive,
     cameraActive,
     cameraReady,
+    cameraIsHeld,
     recognizing,
     recognitionResult,
     captureAndRecognize,
@@ -939,6 +1193,7 @@ function AttendanceSession() {
 
   useEffect(() => {
     return () => {
+      cameraRequestedRef.current = false;
       captureRunRef.current += 1;
       clearAutoTimer();
       clearResultTimer();
@@ -997,9 +1252,12 @@ function AttendanceSession() {
     }
     if (scannerState === "countdown") {
       return {
-        eyebrow: "FACE POSITION ACCEPTED",
+        eyebrow: "AUTO CAPTURE READY",
         title: "Hold still",
-        description: "Automatic capture is starting.",
+        description:
+          countdown !== null
+            ? `Automatic capture in ${countdown} second${countdown === 1 ? "" : "s"}.`
+            : "Automatic capture is starting.",
       };
     }
     if (scannerState === "aligning") {
@@ -1030,16 +1288,20 @@ function AttendanceSession() {
       title: "Camera unavailable",
       description: "Enable the camera to start face attendance.",
     };
-  }, [scannerState, cameraActive, cameraReady, autoScanEnabled, captureProgress]);
+  }, [scannerState, cameraActive, cameraReady, autoScanEnabled, captureProgress, countdown]);
 
   const handleContinueScanner = useCallback(async () => {
     clearAutoTimer();
     clearResultTimer();
     setAmbiguousActionError("");
+    setCameraError("");
     setRecognitionResult(null);
     setCountdown(null);
     setCaptureProgress(0);
     scanLockRef.current = false;
+
+    /* The adviser explicitly chose to continue/retry. */
+    cameraRequestedRef.current = true;
 
     const shouldRestartCamera = !cameraActive && sessionIsActive;
     setCameraHoldReason("");
@@ -1221,6 +1483,7 @@ function AttendanceSession() {
       setEndError("");
       await adviserService.endAttendanceSession(sessionId);
       speechService.stop();
+      cameraRequestedRef.current = false;
       stopCamera();
       setShowEndModal(false);
       navigate("/adviser/attendance", { replace: true });
@@ -1330,8 +1593,22 @@ function AttendanceSession() {
                 disabled={!sessionIsActive || cameraIsHeld || Boolean(recognitionResult)}
                 onClick={() => {
                   clearAutoTimer();
+                  clearResultTimer();
                   setCountdown(null);
-                  setAutoScanEnabled((current) => !current);
+
+                  const nextEnabled = !autoScanEnabled;
+                  setAutoScanEnabled(nextEnabled);
+
+                  if (nextEnabled) {
+                    cameraRequestedRef.current = true;
+                    setCameraError("");
+                    setRecognitionResult(null);
+                    scanLockRef.current = false;
+
+                    if (!cameraActive && sessionIsActive && !cameraIsHeld) {
+                      void startCamera();
+                    }
+                  }
                 }}
               >
                 <span aria-hidden="true" />
@@ -1533,7 +1810,21 @@ function AttendanceSession() {
               <button
                 type="button"
                 disabled={recognizing}
-                onClick={cameraActive ? stopCamera : () => void startCamera()}
+                onClick={() => {
+                  if (cameraActive) {
+                    cameraRequestedRef.current = false;
+                    setAutoScanEnabled(false);
+                    clearAutoTimer();
+                    clearResultTimer();
+                    setRecognitionResult(null);
+                    setCountdown(null);
+                    releaseCamera();
+                    return;
+                  }
+
+                  cameraRequestedRef.current = true;
+                  void startCamera();
+                }}
               >
                 {cameraActive ? "Turn Camera Off" : "Turn Camera On"}
               </button>
@@ -1745,8 +2036,28 @@ function AttendanceSession() {
 
               <p className="attendance-result-message">{recognitionResult.message}</p>
 
-              <button type="button" onClick={() => void handleContinueScanner()}>
-                {recognitionResult.type === "success" ? "Next Student" : "Try Again"}
+              <button
+                type="button"
+                className={`attendance-result-action-button ${
+                  recognitionResult.type === "success" ? "is-next" : "is-retry"
+                }`}
+                disabled={!sessionIsActive && recognitionResult.outcome !== "SESSION_ENDED"}
+                onClick={() => {
+                  if (recognitionResult.outcome === "SESSION_ENDED") {
+                    navigate("/adviser/attendance");
+                    return;
+                  }
+
+                  void handleContinueScanner();
+                }}
+              >
+                {recognitionResult.type === "success"
+                  ? "Next Student"
+                  : recognitionResult.outcome === "SESSION_ENDED"
+                    ? "Back to Attendance"
+                    : autoScanEnabled
+                      ? "Try Again Now"
+                      : "Try Again"}
               </button>
             </div>
           )}
