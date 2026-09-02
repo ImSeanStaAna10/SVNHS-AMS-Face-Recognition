@@ -1,4 +1,8 @@
 package com.example.attendancemanagementbackend.dto.notification;
 
-public class NotificationUnreadCountResponse {
+public record NotificationUnreadCountResponse(
+
+        long unreadCount
+
+) {
 }

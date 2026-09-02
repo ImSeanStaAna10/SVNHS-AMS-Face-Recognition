@@ -1,4 +1,8 @@
 package com.example.attendancemanagementbackend.entity;
 
-public class StudentTransferRequestStatus {
+public enum StudentTransferRequestStatus {
+    PENDING,
+    APPROVED,
+    REJECTED,
+    CANCELLED
 }

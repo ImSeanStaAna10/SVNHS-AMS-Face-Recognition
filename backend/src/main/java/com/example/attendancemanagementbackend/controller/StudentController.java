@@ -2,6 +2,7 @@ package com.example.attendancemanagementbackend.controller;
 
 import com.example.attendancemanagementbackend.dto.student.CreateStudentRequest;
 import com.example.attendancemanagementbackend.dto.student.StudentResponse;
+import com.example.attendancemanagementbackend.dto.student.TransferStudentRequest;
 import com.example.attendancemanagementbackend.dto.student.UpdateStudentRequest;
 import com.example.attendancemanagementbackend.service.StudentService;
 import jakarta.validation.Valid;
@@ -69,8 +70,36 @@ public class StudentController {
             @PathVariable String studentId,
             @Valid @RequestBody UpdateStudentRequest request
     ) {
-
         return studentService.updateStudent(
+                studentId,
+                request
+        );
+    }
+
+    /* =====================================================
+       TRANSFER STUDENT SECTION
+    ===================================================== */
+
+    /*
+     * Transfers an ACTIVE student to another ACTIVE section.
+     *
+     * IMPORTANT:
+     * This Adviser endpoint only allows transfers between
+     * sections assigned to the currently logged-in Adviser.
+     *
+     * Student ID, student number, face registration,
+     * and historical attendance remain preserved.
+     *
+     * For cross-Adviser transfers, use a higher-level
+     * Councilor-controlled workflow instead of weakening
+     * this Adviser ownership rule.
+     */
+    @PatchMapping("/{studentId}/section")
+    public StudentResponse transferStudentSection(
+            @PathVariable String studentId,
+            @Valid @RequestBody TransferStudentRequest request
+    ) {
+        return studentService.transferStudentSection(
                 studentId,
                 request
         );
@@ -94,8 +123,26 @@ public class StudentController {
     public void deleteStudent(
             @PathVariable String studentId
     ) {
-
         studentService.deactivateStudent(
+                studentId
+        );
+    }
+
+    /* =====================================================
+       REACTIVATE STUDENT
+    ===================================================== */
+
+    /*
+     * Restores an inactive student to the active roster.
+     *
+     * Existing student ID, face registration, section,
+     * and historical attendance remain unchanged.
+     */
+    @PatchMapping("/{studentId}/reactivate")
+    public StudentResponse reactivateStudent(
+            @PathVariable String studentId
+    ) {
+        return studentService.reactivateStudent(
                 studentId
         );
     }

@@ -1,4 +1,16 @@
 package com.example.attendancemanagementbackend.entity;
 
-public class NotificationReferenceType {
+public enum NotificationReferenceType {
+
+    STUDENT_TRANSFER,
+
+    ATTENDANCE_REPORT,
+
+    ATTENDANCE_SESSION,
+
+    FACE_CONFLICT,
+
+    USER_ACCOUNT,
+
+    SYSTEM
 }
