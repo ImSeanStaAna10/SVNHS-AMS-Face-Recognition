@@ -37,8 +37,10 @@ class FaceService:
     # The normal school enrollment flow captures one continuous
     # burst. Spring may still send that burst through the existing
     # baseline_images/challenge_images multipart fields while the
-    # Java contract is being migrated. They are treated as one
-    # ordered passive sequence here; no movement is required.
+    # Java contract is being migrated.
+    #
+    # They are treated as one ordered passive sequence here.
+    # No movement is required.
     # =========================================================
 
     MIN_PASSIVE_FRAMES = 8
@@ -149,7 +151,7 @@ class FaceService:
         # baseline + challenge frames appears to remain the
         # same person.
         #
-        # Final Student identity matching still belongs to
+        # Final student identity matching still belongs to
         # Spring / pgvector.
         #
         # Configurable because it must eventually be calibrated
@@ -167,10 +169,51 @@ class FaceService:
             )
         )
 
+        # =====================================================
+        # STRICT ATTENDANCE RECOGNITION LIVENESS
+        #
+        # Normal passive liveness already requires:
+        #
+        # - MiniFASNetV1SE predicts REAL
+        # - MiniFASNetV2 predicts REAL
+        # - ensemble score passes LIVENESS_LIVE_THRESHOLD
+        #
+        # Attendance recognition is slightly stricter:
+        #
+        # BOTH individual MiniFAS model live probabilities must
+        # also meet this floor.
+        #
+        # Enrollment does NOT automatically use this stricter
+        # rule. It is enabled only when:
+        #
+        # strict_recognition_liveness=True
+        #
+        # Current /recognize route uses that flag.
+        # =====================================================
+
+        self.recognition_min_model_live_score = (
+            self._read_float_environment(
+                environment_name=(
+                    "RECOGNITION_MIN_MODEL_LIVE_SCORE"
+                ),
+                default_value=0.70,
+                minimum_value=0.0,
+                maximum_value=1.0,
+            )
+        )
+
     # =========================================================
     # EXISTING FACE ENROLLMENT
     #
     # Existing behavior retained.
+    #
+    # IMPORTANT:
+    #
+    # This intentionally DOES NOT enable strict attendance
+    # recognition liveness.
+    #
+    # Enrollment continues using the normal passive MiniFAS
+    # security decision.
     # =========================================================
 
     async def enroll(
@@ -190,14 +233,25 @@ class FaceService:
         }
 
     # =========================================================
-    # EXISTING FACE EMBEDDING EXTRACTION
+    # FACE EMBEDDING EXTRACTION
     #
-    # Existing single-image endpoint behavior retained.
+    # Used by:
+    #
+    # /enrollment
+    #     strict_recognition_liveness=False
+    #
+    # /recognize
+    #     strict_recognition_liveness=True
+    #
+    # This fixes compatibility with the current recognition
+    # route while preserving enrollment behavior.
     # =========================================================
 
     async def extract_embedding(
         self,
         image: UploadFile,
+        *,
+        strict_recognition_liveness: bool = False,
     ):
 
         # =====================================================
@@ -227,7 +281,7 @@ class FaceService:
             )
 
         # =====================================================
-        # 2. EXISTING INSIGHTFACE FACE DETECTION
+        # 2. INSIGHTFACE FACE DETECTION
         # =====================================================
 
         faces = self.face_app.get(
@@ -256,7 +310,9 @@ class FaceService:
             )
 
         # =====================================================
-        # 3. EXISTING PASSIVE LIVENESS
+        # 3. PASSIVE LIVENESS
+        #
+        # MiniFASNetV1SE + MiniFASNetV2
         # =====================================================
 
         try:
@@ -281,11 +337,17 @@ class FaceService:
         logger.warning(
             (
                 "LIVENESS RESULT | "
+                "mode=%s | "
                 "outcome=%s | "
                 "live_score=%.4f | "
                 "V1SE=%.4f | "
                 "V2=%.4f | "
                 "processing_ms=%.2f"
+            ),
+            (
+                "STRICT_RECOGNITION"
+                if strict_recognition_liveness
+                else "STANDARD"
             ),
             liveness_result.outcome,
             liveness_result.live_score,
@@ -295,7 +357,7 @@ class FaceService:
         )
 
         # =====================================================
-        # 4. EXISTING HARD SECURITY DECISION
+        # 4. NORMAL PASSIVE-LIVENESS SECURITY DECISION
         # =====================================================
 
         if (
@@ -323,7 +385,64 @@ class FaceService:
             )
 
         # =====================================================
-        # 5. EXISTING 512-D EMBEDDING
+        # 5. STRICT ATTENDANCE-RECOGNITION SECURITY GATE
+        #
+        # Applied ONLY when requested by /recognize.
+        #
+        # Even when the ensemble result is LIVE, BOTH individual
+        # MiniFAS model live probabilities must be strong enough.
+        #
+        # Example:
+        #
+        # V1SE = 0.92
+        # V2   = 0.71
+        # threshold = 0.70
+        #
+        # PASS
+        #
+        # V1SE = 0.92
+        # V2   = 0.54
+        #
+        # FAIL as LIVENESS_UNCERTAIN
+        #
+        # This avoids returning a recognition embedding when one
+        # anti-spoof model is substantially less confident.
+        # =====================================================
+
+        if strict_recognition_liveness:
+
+            weakest_model_live_score = min(
+                liveness_result.v1se_live_score,
+                liveness_result.v2_live_score,
+            )
+
+            if (
+                weakest_model_live_score
+                < self.recognition_min_model_live_score
+            ):
+
+                logger.warning(
+                    (
+                        "STRICT RECOGNITION LIVENESS REJECTED | "
+                        "weakest_model_score=%.4f | "
+                        "required_score=%.4f | "
+                        "V1SE=%.4f | "
+                        "V2=%.4f"
+                    ),
+                    weakest_model_live_score,
+                    self.recognition_min_model_live_score,
+                    liveness_result.v1se_live_score,
+                    liveness_result.v2_live_score,
+                )
+
+                raise ValueError(
+                    LIVENESS_UNCERTAIN
+                )
+
+        # =====================================================
+        # 6. 512-D EMBEDDING
+        #
+        # Embedding is returned only after liveness passes.
         # =====================================================
 
         embedding = face.embedding
@@ -346,8 +465,11 @@ class FaceService:
     #
     # - The current Spring endpoint still supplies challenge_type,
     #   baseline_images, and challenge_images.
+    #
     # - challenge_type is retained only as transaction metadata.
+    #
     # - The two image lists are joined into ONE continuous capture.
+    #
     # - BLINK / TURN_LEFT / TURN_RIGHT are NOT evaluated here.
     #
     # Security gates retained:
@@ -390,17 +512,34 @@ class FaceService:
         analysis = []
 
         for image in submitted_images:
-            frame = await self._decode_liveness_frame(image)
-            result = self._analyze_liveness_frame(frame)
+
+            frame = await self._decode_liveness_frame(
+                image
+            )
+
+            result = self._analyze_liveness_frame(
+                frame
+            )
 
             if result is None:
+
                 return self._failed_verification_result(
                     challenge_type=transaction_type,
                     status="CHALLENGE_UNCERTAIN",
                     reason="INVALID_PASSIVE_FACE",
                 )
 
-            analysis.append(result)
+            analysis.append(
+                result
+            )
+
+        # =====================================================
+        # REPRESENTATIVE PASSIVE-LIVENESS FRAMES
+        #
+        # first
+        # middle
+        # last
+        # =====================================================
 
         passive_indices = sorted(
             {
@@ -413,14 +552,20 @@ class FaceService:
         passive_live_scores = []
 
         for index in passive_indices:
+
             frame, face = analysis[index]
 
             try:
-                passive_result = self.liveness_service.check(
-                    frame=frame,
-                    bbox_xyxy=face.bbox,
+
+                passive_result = (
+                    self.liveness_service.check(
+                        frame=frame,
+                        bbox_xyxy=face.bbox,
+                    )
                 )
+
             except Exception:
+
                 logger.exception(
                     "Passive liveness inference failed during "
                     "multi-frame enrollment verification."
@@ -436,46 +581,81 @@ class FaceService:
                 passive_result.live_score
             )
 
-            if passive_result.outcome == SPOOF_DETECTED:
+            if (
+                passive_result.outcome
+                == SPOOF_DETECTED
+            ):
+
                 return self._failed_verification_result(
                     challenge_type=transaction_type,
                     status="CHALLENGE_FAILED",
                     reason=SPOOF_DETECTED,
                     passive_live_score=float(
-                        np.mean(passive_live_scores)
+                        np.mean(
+                            passive_live_scores
+                        )
                     ),
                 )
 
-            if passive_result.outcome != LIVE:
+            if (
+                passive_result.outcome
+                != LIVE
+            ):
+
                 return self._failed_verification_result(
                     challenge_type=transaction_type,
                     status="CHALLENGE_UNCERTAIN",
                     reason=LIVENESS_UNCERTAIN,
                     passive_live_score=float(
-                        np.mean(passive_live_scores)
+                        np.mean(
+                            passive_live_scores
+                        )
                     ),
                 )
 
         passive_live_score = float(
-            np.mean(passive_live_scores)
+            np.mean(
+                passive_live_scores
+            )
         )
 
+        # =====================================================
+        # SAME-PERSON CONTINUITY
+        #
+        # All captured embeddings are normalized and averaged
+        # into a centroid.
+        #
+        # Every frame must remain sufficiently close to that
+        # identity centroid.
+        # =====================================================
+
         normalized_embeddings = [
-            self._normalized_embedding(face.embedding)
+            self._normalized_embedding(
+                face.embedding
+            )
             for _, face in analysis
         ]
 
         centroid = np.mean(
-            np.stack(normalized_embeddings),
+            np.stack(
+                normalized_embeddings
+            ),
             axis=0,
         )
 
-        centroid_norm = float(np.linalg.norm(centroid))
+        centroid_norm = float(
+            np.linalg.norm(
+                centroid
+            )
+        )
 
         if (
-            not np.isfinite(centroid_norm)
+            not np.isfinite(
+                centroid_norm
+            )
             or centroid_norm <= 1e-8
         ):
+
             return self._failed_verification_result(
                 challenge_type=transaction_type,
                 status="CHALLENGE_UNCERTAIN",
@@ -483,55 +663,89 @@ class FaceService:
                 passive_live_score=passive_live_score,
             )
 
-        centroid = centroid / centroid_norm
+        centroid = (
+            centroid
+            / centroid_norm
+        )
 
         continuity_distances = []
 
         for normalized_embedding in normalized_embeddings:
+
             similarity = float(
                 np.clip(
-                    np.dot(centroid, normalized_embedding),
+                    np.dot(
+                        centroid,
+                        normalized_embedding,
+                    ),
                     -1.0,
                     1.0,
                 )
             )
-            continuity_distances.append(1.0 - similarity)
+
+            continuity_distances.append(
+                1.0 - similarity
+            )
 
         max_continuity_distance = float(
-            max(continuity_distances)
+            max(
+                continuity_distances
+            )
         )
 
         if (
             max_continuity_distance
             > self.continuity_max_cosine_distance
         ):
+
             return self._failed_verification_result(
                 challenge_type=transaction_type,
                 status="CHALLENGE_FAILED",
                 reason="FACE_CONTINUITY_FAILED",
                 passive_live_score=passive_live_score,
-                max_continuity_distance=max_continuity_distance,
+                max_continuity_distance=(
+                    max_continuity_distance
+                ),
             )
 
+        # =====================================================
+        # BEST FACE FOR FINAL ENROLLMENT EMBEDDING
+        #
+        # Highest detection-confidence face is selected.
+        # =====================================================
+
         best_face = max(
-            (face for _, face in analysis),
+            (
+                face
+                for _, face in analysis
+            ),
             key=lambda face: float(
-                getattr(face, "det_score", 0.0) or 0.0
+                getattr(
+                    face,
+                    "det_score",
+                    0.0,
+                )
+                or 0.0
             ),
         )
 
-        final_embedding = best_face.embedding
+        final_embedding = (
+            best_face.embedding
+        )
 
         if (
             final_embedding is None
             or len(final_embedding) != 512
         ):
+
             return self._failed_verification_result(
                 challenge_type=transaction_type,
                 status="CHALLENGE_UNCERTAIN",
                 reason="INVALID_FACE_EMBEDDING",
                 passive_live_score=passive_live_score,
-                max_continuity_distance=max_continuity_distance,
+                max_continuity_distance=(
+                    max_continuity_distance
+                ),
             )
 
         return {
@@ -540,9 +754,15 @@ class FaceService:
             "challenge_type": transaction_type,
             "status": "CHALLENGE_PASSED",
             "reason": None,
-            "embedding": final_embedding.tolist(),
-            "passive_live_score": passive_live_score,
-            "max_continuity_distance": max_continuity_distance,
+            "embedding": (
+                final_embedding.tolist()
+            ),
+            "passive_live_score": (
+                passive_live_score
+            ),
+            "max_continuity_distance": (
+                max_continuity_distance
+            ),
         }
 
     # =========================================================
@@ -588,6 +808,7 @@ class FaceService:
             TURN_LEFT,
             TURN_RIGHT,
         }:
+
             raise ValueError(
                 "Unsupported liveness challenge type"
             )
@@ -600,6 +821,7 @@ class FaceService:
             len(baseline_images)
             < self.MIN_BASELINE_FRAMES
         ):
+
             raise ValueError(
                 "At least 5 baseline frames are required"
             )
@@ -608,6 +830,7 @@ class FaceService:
             len(challenge_images)
             < self.MIN_CHALLENGE_FRAMES
         ):
+
             raise ValueError(
                 "At least 5 challenge frames are required"
             )
@@ -616,6 +839,7 @@ class FaceService:
             len(baseline_images)
             > self.MAX_BASELINE_FRAMES
         ):
+
             raise ValueError(
                 "Too many baseline frames"
             )
@@ -624,6 +848,7 @@ class FaceService:
             len(challenge_images)
             > self.MAX_CHALLENGE_FRAMES
         ):
+
             raise ValueError(
                 "Too many challenge frames"
             )
@@ -635,6 +860,7 @@ class FaceService:
         baseline_frames = []
 
         for image in baseline_images:
+
             baseline_frames.append(
                 await self._decode_liveness_frame(
                     image
@@ -644,6 +870,7 @@ class FaceService:
         challenge_frames = []
 
         for image in challenge_images:
+
             challenge_frames.append(
                 await self._decode_liveness_frame(
                     image
@@ -956,6 +1183,7 @@ class FaceService:
             # Blink prototype expects 3 baseline frames.
             #
             # IMPORTANT:
+            #
             # These are PRE-PROMPT frames only.
             #
             # Challenge frames are appended only after the
@@ -1108,9 +1336,10 @@ class FaceService:
         # Select the highest-confidence baseline face.
         #
         # Baseline is used because the person is expected to
-        # be front-facing there. A strongly turned challenge
-        # frame is less desirable for the final recognition
-        # embedding.
+        # be front-facing there.
+        #
+        # A strongly turned challenge frame is less desirable
+        # for the final recognition embedding.
         # =====================================================
 
         best_baseline_face = max(
@@ -1197,6 +1426,7 @@ class FaceService:
         image_bytes = await image.read()
 
         if not image_bytes:
+
             raise ValueError(
                 "Invalid liveness frame"
             )
@@ -1205,6 +1435,7 @@ class FaceService:
             len(image_bytes)
             > self.MAX_FRAME_BYTES
         ):
+
             raise ValueError(
                 "Liveness frame is too large"
             )
@@ -1220,6 +1451,7 @@ class FaceService:
         )
 
         if frame is None:
+
             raise ValueError(
                 "Invalid liveness frame"
             )
@@ -1252,7 +1484,9 @@ class FaceService:
 
             return None
 
-        embedding = face.embedding
+        embedding = (
+            face.embedding
+        )
 
         if (
             embedding is None
@@ -1293,7 +1527,9 @@ class FaceService:
         )
 
         if (
-            not np.isfinite(norm)
+            not np.isfinite(
+                norm
+            )
             or norm <= 1e-8
         ):
 
@@ -1301,12 +1537,16 @@ class FaceService:
                 "Invalid face embedding"
             )
 
-        return array / norm
+        return (
+            array
+            / norm
+        )
 
     # =========================================================
     # FAILED VERIFICATION RESPONSE
     #
     # IMPORTANT:
+    #
     # No embedding is returned when verification fails.
     # =========================================================
 
