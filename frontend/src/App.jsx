@@ -28,6 +28,7 @@ import AttendanceHistory from "./features/adviser/AttendanceHistory";
 import AttendanceHistoryDetail from "./features/adviser/AttendanceHistoryDetail";
 import AttendanceSession from "./features/adviser/AttendanceSession";
 import StudentManagement from "./features/adviser/StudentManagement";
+import StudentTransfers from "./features/adviser/StudentTransfer";
 
 /* =========================================================
    COUNCILOR
@@ -285,6 +286,10 @@ function App() {
           }
         />
 
+        {/* =================================================
+            ADVISER STUDENT MANAGEMENT
+        ================================================= */}
+
         <Route
           path="/adviser/students"
           element={
@@ -294,6 +299,31 @@ function App() {
               ]}
             >
               <StudentManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* =================================================
+            ADVISER STUDENT TRANSFERS
+
+            Central transfer workspace:
+            - Incoming requests
+            - Outgoing requests
+            - Transfer history
+            - Approve
+            - Reject
+            - Cancel
+        ================================================= */}
+
+        <Route
+          path="/adviser/transfers"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "ADVISER",
+              ]}
+            >
+              <StudentTransfers />
             </ProtectedRoute>
           }
         />
@@ -365,8 +395,9 @@ function App() {
         {/* =================================================
             ACTIVE ATTENDANCE SESSION
 
-            Keep dynamic session route after the static
-            attendance routes for readability.
+            Keep dynamic session route after static
+            attendance routes so the static routes remain
+            clear and easy to maintain.
         ================================================= */}
 
         <Route

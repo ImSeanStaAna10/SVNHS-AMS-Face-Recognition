@@ -8,14 +8,11 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import ThemeToggle from "../common/themeToggle";
+import AdviserTopbar from "../components/topbar/adviserTopbar";
 
 import accountService from "../services/accountService";
 import authService from "../services/authService";
 
-import bagongPilipinasLogo from "../assets/bagong-pilipinas-logo.svg";
-import depedLogo from "../assets/kagawaran-educ-logo.svg";
-import schoolDivisionLogo from "../assets/school-division-logo.svg";
 import seniorHighSchoolLogo from "../assets/shs-logo.svg";
 
 /*
@@ -23,6 +20,12 @@ import seniorHighSchoolLogo from "../assets/shs-logo.svg";
  */
 import "../styles/councilor.css";
 import "../styles/adviser/account.css";
+
+/*
+ * Student transfer styles currently own
+ * the Transfers sidebar badge styling.
+ */
+import "../styles/adviser/StudentManagementFaceScanning/studentTransfer.css";
 
 /* =========================================================
    CONSTANTS
@@ -39,25 +42,6 @@ const INITIAL_PASSWORD_VISIBILITY = {
   newPassword: false,
   confirmPassword: false,
 };
-
-const INSTITUTIONAL_LOGOS = [
-  {
-    src: bagongPilipinasLogo,
-    alt: "Bagong Pilipinas",
-  },
-  {
-    src: depedLogo,
-    alt: "Department of Education",
-  },
-  {
-    src: schoolDivisionLogo,
-    alt: "Schools Division Office",
-  },
-  {
-    src: seniorHighSchoolLogo,
-    alt: "Signal Village National High School",
-  },
-];
 
 const NAVIGATION_ITEMS = [
   {
@@ -89,6 +73,13 @@ const NAVIGATION_ITEMS = [
     path: "/adviser/attendance-records",
     exact: true,
   },
+  {
+    label: "Transfers",
+    icon: "↔",
+    path: "/adviser/transfers",
+    exact: true,
+    transferBadge: true,
+  },
 ];
 
 /* =========================================================
@@ -115,6 +106,22 @@ const getErrorMessage = (
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   fallbackMessage;
+
+const normalizePendingTransferCount = (
+  value,
+) => {
+  const parsed =
+    Number(value);
+
+  if (
+    !Number.isFinite(parsed) ||
+    parsed < 0
+  ) {
+    return 0;
+  }
+
+  return Math.floor(parsed);
+};
 
 /* =========================================================
    PASSWORD VISIBILITY ICON
@@ -223,6 +230,29 @@ function AdviserLayout({
   ] = useState(false);
 
   /* =======================================================
+     TRANSFER BADGE STATE
+
+     IMPORTANT:
+     AdviserTopbar already loads the incoming
+     actionable notifications.
+
+     Instead of making another API request here,
+     AdviserTopbar reports its notification count
+     back to this layout.
+
+     This keeps:
+     - Bell badge
+     - Transfers sidebar badge
+
+     synchronized using the same source.
+  ======================================================= */
+
+  const [
+    incomingTransferCount,
+    setIncomingTransferCount,
+  ] = useState(0);
+
+  /* =======================================================
      CHANGE PASSWORD STATE
   ======================================================= */
 
@@ -279,16 +309,40 @@ function AdviserLayout({
     "Adviser account";
 
   /* =======================================================
+     NOTIFICATION COUNT CALLBACK
+
+     AdviserTopbar calls this whenever its notification
+     collection changes.
+
+     The sidebar uses the same count for the Transfers badge.
+  ======================================================= */
+
+  const handleNotificationCountChange =
+    (count) => {
+      setIncomingTransferCount(
+        normalizePendingTransferCount(
+          count,
+        ),
+      );
+    };
+
+  /* =======================================================
      MOBILE SIDEBAR CONTROLS
   ======================================================= */
 
-  const openMobileSidebar = () => {
-    setMobileSidebarOpen(true);
-  };
+  const openMobileSidebar =
+    () => {
+      setMobileSidebarOpen(
+        true,
+      );
+    };
 
-  const closeMobileSidebar = () => {
-    setMobileSidebarOpen(false);
-  };
+  const closeMobileSidebar =
+    () => {
+      setMobileSidebarOpen(
+        false,
+      );
+    };
 
   /* =======================================================
      CLOSE SIDEBAR WHEN RETURNING TO DESKTOP
@@ -300,22 +354,46 @@ function AdviserLayout({
         "(max-width: 720px)",
       );
 
-    const handleViewportChange = (
-      event,
-    ) => {
-      if (!event.matches) {
-        setMobileSidebarOpen(false);
-      }
-    };
+    const handleViewportChange =
+      (event) => {
+        if (
+          !event.matches
+        ) {
+          setMobileSidebarOpen(
+            false,
+          );
+        }
+      };
 
-    mediaQuery.addEventListener(
-      "change",
+    /*
+     * Modern browsers.
+     */
+    if (
+      typeof mediaQuery.addEventListener ===
+      "function"
+    ) {
+      mediaQuery.addEventListener(
+        "change",
+        handleViewportChange,
+      );
+
+      return () => {
+        mediaQuery.removeEventListener(
+          "change",
+          handleViewportChange,
+        );
+      };
+    }
+
+    /*
+     * Compatibility fallback.
+     */
+    mediaQuery.addListener?.(
       handleViewportChange,
     );
 
     return () => {
-      mediaQuery.removeEventListener(
-        "change",
+      mediaQuery.removeListener?.(
         handleViewportChange,
       );
     };
@@ -326,25 +404,30 @@ function AdviserLayout({
   ======================================================= */
 
   useEffect(() => {
-    if (!mobileSidebarOpen) {
+    if (
+      !mobileSidebarOpen
+    ) {
       return undefined;
     }
 
     const previousOverflow =
-      document.body.style.overflow;
+      document.body.style
+        .overflow;
 
     document.body.style.overflow =
       "hidden";
 
-    const handleKeyDown = (
-      event,
-    ) => {
-      if (
-        event.key === "Escape"
-      ) {
-        setMobileSidebarOpen(false);
-      }
-    };
+    const handleKeyDown =
+      (event) => {
+        if (
+          event.key ===
+          "Escape"
+        ) {
+          setMobileSidebarOpen(
+            false,
+          );
+        }
+      };
 
     window.addEventListener(
       "keydown",
@@ -369,37 +452,47 @@ function AdviserLayout({
   ======================================================= */
 
   useEffect(() => {
-    if (!showPasswordModal) {
+    if (
+      !showPasswordModal
+    ) {
       return undefined;
     }
 
     const previousOverflow =
-      document.body.style.overflow;
+      document.body.style
+        .overflow;
 
     document.body.style.overflow =
       "hidden";
 
-    const handleKeyDown = (
-      event,
-    ) => {
-      if (
-        event.key === "Escape" &&
-        !changingPassword
-      ) {
-        setShowPasswordModal(false);
+    const handleKeyDown =
+      (event) => {
+        if (
+          event.key ===
+            "Escape" &&
+          !changingPassword
+        ) {
+          setShowPasswordModal(
+            false,
+          );
 
-        setPasswordForm(
-          INITIAL_PASSWORD_FORM,
-        );
+          setPasswordForm(
+            INITIAL_PASSWORD_FORM,
+          );
 
-        setPasswordVisibility(
-          INITIAL_PASSWORD_VISIBILITY,
-        );
+          setPasswordVisibility(
+            INITIAL_PASSWORD_VISIBILITY,
+          );
 
-        setPasswordError("");
-        setPasswordSuccess("");
-      }
-    };
+          setPasswordError(
+            "",
+          );
+
+          setPasswordSuccess(
+            "",
+          );
+        }
+      };
 
     window.addEventListener(
       "keydown",
@@ -429,22 +522,28 @@ function AdviserLayout({
   ) => {
     closeMobileSidebar();
 
-    navigate(path);
+    navigate(
+      path,
+    );
   };
 
   /* =======================================================
      LOGOUT
   ======================================================= */
 
-  const handleLogout = () => {
-    closeMobileSidebar();
+  const handleLogout =
+    () => {
+      closeMobileSidebar();
 
-    authService.logout();
+      authService.logout();
 
-    navigate("/login", {
-      replace: true,
-    });
-  };
+      navigate(
+        "/login",
+        {
+          replace: true,
+        },
+      );
+    };
 
   /* =======================================================
      RESET PASSWORD MODAL STATE
@@ -460,8 +559,13 @@ function AdviserLayout({
         INITIAL_PASSWORD_VISIBILITY,
       );
 
-      setPasswordError("");
-      setPasswordSuccess("");
+      setPasswordError(
+        "",
+      );
+
+      setPasswordSuccess(
+        "",
+      );
     };
 
   /* =======================================================
@@ -471,23 +575,29 @@ function AdviserLayout({
   const openPasswordModal =
     () => {
       /*
-       * Close the mobile drawer before
-       * displaying the password modal.
+       * Close mobile sidebar before opening
+       * the account security modal.
        */
       closeMobileSidebar();
 
       resetPasswordModalState();
 
-      setShowPasswordModal(true);
+      setShowPasswordModal(
+        true,
+      );
     };
 
   const closePasswordModal =
     () => {
-      if (changingPassword) {
+      if (
+        changingPassword
+      ) {
         return;
       }
 
-      setShowPasswordModal(false);
+      setShowPasswordModal(
+        false,
+      );
 
       resetPasswordModalState();
     };
@@ -496,115 +606,129 @@ function AdviserLayout({
      PASSWORD FORM
   ======================================================= */
 
-  const handlePasswordFormChange = (
-    event,
-  ) => {
-    const {
-      name,
-      value,
-    } = event.target;
+  const handlePasswordFormChange =
+    (event) => {
+      const {
+        name,
+        value,
+      } =
+        event.target;
 
-    setPasswordForm(
-      (current) => ({
-        ...current,
-        [name]: value,
-      }),
-    );
+      setPasswordForm(
+        (current) => ({
+          ...current,
 
-    if (passwordError) {
-      setPasswordError("");
-    }
+          [name]:
+            value,
+        }),
+      );
 
-    if (passwordSuccess) {
-      setPasswordSuccess("");
-    }
-  };
+      if (
+        passwordError
+      ) {
+        setPasswordError(
+          "",
+        );
+      }
+
+      if (
+        passwordSuccess
+      ) {
+        setPasswordSuccess(
+          "",
+        );
+      }
+    };
 
   /* =======================================================
      PASSWORD VISIBILITY
   ======================================================= */
 
-  const togglePasswordVisibility = (
-    fieldName,
-  ) => {
-    setPasswordVisibility(
-      (current) => ({
-        ...current,
+  const togglePasswordVisibility =
+    (fieldName) => {
+      setPasswordVisibility(
+        (current) => ({
+          ...current,
 
-        [fieldName]:
-          !current[fieldName],
-      }),
-    );
-  };
+          [fieldName]:
+            !current[
+              fieldName
+            ],
+        }),
+      );
+    };
 
   /* =======================================================
      PASSWORD VALIDATION
   ======================================================= */
 
-  const validatePasswordForm = () => {
-    const {
-      currentPassword,
-      newPassword,
-      confirmPassword,
-    } = passwordForm;
-
-    if (
-      !currentPassword ||
-      !newPassword ||
-      !confirmPassword
-    ) {
-      return {
-        valid: false,
-
-        message:
-          "Please complete all password fields.",
-      };
-    }
-
-    if (
-      newPassword.length < 8
-    ) {
-      return {
-        valid: false,
-
-        message:
-          "New password must be at least 8 characters.",
-      };
-    }
-
-    if (
-      newPassword ===
-      currentPassword
-    ) {
-      return {
-        valid: false,
-
-        message:
-          "New password must be different from your current password.",
-      };
-    }
-
-    if (
-      newPassword !==
-      confirmPassword
-    ) {
-      return {
-        valid: false,
-
-        message:
-          "New password and confirmation do not match.",
-      };
-    }
-
-    return {
-      valid: true,
-
-      data: {
+  const validatePasswordForm =
+    () => {
+      const {
         currentPassword,
         newPassword,
-      },
+        confirmPassword,
+      } =
+        passwordForm;
+
+      if (
+        !currentPassword ||
+        !newPassword ||
+        !confirmPassword
+      ) {
+        return {
+          valid: false,
+
+          message:
+            "Please complete all password fields.",
+        };
+      }
+
+      if (
+        newPassword.length <
+        8
+      ) {
+        return {
+          valid: false,
+
+          message:
+            "New password must be at least 8 characters.",
+        };
+      }
+
+      if (
+        newPassword ===
+        currentPassword
+      ) {
+        return {
+          valid: false,
+
+          message:
+            "New password must be different from your current password.",
+        };
+      }
+
+      if (
+        newPassword !==
+        confirmPassword
+      ) {
+        return {
+          valid: false,
+
+          message:
+            "New password and confirmation do not match.",
+        };
+      }
+
+      return {
+        valid: true,
+
+        data: {
+          currentPassword,
+          newPassword,
+        },
+      };
     };
-  };
 
   /* =======================================================
      CHANGE PASSWORD
@@ -617,7 +741,9 @@ function AdviserLayout({
       const validation =
         validatePasswordForm();
 
-      if (!validation.valid) {
+      if (
+        !validation.valid
+      ) {
         setPasswordError(
           validation.message,
         );
@@ -626,10 +752,17 @@ function AdviserLayout({
       }
 
       try {
-        setChangingPassword(true);
+        setChangingPassword(
+          true,
+        );
 
-        setPasswordError("");
-        setPasswordSuccess("");
+        setPasswordError(
+          "",
+        );
+
+        setPasswordSuccess(
+          "",
+        );
 
         await accountService.changePassword(
           validation.data,
@@ -646,7 +779,9 @@ function AdviserLayout({
         setPasswordSuccess(
           "Password changed successfully.",
         );
-      } catch (error) {
+      } catch (
+        error
+      ) {
         console.error(
           "Unable to change password:",
           error,
@@ -659,7 +794,9 @@ function AdviserLayout({
           ),
         );
       } finally {
-        setChangingPassword(false);
+        setChangingPassword(
+          false,
+        );
       }
     };
 
@@ -777,11 +914,39 @@ function AdviserLayout({
                     }
                   </span>
 
-                  <span>
-                    {
-                      item.label
-                    }
-                  </span>
+                  {item.transferBadge ? (
+                    <span className="adviser-nav-transfer-label">
+                      <span>
+                        {
+                          item.label
+                        }
+                      </span>
+
+                      {incomingTransferCount >
+                        0 && (
+                        <span
+                          className="adviser-nav-transfer-badge"
+                          aria-label={`${incomingTransferCount} pending incoming transfer request${
+                            incomingTransferCount ===
+                            1
+                              ? ""
+                              : "s"
+                          }`}
+                        >
+                          {incomingTransferCount >
+                          99
+                            ? "99+"
+                            : incomingTransferCount}
+                        </span>
+                      )}
+                    </span>
+                  ) : (
+                    <span>
+                      {
+                        item.label
+                      }
+                    </span>
+                  )}
                 </button>
               );
             },
@@ -868,121 +1033,41 @@ function AdviserLayout({
 
       <section className="councilor-main adviser-main">
         {/* =================================================
-            HEADER
+            REUSABLE TOPBAR
+
+            AdviserTopbar owns:
+            - Page heading
+            - Mobile menu trigger
+            - Institutional logos
+            - Theme toggle
+            - Notification bell
+            - Notification dropdown
+            - Adviser user information
+
+            It reports the actionable notification count
+            back here for the Transfers sidebar badge.
         ================================================== */}
 
-        <header className="councilor-header adviser-header">
-          {/* ===============================================
-              LEFT SIDE
-          ================================================ */}
-
-          <div className="adviser-header-leading">
-            {/* =============================================
-                MOBILE MENU BUTTON
-            ============================================== */}
-
-            <button
-              type="button"
-              className="adviser-mobile-menu-button"
-              onClick={
-                openMobileSidebar
-              }
-              aria-label="Open navigation menu"
-              aria-expanded={
-                mobileSidebarOpen
-              }
-              aria-controls="adviser-mobile-sidebar"
-            >
-              <span
-                aria-hidden="true"
-              />
-
-              <span
-                aria-hidden="true"
-              />
-
-              <span
-                aria-hidden="true"
-              />
-            </button>
-
-            {/* =============================================
-                PAGE INFORMATION
-            ============================================== */}
-
-            <div className="councilor-header-copy">
-              <span className="councilor-eyebrow">
-                {eyebrow}
-              </span>
-
-              <h1>
-                {title}
-              </h1>
-
-              <p>
-                {description}
-              </p>
-            </div>
-          </div>
-
-          {/* ===============================================
-              HEADER ACTIONS
-          ================================================ */}
-
-          <div className="councilor-header-actions">
-            <div
-              className="councilor-header-logos"
-              aria-label="Institutional logos"
-            >
-              {INSTITUTIONAL_LOGOS.map(
-                (logo) => (
-                  <img
-                    key={
-                      logo.alt
-                    }
-                    src={
-                      logo.src
-                    }
-                    alt={
-                      logo.alt
-                    }
-                    title={
-                      logo.alt
-                    }
-                  />
-                ),
-              )}
-            </div>
-
-            <div
-              className="councilor-header-divider"
-              aria-hidden="true"
-            />
-
-            <ThemeToggle />
-
-            <div
-              className="councilor-header-divider"
-              aria-hidden="true"
-            />
-
-            <div className="councilor-user">
-              <div className="councilor-avatar">
-                {userInitial}
-              </div>
-
-              <div className="councilor-user-copy">
-                <strong>
-                  {userName}
-                </strong>
-
-                <span>
-                  Class Adviser
-                </span>
-              </div>
-            </div>
-          </div>
-        </header>
+        <AdviserTopbar
+          title={
+            title
+          }
+          eyebrow={
+            eyebrow
+          }
+          description={
+            description
+          }
+          onMenuOpen={
+            openMobileSidebar
+          }
+          menuOpen={
+            mobileSidebarOpen
+          }
+          onNotificationCountChange={
+            handleNotificationCountChange
+          }
+        />
 
         {/* =================================================
             CONTENT
@@ -1000,7 +1085,9 @@ function AdviserLayout({
       {showPasswordModal && (
         <div
           className="councilor-modal-backdrop"
-          onMouseDown={(event) => {
+          onMouseDown={(
+            event,
+          ) => {
             if (
               event.target ===
               event.currentTarget
@@ -1069,7 +1156,9 @@ function AdviserLayout({
 
               <div className="adviser-password-account">
                 <div className="adviser-password-avatar">
-                  {userInitial}
+                  {
+                    userInitial
+                  }
                 </div>
 
                 <div className="adviser-password-account-copy">
@@ -1078,11 +1167,15 @@ function AdviserLayout({
                   </span>
 
                   <strong>
-                    {userName}
+                    {
+                      userName
+                    }
                   </strong>
 
                   <small>
-                    {userEmail}
+                    {
+                      userEmail
+                    }
                   </small>
                 </div>
               </div>
@@ -1335,7 +1428,9 @@ function AdviserLayout({
                   </span>
 
                   <p>
-                    {passwordError}
+                    {
+                      passwordError
+                    }
                   </p>
                 </div>
               )}

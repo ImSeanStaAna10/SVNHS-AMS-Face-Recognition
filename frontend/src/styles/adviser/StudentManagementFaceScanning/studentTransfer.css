@@ -1,0 +1,2477 @@
+/* =========================================================
+   SVNHS ATTENDANCE MANAGEMENT SYSTEM
+   STUDENT TRANSFERS MODULE
+
+   Uses the same color variables / visual language
+   as Student Management and Adviser portal.
+========================================================= */
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.student-transfers,
+.student-transfers button,
+.student-transfers input,
+.student-transfers select,
+.student-transfers textarea,
+.student-transfer-modal-backdrop,
+.student-transfer-modal-backdrop button,
+.student-transfer-modal-backdrop input,
+.student-transfer-modal-backdrop textarea {
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.student-transfers {
+  width: 100%;
+  display: grid;
+  gap: 20px;
+  padding-bottom: 36px;
+  animation: student-transfer-page-in 0.3s ease both;
+}
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.student-transfer-alert {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: flex-start;
+  gap: 12px;
+
+  padding: 14px 15px;
+
+  border: 1px solid;
+  border-radius: 12px;
+}
+
+.student-transfer-alert > span {
+  width: 30px;
+  height: 30px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 9px;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.student-transfer-alert strong {
+  display: block;
+
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.student-transfer-alert p {
+  margin: 4px 0 0;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.student-transfer-alert > button {
+  min-height: 30px;
+
+  padding: 0 10px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: transparent;
+  color: currentColor;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.student-transfer-alert.is-error {
+  border-color: var(--c-error-border);
+  background: var(--c-error-bg);
+  color: var(--c-error-text);
+}
+
+.student-transfer-alert.is-error > span {
+  background: var(--c-error-text);
+}
+
+.student-transfer-alert.is-success {
+  border-color: var(--c-success-border);
+  background: var(--c-success-bg);
+  color: var(--c-success-text);
+}
+
+.student-transfer-alert.is-success > span {
+  background: var(--c-success-text);
+}
+
+/* =========================================================
+   OVERVIEW
+========================================================= */
+
+.student-transfer-overview {
+  position: relative;
+
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(500px, auto);
+  align-items: center;
+  gap: 28px;
+
+  overflow: hidden;
+
+  padding: 24px 26px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 15px;
+
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-icon-bg) 52%, var(--c-surface)),
+    var(--c-surface) 54%
+  );
+
+  box-shadow: var(--c-panel-shadow);
+}
+
+.student-transfer-overview::before {
+  content: "";
+
+  position: absolute;
+  inset: 0 auto 0 0;
+
+  width: 4px;
+
+  background: linear-gradient(180deg, var(--c-blue-900), var(--c-red-600));
+}
+
+.student-transfer-overview-copy {
+  min-width: 0;
+
+  padding-left: 6px;
+}
+
+.student-transfer-overview-copy > span {
+  display: block;
+
+  color: var(--c-blue-800);
+
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.student-transfer-overview-copy h2 {
+  margin: 6px 0 0;
+
+  color: var(--c-text-primary);
+
+  font-size: clamp(26px, 2.6vw, 32px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.student-transfer-overview-copy p {
+  max-width: 530px;
+
+  margin: 8px 0 0;
+
+  color: var(--c-text-body);
+
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   OVERVIEW STATS
+========================================================= */
+
+.student-transfer-overview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(145px, 1fr));
+
+  overflow: hidden;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+
+  background: var(--c-surface);
+}
+
+.student-transfer-overview-stats > button {
+  min-width: 0;
+
+  padding: 15px 16px;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+  color: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease;
+}
+
+.student-transfer-overview-stats > button + button {
+  border-left: 1px solid var(--c-border-soft);
+}
+
+.student-transfer-overview-stats > button:hover,
+.student-transfer-overview-stats > button.is-active {
+  background: var(--c-icon-bg);
+}
+
+.student-transfer-overview-stats > button:hover {
+  transform: translateY(-1px);
+}
+
+.student-transfer-overview-stats span {
+  display: block;
+
+  color: var(--c-text-muted);
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+}
+
+.student-transfer-overview-stats strong {
+  display: block;
+
+  margin-top: 7px;
+
+  color: var(--c-text-primary);
+
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.student-transfer-overview-stats small {
+  display: block;
+
+  margin-top: 6px;
+
+  color: var(--c-text-body);
+
+  font-size: 9.5px;
+}
+
+/* =========================================================
+   PANEL
+========================================================= */
+
+.student-transfer-panel {
+  overflow: hidden;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 15px;
+
+  background: var(--c-surface);
+
+  box-shadow: var(--c-panel-shadow);
+}
+
+.student-transfer-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 20px 22px;
+
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.student-transfer-panel-header > div {
+  min-width: 0;
+}
+
+.student-transfer-panel-header > div > span {
+  display: block;
+
+  color: var(--c-blue-800);
+
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.student-transfer-panel-header h2 {
+  margin: 5px 0 0;
+
+  color: var(--c-text-primary);
+
+  font-size: 21px;
+  font-weight: 880;
+}
+
+.student-transfer-panel-header p {
+  margin: 5px 0 0;
+
+  color: var(--c-text-body);
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   REFRESH BUTTON
+========================================================= */
+
+.student-transfer-refresh {
+  min-height: 39px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 0 12px;
+
+  border: 1px solid var(--c-border);
+  border-radius: 9px;
+
+  background: var(--c-surface);
+  color: var(--c-text-secondary);
+
+  font-size: 11px;
+  font-weight: 820;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.student-transfer-refresh:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  border-color: var(--c-brand-border);
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+}
+
+.student-transfer-refresh:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.student-transfer-refresh span.is-spinning {
+  animation: student-transfer-spin 0.75s linear infinite;
+}
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.student-transfer-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  padding: 12px 16px;
+
+  border-bottom: 1px solid var(--c-border-soft);
+
+  background: var(--c-surface-soft);
+}
+
+.student-transfer-tabs > button {
+  position: relative;
+
+  min-width: 0;
+  min-height: 60px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: center;
+  column-gap: 10px;
+
+  padding: 10px 13px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  background: transparent;
+  color: var(--c-text-secondary);
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.student-transfer-tabs > button:hover {
+  background: var(--c-surface);
+}
+
+.student-transfer-tabs > button.is-active {
+  border-color: var(--c-brand-border);
+
+  background: var(--c-surface);
+
+  box-shadow: 0 5px 14px rgba(7, 27, 66, 0.05);
+}
+
+.student-transfer-tabs > button.is-active::after {
+  content: "";
+
+  position: absolute;
+
+  right: 13px;
+  bottom: 0;
+  left: 13px;
+
+  height: 2px;
+
+  border-radius: 999px;
+
+  background: var(--c-blue-800);
+}
+
+.student-transfer-tabs span {
+  display: block;
+
+  color: var(--c-text-primary);
+
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.student-transfer-tabs small {
+  grid-column: 1;
+
+  display: block;
+
+  margin-top: 2px;
+
+  color: var(--c-text-muted);
+
+  font-size: 9px;
+}
+
+.student-transfer-tabs strong {
+  grid-column: 2;
+  grid-row: 1 / 3;
+
+  min-width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 999px;
+
+  background: var(--c-surface-soft);
+  color: var(--c-text-secondary);
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.student-transfer-tabs > button.is-active strong {
+  border-color: var(--c-brand-border);
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.student-transfer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  padding: 13px 16px;
+
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.student-transfer-search {
+  width: min(100%, 500px);
+  min-height: 42px;
+
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+
+  padding: 0 11px;
+
+  border: 1px solid var(--c-border);
+  border-radius: 9px;
+
+  background: var(--c-surface);
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.student-transfer-search:focus-within {
+  border-color: var(--c-blue-800);
+
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.08);
+}
+
+.student-transfer-search > span {
+  color: var(--c-text-muted);
+
+  font-size: 16px;
+}
+
+.student-transfer-search input {
+  width: 100%;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: var(--c-text-primary);
+
+  font-size: 11.5px;
+}
+
+.student-transfer-search input::placeholder {
+  color: var(--c-text-muted);
+}
+
+.student-transfer-search button {
+  width: 27px;
+  height: 27px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+  color: var(--c-text-muted);
+
+  font-size: 17px;
+
+  cursor: pointer;
+}
+
+.student-transfer-toolbar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.student-transfer-toolbar-controls > label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.student-transfer-toolbar-controls > label > span {
+  color: var(--c-text-muted);
+
+  font-size: 9.5px;
+  font-weight: 850;
+}
+
+.student-transfer-toolbar-controls select {
+  min-height: 36px;
+
+  padding: 0 29px 0 9px;
+
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+
+  outline: 0;
+
+  background: var(--c-surface);
+  color: var(--c-text-secondary);
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.student-transfer-result-count {
+  min-height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0 10px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 8px;
+
+  background: var(--c-surface-soft);
+  color: var(--c-text-muted);
+
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.student-transfer-result-count strong {
+  margin-right: 4px;
+
+  color: var(--c-text-secondary);
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+/* =========================================================
+   LIST
+========================================================= */
+
+.student-transfer-list {
+  min-height: 330px;
+
+  display: grid;
+  align-content: start;
+  gap: 10px;
+
+  padding: 16px;
+}
+
+/* =========================================================
+   TRANSFER CARD
+========================================================= */
+
+.student-transfer-card {
+  position: relative;
+
+  overflow: hidden;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 12px;
+
+  background: var(--c-surface);
+
+  animation: student-transfer-card-in 0.22s ease both;
+
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.student-transfer-card:hover {
+  transform: translateY(-1px);
+
+  border-color: color-mix(in srgb, var(--c-blue-800) 22%, var(--c-border-soft));
+
+  box-shadow: 0 8px 24px rgba(7, 27, 66, 0.055);
+}
+
+.student-transfer-card.is-pending::before {
+  content: "";
+
+  position: absolute;
+  inset: 0 auto 0 0;
+
+  width: 3px;
+
+  background: #f59e0b;
+}
+
+.student-transfer-card-main {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 0.9fr)
+    minmax(330px, 1.35fr)
+    auto;
+  align-items: center;
+  gap: 22px;
+
+  padding: 14px 16px;
+}
+
+/* =========================================================
+   STUDENT
+========================================================= */
+
+.student-transfer-student {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.student-transfer-avatar {
+  width: 40px;
+  height: 40px;
+
+  flex: 0 0 40px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--c-brand-border);
+  border-radius: 10px;
+
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.student-transfer-avatar.is-large {
+  width: 47px;
+  height: 47px;
+
+  flex-basis: 47px;
+
+  border-radius: 12px;
+
+  font-size: 16px;
+}
+
+.student-transfer-student-copy {
+  min-width: 0;
+}
+
+.student-transfer-student-copy small {
+  display: block;
+
+  color: var(--c-text-muted);
+
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.student-transfer-student-copy strong {
+  display: block;
+
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: var(--c-text-primary);
+
+  font-size: 13px;
+  font-weight: 850;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-transfer-student-copy span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--c-text-body);
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   ROUTE
+========================================================= */
+
+.student-transfer-route {
+  min-width: 0;
+
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto
+    minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.student-transfer-route-section {
+  min-width: 0;
+
+  padding: 9px 10px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 9px;
+
+  background: var(--c-surface-soft);
+}
+
+.student-transfer-route-section.is-destination {
+  border-color: var(--c-brand-border);
+
+  background: var(--c-icon-bg);
+}
+
+.student-transfer-route-section small {
+  display: block;
+
+  color: var(--c-text-muted);
+
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+}
+
+.student-transfer-route-section strong {
+  display: block;
+
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: var(--c-text-primary);
+
+  font-size: 11px;
+  font-weight: 830;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-transfer-route-arrow {
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.student-transfer-card-status {
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+}
+
+.student-transfer-status {
+  min-height: 29px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 0 10px;
+
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+
+  background: var(--c-inactive-bg);
+  color: var(--c-inactive-text);
+
+  font-size: 9px;
+  font-weight: 900;
+
+  white-space: nowrap;
+}
+
+.student-transfer-status > span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+.student-transfer-status.status-pending {
+  border-color: #f3d497;
+  background: #fff8e7;
+  color: #a15c08;
+}
+
+.student-transfer-status.status-approved {
+  border-color: var(--c-success-border);
+  background: var(--c-success-bg);
+  color: var(--c-success-text);
+}
+
+.student-transfer-status.status-rejected {
+  border-color: #f1b5b5;
+  background: #fff2f2;
+  color: #b42318;
+}
+
+.student-transfer-status.status-cancelled {
+  border-color: var(--c-border);
+  background: var(--c-surface-soft);
+  color: var(--c-text-muted);
+}
+
+.student-transfer-card-date {
+  color: var(--c-text-muted);
+
+  font-size: 8.5px;
+}
+
+/* =========================================================
+   CARD FOOTER
+========================================================= */
+
+.student-transfer-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  padding: 10px 16px;
+
+  border-top: 1px solid var(--c-border-soft);
+
+  background: color-mix(in srgb, var(--c-surface-soft) 58%, var(--c-surface));
+}
+
+.student-transfer-meta {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.student-transfer-meta > div {
+  min-width: 0;
+}
+
+.student-transfer-meta small {
+  display: block;
+
+  color: var(--c-text-muted);
+
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+}
+
+.student-transfer-meta strong {
+  display: block;
+
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color: var(--c-text-secondary);
+
+  font-size: 9.5px;
+  font-weight: 750;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-transfer-meta-reason {
+  max-width: 310px;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.student-transfer-primary-button,
+.student-transfer-secondary-button,
+.student-transfer-approve-button,
+.student-transfer-reject-button,
+.student-transfer-cancel-button {
+  min-height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 12px;
+
+  border: 1px solid;
+  border-radius: 9px;
+
+  font-family: inherit;
+
+  font-size: 10.5px;
+  font-weight: 850;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.student-transfer-primary-button,
+.student-transfer-approve-button {
+  border-color: var(--c-blue-900);
+
+  background: var(--c-blue-900);
+  color: #ffffff;
+}
+
+.student-transfer-secondary-button {
+  border-color: var(--c-border);
+
+  background: var(--c-surface);
+  color: var(--c-text-secondary);
+}
+
+.student-transfer-reject-button {
+  border-color: rgba(220, 38, 38, 0.2);
+
+  background: rgba(220, 38, 38, 0.055);
+  color: #b42318;
+}
+
+.student-transfer-cancel-button {
+  border-color: #e5b953;
+
+  background: #fff8e8;
+  color: #945909;
+}
+
+.student-transfer-primary-button:hover:not(:disabled),
+.student-transfer-secondary-button:hover:not(:disabled),
+.student-transfer-approve-button:hover:not(:disabled),
+.student-transfer-reject-button:hover:not(:disabled),
+.student-transfer-cancel-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow: 0 5px 14px rgba(7, 27, 66, 0.07);
+}
+
+.student-transfer-secondary-button:hover:not(:disabled) {
+  border-color: var(--c-brand-border);
+
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+}
+
+.student-transfer-primary-button:disabled,
+.student-transfer-secondary-button:disabled,
+.student-transfer-approve-button:disabled,
+.student-transfer-reject-button:disabled,
+.student-transfer-cancel-button:disabled {
+  transform: none;
+
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   EMPTY / LOADING
+========================================================= */
+
+.student-transfer-loading,
+.student-transfer-empty {
+  min-height: 320px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  padding: 35px;
+
+  text-align: center;
+}
+
+.student-transfer-spinner {
+  width: 35px;
+  height: 35px;
+
+  border: 3px solid var(--c-border-soft);
+  border-top-color: var(--c-blue-800);
+  border-radius: 50%;
+
+  animation: student-transfer-spin 0.75s linear infinite;
+}
+
+.student-transfer-loading strong,
+.student-transfer-empty h3 {
+  margin: 13px 0 0;
+
+  color: var(--c-text-primary);
+
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.student-transfer-loading p,
+.student-transfer-empty p {
+  max-width: 420px;
+
+  margin: 6px auto 0;
+
+  color: var(--c-text-body);
+
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.student-transfer-empty-icon {
+  width: 54px;
+  height: 54px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid var(--c-brand-border);
+  border-radius: 14px;
+
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+
+  font-size: 20px;
+}
+
+.student-transfer-empty button {
+  margin-top: 15px;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.student-transfer-modal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 1500;
+
+  display: grid;
+  place-items: center;
+
+  padding: 18px;
+
+  overflow: hidden;
+
+  background: rgba(8, 18, 34, 0.56);
+
+  backdrop-filter: blur(5px);
+
+  animation: student-transfer-backdrop-in 0.18s ease both;
+}
+
+.student-transfer-modal {
+  width: min(720px, calc(100vw - 36px));
+  max-height: calc(100dvh - 36px);
+
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+
+  overflow: hidden;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 17px;
+
+  background: var(--c-surface);
+
+  box-shadow:
+    0 32px 90px rgba(2, 8, 23, 0.28),
+    0 8px 25px rgba(2, 8, 23, 0.11);
+
+  animation: student-transfer-modal-in 0.2s ease both;
+}
+
+.student-transfer-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid var(--c-border-soft);
+
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-icon-bg) 62%, var(--c-surface)),
+    var(--c-surface) 64%
+  );
+}
+
+.student-transfer-modal-heading {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.student-transfer-modal-icon {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 11px;
+
+  background: var(--c-icon-bg);
+  color: var(--c-blue-800);
+
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.student-transfer-modal-heading > div {
+  min-width: 0;
+}
+
+.student-transfer-modal-heading small {
+  display: block;
+
+  color: var(--c-blue-800);
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.student-transfer-modal-heading h2 {
+  margin: 4px 0 0;
+
+  color: var(--c-text-primary);
+
+  font-size: 20px;
+  font-weight: 880;
+}
+
+.student-transfer-modal-heading p {
+  margin: 5px 0 0;
+
+  color: var(--c-text-body);
+
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.student-transfer-modal-close {
+  width: 35px;
+  height: 35px;
+
+  flex: 0 0 35px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 9px;
+
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+
+  font-size: 20px;
+
+  cursor: pointer;
+}
+
+.student-transfer-modal-close:hover:not(:disabled) {
+  border-color: var(--c-border);
+
+  background: var(--c-surface-soft);
+  color: var(--c-text-primary);
+}
+
+/* =========================================================
+   MODAL BODY
+========================================================= */
+
+.student-transfer-modal-body {
+  min-height: 0;
+
+  overflow-y: auto;
+
+  display: grid;
+  gap: 14px;
+
+  padding: 18px 20px;
+
+  scrollbar-width: thin;
+}
+
+.student-transfer-modal-student {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+
+  padding: 12px 13px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+
+  background: var(--c-surface-soft);
+}
+
+.student-transfer-modal-student > div:nth-child(2) {
+  min-width: 0;
+}
+
+.student-transfer-modal-student small {
+  display: block;
+
+  color: var(--c-text-muted);
+
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.student-transfer-modal-student strong {
+  display: block;
+
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: var(--c-text-primary);
+
+  font-size: 14px;
+  font-weight: 850;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-transfer-modal-student div > span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--c-text-body);
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   MODAL ROUTE
+========================================================= */
+
+.student-transfer-modal-route {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 11px;
+}
+
+.student-transfer-modal-route > div {
+  min-width: 0;
+
+  padding: 13px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+
+  background: var(--c-surface);
+}
+
+.student-transfer-modal-route > div:last-child {
+  border-color: var(--c-brand-border);
+
+  background: var(--c-icon-bg);
+}
+
+.student-transfer-modal-route > span {
+  align-self: center;
+
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--c-blue-900);
+  color: #ffffff;
+
+  font-size: 14px;
+}
+
+.student-transfer-modal-route small {
+  display: block;
+
+  color: var(--c-text-muted);
+
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.student-transfer-modal-route strong {
+  display: block;
+
+  margin-top: 4px;
+
+  overflow: hidden;
+
+  color: var(--c-text-primary);
+
+  font-size: 13px;
+  font-weight: 850;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-transfer-modal-route div > span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: var(--c-text-body);
+
+  font-size: 9.5px;
+}
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+.student-transfer-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.student-transfer-detail-grid > div {
+  padding: 11px 12px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+
+  background: var(--c-surface-soft);
+}
+
+.student-transfer-detail-grid small,
+.student-transfer-note-card small {
+  display: block;
+
+  color: var(--c-text-muted);
+
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.student-transfer-detail-grid strong {
+  display: block;
+
+  margin-top: 4px;
+
+  color: var(--c-text-secondary);
+
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* =========================================================
+   NOTE
+========================================================= */
+
+.student-transfer-note-card {
+  padding: 12px 13px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+
+  background: var(--c-surface-soft);
+}
+
+.student-transfer-note-card p {
+  margin: 5px 0 0;
+
+  color: var(--c-text-body);
+
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   REVIEW NOTE
+========================================================= */
+
+.student-transfer-review-note {
+  display: grid;
+  gap: 7px;
+}
+
+.student-transfer-review-note > span {
+  color: var(--c-text-secondary);
+
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.student-transfer-review-note > span small {
+  margin-left: 4px;
+
+  color: var(--c-text-muted);
+
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.student-transfer-review-note textarea {
+  width: 100%;
+  min-height: 94px;
+
+  padding: 11px 12px;
+
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+
+  outline: 0;
+
+  resize: vertical;
+
+  background: var(--c-surface);
+  color: var(--c-text-primary);
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.student-transfer-review-note textarea:focus {
+  border-color: var(--c-blue-800);
+
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.08);
+}
+
+.student-transfer-review-note > small {
+  color: var(--c-text-muted);
+
+  font-size: 9px;
+
+  text-align: right;
+}
+
+/* =========================================================
+   PENDING NOTE
+========================================================= */
+
+.student-transfer-pending-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+
+  padding: 12px 13px;
+
+  border: 1px solid #f3d497;
+  border-radius: 10px;
+
+  background: #fff9ea;
+}
+
+.student-transfer-pending-note > span {
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 8px;
+
+  background: #b66b0d;
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.student-transfer-pending-note strong {
+  display: block;
+
+  color: #7f4b08;
+
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.student-transfer-pending-note p {
+  margin: 4px 0 0;
+
+  color: #8a5a16;
+
+  font-size: 9.8px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.student-transfer-modal-error {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 9px;
+
+  padding: 10px 11px;
+
+  border: 1px solid var(--c-error-border);
+  border-radius: 9px;
+
+  background: var(--c-error-bg);
+  color: var(--c-error-text);
+}
+
+.student-transfer-modal-error > span {
+  width: 24px;
+  height: 24px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--c-error-text);
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.student-transfer-modal-error p {
+  margin: 3px 0 0;
+
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   MODAL FOOTER
+========================================================= */
+
+.student-transfer-modal-actions {
+  min-height: 67px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  padding: 11px 18px;
+
+  border-top: 1px solid var(--c-border-soft);
+
+  background: var(--c-surface);
+}
+
+.student-transfer-modal-actions > div:first-child {
+  min-width: 0;
+}
+
+.student-transfer-modal-actions > div:first-child strong {
+  display: block;
+
+  color: var(--c-text-primary);
+
+  font-size: 10.5px;
+  font-weight: 850;
+}
+
+.student-transfer-modal-actions > div:first-child span {
+  display: block;
+
+  max-width: 330px;
+
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color: var(--c-text-muted);
+
+  font-size: 8.5px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-transfer-modal-actions > div:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+/* =========================================================
+   SIDEBAR TRANSFER BADGE
+========================================================= */
+
+.adviser-nav-transfer-label {
+  min-width: 0;
+
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.adviser-nav-transfer-badge {
+  min-width: 22px;
+  height: 22px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 6px;
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 999px;
+
+  background: var(--c-red-600, #dc2626);
+  color: #ffffff;
+
+  font-size: 8.5px;
+  font-weight: 900;
+
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08);
+
+  animation: adviser-transfer-badge-in 0.2s ease both;
+}
+
+.councilor-nav-item.active .adviser-nav-transfer-badge {
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-transfer-overview,
+html[data-theme="dark"] .student-transfer-card,
+html[data-theme="dark"] .student-transfer-modal {
+  border-color: var(--c-border);
+}
+
+html[data-theme="dark"] .student-transfer-status.status-pending {
+  border-color: rgba(245, 158, 11, 0.32);
+  background: rgba(120, 53, 15, 0.2);
+  color: #fcd34d;
+}
+
+html[data-theme="dark"] .student-transfer-status.status-rejected {
+  border-color: rgba(248, 113, 113, 0.24);
+  background: rgba(127, 29, 29, 0.18);
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .student-transfer-cancel-button {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(120, 53, 15, 0.18);
+  color: #fcd34d;
+}
+
+html[data-theme="dark"] .student-transfer-reject-button {
+  border-color: rgba(248, 113, 113, 0.22);
+  background: rgba(127, 29, 29, 0.16);
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .student-transfer-pending-note {
+  border-color: rgba(245, 158, 11, 0.26);
+  background: rgba(120, 53, 15, 0.18);
+}
+
+html[data-theme="dark"] .student-transfer-pending-note strong {
+  color: #fcd34d;
+}
+
+html[data-theme="dark"] .student-transfer-pending-note p {
+  color: #d9b76c;
+}
+
+html[data-theme="dark"] .student-transfer-modal-backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 1080px) {
+  .student-transfer-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .student-transfer-card-main {
+    grid-template-columns: minmax(210px, 0.8fr) minmax(0, 1fr);
+  }
+
+  .student-transfer-card-status {
+    grid-column: 1 / -1;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 760px) {
+  .student-transfers {
+    gap: 14px;
+  }
+
+  .student-transfer-overview {
+    gap: 18px;
+
+    padding: 19px 17px;
+  }
+
+  .student-transfer-overview-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .student-transfer-overview-stats > button + button {
+    border-top: 1px solid var(--c-border-soft);
+    border-left: 0;
+  }
+
+  .student-transfer-panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .student-transfer-refresh {
+    width: 100%;
+  }
+
+  .student-transfer-tabs {
+    grid-template-columns: 1fr;
+
+    gap: 5px;
+  }
+
+  .student-transfer-tabs > button {
+    min-height: 55px;
+  }
+
+  .student-transfer-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-transfer-search {
+    width: 100%;
+  }
+
+  .student-transfer-toolbar-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-transfer-toolbar-controls > label {
+    justify-content: space-between;
+  }
+
+  .student-transfer-toolbar-controls select {
+    flex: 1;
+  }
+
+  .student-transfer-result-count {
+    justify-content: center;
+  }
+
+  .student-transfer-list {
+    padding: 11px;
+  }
+
+  .student-transfer-card-main {
+    grid-template-columns: 1fr;
+
+    gap: 13px;
+  }
+
+  .student-transfer-route {
+    grid-template-columns: 1fr;
+  }
+
+  .student-transfer-route-arrow {
+    transform: rotate(90deg);
+
+    margin-inline: auto;
+  }
+
+  .student-transfer-card-status {
+    grid-column: auto;
+  }
+
+  .student-transfer-card-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-transfer-meta {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+  .student-transfer-card-actions,
+  .student-transfer-card-actions button {
+    width: 100%;
+  }
+
+  .student-transfer-modal-backdrop {
+    padding: 10px;
+  }
+
+  .student-transfer-modal {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+  }
+
+  .student-transfer-modal-header {
+    padding: 15px;
+  }
+
+  .student-transfer-modal-body {
+    padding: 14px;
+  }
+
+  .student-transfer-modal-route {
+    grid-template-columns: 1fr;
+  }
+
+  .student-transfer-modal-route > span {
+    margin-inline: auto;
+
+    transform: rotate(90deg);
+  }
+
+  .student-transfer-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-transfer-modal-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-transfer-modal-actions > div:last-child {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .student-transfer-modal-actions button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes student-transfer-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes student-transfer-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes student-transfer-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes student-transfer-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes student-transfer-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes adviser-transfer-badge-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-transfers,
+  .student-transfer-card,
+  .student-transfer-modal,
+  .student-transfer-modal-backdrop,
+  .adviser-nav-transfer-badge {
+    animation: none !important;
+  }
+
+  .student-transfer-card,
+  .student-transfer-refresh,
+  .student-transfer-primary-button,
+  .student-transfer-secondary-button,
+  .student-transfer-approve-button,
+  .student-transfer-reject-button,
+  .student-transfer-cancel-button {
+    transition: none !important;
+  }
+}
+
+/* =========================================================
+   AUTO SYNC STATUS
+========================================================= */
+
+.student-transfer-auto-sync {
+  min-height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 7px 11px;
+
+  border: 1px solid var(--c-border-soft);
+  border-radius: 10px;
+
+  background: var(--c-surface-soft);
+
+  white-space: nowrap;
+}
+
+.student-transfer-auto-sync > span {
+  width: 8px;
+  height: 8px;
+
+  flex: 0 0 8px;
+
+  border-radius: 50%;
+
+  background: var(--c-success-dot);
+
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--c-success-dot) 14%, transparent);
+
+  animation: student-transfer-sync-pulse 2s ease-in-out infinite;
+}
+
+.student-transfer-auto-sync > div {
+  display: grid;
+  gap: 1px;
+}
+
+.student-transfer-auto-sync strong {
+  color: var(--c-text-secondary);
+
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.student-transfer-auto-sync small {
+  color: var(--c-text-muted);
+
+  font-size: 8.5px;
+  font-weight: 650;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.student-transfer-pagination {
+  min-height: 66px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  padding: 13px 16px;
+
+  border-top: 1px solid var(--c-border-soft);
+
+  background: color-mix(in srgb, var(--c-surface-soft) 35%, var(--c-surface));
+}
+
+/* =========================================================
+   PAGINATION SUMMARY
+========================================================= */
+
+.student-transfer-pagination-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  color: var(--c-text-muted);
+
+  font-size: 10.5px;
+  line-height: 1.4;
+
+  white-space: nowrap;
+}
+
+.student-transfer-pagination-summary strong {
+  color: var(--c-text-secondary);
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+/* =========================================================
+   PAGINATION CONTROLS
+========================================================= */
+
+.student-transfer-pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.student-transfer-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* =========================================================
+   PAGE BUTTON
+========================================================= */
+
+.student-transfer-pagination-page {
+  min-width: 35px;
+  height: 35px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 8px;
+
+  border: 1px solid var(--c-border);
+
+  border-radius: 8px;
+
+  background: var(--c-surface);
+
+  color: var(--c-text-secondary);
+
+  font-family: inherit;
+
+  font-size: 10px;
+  font-weight: 850;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.student-transfer-pagination-page:hover:not(.is-active) {
+  transform: translateY(-1px);
+
+  border-color: var(--c-brand-border);
+
+  background: var(--c-icon-bg);
+
+  color: var(--c-blue-800);
+
+  box-shadow: 0 4px 12px rgba(7, 27, 66, 0.055);
+}
+
+.student-transfer-pagination-page.is-active {
+  border-color: var(--c-blue-900);
+
+  background: var(--c-blue-900);
+
+  color: #ffffff;
+
+  box-shadow: 0 5px 14px rgba(18, 61, 126, 0.16);
+}
+
+/* =========================================================
+   PREVIOUS / NEXT
+========================================================= */
+
+.student-transfer-pagination-nav {
+  min-height: 35px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  padding: 0 10px;
+
+  border: 1px solid var(--c-border);
+
+  border-radius: 8px;
+
+  background: var(--c-surface);
+
+  color: var(--c-text-secondary);
+
+  font-family: inherit;
+
+  font-size: 10px;
+
+  font-weight: 820;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.student-transfer-pagination-nav > span[aria-hidden="true"] {
+  font-size: 17px;
+
+  line-height: 1;
+}
+
+.student-transfer-pagination-nav:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  border-color: var(--c-brand-border);
+
+  background: var(--c-icon-bg);
+
+  color: var(--c-blue-800);
+}
+
+.student-transfer-pagination-nav:disabled {
+  transform: none;
+
+  background: var(--c-surface-soft);
+
+  color: var(--c-text-muted);
+
+  cursor: not-allowed;
+
+  opacity: 0.45;
+}
+
+/* =========================================================
+   ELLIPSIS
+========================================================= */
+
+.student-transfer-pagination-ellipsis {
+  min-width: 22px;
+
+  display: grid;
+
+  place-items: center;
+
+  color: var(--c-text-muted);
+
+  font-size: 14px;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-transfer-auto-sync {
+  border-color: var(--c-border);
+
+  background: rgba(15, 23, 42, 0.5);
+}
+
+html[data-theme="dark"] .student-transfer-pagination {
+  border-color: var(--c-border);
+
+  background: color-mix(in srgb, var(--c-surface-soft) 50%, var(--c-surface));
+}
+
+html[data-theme="dark"] .student-transfer-pagination-page,
+html[data-theme="dark"] .student-transfer-pagination-nav {
+  border-color: var(--c-border);
+
+  background: var(--c-surface);
+
+  color: var(--c-text-secondary);
+}
+
+html[data-theme="dark"] .student-transfer-pagination-page:hover:not(.is-active),
+html[data-theme="dark"] .student-transfer-pagination-nav:hover:not(:disabled) {
+  border-color: rgba(96, 165, 250, 0.3);
+
+  background: rgba(59, 130, 246, 0.1);
+
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"] .student-transfer-pagination-page.is-active {
+  border-color: #3b82f6;
+
+  background: #2563eb;
+
+  color: #ffffff;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 820px) {
+  .student-transfer-pagination {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .student-transfer-pagination-summary {
+    justify-content: center;
+  }
+
+  .student-transfer-pagination-controls {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .student-transfer-auto-sync {
+    width: 100%;
+
+    justify-content: center;
+  }
+
+  .student-transfer-pagination-pages {
+    flex-wrap: wrap;
+
+    justify-content: center;
+  }
+
+  .student-transfer-pagination-controls {
+    flex-wrap: wrap;
+  }
+
+  .student-transfer-pagination-nav-label {
+    display: none;
+  }
+
+  .student-transfer-pagination-nav {
+    min-width: 35px;
+
+    padding: 0 8px;
+  }
+}
+
+/* =========================================================
+   AUTO SYNC ANIMATION
+========================================================= */
+
+@keyframes student-transfer-sync-pulse {
+  0%,
+  100% {
+    opacity: 1;
+
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.55;
+
+    transform: scale(0.82);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-transfer-auto-sync > span {
+    animation: none;
+  }
+
+  .student-transfer-pagination-page,
+  .student-transfer-pagination-nav {
+    transition: none;
+  }
+}

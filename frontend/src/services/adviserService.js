@@ -17,19 +17,16 @@ const normalizeLivenessFrames = (...candidates) => {
     try {
       return Array.from(candidate);
     } catch {
-      // Try the next compatible property name.
+      /*
+       * Try the next compatible property name.
+       */
     }
   }
 
   return [];
 };
 
-const appendLivenessFrames = (
-  formData,
-  fieldName,
-  frames,
-  filenamePrefix,
-) => {
+const appendLivenessFrames = (formData, fieldName, frames, filenamePrefix) => {
   const normalizedFrames = normalizeLivenessFrames(frames).filter(Boolean);
 
   if (normalizedFrames.length === 0) {
@@ -65,21 +62,24 @@ const appendLivenessFrames = (
 const buildLivenessFormData = ({
   baselineFrames,
   challengeFrames,
+
   baselineImages,
   challengeImages,
 }) => {
   /*
    * Compatibility:
    *
-   * Current StudentManagement uses:
-   *   baselineImages
-   *   challengeImages
+   * Current StudentManagement may use:
+   *
+   * baselineImages
+   * challengeImages
    *
    * Other/newer code may use:
-   *   baselineFrames
-   *   challengeFrames
    *
-   * We support BOTH.
+   * baselineFrames
+   * challengeFrames
+   *
+   * Both are supported.
    */
 
   const resolvedBaselineFrames = normalizeLivenessFrames(
@@ -113,15 +113,37 @@ const buildLivenessFormData = ({
       baselineCount,
       challengeCount,
 
-      baselineFormDataCount:
-        formData.getAll("baseline_images").length,
+      baselineFormDataCount: formData.getAll("baseline_images").length,
 
-      challengeFormDataCount:
-        formData.getAll("challenge_images").length,
+      challengeFormDataCount: formData.getAll("challenge_images").length,
     });
   }
 
   return formData;
+};
+
+/* =========================================================
+   GENERAL HELPERS
+========================================================= */
+
+const normalizeOptionalText = (value) => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  const normalized = String(value).trim();
+
+  return normalized ? normalized : null;
+};
+
+const requireId = (value, message) => {
+  const normalized = normalizeOptionalText(value);
+
+  if (!normalized) {
+    throw new Error(message);
+  }
+
+  return normalized;
 };
 
 /* =========================================================
@@ -144,11 +166,7 @@ const getStudents = async () => {
   return response.data;
 };
 
-const createStudent = async ({
-  studentNumber,
-  name,
-  sectionId,
-}) => {
+const createStudent = async ({ studentNumber, name, sectionId }) => {
   const response = await api.post("/students", {
     studentNumber,
     name,
@@ -158,50 +176,366 @@ const createStudent = async ({
   return response.data;
 };
 
-const updateStudent = async (
-  studentId,
-  {
+const updateStudent = async (studentId, { studentNumber, name }) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required to update a student.",
+  );
+
+  const response = await api.patch(`/students/${normalizedStudentId}`, {
     studentNumber,
     name,
-  },
-) => {
+  });
+
+  return response.data;
+};
+
+/* =========================================================
+   DEACTIVATE STUDENT
+   SOFT DELETE
+========================================================= */
+
+const deleteStudent = async (studentId) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required to deactivate a student.",
+  );
+
+  await api.delete(`/students/${normalizedStudentId}`);
+};
+
+/* =========================================================
+   REACTIVATE STUDENT
+========================================================= */
+
+const reactivateStudent = async (studentId) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required to reactivate a student.",
+  );
+
   const response = await api.patch(
-    `/students/${studentId}`,
+    `/students/${normalizedStudentId}/reactivate`,
+  );
+
+  return response.data;
+};
+
+/* =========================================================
+   LEGACY DIRECT TRANSFER
+
+   Retained only for compatibility.
+
+   Normal StudentManagement transfer flow now uses:
+   createStudentTransferRequest(...)
+========================================================= */
+
+const transferStudentSection = async (studentId, sectionId) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required to transfer a student.",
+  );
+
+  const normalizedSectionId = requireId(
+    sectionId,
+    "Destination section ID is required.",
+  );
+
+  const response = await api.patch(`/students/${normalizedStudentId}/section`, {
+    sectionId: normalizedSectionId,
+  });
+
+  return response.data;
+};
+
+/* =========================================================
+   STUDENT TRANSFER REQUESTS
+
+   FLOW:
+
+   Source Adviser
+        ↓
+   Creates transfer request
+        ↓
+      PENDING
+        ↓
+   Destination Adviser
+        ↓
+   APPROVE / REJECT
+
+   Source Adviser may CANCEL while still PENDING.
+========================================================= */
+
+/* ---------------------------------------------------------
+   ELIGIBLE DESTINATION SECTIONS
+--------------------------------------------------------- */
+
+const getEligibleStudentTransferSections = async (studentId) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required to load transfer destinations.",
+  );
+
+  const response = await api.get(
+    `/student-transfer-requests/students/${normalizedStudentId}/eligible-sections`,
+  );
+
+  return Array.isArray(response.data) ? response.data : [];
+};
+
+/* ---------------------------------------------------------
+   CREATE TRANSFER REQUEST
+--------------------------------------------------------- */
+
+const createStudentTransferRequest = async ({
+  studentId,
+  destinationSectionId,
+  reason = null,
+}) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required to create a transfer request.",
+  );
+
+  const normalizedDestinationSectionId = requireId(
+    destinationSectionId,
+    "Destination section ID is required to create a transfer request.",
+  );
+
+  const response = await api.post(
+    "/student-transfer-requests",
     {
-      studentNumber,
-      name,
+      studentId: normalizedStudentId,
+
+      destinationSectionId: normalizedDestinationSectionId,
+
+      reason: normalizeOptionalText(reason),
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
     },
   );
 
   return response.data;
 };
 
-const deleteStudent = async (studentId) => {
-  await api.delete(
-    `/students/${studentId}`,
+/* ---------------------------------------------------------
+   OUTGOING TRANSFER REQUESTS
+
+   Requests created by the currently
+   logged-in Adviser.
+--------------------------------------------------------- */
+
+const getOutgoingStudentTransferRequests = async () => {
+  const response = await api.get("/student-transfer-requests/outgoing");
+
+  return Array.isArray(response.data) ? response.data : [];
+};
+
+/* ---------------------------------------------------------
+   INCOMING TRANSFER REQUESTS
+
+   Requests where logged-in Adviser controls
+   the destination section.
+--------------------------------------------------------- */
+
+const getIncomingStudentTransferRequests = async () => {
+  const response = await api.get("/student-transfer-requests/incoming");
+
+  return Array.isArray(response.data) ? response.data : [];
+};
+
+/* ---------------------------------------------------------
+   INCOMING PENDING COUNT
+
+   This is the transfer sidebar badge.
+
+   NOTE:
+   This is different from unread notification count.
+--------------------------------------------------------- */
+
+const getIncomingPendingTransferCount = async () => {
+  const response = await api.get(
+    "/student-transfer-requests/incoming/pending-count",
   );
+
+  const data = response.data;
+
+  /*
+   * Supports:
+   *
+   * 3
+   *
+   * OR
+   *
+   * {
+   *   count: 3
+   * }
+   *
+   * OR
+   *
+   * {
+   *   pendingCount: 3
+   * }
+   */
+
+  if (typeof data === "number") {
+    return Math.max(0, data);
+  }
+
+  if (typeof data?.count === "number") {
+    return Math.max(0, data.count);
+  }
+
+  if (typeof data?.pendingCount === "number") {
+    return Math.max(0, data.pendingCount);
+  }
+
+  const numeric = Number(data);
+
+  return Number.isFinite(numeric) ? Math.max(0, numeric) : 0;
+};
+
+/* ---------------------------------------------------------
+   APPROVE TRANSFER REQUEST
+
+   Destination Adviser only.
+
+   IMPORTANT:
+   Spring expects:
+
+   @RequestBody ReviewStudentTransferRequest
+
+   Therefore this request ALWAYS sends JSON:
+
+   {
+     "note": null
+   }
+
+   OR
+
+   {
+     "note": "Approved..."
+   }
+
+   Never send null as the request body because the
+   Axios/browser configuration may serialize an empty
+   PATCH request with an unsuitable Content-Type.
+--------------------------------------------------------- */
+
+const approveStudentTransferRequest = async (requestId, note = null) => {
+  const normalizedRequestId = requireId(
+    requestId,
+    "Transfer request ID is required for approval.",
+  );
+
+  const normalizedNote = normalizeOptionalText(note);
+
+  const response = await api.patch(
+    `/student-transfer-requests/${normalizedRequestId}/approve`,
+
+    {
+      note: normalizedNote,
+    },
+
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return response.data;
+};
+
+/* ---------------------------------------------------------
+   REJECT TRANSFER REQUEST
+
+   Destination Adviser only.
+
+   Student remains in source section and becomes
+   attendance-eligible again.
+
+   IMPORTANT:
+   Always send a JSON object, even when note is empty.
+--------------------------------------------------------- */
+
+const rejectStudentTransferRequest = async (requestId, note = null) => {
+  const normalizedRequestId = requireId(
+    requestId,
+    "Transfer request ID is required for rejection.",
+  );
+
+  const normalizedNote = normalizeOptionalText(note);
+
+  const response = await api.patch(
+    `/student-transfer-requests/${normalizedRequestId}/reject`,
+
+    {
+      note: normalizedNote,
+    },
+
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return response.data;
+};
+
+/* ---------------------------------------------------------
+   CANCEL TRANSFER REQUEST
+
+   Source Adviser only.
+
+   Can only cancel while PENDING.
+
+   Cancellation endpoint has no RequestBody, so there is
+   no reason to send JSON here.
+--------------------------------------------------------- */
+
+const cancelStudentTransferRequest = async (requestId) => {
+  const normalizedRequestId = requireId(
+    requestId,
+    "Transfer request ID is required for cancellation.",
+  );
+
+  const response = await api.patch(
+    `/student-transfer-requests/${normalizedRequestId}/cancel`,
+  );
+
+  return response.data;
 };
 
 /* =========================================================
    STUDENT VERIFICATION SETTINGS
 ========================================================= */
 
-const getStudentVerificationSettings = async (
-  studentId,
-) => {
+const getStudentVerificationSettings = async (studentId) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required to load verification settings.",
+  );
+
   const response = await api.get(
-    `/students/${studentId}/verification-settings`,
+    `/students/${normalizedStudentId}/verification-settings`,
   );
 
   return response.data;
 };
 
-const updateStudentVerificationSettings = async (
-  studentId,
-  settings,
-) => {
+const updateStudentVerificationSettings = async (studentId, settings) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required to update verification settings.",
+  );
+
   const response = await api.patch(
-    `/students/${studentId}/verification-settings`,
+    `/students/${normalizedStudentId}/verification-settings`,
     settings,
   );
 
@@ -209,30 +543,31 @@ const updateStudentVerificationSettings = async (
 };
 
 /* =========================================================
-   SECURE ENROLLMENT LIVENESS
+   SECURE PASSIVE ENROLLMENT
+
+   Existing Spring liveness challenge URLs remain supported.
+
+   Python treats both multipart groups as one ordered
+   passive live-face sequence.
 ========================================================= */
 
-const createEnrollmentLivenessChallenge = async (
-  studentId,
-) => {
+const createEnrollmentLivenessChallenge = async (studentId) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required to create an enrollment liveness challenge.",
+  );
+
   const response = await api.post(
-    `/students/${studentId}/liveness-challenges/enrollment`,
+    `/students/${normalizedStudentId}/liveness-challenges/enrollment`,
   );
 
   return response.data;
 };
 
-/**
- * Supports BOTH:
- *
- * baselineImages / challengeImages
- *
- * and
- *
- * baselineFrames / challengeFrames
- *
- * This prevents frontend version mismatches.
- */
+/* =========================================================
+   VERIFY ENROLLMENT LIVENESS
+========================================================= */
+
 const verifyEnrollmentLiveness = async ({
   studentId,
   challengeId,
@@ -243,17 +578,15 @@ const verifyEnrollmentLiveness = async ({
   baselineImages,
   challengeImages,
 }) => {
-  if (!studentId) {
-    throw new Error(
-      "Student ID is required for liveness verification.",
-    );
-  }
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required for liveness verification.",
+  );
 
-  if (!challengeId) {
-    throw new Error(
-      "Challenge ID is required for liveness verification.",
-    );
-  }
+  const normalizedChallengeId = requireId(
+    challengeId,
+    "Challenge ID is required for liveness verification.",
+  );
 
   const formData = buildLivenessFormData({
     baselineFrames,
@@ -264,14 +597,17 @@ const verifyEnrollmentLiveness = async ({
   });
 
   /*
-   * DO NOT manually set:
+   * IMPORTANT:
+   *
+   * Do NOT manually set:
    *
    * Content-Type: multipart/form-data
    *
-   * Browser/Axios must create the multipart boundary.
+   * Browser/Axios must generate the multipart boundary.
    */
+
   const response = await api.post(
-    `/students/${studentId}/liveness-challenges/${challengeId}/verify`,
+    `/students/${normalizedStudentId}/liveness-challenges/${normalizedChallengeId}/verify`,
     formData,
   );
 
@@ -279,15 +615,22 @@ const verifyEnrollmentLiveness = async ({
 };
 
 /* =========================================================
-   SECURE FACE-CONFLICT LIVENESS
+   SECURE FACE-CONFLICT PASSIVE VERIFICATION
 ========================================================= */
 
-const createFaceConflictLivenessChallenge = async (
-  studentId,
-  conflictId,
-) => {
+const createFaceConflictLivenessChallenge = async (studentId, conflictId) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required for face-conflict liveness verification.",
+  );
+
+  const normalizedConflictId = requireId(
+    conflictId,
+    "Conflict ID is required for face-conflict liveness verification.",
+  );
+
   const response = await api.post(
-    `/students/${studentId}/liveness-challenges/face-conflicts/${conflictId}`,
+    `/students/${normalizedStudentId}/liveness-challenges/face-conflicts/${normalizedConflictId}`,
   );
 
   return response.data;
@@ -304,23 +647,20 @@ const verifyFaceConflictLiveness = async ({
   baselineImages,
   challengeImages,
 }) => {
-  if (!studentId) {
-    throw new Error(
-      "Student ID is required for face-conflict verification.",
-    );
-  }
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required for face-conflict verification.",
+  );
 
-  if (!conflictId) {
-    throw new Error(
-      "Conflict ID is required for face-conflict verification.",
-    );
-  }
+  const normalizedConflictId = requireId(
+    conflictId,
+    "Conflict ID is required for face-conflict verification.",
+  );
 
-  if (!challengeId) {
-    throw new Error(
-      "Challenge ID is required for face-conflict verification.",
-    );
-  }
+  const normalizedChallengeId = requireId(
+    challengeId,
+    "Challenge ID is required for face-conflict verification.",
+  );
 
   const formData = buildLivenessFormData({
     baselineFrames,
@@ -331,7 +671,7 @@ const verifyFaceConflictLiveness = async ({
   });
 
   const response = await api.post(
-    `/students/${studentId}/liveness-challenges/face-conflicts/${conflictId}/${challengeId}/verify`,
+    `/students/${normalizedStudentId}/liveness-challenges/face-conflicts/${normalizedConflictId}/${normalizedChallengeId}/verify`,
     formData,
   );
 
@@ -340,44 +680,43 @@ const verifyFaceConflictLiveness = async ({
 
 /* =========================================================
    LEGACY STUDENT FACE REGISTRATION
+
+   Kept for compatibility.
+
+   StudentManagement normally uses:
+
+   createEnrollmentLivenessChallenge()
+   +
+   verifyEnrollmentLiveness()
 ========================================================= */
 
-/**
- * Retained for compatibility with other frontend pages.
- *
- * New StudentManagement liveness enrollment should normally
- * use createEnrollmentLivenessChallenge +
- * verifyEnrollmentLiveness.
- */
-const registerStudentFace = async (
-  studentId,
-  imageFile,
-) => {
+const registerStudentFace = async (studentId, imageFile) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required for face registration.",
+  );
+
+  if (!(imageFile instanceof Blob)) {
+    throw new Error("A valid face image File or Blob is required.");
+  }
+
   const formData = new FormData();
 
-  formData.append(
-    "image",
-    imageFile,
-  );
+  formData.append("image", imageFile);
 
   try {
     const response = await api.post(
-      `/students/${studentId}/face`,
+      `/students/${normalizedStudentId}/face`,
       formData,
     );
 
     return response.data;
   } catch (error) {
-    const status =
-      error?.response?.status;
+    const status = error?.response?.status;
 
-    const data =
-      error?.response?.data;
+    const data = error?.response?.data;
 
-    if (
-      status === 409 &&
-      data?.outcome === "FACE_CONFLICT"
-    ) {
+    if (status === 409 && data?.outcome === "FACE_CONFLICT") {
       return data;
     }
 
@@ -394,16 +733,26 @@ const verifyStudentFaceConflictCapture = async (
   conflictId,
   imageFile,
 ) => {
-  const formData =
-    new FormData();
-
-  formData.append(
-    "image",
-    imageFile,
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required for face-conflict verification.",
   );
 
+  const normalizedConflictId = requireId(
+    conflictId,
+    "Conflict ID is required for face-conflict verification.",
+  );
+
+  if (!(imageFile instanceof Blob)) {
+    throw new Error("A valid face image File or Blob is required.");
+  }
+
+  const formData = new FormData();
+
+  formData.append("image", imageFile);
+
   const response = await api.post(
-    `/students/${studentId}/face-conflicts/${conflictId}/verify-capture`,
+    `/students/${normalizedStudentId}/face-conflicts/${normalizedConflictId}/verify-capture`,
     formData,
   );
 
@@ -414,13 +763,19 @@ const verifyStudentFaceConflictCapture = async (
    STUDENT FACE CONFLICT RESOLUTION
 ========================================================= */
 
-const resolveStudentFaceConflict = async (
-  studentId,
-  conflictId,
-  decision,
-) => {
+const resolveStudentFaceConflict = async (studentId, conflictId, decision) => {
+  const normalizedStudentId = requireId(
+    studentId,
+    "Student ID is required for conflict resolution.",
+  );
+
+  const normalizedConflictId = requireId(
+    conflictId,
+    "Conflict ID is required for conflict resolution.",
+  );
+
   const response = await api.post(
-    `/students/${studentId}/face-conflicts/${conflictId}/resolve`,
+    `/students/${normalizedStudentId}/face-conflicts/${normalizedConflictId}/resolve`,
     {
       decision,
     },
@@ -433,19 +788,20 @@ const resolveStudentFaceConflict = async (
    ATTENDANCE SESSION
 ========================================================= */
 
-const getActiveSession = async (
-  sectionId,
-) => {
+const getActiveSession = async (sectionId) => {
+  const normalizedSectionId = requireId(
+    sectionId,
+    "Section ID is required to load the active attendance session.",
+  );
+
   try {
     const response = await api.get(
-      `/attendance-sessions/section/${sectionId}/active`,
+      `/attendance-sessions/section/${normalizedSectionId}/active`,
     );
 
     return response.data;
   } catch (error) {
-    if (
-      error?.response?.status === 404
-    ) {
+    if (error?.response?.status === 404) {
       return null;
     }
 
@@ -457,33 +813,30 @@ const getActiveSession = async (
    START ATTENDANCE SESSION
 ========================================================= */
 
-const startAttendanceSession = async (
-  configuration,
-) => {
+const startAttendanceSession = async (configuration) => {
   /*
-   * Legacy usage:
+   * Legacy:
    *
    * startAttendanceSession(sectionId)
    */
-  if (
-    typeof configuration === "string"
-  ) {
-    const response = await api.post(
-      "/attendance-sessions",
-      null,
-      {
-        params: {
-          sectionId:
-            configuration,
-        },
-      },
+
+  if (typeof configuration === "string") {
+    const normalizedSectionId = requireId(
+      configuration,
+      "Section ID is required to start attendance.",
     );
+
+    const response = await api.post("/attendance-sessions", null, {
+      params: {
+        sectionId: normalizedSectionId,
+      },
+    });
 
     return response.data;
   }
 
   /*
-   * New configured session:
+   * Configured usage:
    *
    * {
    *   sectionId,
@@ -496,17 +849,20 @@ const startAttendanceSession = async (
     sectionId,
     lateAfterMinutes,
     scheduledEndTime = null,
-  } =
-    configuration || {};
+  } = configuration || {};
 
-  const response = await api.post(
-    "/attendance-sessions",
-    {
-      sectionId,
-      lateAfterMinutes,
-      scheduledEndTime,
-    },
+  const normalizedSectionId = requireId(
+    sectionId,
+    "Section ID is required to start attendance.",
   );
+
+  const response = await api.post("/attendance-sessions", {
+    sectionId: normalizedSectionId,
+
+    lateAfterMinutes,
+
+    scheduledEndTime,
+  });
 
   return response.data;
 };
@@ -515,11 +871,14 @@ const startAttendanceSession = async (
    END ATTENDANCE SESSION
 ========================================================= */
 
-const endAttendanceSession = async (
-  sessionId,
-) => {
+const endAttendanceSession = async (sessionId) => {
+  const normalizedSessionId = requireId(
+    sessionId,
+    "Attendance session ID is required.",
+  );
+
   const response = await api.patch(
-    `/attendance-sessions/${sessionId}/end`,
+    `/attendance-sessions/${normalizedSessionId}/end`,
   );
 
   return response.data;
@@ -535,17 +894,14 @@ const getAttendanceHistory = async ({
   page = 0,
   size = 10,
 } = {}) => {
-  const response = await api.get(
-    "/attendance-sessions/history",
-    {
-      params: {
-        fromDate,
-        toDate,
-        page,
-        size,
-      },
+  const response = await api.get("/attendance-sessions/history", {
+    params: {
+      fromDate,
+      toDate,
+      page,
+      size,
     },
-  );
+  });
 
   return response.data;
 };
@@ -554,27 +910,23 @@ const getAttendanceHistory = async ({
    ATTENDANCE RECORDS
 ========================================================= */
 
-const getSessionRecords = async (
-  sessionId,
-) => {
-  const response = await api.get(
-    `/attendance-records/session/${sessionId}`,
+const getSessionRecords = async (sessionId) => {
+  const normalizedSessionId = requireId(
+    sessionId,
+    "Attendance session ID is required.",
   );
 
-  const data =
-    response.data;
+  const response = await api.get(
+    `/attendance-records/session/${normalizedSessionId}`,
+  );
 
-  if (
-    Array.isArray(data)
-  ) {
+  const data = response.data;
+
+  if (Array.isArray(data)) {
     return data;
   }
 
-  if (
-    Array.isArray(
-      data?.records,
-    )
-  ) {
+  if (Array.isArray(data?.records)) {
     return data.records;
   }
 
@@ -585,20 +937,21 @@ const getSessionRecords = async (
    MANUAL ATTENDANCE
 ========================================================= */
 
-const markManualAttendance = async ({
-  sessionId,
-  studentId,
-}) => {
-  const response = await api.post(
-    "/attendance-records",
-    null,
-    {
-      params: {
-        sessionId,
-        studentId,
-      },
-    },
+const markManualAttendance = async ({ sessionId, studentId }) => {
+  const normalizedSessionId = requireId(
+    sessionId,
+    "Attendance session ID is required.",
   );
+
+  const normalizedStudentId = requireId(studentId, "Student ID is required.");
+
+  const response = await api.post("/attendance-records", null, {
+    params: {
+      sessionId: normalizedSessionId,
+
+      studentId: normalizedStudentId,
+    },
+  });
 
   return response.data;
 };
@@ -607,27 +960,23 @@ const markManualAttendance = async ({
    FACE RECOGNITION ATTENDANCE
 ========================================================= */
 
-const markFaceAttendance = async ({
-  sessionId,
-  imageFile,
-}) => {
-  const formData =
-    new FormData();
-
-  formData.append(
-    "sessionId",
+const markFaceAttendance = async ({ sessionId, imageFile }) => {
+  const normalizedSessionId = requireId(
     sessionId,
+    "Attendance session ID is required.",
   );
 
-  formData.append(
-    "image",
-    imageFile,
-  );
+  if (!(imageFile instanceof Blob)) {
+    throw new Error("A valid face image File or Blob is required.");
+  }
 
-  const response = await api.post(
-    "/attendance-records/face",
-    formData,
-  );
+  const formData = new FormData();
+
+  formData.append("sessionId", normalizedSessionId);
+
+  formData.append("image", imageFile);
+
+  const response = await api.post("/attendance-records/face", formData);
 
   return response.data;
 };
@@ -636,19 +985,21 @@ const markFaceAttendance = async ({
    REMOVE ATTENDANCE RECORD
 ========================================================= */
 
-const removeAttendance = async ({
-  sessionId,
-  studentId,
-}) => {
-  const response = await api.delete(
-    "/attendance-records",
-    {
-      params: {
-        sessionId,
-        studentId,
-      },
-    },
+const removeAttendance = async ({ sessionId, studentId }) => {
+  const normalizedSessionId = requireId(
+    sessionId,
+    "Attendance session ID is required.",
   );
+
+  const normalizedStudentId = requireId(studentId, "Student ID is required.");
+
+  const response = await api.delete("/attendance-records", {
+    params: {
+      sessionId: normalizedSessionId,
+
+      studentId: normalizedStudentId,
+    },
+  });
 
   return response.data;
 };
@@ -657,17 +1008,11 @@ const removeAttendance = async ({
    ACCOUNT SECURITY
 ========================================================= */
 
-const changePassword = async ({
-  currentPassword,
-  newPassword,
-}) => {
-  const response = await api.patch(
-    "/users/me/password",
-    {
-      currentPassword,
-      newPassword,
-    },
-  );
+const changePassword = async ({ currentPassword, newPassword }) => {
+  const response = await api.patch("/users/me/password", {
+    currentPassword,
+    newPassword,
+  });
 
   return response.data;
 };
@@ -687,6 +1032,26 @@ const adviserService = {
   createStudent,
   updateStudent,
   deleteStudent,
+  reactivateStudent,
+
+  /*
+   * Legacy direct-transfer API.
+   * Kept for compatibility only.
+   */
+  transferStudentSection,
+
+  /* STUDENT TRANSFER REQUESTS */
+
+  getEligibleStudentTransferSections,
+  createStudentTransferRequest,
+
+  getOutgoingStudentTransferRequests,
+  getIncomingStudentTransferRequests,
+  getIncomingPendingTransferCount,
+
+  approveStudentTransferRequest,
+  rejectStudentTransferRequest,
+  cancelStudentTransferRequest,
 
   /* VERIFICATION SETTINGS */
 

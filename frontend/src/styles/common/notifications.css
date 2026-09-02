@@ -1,0 +1,1825 @@
+/* =========================================================
+   SVNHS NOTIFICATION SYSTEM
+========================================================= */
+
+/* =========================================================
+   TOPBAR STACKING
+========================================================= */
+
+.councilor-header.adviser-header {
+  position: relative;
+  z-index: 5000;
+
+  overflow: visible;
+}
+
+.councilor-header-actions {
+  position: relative;
+  z-index: 5001;
+
+  overflow: visible;
+}
+
+.adviser-content {
+  position: relative;
+  z-index: 1;
+}
+
+.adviser-main {
+  overflow: visible;
+}
+
+/* =========================================================
+   BELL CONTAINER
+========================================================= */
+
+.app-notification-bell-container {
+  position: relative;
+  z-index: 5002;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  overflow: visible;
+}
+
+/* =========================================================
+   BELL
+========================================================= */
+
+.app-notification-bell {
+  position: relative;
+
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 38px;
+
+  padding: 0;
+
+  border:
+    1px solid
+    var(--c-border-soft);
+
+  border-radius: 10px;
+
+  background:
+    var(--c-surface);
+
+  color:
+    var(--c-text-secondary);
+
+  font-family: inherit;
+
+  cursor: pointer;
+
+  outline: none;
+
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.app-notification-bell svg {
+  width: 19px;
+  height: 19px;
+
+  display: block;
+}
+
+.app-notification-bell:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    var(--c-brand-border);
+
+  background:
+    var(--c-icon-bg);
+
+  color:
+    var(--c-blue-800);
+
+  box-shadow:
+    0 5px 15px
+    rgba(7, 27, 66, 0.07);
+}
+
+.app-notification-bell.is-open {
+  border-color:
+    var(--c-brand-border);
+
+  background:
+    var(--c-icon-bg);
+
+  color:
+    var(--c-blue-800);
+
+  box-shadow:
+    0 4px 12px
+    rgba(7, 27, 66, 0.07);
+}
+
+.app-notification-bell:focus-visible {
+  border-color:
+    var(--c-blue-800);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(37, 99, 235, 0.12);
+}
+
+/* =========================================================
+   BELL BADGE
+========================================================= */
+
+.app-notification-badge {
+  position: absolute;
+
+  top: -5px;
+  right: -5px;
+
+  min-width: 19px;
+  height: 19px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 5px;
+
+  border:
+    2px solid
+    var(--c-surface);
+
+  border-radius: 999px;
+
+  background: #dc2626;
+
+  color: #ffffff;
+
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1;
+
+  pointer-events: none;
+
+  box-shadow:
+    0 2px 7px
+    rgba(220, 38, 38, 0.18);
+
+  animation:
+    app-notification-badge-in
+    0.2s ease both;
+}
+
+/* =========================================================
+   DROPDOWN
+========================================================= */
+
+.app-notification-dropdown {
+  position: absolute;
+
+  z-index: 9999;
+
+  top: calc(100% + 10px);
+  right: -6px;
+
+  width:
+    min(
+      380px,
+      calc(100vw - 28px)
+    );
+
+  max-height:
+    min(
+      520px,
+      calc(100dvh - 92px)
+    );
+
+  display: grid;
+
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--c-border-soft);
+
+  border-radius: 15px;
+
+  background:
+    var(--c-surface);
+
+  box-shadow:
+    0 24px 60px
+      rgba(2, 8, 23, 0.15),
+    0 5px 16px
+      rgba(2, 8, 23, 0.06);
+
+  transform-origin:
+    top right;
+
+  animation:
+    app-notification-dropdown-in
+    0.18s ease both;
+}
+
+/* =========================================================
+   POINTER
+========================================================= */
+
+.app-notification-dropdown::before {
+  content: "";
+
+  position: absolute;
+
+  top: -6px;
+  right: 17px;
+
+  width: 11px;
+  height: 11px;
+
+  border-top:
+    1px solid
+    var(--c-border-soft);
+
+  border-left:
+    1px solid
+    var(--c-border-soft);
+
+  background:
+    var(--c-surface);
+
+  transform:
+    rotate(45deg);
+
+  z-index: 1;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.app-notification-dropdown-header {
+  position: relative;
+  z-index: 2;
+
+  padding:
+    14px 14px 11px;
+
+  border-bottom:
+    1px solid
+    var(--c-border-soft);
+
+  background:
+    var(--c-surface);
+}
+
+.app-notification-dropdown-heading {
+  min-width: 0;
+}
+
+.app-notification-dropdown-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.app-notification-dropdown-title-row > div {
+  min-width: 0;
+}
+
+.app-notification-dropdown-title-row h3 {
+  margin: 0;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 16px;
+  font-weight: 880;
+
+  line-height: 1.2;
+}
+
+.app-notification-dropdown-title-row p {
+  margin:
+    4px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 8.5px;
+  font-weight: 600;
+
+  line-height: 1.4;
+}
+
+/* =========================================================
+   MANAGE BUTTON
+========================================================= */
+
+.app-notification-manage-button {
+  flex: 0 0 auto;
+
+  min-height: 28px;
+
+  padding:
+    0 8px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background:
+    transparent;
+
+  color:
+    var(--c-blue-800);
+
+  font-family: inherit;
+
+  font-size: 8.5px;
+  font-weight: 850;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.app-notification-manage-button:hover {
+  background:
+    var(--c-icon-bg);
+}
+
+.app-notification-manage-button:disabled {
+  opacity: 0.45;
+
+  cursor: default;
+}
+
+/* =========================================================
+   MARK ALL READ
+========================================================= */
+
+.app-notification-mark-all {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  margin-top: 8px;
+
+  padding: 0;
+
+  border: 0;
+
+  background:
+    transparent;
+
+  color:
+    var(--c-blue-800);
+
+  font-family: inherit;
+
+  font-size: 8.5px;
+  font-weight: 850;
+
+  cursor: pointer;
+}
+
+.app-notification-mark-all svg {
+  width: 13px;
+  height: 13px;
+}
+
+.app-notification-mark-all:hover {
+  opacity: 0.76;
+}
+
+.app-notification-mark-all:disabled {
+  opacity: 0.42;
+
+  cursor: default;
+}
+
+/* =========================================================
+   MANAGE HEADER ROW
+========================================================= */
+
+.app-notification-manage-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-top: 9px;
+}
+
+.app-notification-manage-row > span {
+  color:
+    var(--c-text-muted);
+
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.app-notification-manage-row button {
+  padding: 0;
+
+  border: 0;
+
+  background:
+    transparent;
+
+  color:
+    var(--c-blue-800);
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 850;
+
+  cursor: pointer;
+}
+
+.app-notification-manage-row button:hover {
+  text-decoration:
+    underline;
+}
+
+.app-notification-manage-row button:disabled {
+  opacity: 0.45;
+
+  cursor: default;
+
+  text-decoration: none;
+}
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.app-notification-dropdown-body {
+  min-height: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior:
+    contain;
+
+  scrollbar-width:
+    thin;
+
+  scrollbar-color:
+    var(--c-border)
+    transparent;
+}
+
+.app-notification-dropdown-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.app-notification-dropdown-body::-webkit-scrollbar-track {
+  background:
+    transparent;
+}
+
+.app-notification-dropdown-body::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+
+  background:
+    var(--c-border);
+}
+
+/* =========================================================
+   LIST
+========================================================= */
+
+.app-notification-list {
+  width: 100%;
+
+  display: grid;
+}
+
+/* =========================================================
+   ITEM
+========================================================= */
+
+.app-notification-item {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+
+  align-items:
+    flex-start;
+
+  border-bottom:
+    1px solid
+    var(--c-border-soft);
+
+  background:
+    var(--c-surface);
+
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.app-notification-item:last-child {
+  border-bottom: 0;
+}
+
+.app-notification-item:hover {
+  background:
+    var(--c-surface-soft);
+}
+
+/* =========================================================
+   UNREAD
+========================================================= */
+
+.app-notification-item.is-unread {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(37, 99, 235, 0.055),
+      var(--c-surface) 72%
+    );
+}
+
+.app-notification-item.is-unread::before {
+  content: "";
+
+  position: absolute;
+
+  top: 9px;
+  bottom: 9px;
+  left: 0;
+
+  width: 3px;
+
+  border-radius:
+    0 999px 999px 0;
+
+  background:
+    #2563eb;
+}
+
+/* =========================================================
+   MANAGE MODE
+========================================================= */
+
+.app-notification-item.is-managing {
+  grid-template-columns:
+    minmax(0, 1fr);
+
+  cursor: pointer;
+}
+
+.app-notification-item.is-managing:hover {
+  background:
+    rgba(37, 99, 235, 0.035);
+}
+
+.app-notification-item.is-selected {
+  background:
+    rgba(37, 99, 235, 0.07);
+}
+
+.app-notification-item.is-selected::before {
+  content: "";
+
+  position: absolute;
+
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+
+  width: 3px;
+
+  border-radius:
+    0 999px 999px 0;
+
+  background:
+    #2563eb;
+}
+
+/* =========================================================
+   MAIN ITEM BUTTON
+========================================================= */
+
+.app-notification-item-main {
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    35px
+    minmax(0, 1fr)
+    auto;
+
+  align-items:
+    flex-start;
+
+  gap: 10px;
+
+  padding:
+    12px 5px
+    12px 13px;
+
+  border: 0;
+
+  background:
+    transparent;
+
+  color: inherit;
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  outline: none;
+}
+
+.app-notification-item.is-managing
+  .app-notification-item-main {
+  grid-template-columns:
+    20px
+    35px
+    minmax(0, 1fr);
+
+  padding-right: 13px;
+}
+
+.app-notification-item-main:focus-visible {
+  box-shadow:
+    inset
+    0 0 0 2px
+    rgba(37, 99, 235, 0.16);
+}
+
+.app-notification-item-main:disabled {
+  cursor: default;
+}
+
+/* =========================================================
+   SELECT INDICATOR
+========================================================= */
+
+.app-notification-select-indicator {
+  width: 18px;
+  height: 18px;
+
+  display: grid;
+  place-items: center;
+
+  margin-top: 8px;
+
+  border:
+    1.5px solid
+    var(--c-border);
+
+  border-radius: 6px;
+
+  background:
+    var(--c-surface);
+
+  color:
+    #ffffff;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.app-notification-select-indicator svg {
+  width: 13px;
+  height: 13px;
+}
+
+.app-notification-item.is-selected
+  .app-notification-select-indicator {
+  border-color:
+    #2563eb;
+
+  background:
+    #2563eb;
+
+  transform:
+    scale(1.03);
+}
+
+/* =========================================================
+   ICON
+========================================================= */
+
+.app-notification-item-icon {
+  width: 35px;
+  height: 35px;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid
+    rgba(37, 99, 235, 0.14);
+
+  border-radius: 10px;
+
+  background:
+    rgba(37, 99, 235, 0.07);
+
+  color:
+    #2563eb;
+}
+
+.app-notification-item-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* =========================================================
+   TONES
+========================================================= */
+
+.app-notification-item.is-success
+  .app-notification-item-icon {
+  border-color:
+    rgba(22, 163, 74, 0.16);
+
+  background:
+    rgba(22, 163, 74, 0.07);
+
+  color:
+    #15803d;
+}
+
+.app-notification-item.is-danger
+  .app-notification-item-icon {
+  border-color:
+    rgba(220, 38, 38, 0.16);
+
+  background:
+    rgba(220, 38, 38, 0.065);
+
+  color:
+    #dc2626;
+}
+
+.app-notification-item.is-warning
+  .app-notification-item-icon {
+  border-color:
+    rgba(217, 119, 6, 0.18);
+
+  background:
+    rgba(245, 158, 11, 0.08);
+
+  color:
+    #b45309;
+}
+
+.app-notification-item.is-neutral
+  .app-notification-item-icon {
+  border-color:
+    rgba(100, 116, 139, 0.16);
+
+  background:
+    rgba(100, 116, 139, 0.07);
+
+  color:
+    #64748b;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.app-notification-item-content {
+  min-width: 0;
+
+  display: block;
+}
+
+.app-notification-item-topline {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+}
+
+.app-notification-item-category {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 7.5px;
+  font-weight: 900;
+
+  letter-spacing:
+    0.045em;
+
+  line-height: 1.2;
+
+  text-transform:
+    uppercase;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+/* =========================================================
+   NEW LABEL
+========================================================= */
+
+.app-notification-new-label {
+  flex: 0 0 auto;
+
+  padding:
+    2px 5px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(37, 99, 235, 0.1);
+
+  color:
+    #1d4ed8;
+
+  font-size: 6.5px;
+  font-weight: 900;
+
+  line-height: 1.2;
+
+  text-transform:
+    uppercase;
+}
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.app-notification-item-title {
+  display: block;
+
+  margin-top: 4px;
+
+  overflow: hidden;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 11px;
+  font-weight: 850;
+
+  line-height: 1.35;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+}
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.app-notification-item-message {
+  display:
+    -webkit-box;
+
+  margin-top: 3px;
+
+  overflow: hidden;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 9px;
+  line-height: 1.42;
+
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* =========================================================
+   TIME
+========================================================= */
+
+.app-notification-item-time {
+  display: block;
+
+  margin-top: 6px;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 7.5px;
+  font-weight: 650;
+}
+
+/* =========================================================
+   UNREAD DOT
+========================================================= */
+
+.app-notification-item-dot {
+  width: 7px;
+  height: 7px;
+
+  margin-top: 6px;
+
+  border-radius: 50%;
+
+  background:
+    #2563eb;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(37, 99, 235, 0.09);
+}
+
+/* =========================================================
+   MORE WRAPPER
+========================================================= */
+
+.app-notification-item-menu-wrap {
+  position: relative;
+
+  z-index: 30;
+
+  padding:
+    8px 8px 0 0;
+}
+
+/* =========================================================
+   MORE BUTTON
+========================================================= */
+
+.app-notification-more-button {
+  width: 29px;
+  height: 29px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border:
+    1px solid transparent;
+
+  border-radius: 8px;
+
+  background:
+    transparent;
+
+  color:
+    var(--c-text-muted);
+
+  cursor: pointer;
+
+  outline: none;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.app-notification-more-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.app-notification-more-button:hover,
+.app-notification-more-button.is-open {
+  border-color:
+    var(--c-border-soft);
+
+  background:
+    var(--c-surface-soft);
+
+  color:
+    var(--c-text-primary);
+}
+
+.app-notification-more-button:disabled {
+  opacity: 0.4;
+
+  cursor: default;
+}
+
+/* =========================================================
+   ITEM OPTIONS MENU
+========================================================= */
+
+.app-notification-item-menu {
+  position: absolute;
+
+  z-index: 200;
+
+  top: 40px;
+  right: 7px;
+
+  width: 156px;
+
+  overflow: hidden;
+
+  padding: 5px;
+
+  border:
+    1px solid
+    var(--c-border-soft);
+
+  border-radius: 10px;
+
+  background:
+    var(--c-surface);
+
+  box-shadow:
+    0 14px 32px
+      rgba(2, 8, 23, 0.16),
+    0 4px 10px
+      rgba(2, 8, 23, 0.06);
+
+  animation:
+    app-notification-menu-in
+    0.14s ease both;
+}
+
+.app-notification-item-menu button {
+  width: 100%;
+  min-height: 32px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  padding:
+    0 9px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background:
+    transparent;
+
+  color:
+    var(--c-text-secondary);
+
+  font-family: inherit;
+
+  font-size: 8.5px;
+  font-weight: 800;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.app-notification-item-menu button svg {
+  width: 14px;
+  height: 14px;
+
+  flex: 0 0 14px;
+}
+
+.app-notification-item-menu button:hover {
+  background:
+    var(--c-surface-soft);
+
+  color:
+    var(--c-blue-800);
+}
+
+.app-notification-item-menu button.is-danger {
+  color:
+    #dc2626;
+}
+
+.app-notification-item-menu
+  button.is-danger:hover {
+  background:
+    rgba(220, 38, 38, 0.07);
+
+  color:
+    #b91c1c;
+}
+
+.app-notification-menu-divider {
+  height: 1px;
+
+  margin:
+    4px 3px;
+
+  background:
+    var(--c-border-soft);
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.app-notification-loading {
+  min-height: 120px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 20px;
+
+  color:
+    var(--c-text-body);
+}
+
+.app-notification-loading strong {
+  display: block;
+
+  color:
+    var(--c-text-secondary);
+
+  font-size: 9.5px;
+  font-weight: 800;
+}
+
+.app-notification-loading p {
+  margin:
+    3px 0 0;
+
+  font-size: 8px;
+}
+
+.app-notification-spinner {
+  width: 24px;
+  height: 24px;
+
+  flex: 0 0 24px;
+
+  border:
+    3px solid
+    var(--c-border-soft);
+
+  border-top-color:
+    var(--c-blue-800);
+
+  border-radius: 50%;
+
+  animation:
+    app-notification-spin
+    0.7s linear infinite;
+}
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.app-notification-empty {
+  min-height: 125px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  padding:
+    18px 20px;
+
+  text-align: center;
+}
+
+.app-notification-empty-icon {
+  width: 36px;
+  height: 36px;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid
+    rgba(22, 163, 74, 0.16);
+
+  border-radius: 10px;
+
+  background:
+    rgba(22, 163, 74, 0.07);
+
+  color:
+    #15803d;
+}
+
+.app-notification-empty-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.app-notification-empty strong {
+  margin-top: 8px;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 10.5px;
+  font-weight: 850;
+}
+
+.app-notification-empty p {
+  margin:
+    4px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 8.5px;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.app-notification-error {
+  min-height: 118px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 17px;
+}
+
+.app-notification-error-icon {
+  width: 31px;
+  height: 31px;
+
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 31px;
+
+  border-radius: 8px;
+
+  background:
+    rgba(220, 38, 38, 0.07);
+
+  color:
+    #dc2626;
+}
+
+.app-notification-error-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.app-notification-error strong {
+  display: block;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 9.5px;
+}
+
+.app-notification-error p {
+  margin:
+    3px 0 0;
+
+  color:
+    var(--c-text-body);
+
+  font-size: 8px;
+}
+
+/* =========================================================
+   INLINE ACTION ERROR
+========================================================= */
+
+.app-notification-inline-error {
+  padding:
+    8px 12px;
+
+  border-top:
+    1px solid
+    rgba(220, 38, 38, 0.12);
+
+  background:
+    rgba(220, 38, 38, 0.045);
+
+  color:
+    #b91c1c;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  line-height: 1.4;
+}
+
+/* =========================================================
+   MANAGE FOOTER
+========================================================= */
+
+.app-notification-manage-footer {
+  padding:
+    9px 10px;
+
+  border-top:
+    1px solid
+    var(--c-border-soft);
+
+  background:
+    var(--c-surface);
+}
+
+/* =========================================================
+   DELETE SELECTED
+========================================================= */
+
+.app-notification-delete-selected {
+  width: 100%;
+  min-height: 35px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border:
+    1px solid
+    rgba(220, 38, 38, 0.18);
+
+  border-radius: 9px;
+
+  background:
+    rgba(220, 38, 38, 0.055);
+
+  color:
+    #dc2626;
+
+  font-family: inherit;
+
+  font-size: 8.5px;
+  font-weight: 850;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.app-notification-delete-selected svg {
+  width: 15px;
+  height: 15px;
+}
+
+.app-notification-delete-selected:hover:not(:disabled) {
+  border-color:
+    rgba(220, 38, 38, 0.28);
+
+  background:
+    rgba(220, 38, 38, 0.09);
+}
+
+.app-notification-delete-selected:disabled {
+  opacity: 0.4;
+
+  cursor: default;
+}
+
+/* =========================================================
+   DELETE CONFIRMATION
+========================================================= */
+
+.app-notification-delete-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.app-notification-delete-confirm-copy {
+  min-width: 0;
+}
+
+.app-notification-delete-confirm-copy strong {
+  display: block;
+
+  color:
+    var(--c-text-primary);
+
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.app-notification-delete-confirm-copy span {
+  display: block;
+
+  margin-top: 2px;
+
+  color:
+    var(--c-text-muted);
+
+  font-size: 7.5px;
+  line-height: 1.35;
+}
+
+.app-notification-delete-confirm-actions {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+.app-notification-delete-confirm-actions button {
+  min-height: 30px;
+
+  padding:
+    0 9px;
+
+  border-radius: 7px;
+
+  font-family: inherit;
+
+  font-size: 8px;
+  font-weight: 850;
+
+  cursor: pointer;
+}
+
+.app-notification-delete-confirm-actions
+  .is-cancel {
+  border:
+    1px solid
+    var(--c-border-soft);
+
+  background:
+    var(--c-surface);
+
+  color:
+    var(--c-text-secondary);
+}
+
+.app-notification-delete-confirm-actions
+  .is-delete {
+  border:
+    1px solid
+    #dc2626;
+
+  background:
+    #dc2626;
+
+  color:
+    #ffffff;
+}
+
+.app-notification-delete-confirm-actions
+  button:disabled {
+  opacity: 0.45;
+
+  cursor: default;
+}
+
+/* =========================================================
+   TRANSFER SIDEBAR BADGE
+========================================================= */
+
+.adviser-nav-transfer-label {
+  min-width: 0;
+
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+}
+
+.adviser-nav-transfer-badge {
+  min-width: 21px;
+  height: 21px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 6px;
+
+  border-radius: 999px;
+
+  background:
+    #dc2626;
+
+  color:
+    #ffffff;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  line-height: 1;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+html[data-theme="dark"]
+  .app-notification-dropdown,
+html[data-theme="dark"]
+  .app-notification-item-menu {
+  border-color:
+    var(--c-border);
+
+  background:
+    var(--c-surface);
+}
+
+html[data-theme="dark"]
+  .app-notification-dropdown::before {
+  border-color:
+    var(--c-border);
+
+  background:
+    var(--c-surface);
+}
+
+html[data-theme="dark"]
+  .app-notification-item {
+  border-color:
+    var(--c-border);
+}
+
+html[data-theme="dark"]
+  .app-notification-item:hover {
+  background:
+    rgba(59, 130, 246, 0.06);
+}
+
+html[data-theme="dark"]
+  .app-notification-item.is-unread {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(59, 130, 246, 0.1),
+      var(--c-surface) 75%
+    );
+}
+
+html[data-theme="dark"]
+  .app-notification-item.is-selected {
+  background:
+    rgba(59, 130, 246, 0.13);
+}
+
+html[data-theme="dark"]
+  .app-notification-item-menu
+  button:hover {
+  background:
+    rgba(59, 130, 246, 0.07);
+}
+
+html[data-theme="dark"]
+  .app-notification-delete-selected {
+  background:
+    rgba(220, 38, 38, 0.09);
+}
+
+html[data-theme="dark"]
+  .app-notification-badge {
+  border-color:
+    var(--c-surface);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 720px) {
+  .app-notification-dropdown {
+    position: fixed;
+
+    top: 70px;
+    right: 12px;
+    left: 12px;
+
+    width: auto;
+
+    max-height:
+      calc(100dvh - 86px);
+
+    transform-origin:
+      top center;
+  }
+
+  .app-notification-dropdown::before {
+    display: none;
+  }
+
+  .app-notification-delete-confirm {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .app-notification-delete-confirm-actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 520px) {
+  .adviser-notification-divider {
+    display: none;
+  }
+
+  .app-notification-bell {
+    width: 36px;
+    height: 36px;
+
+    flex-basis: 36px;
+  }
+
+  .app-notification-bell svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .app-notification-dropdown {
+    top: 64px;
+    right: 8px;
+    left: 8px;
+
+    max-height:
+      calc(100dvh - 76px);
+
+    border-radius: 13px;
+  }
+
+  .app-notification-item-main {
+    padding:
+      11px 5px
+      11px 11px;
+  }
+
+  .app-notification-item.is-managing
+    .app-notification-item-main {
+    padding-right: 11px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+  .app-notification-item-main {
+    grid-template-columns:
+      32px
+      minmax(0, 1fr)
+      auto;
+
+    gap: 8px;
+  }
+
+  .app-notification-item.is-managing
+    .app-notification-item-main {
+    grid-template-columns:
+      18px
+      32px
+      minmax(0, 1fr);
+  }
+
+  .app-notification-item-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .app-notification-manage-row {
+    align-items: flex-start;
+  }
+}
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes app-notification-dropdown-in {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px)
+      scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes app-notification-menu-in {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-3px)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes app-notification-badge-in {
+  from {
+    opacity: 0;
+
+    transform:
+      scale(0.65);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+}
+
+@keyframes app-notification-spin {
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .app-notification-dropdown,
+  .app-notification-item-menu,
+  .app-notification-badge,
+  .app-notification-spinner {
+    animation: none;
+  }
+
+  .app-notification-bell,
+  .app-notification-item,
+  .app-notification-select-indicator,
+  .app-notification-more-button,
+  .app-notification-delete-selected {
+    transition: none;
+  }
+}
