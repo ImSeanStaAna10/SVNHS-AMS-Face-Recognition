@@ -8,21 +8,30 @@
 
 .councilor-header.adviser-header {
   position: relative;
-  z-index: 5000;
+  z-index: 100;
 
   overflow: visible;
 }
 
 .councilor-header-actions {
   position: relative;
-  z-index: 5001;
+  z-index: 101;
 
   overflow: visible;
 }
 
 .adviser-content {
   position: relative;
-  z-index: 1;
+
+  /*
+   * IMPORTANT:
+   * Do not assign a numeric z-index here.
+   *
+   * A numeric z-index creates a stacking context and traps page
+   * modals beneath the Adviser topbar, even when the modal itself
+   * has a much larger z-index.
+   */
+  z-index: auto;
 }
 
 .adviser-main {
@@ -35,7 +44,7 @@
 
 .app-notification-bell-container {
   position: relative;
-  z-index: 5002;
+  z-index: 102;
 
   display: inline-flex;
   align-items: center;
@@ -189,7 +198,7 @@
 .app-notification-dropdown {
   position: absolute;
 
-  z-index: 9999;
+  z-index: 1000;
 
   top: calc(100% + 10px);
   right: -6px;
@@ -1823,3 +1832,45 @@ html[data-theme="dark"]
     transition: none;
   }
 }
+
+/* =========================================================
+   FINAL — MODAL / TOPBAR STACKING SAFETY
+   KEEP THIS BLOCK LAST
+
+   Notification UI stays above normal page content.
+   Application modals remain free to appear above the topbar.
+========================================================= */
+
+.councilor-header.adviser-header {
+  z-index: 100 !important;
+}
+
+.councilor-header-actions {
+  z-index: 101 !important;
+}
+
+.app-notification-bell-container {
+  z-index: 102 !important;
+}
+
+/*
+ * CRITICAL:
+ * z-index:auto means this positioned element does NOT create the
+ * z-index:1 stacking context that previously trapped Student
+ * Management modals underneath the Adviser header.
+ */
+.adviser-content {
+  z-index: auto !important;
+}
+
+.app-notification-dropdown {
+  z-index: 1000 !important;
+}
+
+/*
+ * Student Management modals use 1200+ in the base CSS and the
+ * enrollment polish can use an even higher value. Once
+ * .adviser-content is no longer a stacking context, those modal
+ * values correctly outrank this header.
+ */
+

@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AdviserLayout from "../../layouts/AdviserLayout";
 import adviserService from "../../services/adviserService";
@@ -16,8 +11,7 @@ import "../../styles/adviser/StudentManagementFaceScanning/studentTransfer.css";
 
 const AUTO_REFRESH_INTERVAL_MS = 30_000;
 
-const TRANSFER_UPDATED_EVENT =
-  "student-transfer-updated";
+const TRANSFER_UPDATED_EVENT = "student-transfer-updated";
 
 const DEFAULT_ROWS_PER_PAGE = 5;
 
@@ -66,20 +60,14 @@ const STATUS_FILTERS = [
    HELPERS
 ========================================================= */
 
-const normalizeArray = (value) =>
-  Array.isArray(value)
-    ? value
-    : [];
+const normalizeArray = (value) => (Array.isArray(value) ? value : []);
 
 const normalizeStatus = (value) =>
   String(value || "")
     .trim()
     .toUpperCase();
 
-const getErrorMessage = (
-  error,
-  fallback,
-) =>
+const getErrorMessage = (error, fallback) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   error?.response?.data?.detail ||
@@ -91,43 +79,29 @@ const formatDateTime = (value) => {
     return "—";
   }
 
-  const parsed =
-    new Date(value);
+  const parsed = new Date(value);
 
-  if (
-    Number.isNaN(
-      parsed.getTime(),
-    )
-  ) {
+  if (Number.isNaN(parsed.getTime())) {
     return String(value);
   }
 
-  return new Intl.DateTimeFormat(
-    "en-PH",
-    {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    },
-  ).format(parsed);
+  return new Intl.DateTimeFormat("en-PH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(parsed);
 };
 
-const getStudentInitial = (
-  name,
-) =>
+const getStudentInitial = (name) =>
   String(name || "S")
     .trim()
     .charAt(0)
     .toUpperCase() || "S";
 
-const getStatusLabel = (
-  status,
-) => {
-  switch (
-    normalizeStatus(status)
-  ) {
+const getStatusLabel = (status) => {
+  switch (normalizeStatus(status)) {
     case "PENDING":
       return "Pending";
 
@@ -141,16 +115,11 @@ const getStatusLabel = (
       return "Cancelled";
 
     default:
-      return (
-        status ||
-        "Unknown"
-      );
+      return status || "Unknown";
   }
 };
 
-const getSearchText = (
-  request,
-) =>
+const getSearchText = (request) =>
   [
     request?.studentName,
     request?.studentNumber,
@@ -169,35 +138,21 @@ const getSearchText = (
    PAGINATION HELPER
 ========================================================= */
 
-const buildPaginationItems = (
-  currentPage,
-  totalPages,
-) => {
+const buildPaginationItems = (currentPage, totalPages) => {
   if (totalPages <= 5) {
     return Array.from(
       {
         length: totalPages,
       },
-      (_, index) =>
-        index + 1,
+      (_, index) => index + 1,
     );
   }
 
   if (currentPage <= 3) {
-    return [
-      1,
-      2,
-      3,
-      4,
-      "RIGHT_ELLIPSIS",
-      totalPages,
-    ];
+    return [1, 2, 3, 4, "RIGHT_ELLIPSIS", totalPages];
   }
 
-  if (
-    currentPage >=
-    totalPages - 2
-  ) {
+  if (currentPage >= totalPages - 2) {
     return [
       1,
       "LEFT_ELLIPSIS",
@@ -223,23 +178,16 @@ const buildPaginationItems = (
    STATUS BADGE
 ========================================================= */
 
-function TransferStatusBadge({
-  status,
-}) {
-  const normalized =
-    normalizeStatus(status);
+function TransferStatusBadge({ status }) {
+  const normalized = normalizeStatus(status);
 
   return (
     <span
       className={`student-transfer-status status-${normalized.toLowerCase()}`}
     >
-      <span
-        aria-hidden="true"
-      />
+      <span aria-hidden="true" />
 
-      {getStatusLabel(
-        normalized,
-      )}
+      {getStatusLabel(normalized)}
     </span>
   );
 }
@@ -248,38 +196,23 @@ function TransferStatusBadge({
    TRANSFER ROUTE
 ========================================================= */
 
-function TransferRoute({
-  request,
-}) {
+function TransferRoute({ request }) {
   return (
     <div className="student-transfer-route">
       <div className="student-transfer-route-section">
-        <small>
-          FROM
-        </small>
+        <small>FROM</small>
 
-        <strong>
-          {request?.sourceSectionName ||
-            "Unknown section"}
-        </strong>
+        <strong>{request?.sourceSectionName || "Unknown section"}</strong>
       </div>
 
-      <div
-        className="student-transfer-route-arrow"
-        aria-hidden="true"
-      >
+      <div className="student-transfer-route-arrow" aria-hidden="true">
         →
       </div>
 
       <div className="student-transfer-route-section is-destination">
-        <small>
-          TO
-        </small>
+        <small>TO</small>
 
-        <strong>
-          {request?.destinationSectionName ||
-            "Unknown section"}
-        </strong>
+        <strong>{request?.destinationSectionName || "Unknown section"}</strong>
       </div>
     </div>
   );
@@ -289,57 +222,39 @@ function TransferRoute({
    EMPTY STATE
 ========================================================= */
 
-function TransferEmptyState({
-  activeTab,
-  hasFilters,
-  onReset,
-}) {
+function TransferEmptyState({ activeTab, hasFilters, onReset }) {
   const content = {
     INCOMING: {
       icon: "↓",
-      title:
-        "No incoming transfer requests",
+      title: "No incoming transfer requests",
       description:
         "Requests from other Advisers to move students into your section will appear here.",
     },
 
     OUTGOING: {
       icon: "↑",
-      title:
-        "No outgoing transfer requests",
+      title: "No outgoing transfer requests",
       description:
         "Transfer requests you create from Student Management will appear here.",
     },
 
     HISTORY: {
       icon: "▤",
-      title:
-        "No transfer history yet",
+      title: "No transfer history yet",
       description:
         "Approved, rejected, and cancelled student transfers will appear here.",
     },
   };
 
-  const current =
-    content[activeTab] ||
-    content.INCOMING;
+  const current = content[activeTab] || content.INCOMING;
 
   return (
     <div className="student-transfer-empty">
-      <span
-        className="student-transfer-empty-icon"
-        aria-hidden="true"
-      >
-        {hasFilters
-          ? "⌕"
-          : current.icon}
+      <span className="student-transfer-empty-icon" aria-hidden="true">
+        {hasFilters ? "⌕" : current.icon}
       </span>
 
-      <h3>
-        {hasFilters
-          ? "No matching transfers"
-          : current.title}
-      </h3>
+      <h3>{hasFilters ? "No matching transfers" : current.title}</h3>
 
       <p>
         {hasFilters
@@ -351,9 +266,7 @@ function TransferEmptyState({
         <button
           type="button"
           className="student-transfer-secondary-button"
-          onClick={
-            onReset
-          }
+          onClick={onReset}
         >
           Reset Filters
         </button>
@@ -366,36 +279,17 @@ function TransferEmptyState({
    TRANSFER REQUEST CARD
 ========================================================= */
 
-function TransferRequestCard({
-  request,
-  activeTab,
-  onOpen,
-}) {
-  const status =
-    normalizeStatus(
-      request?.status,
-    );
+function TransferRequestCard({ request, activeTab, onOpen }) {
+  const status = normalizeStatus(request?.status);
 
-  const pending =
-    status ===
-    "PENDING";
+  const pending = status === "PENDING";
 
-  const isIncoming =
-    activeTab ===
-    "INCOMING";
+  const isIncoming = activeTab === "INCOMING";
 
-  const isOutgoing =
-    activeTab ===
-    "OUTGOING";
+  const isOutgoing = activeTab === "OUTGOING";
 
   return (
-    <article
-      className={`student-transfer-card ${
-        pending
-          ? "is-pending"
-          : ""
-      }`}
-    >
+    <article className={`student-transfer-card ${pending ? "is-pending" : ""}`}>
       <div className="student-transfer-card-main">
         {/* =================================================
             STUDENT
@@ -403,25 +297,15 @@ function TransferRequestCard({
 
         <div className="student-transfer-student">
           <div className="student-transfer-avatar">
-            {getStudentInitial(
-              request?.studentName,
-            )}
+            {getStudentInitial(request?.studentName)}
           </div>
 
           <div className="student-transfer-student-copy">
-            <small>
-              STUDENT
-            </small>
+            <small>STUDENT</small>
 
-            <strong>
-              {request?.studentName ||
-                "Unnamed Student"}
-            </strong>
+            <strong>{request?.studentName || "Unnamed Student"}</strong>
 
-            <span>
-              {request?.studentNumber ||
-                "No student number"}
-            </span>
+            <span>{request?.studentNumber || "No student number"}</span>
           </div>
         </div>
 
@@ -429,27 +313,17 @@ function TransferRequestCard({
             ROUTE
         ================================================= */}
 
-        <TransferRoute
-          request={
-            request
-          }
-        />
+        <TransferRoute request={request} />
 
         {/* =================================================
             STATUS
         ================================================= */}
 
         <div className="student-transfer-card-status">
-          <TransferStatusBadge
-            status={
-              status
-            }
-          />
+          <TransferStatusBadge status={status} />
 
           <span className="student-transfer-card-date">
-            {formatDateTime(
-              request?.createdAt,
-            )}
+            {formatDateTime(request?.createdAt)}
           </span>
         </div>
       </div>
@@ -462,55 +336,37 @@ function TransferRequestCard({
         <div className="student-transfer-meta">
           {isIncoming && (
             <div>
-              <small>
-                REQUESTED BY
-              </small>
+              <small>REQUESTED BY</small>
 
               <strong>
-                {request?.requestedByAdviserName ||
-                  "Source Adviser"}
+                {request?.requestedByAdviserName || "Source Adviser"}
               </strong>
             </div>
           )}
 
           {isOutgoing && (
             <div>
-              <small>
-                DESTINATION ADVISER
-              </small>
+              <small>DESTINATION ADVISER</small>
 
               <strong>
-                {request?.destinationAdviserName ||
-                  "Destination Adviser"}
+                {request?.destinationAdviserName || "Destination Adviser"}
               </strong>
             </div>
           )}
 
-          {activeTab ===
-            "HISTORY" && (
+          {activeTab === "HISTORY" && (
             <>
               <div>
-                <small>
-                  RESULT
-                </small>
+                <small>RESULT</small>
 
-                <strong>
-                  {getStatusLabel(
-                    request?.status,
-                  )}
-                </strong>
+                <strong>{getStatusLabel(request?.status)}</strong>
               </div>
 
               <div>
-                <small>
-                  DIRECTION
-                </small>
+                <small>DIRECTION</small>
 
                 <strong>
-                  {request?.direction ===
-                  "INCOMING"
-                    ? "Incoming"
-                    : "Outgoing"}
+                  {request?.direction === "INCOMING" ? "Incoming" : "Outgoing"}
                 </strong>
               </div>
             </>
@@ -518,15 +374,9 @@ function TransferRequestCard({
 
           {request?.reason && (
             <div className="student-transfer-meta-reason">
-              <small>
-                REASON
-              </small>
+              <small>REASON</small>
 
-              <strong>
-                {
-                  request.reason
-                }
-              </strong>
+              <strong>{request.reason}</strong>
             </div>
           )}
         </div>
@@ -535,22 +385,22 @@ function TransferRequestCard({
           <button
             type="button"
             className={
-              pending &&
-              isIncoming
+              pending && isIncoming
                 ? "student-transfer-primary-button"
                 : "student-transfer-secondary-button"
             }
-            onClick={() =>
-              onOpen(
-                request,
-              )
+            title={
+              pending && isIncoming
+                ? "Review this incoming transfer request"
+                : pending && isOutgoing
+                  ? "View details or cancel this pending request"
+                  : "View the full transfer details"
             }
+            onClick={() => onOpen(request)}
           >
-            {pending &&
-            isIncoming
+            {pending && isIncoming
               ? "Review Request"
-              : pending &&
-                  isOutgoing
+              : pending && isOutgoing
                 ? "View / Cancel"
                 : "View Details"}
           </button>
@@ -569,110 +419,51 @@ function StudentTransfers() {
      DATA
   ======================================================= */
 
-  const [
-    incomingRequests,
-    setIncomingRequests,
-  ] = useState([]);
+  const [incomingRequests, setIncomingRequests] = useState([]);
 
-  const [
-    outgoingRequests,
-    setOutgoingRequests,
-  ] = useState([]);
+  const [outgoingRequests, setOutgoingRequests] = useState([]);
 
   /* =======================================================
      VIEW
   ======================================================= */
 
-  const [
-    activeTab,
-    setActiveTab,
-  ] = useState(
-    "INCOMING",
-  );
+  const [activeTab, setActiveTab] = useState("INCOMING");
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(
-    true,
-  );
+  const [loading, setLoading] = useState(true);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] = useState("");
 
-  const [
-    successMessage,
-    setSuccessMessage,
-  ] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   /* =======================================================
      FILTERS
   ======================================================= */
 
-  const [
-    searchQuery,
-    setSearchQuery,
-  ] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const [
-    statusFilter,
-    setStatusFilter,
-  ] = useState(
-    "ALL",
-  );
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
-  const [
-    historyDirection,
-    setHistoryDirection,
-  ] = useState(
-    "ALL",
-  );
+  const [historyDirection, setHistoryDirection] = useState("ALL");
 
   /* =======================================================
      PAGINATION
   ======================================================= */
 
-  const [
-    rowsPerPage,
-    setRowsPerPage,
-  ] = useState(
-    DEFAULT_ROWS_PER_PAGE,
-  );
+  const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE);
 
-  const [
-    currentPage,
-    setCurrentPage,
-  ] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   /* =======================================================
      MODAL
   ======================================================= */
 
-  const [
-    selectedRequest,
-    setSelectedRequest,
-  ] = useState(
-    null,
-  );
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
-  const [
-    reviewNote,
-    setReviewNote,
-  ] = useState("");
+  const [reviewNote, setReviewNote] = useState("");
 
-  const [
-    actionError,
-    setActionError,
-  ] = useState("");
+  const [actionError, setActionError] = useState("");
 
-  const [
-    actionBusy,
-    setActionBusy,
-  ] = useState(
-    false,
-  );
+  const [actionBusy, setActionBusy] = useState(false);
 
   /* =======================================================
      LOAD DATA
@@ -682,83 +473,56 @@ function StudentTransfers() {
      loading state does not flash every 30 seconds.
   ======================================================= */
 
-  const loadTransfers =
-    useCallback(
-      async ({
-        silent = false,
-      } = {}) => {
-        try {
-          if (!silent) {
-            setLoading(
-              true,
-            );
+  const loadTransfers = useCallback(async ({ silent = false } = {}) => {
+    try {
+      if (!silent) {
+        setLoading(true);
 
-            setError("");
-          }
+        setError("");
+      }
 
-          const [
-            incoming,
-            outgoing,
-          ] =
-            await Promise.all([
-              adviserService.getIncomingStudentTransferRequests(),
-              adviserService.getOutgoingStudentTransferRequests(),
-            ]);
+      const [incoming, outgoing] = await Promise.all([
+        adviserService.getIncomingStudentTransferRequests(),
+        adviserService.getOutgoingStudentTransferRequests(),
+      ]);
 
-          setIncomingRequests(
-            normalizeArray(
-              incoming,
-            ),
-          );
+      setIncomingRequests(normalizeArray(incoming));
 
-          setOutgoingRequests(
-            normalizeArray(
-              outgoing,
-            ),
-          );
+      setOutgoingRequests(normalizeArray(outgoing));
 
-          /*
-           * Successful automatic sync may clear an earlier
-           * initial-load error if one was being displayed.
-           */
-          setError("");
-        } catch (
-          requestError
-        ) {
-          if (silent) {
-            /*
-             * Silent auto-sync failure must not destroy
-             * already visible transfer data.
-             */
-            console.warn(
-              "Automatic transfer synchronization failed:",
-              requestError,
-            );
+      /*
+       * Successful automatic sync may clear an earlier
+       * initial-load error if one was being displayed.
+       */
+      setError("");
+    } catch (requestError) {
+      if (silent) {
+        /*
+         * Silent auto-sync failure must not destroy
+         * already visible transfer data.
+         */
+        console.warn(
+          "Automatic transfer synchronization failed:",
+          requestError,
+        );
 
-            return;
-          }
+        return;
+      }
 
-          console.error(
-            "Unable to load transfer requests:",
-            requestError,
-          );
+      console.error("Unable to load transfer requests:", requestError);
 
-          setError(
-            getErrorMessage(
-              requestError,
-              "Unable to load student transfer requests.",
-            ),
-          );
-        } finally {
-          if (!silent) {
-            setLoading(
-              false,
-            );
-          }
-        }
-      },
-      [],
-    );
+      setError(
+        getErrorMessage(
+          requestError,
+          "Unable to load student transfer requests.",
+        ),
+      );
+    } finally {
+      if (!silent) {
+        setLoading(false);
+      }
+    }
+  }, []);
 
   /* =======================================================
      INITIAL LOAD
@@ -766,9 +530,7 @@ function StudentTransfers() {
 
   useEffect(() => {
     void loadTransfers();
-  }, [
-    loadTransfers,
-  ]);
+  }, [loadTransfers]);
 
   /* =======================================================
      AUTOMATIC SYNCHRONIZATION
@@ -781,118 +543,71 @@ function StudentTransfers() {
   ======================================================= */
 
   useEffect(() => {
-    const synchronize =
-      () => {
-        if (
-          document.visibilityState !==
-          "visible"
-        ) {
-          return;
-        }
+    const synchronize = () => {
+      if (document.visibilityState !== "visible") {
+        return;
+      }
 
-        void loadTransfers({
-          silent: true,
-        });
-      };
+      void loadTransfers({
+        silent: true,
+      });
+    };
 
-    const handleFocus =
-      () => {
+    const handleFocus = () => {
+      synchronize();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
         synchronize();
-      };
+      }
+    };
 
-    const handleVisibilityChange =
-      () => {
-        if (
-          document.visibilityState ===
-          "visible"
-        ) {
-          synchronize();
-        }
-      };
+    const handleTransferUpdated = () => {
+      synchronize();
+    };
 
-    const handleTransferUpdated =
-      () => {
-        synchronize();
-      };
-
-    const intervalId =
-      window.setInterval(
-        synchronize,
-        AUTO_REFRESH_INTERVAL_MS,
-      );
-
-    window.addEventListener(
-      "focus",
-      handleFocus,
+    const intervalId = window.setInterval(
+      synchronize,
+      AUTO_REFRESH_INTERVAL_MS,
     );
 
-    window.addEventListener(
-      TRANSFER_UPDATED_EVENT,
-      handleTransferUpdated,
-    );
+    window.addEventListener("focus", handleFocus);
 
-    document.addEventListener(
-      "visibilitychange",
-      handleVisibilityChange,
-    );
+    window.addEventListener(TRANSFER_UPDATED_EVENT, handleTransferUpdated);
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      window.clearInterval(
-        intervalId,
-      );
+      window.clearInterval(intervalId);
 
-      window.removeEventListener(
-        "focus",
-        handleFocus,
-      );
+      window.removeEventListener("focus", handleFocus);
 
-      window.removeEventListener(
-        TRANSFER_UPDATED_EVENT,
-        handleTransferUpdated,
-      );
+      window.removeEventListener(TRANSFER_UPDATED_EVENT, handleTransferUpdated);
 
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibilityChange,
-      );
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [
-    loadTransfers,
-  ]);
+  }, [loadTransfers]);
 
   /* =======================================================
      COUNTS
   ======================================================= */
 
-  const incomingPendingCount =
-    useMemo(
-      () =>
-        incomingRequests.filter(
-          (request) =>
-            normalizeStatus(
-              request?.status,
-            ) ===
-            "PENDING",
-        ).length,
-      [
-        incomingRequests,
-      ],
-    );
+  const incomingPendingCount = useMemo(
+    () =>
+      incomingRequests.filter(
+        (request) => normalizeStatus(request?.status) === "PENDING",
+      ).length,
+    [incomingRequests],
+  );
 
-  const outgoingPendingCount =
-    useMemo(
-      () =>
-        outgoingRequests.filter(
-          (request) =>
-            normalizeStatus(
-              request?.status,
-            ) ===
-            "PENDING",
-        ).length,
-      [
-        outgoingRequests,
-      ],
-    );
+  const outgoingPendingCount = useMemo(
+    () =>
+      outgoingRequests.filter(
+        (request) => normalizeStatus(request?.status) === "PENDING",
+      ).length,
+    [outgoingRequests],
+  );
 
   /* =======================================================
      HISTORY
@@ -901,313 +616,145 @@ function StudentTransfers() {
      Request ID prevents duplicate entries.
   ======================================================= */
 
-  const historyRequests =
-    useMemo(
-      () => {
-        const byId =
-          new Map();
+  const historyRequests = useMemo(() => {
+    const byId = new Map();
 
-        outgoingRequests.forEach(
-          (request) => {
-            const status =
-              normalizeStatus(
-                request?.status,
-              );
+    outgoingRequests.forEach((request) => {
+      const status = normalizeStatus(request?.status);
 
-            if (
-              status ===
-              "PENDING"
-            ) {
-              return;
-            }
+      if (status === "PENDING") {
+        return;
+      }
 
-            const key =
-              request?.id ||
-              `${request?.studentId}-${request?.createdAt}`;
+      const key = request?.id || `${request?.studentId}-${request?.createdAt}`;
 
-            byId.set(
-              String(key),
-              {
-                ...request,
+      byId.set(String(key), {
+        ...request,
 
-                direction:
-                  "OUTGOING",
-              },
-            );
-          },
-        );
+        direction: "OUTGOING",
+      });
+    });
 
-        incomingRequests.forEach(
-          (request) => {
-            const status =
-              normalizeStatus(
-                request?.status,
-              );
+    incomingRequests.forEach((request) => {
+      const status = normalizeStatus(request?.status);
 
-            if (
-              status ===
-              "PENDING"
-            ) {
-              return;
-            }
+      if (status === "PENDING") {
+        return;
+      }
 
-            const key =
-              request?.id ||
-              `${request?.studentId}-${request?.createdAt}`;
+      const key = request?.id || `${request?.studentId}-${request?.createdAt}`;
 
-            const normalizedKey =
-              String(key);
+      const normalizedKey = String(key);
 
-            if (
-              !byId.has(
-                normalizedKey,
-              )
-            ) {
-              byId.set(
-                normalizedKey,
-                {
-                  ...request,
+      if (!byId.has(normalizedKey)) {
+        byId.set(normalizedKey, {
+          ...request,
 
-                  direction:
-                    "INCOMING",
-                },
-              );
-            }
-          },
-        );
+          direction: "INCOMING",
+        });
+      }
+    });
 
-        return Array.from(
-          byId.values(),
-        ).sort(
-          (
-            first,
-            second,
-          ) =>
-            new Date(
-              second?.reviewedAt ||
-                second?.createdAt ||
-                0,
-            ).getTime() -
-            new Date(
-              first?.reviewedAt ||
-                first?.createdAt ||
-                0,
-            ).getTime(),
-        );
-      },
-      [
-        incomingRequests,
-        outgoingRequests,
-      ],
+    return Array.from(byId.values()).sort(
+      (first, second) =>
+        new Date(second?.reviewedAt || second?.createdAt || 0).getTime() -
+        new Date(first?.reviewedAt || first?.createdAt || 0).getTime(),
     );
+  }, [incomingRequests, outgoingRequests]);
 
-  const completedCount =
-    historyRequests.length;
+  const completedCount = historyRequests.length;
 
   /* =======================================================
      CURRENT TAB DATA
   ======================================================= */
 
-  const currentRequests =
-    useMemo(
-      () => {
-        if (
-          activeTab ===
-          "INCOMING"
-        ) {
-          return [
-            ...incomingRequests,
-          ];
-        }
+  const currentRequests = useMemo(() => {
+    if (activeTab === "INCOMING") {
+      return [...incomingRequests];
+    }
 
-        if (
-          activeTab ===
-          "OUTGOING"
-        ) {
-          return [
-            ...outgoingRequests,
-          ];
-        }
+    if (activeTab === "OUTGOING") {
+      return [...outgoingRequests];
+    }
 
-        return [
-          ...historyRequests,
-        ];
-      },
-      [
-        activeTab,
-        incomingRequests,
-        outgoingRequests,
-        historyRequests,
-      ],
-    );
+    return [...historyRequests];
+  }, [activeTab, incomingRequests, outgoingRequests, historyRequests]);
 
   /* =======================================================
      FILTERING
   ======================================================= */
 
-  const filteredRequests =
-    useMemo(
-      () => {
-        const query =
-          searchQuery
-            .trim()
-            .toLowerCase();
+  const filteredRequests = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
 
-        return currentRequests
-          .filter(
-            (request) => {
-              const status =
-                normalizeStatus(
-                  request?.status,
-                );
+    return currentRequests
+      .filter((request) => {
+        const status = normalizeStatus(request?.status);
 
-              const matchesSearch =
-                !query ||
-                getSearchText(
-                  request,
-                ).includes(
-                  query,
-                );
+        const matchesSearch = !query || getSearchText(request).includes(query);
 
-              const matchesStatus =
-                statusFilter ===
-                  "ALL" ||
-                status ===
-                  statusFilter;
+        const matchesStatus = statusFilter === "ALL" || status === statusFilter;
 
-              const matchesDirection =
-                activeTab !==
-                  "HISTORY" ||
-                historyDirection ===
-                  "ALL" ||
-                request?.direction ===
-                  historyDirection;
+        const matchesDirection =
+          activeTab !== "HISTORY" ||
+          historyDirection === "ALL" ||
+          request?.direction === historyDirection;
 
-              return (
-                matchesSearch &&
-                matchesStatus &&
-                matchesDirection
-              );
-            },
-          )
-          .sort(
-            (
-              first,
-              second,
-            ) => {
-              const firstPending =
-                normalizeStatus(
-                  first?.status,
-                ) ===
-                "PENDING";
+        return matchesSearch && matchesStatus && matchesDirection;
+      })
+      .sort((first, second) => {
+        const firstPending = normalizeStatus(first?.status) === "PENDING";
 
-              const secondPending =
-                normalizeStatus(
-                  second?.status,
-                ) ===
-                "PENDING";
+        const secondPending = normalizeStatus(second?.status) === "PENDING";
 
-              /*
-               * Pending first.
-               */
-              if (
-                firstPending !==
-                secondPending
-              ) {
-                return firstPending
-                  ? -1
-                  : 1;
-              }
+        /*
+         * Pending first.
+         */
+        if (firstPending !== secondPending) {
+          return firstPending ? -1 : 1;
+        }
 
-              return (
-                new Date(
-                  second?.createdAt ||
-                    0,
-                ).getTime() -
-                new Date(
-                  first?.createdAt ||
-                    0,
-                ).getTime()
-              );
-            },
-          );
-      },
-      [
-        currentRequests,
-        searchQuery,
-        statusFilter,
-        activeTab,
-        historyDirection,
-      ],
-    );
+        return (
+          new Date(second?.createdAt || 0).getTime() -
+          new Date(first?.createdAt || 0).getTime()
+        );
+      });
+  }, [currentRequests, searchQuery, statusFilter, activeTab, historyDirection]);
 
   const hasFilters =
-    Boolean(
-      searchQuery.trim(),
-    ) ||
-    statusFilter !==
-      "ALL" ||
-    (activeTab ===
-      "HISTORY" &&
-      historyDirection !==
-        "ALL");
+    Boolean(searchQuery.trim()) ||
+    statusFilter !== "ALL" ||
+    (activeTab === "HISTORY" && historyDirection !== "ALL");
 
   /* =======================================================
      PAGINATION CALCULATIONS
   ======================================================= */
 
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        filteredRequests.length /
-          rowsPerPage,
-      ),
-    );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredRequests.length / rowsPerPage),
+  );
 
-  const safePage =
-    Math.min(
-      currentPage,
-      totalPages,
-    );
+  const safePage = Math.min(currentPage, totalPages);
 
-  const pageStartIndex =
-    (safePage - 1) *
-    rowsPerPage;
+  const pageStartIndex = (safePage - 1) * rowsPerPage;
 
-  const paginatedRequests =
-    filteredRequests.slice(
-      pageStartIndex,
-      pageStartIndex +
-        rowsPerPage,
-    );
+  const paginatedRequests = filteredRequests.slice(
+    pageStartIndex,
+    pageStartIndex + rowsPerPage,
+  );
 
-  const visibleStart =
-    filteredRequests.length >
-    0
-      ? pageStartIndex +
-        1
-      : 0;
+  const visibleStart = filteredRequests.length > 0 ? pageStartIndex + 1 : 0;
 
-  const visibleEnd =
-    Math.min(
-      pageStartIndex +
-        rowsPerPage,
-      filteredRequests.length,
-    );
+  const visibleEnd = Math.min(
+    pageStartIndex + rowsPerPage,
+    filteredRequests.length,
+  );
 
-  const paginationItems =
-    useMemo(
-      () =>
-        buildPaginationItems(
-          safePage,
-          totalPages,
-        ),
-      [
-        safePage,
-        totalPages,
-      ],
-    );
+  const paginationItems = useMemo(
+    () => buildPaginationItems(safePage, totalPages),
+    [safePage, totalPages],
+  );
 
   /* =======================================================
      RESET PAGE WHEN VIEW CHANGES
@@ -1215,13 +762,7 @@ function StudentTransfers() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [
-    activeTab,
-    searchQuery,
-    statusFilter,
-    historyDirection,
-    rowsPerPage,
-  ]);
+  }, [activeTab, searchQuery, statusFilter, historyDirection, rowsPerPage]);
 
   /* =======================================================
      PROTECT AGAINST PAGE BECOMING INVALID
@@ -1229,96 +770,67 @@ function StudentTransfers() {
   ======================================================= */
 
   useEffect(() => {
-    if (
-      currentPage >
-      totalPages
-    ) {
-      setCurrentPage(
-        totalPages,
-      );
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
     }
-  }, [
-    currentPage,
-    totalPages,
-  ]);
+  }, [currentPage, totalPages]);
 
   /* =======================================================
      RESET FILTERS
   ======================================================= */
 
-  const resetFilters =
-    () => {
-      setSearchQuery("");
-      setStatusFilter(
-        "ALL",
-      );
-      setHistoryDirection(
-        "ALL",
-      );
-      setCurrentPage(1);
-    };
+  const resetFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("ALL");
+    setHistoryDirection("ALL");
+    setCurrentPage(1);
+  };
 
   /* =======================================================
      CHANGE TAB
   ======================================================= */
 
-  const handleTabChange =
-    (tab) => {
-      setActiveTab(tab);
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
 
-      setSearchQuery("");
+    setSearchQuery("");
 
-      setStatusFilter(
-        "ALL",
-      );
+    setStatusFilter("ALL");
 
-      setHistoryDirection(
-        "ALL",
-      );
+    setHistoryDirection("ALL");
 
-      setCurrentPage(1);
-    };
+    setCurrentPage(1);
+  };
 
   /* =======================================================
      OPEN REQUEST
   ======================================================= */
 
-  const openRequest =
-    (request) => {
-      setSelectedRequest(
-        request,
-      );
+  const openRequest = (request) => {
+    setSelectedRequest(request);
 
-      setReviewNote(
-        request?.reviewNote ||
-          "",
-      );
+    setReviewNote(request?.reviewNote || "");
 
-      setActionError("");
+    setActionError("");
 
-      setSuccessMessage("");
-    };
+    setSuccessMessage("");
+  };
 
   /* =======================================================
      CLOSE REQUEST
   ======================================================= */
 
-  const closeRequest =
-    () => {
-      if (
-        actionBusy
-      ) {
-        return;
-      }
+  const closeRequest = () => {
+    if (actionBusy) {
+      return;
+    }
 
-      setSelectedRequest(
-        null,
-      );
+    setSelectedRequest(null);
 
-      setReviewNote("");
+    setReviewNote("");
 
-      setActionError("");
-    };
+    setActionError("");
+  };
 
   /* =======================================================
      NOTIFY OTHER UI PARTS THAT TRANSFER DATA CHANGED
@@ -1327,301 +839,214 @@ function StudentTransfers() {
      pending count can refresh immediately.
   ======================================================= */
 
-  const announceTransferUpdated =
-    () => {
-      window.dispatchEvent(
-        new Event(
-          TRANSFER_UPDATED_EVENT,
-        ),
-      );
-    };
+  const announceTransferUpdated = () => {
+    window.dispatchEvent(new Event(TRANSFER_UPDATED_EVENT));
+  };
 
   /* =======================================================
      APPROVE
   ======================================================= */
 
-  const handleApprove =
-    async () => {
-      if (
-        !selectedRequest?.id
-      ) {
-        return;
-      }
+  const handleApprove = async () => {
+    if (!selectedRequest?.id) {
+      return;
+    }
 
-      try {
-        setActionBusy(
-          true,
+    try {
+      setActionBusy(true);
+
+      setActionError("");
+
+      await adviserService.approveStudentTransferRequest(
+        selectedRequest.id,
+        reviewNote.trim() || null,
+      );
+
+      const studentName = selectedRequest?.studentName || "Student";
+
+      const destination =
+        selectedRequest?.destinationSectionName || "the destination section";
+
+      setSelectedRequest(null);
+
+      setReviewNote("");
+
+      setSuccessMessage(
+        `${studentName}'s transfer to ${destination} was approved successfully.`,
+      );
+
+      /*
+       * Reload this page immediately.
+       */
+      await loadTransfers({
+        silent: true,
+      });
+
+      /*
+       * Tell layout/sidebar to refresh its pending count.
+       */
+      announceTransferUpdated();
+    } catch (requestError) {
+      console.error("Unable to approve transfer request:", requestError);
+
+      if (requestError?.response?.status === 409) {
+        setActionError(
+          "This transfer request is no longer pending. The latest transfer status is being synchronized.",
         );
 
-        setActionError("");
-
-        await adviserService.approveStudentTransferRequest(
-          selectedRequest.id,
-          reviewNote.trim() ||
-            null,
-        );
-
-        const studentName =
-          selectedRequest?.studentName ||
-          "Student";
-
-        const destination =
-          selectedRequest?.destinationSectionName ||
-          "the destination section";
-
-        setSelectedRequest(
-          null,
-        );
-
-        setReviewNote("");
-
-        setSuccessMessage(
-          `${studentName}'s transfer to ${destination} was approved successfully.`,
-        );
-
-        /*
-         * Reload this page immediately.
-         */
-        await loadTransfers({
+        void loadTransfers({
           silent: true,
         });
 
-        /*
-         * Tell layout/sidebar to refresh its pending count.
-         */
-        announceTransferUpdated();
-      } catch (
-        requestError
-      ) {
-        console.error(
-          "Unable to approve transfer request:",
-          requestError,
-        );
-
-        if (
-          requestError?.response
-            ?.status ===
-          409
-        ) {
-          setActionError(
-            "This transfer request is no longer pending. The latest transfer status is being synchronized.",
-          );
-
-          void loadTransfers({
-            silent: true,
-          });
-
-          return;
-        }
-
-        setActionError(
-          getErrorMessage(
-            requestError,
-            "Unable to approve this transfer request.",
-          ),
-        );
-      } finally {
-        setActionBusy(
-          false,
-        );
+        return;
       }
-    };
+
+      setActionError(
+        getErrorMessage(
+          requestError,
+          "Unable to approve this transfer request.",
+        ),
+      );
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   /* =======================================================
      REJECT
   ======================================================= */
 
-  const handleReject =
-    async () => {
-      if (
-        !selectedRequest?.id
-      ) {
-        return;
-      }
+  const handleReject = async () => {
+    if (!selectedRequest?.id) {
+      return;
+    }
 
-      try {
-        setActionBusy(
-          true,
+    try {
+      setActionBusy(true);
+
+      setActionError("");
+
+      await adviserService.rejectStudentTransferRequest(
+        selectedRequest.id,
+        reviewNote.trim() || null,
+      );
+
+      const studentName = selectedRequest?.studentName || "Student";
+
+      setSelectedRequest(null);
+
+      setReviewNote("");
+
+      setSuccessMessage(
+        `${studentName}'s transfer request was rejected. The student remains in the original section.`,
+      );
+
+      await loadTransfers({
+        silent: true,
+      });
+
+      announceTransferUpdated();
+    } catch (requestError) {
+      console.error("Unable to reject transfer request:", requestError);
+
+      if (requestError?.response?.status === 409) {
+        setActionError(
+          "This transfer request is no longer pending. The latest transfer status is being synchronized.",
         );
 
-        setActionError("");
-
-        await adviserService.rejectStudentTransferRequest(
-          selectedRequest.id,
-          reviewNote.trim() ||
-            null,
-        );
-
-        const studentName =
-          selectedRequest?.studentName ||
-          "Student";
-
-        setSelectedRequest(
-          null,
-        );
-
-        setReviewNote("");
-
-        setSuccessMessage(
-          `${studentName}'s transfer request was rejected. The student remains in the original section.`,
-        );
-
-        await loadTransfers({
+        void loadTransfers({
           silent: true,
         });
 
-        announceTransferUpdated();
-      } catch (
-        requestError
-      ) {
-        console.error(
-          "Unable to reject transfer request:",
-          requestError,
-        );
-
-        if (
-          requestError?.response
-            ?.status ===
-          409
-        ) {
-          setActionError(
-            "This transfer request is no longer pending. The latest transfer status is being synchronized.",
-          );
-
-          void loadTransfers({
-            silent: true,
-          });
-
-          return;
-        }
-
-        setActionError(
-          getErrorMessage(
-            requestError,
-            "Unable to reject this transfer request.",
-          ),
-        );
-      } finally {
-        setActionBusy(
-          false,
-        );
+        return;
       }
-    };
+
+      setActionError(
+        getErrorMessage(
+          requestError,
+          "Unable to reject this transfer request.",
+        ),
+      );
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   /* =======================================================
      CANCEL
   ======================================================= */
 
-  const handleCancel =
-    async () => {
-      if (
-        !selectedRequest?.id
-      ) {
-        return;
-      }
+  const handleCancel = async () => {
+    if (!selectedRequest?.id) {
+      return;
+    }
 
-      try {
-        setActionBusy(
-          true,
+    try {
+      setActionBusy(true);
+
+      setActionError("");
+
+      await adviserService.cancelStudentTransferRequest(selectedRequest.id);
+
+      const studentName = selectedRequest?.studentName || "Student";
+
+      setSelectedRequest(null);
+
+      setReviewNote("");
+
+      setSuccessMessage(
+        `${studentName}'s pending transfer was cancelled successfully. The student is active in the original section again.`,
+      );
+
+      await loadTransfers({
+        silent: true,
+      });
+
+      announceTransferUpdated();
+    } catch (requestError) {
+      console.error("Unable to cancel transfer request:", requestError);
+
+      if (requestError?.response?.status === 409) {
+        setActionError(
+          "This request was already approved, rejected, or cancelled and can no longer be cancelled.",
         );
 
-        setActionError("");
-
-        await adviserService.cancelStudentTransferRequest(
-          selectedRequest.id,
-        );
-
-        const studentName =
-          selectedRequest?.studentName ||
-          "Student";
-
-        setSelectedRequest(
-          null,
-        );
-
-        setReviewNote("");
-
-        setSuccessMessage(
-          `${studentName}'s pending transfer was cancelled successfully. The student is active in the original section again.`,
-        );
-
-        await loadTransfers({
+        void loadTransfers({
           silent: true,
         });
 
-        announceTransferUpdated();
-      } catch (
-        requestError
-      ) {
-        console.error(
-          "Unable to cancel transfer request:",
-          requestError,
-        );
-
-        if (
-          requestError?.response
-            ?.status ===
-          409
-        ) {
-          setActionError(
-            "This request was already approved, rejected, or cancelled and can no longer be cancelled.",
-          );
-
-          void loadTransfers({
-            silent: true,
-          });
-
-          return;
-        }
-
-        setActionError(
-          getErrorMessage(
-            requestError,
-            "Unable to cancel this transfer request.",
-          ),
-        );
-      } finally {
-        setActionBusy(
-          false,
-        );
+        return;
       }
-    };
+
+      setActionError(
+        getErrorMessage(
+          requestError,
+          "Unable to cancel this transfer request.",
+        ),
+      );
+    } finally {
+      setActionBusy(false);
+    }
+  };
 
   /* =======================================================
      SELECTED REQUEST STATE
   ======================================================= */
 
-  const selectedStatus =
-    normalizeStatus(
-      selectedRequest?.status,
-    );
+  const selectedStatus = normalizeStatus(selectedRequest?.status);
 
-  const selectedPending =
-    selectedStatus ===
-    "PENDING";
+  const selectedPending = selectedStatus === "PENDING";
 
   const selectedIncoming =
     selectedRequest &&
     incomingRequests.some(
-      (request) =>
-        String(
-          request?.id,
-        ) ===
-        String(
-          selectedRequest?.id,
-        ),
+      (request) => String(request?.id) === String(selectedRequest?.id),
     );
 
   const selectedOutgoing =
     selectedRequest &&
     outgoingRequests.some(
-      (request) =>
-        String(
-          request?.id,
-        ) ===
-        String(
-          selectedRequest?.id,
-        ),
+      (request) => String(request?.id) === String(selectedRequest?.id),
     );
 
   /* =======================================================
@@ -1640,68 +1065,35 @@ function StudentTransfers() {
         ================================================= */}
 
         {error && (
-          <div
-            className="student-transfer-alert is-error"
-            role="alert"
-          >
-            <span
-              aria-hidden="true"
-            >
-              !
-            </span>
+          <div className="student-transfer-alert is-error" role="alert">
+            <span aria-hidden="true">!</span>
 
             <div>
-              <strong>
-                Transfer data unavailable
-              </strong>
+              <strong>Transfer data unavailable</strong>
 
-              <p>
-                {error}
-              </p>
+              <p>{error}</p>
             </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                void loadTransfers()
-              }
-            >
+            <button type="button" onClick={() => void loadTransfers()}>
               Retry
             </button>
           </div>
         )}
 
         {successMessage && (
-          <div
-            className="student-transfer-alert is-success"
-            role="status"
-          >
-            <span
-              aria-hidden="true"
-            >
-              ✓
-            </span>
+          <div className="student-transfer-alert is-success" role="status">
+            <span aria-hidden="true">✓</span>
 
             <div>
-              <strong>
-                Transfer updated
-              </strong>
+              <strong>Transfer updated</strong>
 
-              <p>
-                {
-                  successMessage
-                }
-              </p>
+              <p>{successMessage}</p>
             </div>
 
             <button
               type="button"
               aria-label="Dismiss message"
-              onClick={() =>
-                setSuccessMessage(
-                  "",
-                )
-              }
+              onClick={() => setSuccessMessage("")}
             >
               ×
             </button>
@@ -1714,106 +1106,51 @@ function StudentTransfers() {
 
         <section className="student-transfer-overview">
           <div className="student-transfer-overview-copy">
-            <span>
-              TRANSFER CENTER
-            </span>
+            <span>TRANSFER CENTER</span>
 
-            <h2>
-              Student Transfers
-            </h2>
+            <h2>Student Transfers</h2>
 
             <p>
-              Manage student movement between sections without losing
-              face identity or attendance history.
+              Manage student movement between sections without losing face
+              identity or attendance history.
             </p>
           </div>
 
           <div className="student-transfer-overview-stats">
             <button
               type="button"
-              className={
-                activeTab ===
-                "INCOMING"
-                  ? "is-active"
-                  : ""
-              }
-              onClick={() =>
-                handleTabChange(
-                  "INCOMING",
-                )
-              }
+              className={activeTab === "INCOMING" ? "is-active" : ""}
+              onClick={() => handleTabChange("INCOMING")}
             >
-              <span>
-                INCOMING PENDING
-              </span>
+              <span>INCOMING PENDING</span>
 
-              <strong>
-                {loading
-                  ? "—"
-                  : incomingPendingCount}
-              </strong>
+              <strong>{loading ? "—" : incomingPendingCount}</strong>
 
-              <small>
-                Awaiting your review
-              </small>
+              <small>Awaiting your review</small>
             </button>
 
             <button
               type="button"
-              className={
-                activeTab ===
-                "OUTGOING"
-                  ? "is-active"
-                  : ""
-              }
-              onClick={() =>
-                handleTabChange(
-                  "OUTGOING",
-                )
-              }
+              className={activeTab === "OUTGOING" ? "is-active" : ""}
+              onClick={() => handleTabChange("OUTGOING")}
             >
-              <span>
-                OUTGOING PENDING
-              </span>
+              <span>OUTGOING PENDING</span>
 
-              <strong>
-                {loading
-                  ? "—"
-                  : outgoingPendingCount}
-              </strong>
+              <strong>{loading ? "—" : outgoingPendingCount}</strong>
 
-              <small>
-                Awaiting destination
-              </small>
+              <small>Awaiting destination</small>
             </button>
 
             <button
               type="button"
-              className={
-                activeTab ===
-                "HISTORY"
-                  ? "is-active"
-                  : ""
-              }
-              onClick={() =>
-                handleTabChange(
-                  "HISTORY",
-                )
-              }
+              className={activeTab === "HISTORY" ? "is-active" : ""}
+              onClick={() => handleTabChange("HISTORY")}
             >
-              <span>
-                HISTORY
-              </span>
+              <span>HISTORY</span>
 
-              <strong>
-                {loading
-                  ? "—"
-                  : completedCount}
-              </strong>
+              <strong>{loading ? "—" : completedCount}</strong>
 
-              <small>
-                Resolved requests
-              </small>
+              <small>Resolved requests</small>
             </button>
           </div>
         </section>
@@ -1825,18 +1162,26 @@ function StudentTransfers() {
         <section className="student-transfer-panel">
           <header className="student-transfer-panel-header">
             <div>
-              <span>
-                TRANSFER WORKSPACE
-              </span>
+              <span>TRANSFER WORKSPACE</span>
 
-              <h2>
-                Manage Requests
-              </h2>
+              <h2>Manage Requests</h2>
 
               <p>
-                Pending transfers are temporarily excluded from attendance
-                until resolved.
+                Pending transfers are temporarily excluded from attendance until
+                resolved.
               </p>
+
+              <div className="student-transfer-workspace-state">
+                <span aria-hidden="true" />
+
+                <strong>
+                  {activeTab === "INCOMING"
+                    ? "Reviewing incoming requests"
+                    : activeTab === "OUTGOING"
+                      ? "Tracking outgoing requests"
+                      : "Viewing transfer history"}
+                </strong>
+              </div>
             </div>
 
             {/* =============================================
@@ -1847,18 +1192,12 @@ function StudentTransfers() {
               className="student-transfer-auto-sync"
               title="Transfer data automatically synchronizes every 30 seconds"
             >
-              <span
-                aria-hidden="true"
-              />
+              <span aria-hidden="true" />
 
               <div>
-                <strong>
-                  Auto sync
-                </strong>
+                <strong>Auto sync</strong>
 
-                <small>
-                  Every 30 seconds
-                </small>
+                <small>Every 30 seconds</small>
               </div>
             </div>
           </header>
@@ -1868,74 +1207,38 @@ function StudentTransfers() {
           ================================================= */}
 
           <div className="student-transfer-tabs">
-            {TAB_ITEMS.map(
-              (tab) => {
-                const active =
-                  activeTab ===
-                  tab.key;
+            {TAB_ITEMS.map((tab) => {
+              const active = activeTab === tab.key;
 
-                let count = 0;
+              let count = 0;
 
-                if (
-                  tab.key ===
-                  "INCOMING"
-                ) {
-                  count =
-                    incomingPendingCount;
-                }
+              if (tab.key === "INCOMING") {
+                count = incomingPendingCount;
+              }
 
-                if (
-                  tab.key ===
-                  "OUTGOING"
-                ) {
-                  count =
-                    outgoingPendingCount;
-                }
+              if (tab.key === "OUTGOING") {
+                count = outgoingPendingCount;
+              }
 
-                if (
-                  tab.key ===
-                  "HISTORY"
-                ) {
-                  count =
-                    completedCount;
-                }
+              if (tab.key === "HISTORY") {
+                count = completedCount;
+              }
 
-                return (
-                  <button
-                    key={
-                      tab.key
-                    }
-                    type="button"
-                    className={
-                      active
-                        ? "is-active"
-                        : ""
-                    }
-                    onClick={() =>
-                      handleTabChange(
-                        tab.key,
-                      )
-                    }
-                  >
-                    <span>
-                      {
-                        tab.label
-                      }
-                    </span>
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  className={active ? "is-active" : ""}
+                  onClick={() => handleTabChange(tab.key)}
+                >
+                  <span>{tab.label}</span>
 
-                    <small>
-                      {
-                        tab.description
-                      }
-                    </small>
+                  <small>{tab.description}</small>
 
-                    <strong>
-                      {count}
-                    </strong>
-                  </button>
-                );
-              },
-            )}
+                  <strong>{count}</strong>
+                </button>
+              );
+            })}
           </div>
 
           {/* =================================================
@@ -1944,37 +1247,20 @@ function StudentTransfers() {
 
           <div className="student-transfer-toolbar">
             <label className="student-transfer-search">
-              <span
-                aria-hidden="true"
-              >
-                ⌕
-              </span>
+              <span aria-hidden="true">⌕</span>
 
               <input
                 type="search"
                 placeholder="Search student, section, adviser..."
-                value={
-                  searchQuery
-                }
-                onChange={(
-                  event,
-                ) =>
-                  setSearchQuery(
-                    event.target
-                      .value,
-                  )
-                }
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
               />
 
               {searchQuery && (
                 <button
                   type="button"
                   aria-label="Clear search"
-                  onClick={() =>
-                    setSearchQuery(
-                      "",
-                    )
-                  }
+                  onClick={() => setSearchQuery("")}
                 >
                   ×
                 </button>
@@ -1987,41 +1273,17 @@ function StudentTransfers() {
               ============================================ */}
 
               <label>
-                <span>
-                  Status
-                </span>
+                <span>Status</span>
 
                 <select
-                  value={
-                    statusFilter
-                  }
-                  onChange={(
-                    event,
-                  ) =>
-                    setStatusFilter(
-                      event.target
-                        .value,
-                    )
-                  }
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value)}
                 >
-                  {STATUS_FILTERS.map(
-                    (
-                      option,
-                    ) => (
-                      <option
-                        key={
-                          option.value
-                        }
-                        value={
-                          option.value
-                        }
-                      >
-                        {
-                          option.label
-                        }
-                      </option>
-                    ),
-                  )}
+                  {STATUS_FILTERS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </label>
 
@@ -2029,37 +1291,21 @@ function StudentTransfers() {
                   HISTORY DIRECTION
               ============================================ */}
 
-              {activeTab ===
-                "HISTORY" && (
+              {activeTab === "HISTORY" && (
                 <label>
-                  <span>
-                    Direction
-                  </span>
+                  <span>Direction</span>
 
                   <select
-                    value={
-                      historyDirection
-                    }
-                    onChange={(
-                      event,
-                    ) =>
-                      setHistoryDirection(
-                        event.target
-                          .value,
-                      )
+                    value={historyDirection}
+                    onChange={(event) =>
+                      setHistoryDirection(event.target.value)
                     }
                   >
-                    <option value="ALL">
-                      All directions
-                    </option>
+                    <option value="ALL">All directions</option>
 
-                    <option value="INCOMING">
-                      Incoming
-                    </option>
+                    <option value="INCOMING">Incoming</option>
 
-                    <option value="OUTGOING">
-                      Outgoing
-                    </option>
+                    <option value="OUTGOING">Outgoing</option>
                   </select>
                 </label>
               )}
@@ -2069,52 +1315,35 @@ function StudentTransfers() {
               ============================================ */}
 
               <label>
-                <span>
-                  Rows
-                </span>
+                <span>Rows</span>
 
                 <select
-                  value={
-                    rowsPerPage
-                  }
-                  onChange={(
-                    event,
-                  ) =>
-                    setRowsPerPage(
-                      Number(
-                        event.target
-                          .value,
-                      ),
-                    )
+                  value={rowsPerPage}
+                  onChange={(event) =>
+                    setRowsPerPage(Number(event.target.value))
                   }
                 >
-                  <option value={5}>
-                    5 per page
-                  </option>
+                  <option value={5}>5 per page</option>
 
-                  <option value={10}>
-                    10 per page
-                  </option>
+                  <option value={10}>10 per page</option>
 
-                  <option value={20}>
-                    20 per page
-                  </option>
+                  <option value={20}>20 per page</option>
                 </select>
               </label>
 
-              <span className="student-transfer-result-count">
-                <strong>
-                  {
-                    filteredRequests.length
-                  }
-                </strong>
+              {hasFilters && (
+                <button
+                  type="button"
+                  className="student-transfer-toolbar-reset"
+                  onClick={resetFilters}
+                >
+                  Reset filters
+                </button>
+              )}
 
-                {" "}
-                request
-                {filteredRequests.length ===
-                1
-                  ? ""
-                  : "s"}
+              <span className="student-transfer-result-count">
+                <strong>{filteredRequests.length}</strong> request
+                {filteredRequests.length === 1 ? "" : "s"}
               </span>
             </div>
           </div>
@@ -2126,52 +1355,58 @@ function StudentTransfers() {
           <div className="student-transfer-list">
             {loading ? (
               <div className="student-transfer-loading">
-                <span className="student-transfer-spinner" />
+                <div className="student-transfer-loading-heading">
+                  <span className="student-transfer-spinner" />
 
-                <strong>
-                  Loading transfers...
-                </strong>
+                  <div>
+                    <strong>Loading transfers...</strong>
 
-                <p>
-                  Retrieving student transfer requests.
-                </p>
+                    <p>Retrieving the latest student transfer requests.</p>
+                  </div>
+                </div>
+
+                <div
+                  className="student-transfer-skeleton-list"
+                  aria-hidden="true"
+                >
+                  {[0, 1, 2].map((item) => (
+                    <div className="student-transfer-skeleton-card" key={item}>
+                      <span className="student-transfer-skeleton-avatar" />
+
+                      <div className="student-transfer-skeleton-copy">
+                        <span />
+                        <span />
+                      </div>
+
+                      <div className="student-transfer-skeleton-route">
+                        <span />
+                        <i />
+                        <span />
+                      </div>
+
+                      <span className="student-transfer-skeleton-status" />
+                    </div>
+                  ))}
+                </div>
               </div>
-            ) : filteredRequests.length ===
-              0 ? (
+            ) : filteredRequests.length === 0 ? (
               <TransferEmptyState
-                activeTab={
-                  activeTab
-                }
-                hasFilters={
-                  hasFilters
-                }
-                onReset={
-                  resetFilters
-                }
+                activeTab={activeTab}
+                hasFilters={hasFilters}
+                onReset={resetFilters}
               />
             ) : (
-              paginatedRequests.map(
-                (
-                  request,
-                  index,
-                ) => (
-                  <TransferRequestCard
-                    key={
-                      request?.id ||
-                      `${request?.studentId}-${pageStartIndex + index}`
-                    }
-                    request={
-                      request
-                    }
-                    activeTab={
-                      activeTab
-                    }
-                    onOpen={
-                      openRequest
-                    }
-                  />
-                ),
-              )
+              paginatedRequests.map((request, index) => (
+                <TransferRequestCard
+                  key={
+                    request?.id ||
+                    `${request?.studentId}-${pageStartIndex + index}`
+                  }
+                  request={request}
+                  activeTab={activeTab}
+                  onOpen={openRequest}
+                />
+              ))
             )}
           </div>
 
@@ -2179,151 +1414,83 @@ function StudentTransfers() {
               PAGINATION
           ================================================= */}
 
-          {!loading &&
-            filteredRequests.length >
-              0 && (
-              <footer className="student-transfer-pagination">
-                <div className="student-transfer-pagination-summary">
-                  Showing{" "}
-                  <strong>
-                    {visibleStart}–
-                    {visibleEnd}
-                  </strong>{" "}
-                  of{" "}
-                  <strong>
-                    {
-                      filteredRequests.length
+          {!loading && filteredRequests.length > 0 && (
+            <footer className="student-transfer-pagination">
+              <div className="student-transfer-pagination-summary">
+                Showing{" "}
+                <strong>
+                  {visibleStart}–{visibleEnd}
+                </strong>{" "}
+                of <strong>{filteredRequests.length}</strong> request
+                {filteredRequests.length === 1 ? "" : "s"}
+              </div>
+
+              <nav
+                className="student-transfer-pagination-controls"
+                aria-label="Transfer requests pagination"
+              >
+                <button
+                  type="button"
+                  className="student-transfer-pagination-nav"
+                  disabled={safePage === 1}
+                  onClick={() =>
+                    setCurrentPage((page) => Math.max(1, page - 1))
+                  }
+                >
+                  <span aria-hidden="true">‹</span>
+
+                  <span className="student-transfer-pagination-nav-label">
+                    Previous
+                  </span>
+                </button>
+
+                <div className="student-transfer-pagination-pages">
+                  {paginationItems.map((item, index) => {
+                    if (typeof item === "string") {
+                      return (
+                        <span
+                          key={`${item}-${index}`}
+                          className="student-transfer-pagination-ellipsis"
+                          aria-hidden="true"
+                        >
+                          …
+                        </span>
+                      );
                     }
-                  </strong>{" "}
-                  request
-                  {filteredRequests.length ===
-                  1
-                    ? ""
-                    : "s"}
+
+                    return (
+                      <button
+                        key={item}
+                        type="button"
+                        className={`student-transfer-pagination-page ${
+                          safePage === item ? "is-active" : ""
+                        }`}
+                        aria-current={safePage === item ? "page" : undefined}
+                        onClick={() => setCurrentPage(item)}
+                      >
+                        {item}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <nav
-                  className="student-transfer-pagination-controls"
-                  aria-label="Transfer requests pagination"
+                <button
+                  type="button"
+                  className="student-transfer-pagination-nav"
+                  disabled={safePage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((page) => Math.min(totalPages, page + 1))
+                  }
                 >
-                  <button
-                    type="button"
-                    className="student-transfer-pagination-nav"
-                    disabled={
-                      safePage ===
-                      1
-                    }
-                    onClick={() =>
-                      setCurrentPage(
-                        (
-                          page,
-                        ) =>
-                          Math.max(
-                            1,
-                            page -
-                              1,
-                          ),
-                      )
-                    }
-                  >
-                    <span
-                      aria-hidden="true"
-                    >
-                      ‹
-                    </span>
+                  <span className="student-transfer-pagination-nav-label">
+                    Next
+                  </span>
 
-                    <span className="student-transfer-pagination-nav-label">
-                      Previous
-                    </span>
-                  </button>
-
-                  <div className="student-transfer-pagination-pages">
-                    {paginationItems.map(
-                      (
-                        item,
-                        index,
-                      ) => {
-                        if (
-                          typeof item ===
-                          "string"
-                        ) {
-                          return (
-                            <span
-                              key={`${item}-${index}`}
-                              className="student-transfer-pagination-ellipsis"
-                              aria-hidden="true"
-                            >
-                              …
-                            </span>
-                          );
-                        }
-
-                        return (
-                          <button
-                            key={
-                              item
-                            }
-                            type="button"
-                            className={`student-transfer-pagination-page ${
-                              safePage ===
-                              item
-                                ? "is-active"
-                                : ""
-                            }`}
-                            aria-current={
-                              safePage ===
-                              item
-                                ? "page"
-                                : undefined
-                            }
-                            onClick={() =>
-                              setCurrentPage(
-                                item,
-                              )
-                            }
-                          >
-                            {
-                              item
-                            }
-                          </button>
-                        );
-                      },
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    className="student-transfer-pagination-nav"
-                    disabled={
-                      safePage ===
-                      totalPages
-                    }
-                    onClick={() =>
-                      setCurrentPage(
-                        (
-                          page,
-                        ) =>
-                          Math.min(
-                            totalPages,
-                            page +
-                              1,
-                          ),
-                      )
-                    }
-                  >
-                    <span className="student-transfer-pagination-nav-label">
-                      Next
-                    </span>
-
-                    <span
-                      aria-hidden="true"
-                    >
-                      ›
-                    </span>
-                  </button>
-                </nav>
-              </footer>
-            )}
+                  <span aria-hidden="true">›</span>
+                </button>
+              </nav>
+            </footer>
+          )}
         </section>
       </section>
 
@@ -2335,13 +1502,8 @@ function StudentTransfers() {
         <div
           className="student-transfer-modal-backdrop"
           role="presentation"
-          onMouseDown={(
-            event,
-          ) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
               closeRequest();
             }
           }}
@@ -2358,22 +1520,16 @@ function StudentTransfers() {
 
             <header className="student-transfer-modal-header">
               <div className="student-transfer-modal-heading">
-                <span className="student-transfer-modal-icon">
-                  ↔
-                </span>
+                <span className="student-transfer-modal-icon">↔</span>
 
                 <div>
-                  <small>
-                    STUDENT TRANSFER
-                  </small>
+                  <small>STUDENT TRANSFER</small>
 
-                  <h2 id="student-transfer-modal-title">
-                    Transfer Request
-                  </h2>
+                  <h2 id="student-transfer-modal-title">Transfer Request</h2>
 
                   <p>
-                    Review the student, source section, and destination
-                    before taking action.
+                    Review the student, source section, and destination before
+                    taking action.
                   </p>
                 </div>
               </div>
@@ -2381,12 +1537,8 @@ function StudentTransfers() {
               <button
                 type="button"
                 className="student-transfer-modal-close"
-                disabled={
-                  actionBusy
-                }
-                onClick={
-                  closeRequest
-                }
+                disabled={actionBusy}
+                onClick={closeRequest}
                 aria-label="Close transfer request"
               >
                 ×
@@ -2404,32 +1556,22 @@ function StudentTransfers() {
 
               <div className="student-transfer-modal-student">
                 <div className="student-transfer-avatar is-large">
-                  {getStudentInitial(
-                    selectedRequest?.studentName,
-                  )}
+                  {getStudentInitial(selectedRequest?.studentName)}
                 </div>
 
                 <div>
-                  <small>
-                    STUDENT
-                  </small>
+                  <small>STUDENT</small>
 
                   <strong>
-                    {selectedRequest?.studentName ||
-                      "Unnamed Student"}
+                    {selectedRequest?.studentName || "Unnamed Student"}
                   </strong>
 
                   <span>
-                    {selectedRequest?.studentNumber ||
-                      "No student number"}
+                    {selectedRequest?.studentNumber || "No student number"}
                   </span>
                 </div>
 
-                <TransferStatusBadge
-                  status={
-                    selectedRequest?.status
-                  }
-                />
+                <TransferStatusBadge status={selectedRequest?.status} />
               </div>
 
               {/* ===========================================
@@ -2438,13 +1580,10 @@ function StudentTransfers() {
 
               <div className="student-transfer-modal-route">
                 <div>
-                  <small>
-                    CURRENT / SOURCE
-                  </small>
+                  <small>CURRENT / SOURCE</small>
 
                   <strong>
-                    {selectedRequest?.sourceSectionName ||
-                      "Unknown section"}
+                    {selectedRequest?.sourceSectionName || "Unknown section"}
                   </strong>
 
                   <span>
@@ -2453,16 +1592,10 @@ function StudentTransfers() {
                   </span>
                 </div>
 
-                <span
-                  aria-hidden="true"
-                >
-                  →
-                </span>
+                <span aria-hidden="true">→</span>
 
                 <div>
-                  <small>
-                    DESTINATION
-                  </small>
+                  <small>DESTINATION</small>
 
                   <strong>
                     {selectedRequest?.destinationSectionName ||
@@ -2482,27 +1615,15 @@ function StudentTransfers() {
 
               <div className="student-transfer-detail-grid">
                 <div>
-                  <small>
-                    REQUESTED
-                  </small>
+                  <small>REQUESTED</small>
 
-                  <strong>
-                    {formatDateTime(
-                      selectedRequest?.createdAt,
-                    )}
-                  </strong>
+                  <strong>{formatDateTime(selectedRequest?.createdAt)}</strong>
                 </div>
 
                 <div>
-                  <small>
-                    REVIEWED
-                  </small>
+                  <small>REVIEWED</small>
 
-                  <strong>
-                    {formatDateTime(
-                      selectedRequest?.reviewedAt,
-                    )}
-                  </strong>
+                  <strong>{formatDateTime(selectedRequest?.reviewedAt)}</strong>
                 </div>
               </div>
 
@@ -2512,15 +1633,9 @@ function StudentTransfers() {
 
               {selectedRequest?.reason && (
                 <div className="student-transfer-note-card">
-                  <small>
-                    TRANSFER REASON
-                  </small>
+                  <small>TRANSFER REASON</small>
 
-                  <p>
-                    {
-                      selectedRequest.reason
-                    }
-                  </p>
+                  <p>{selectedRequest.reason}</p>
                 </div>
               )}
 
@@ -2528,70 +1643,44 @@ function StudentTransfers() {
                   REVIEW NOTE
               ============================================ */}
 
-              {selectedRequest?.reviewNote &&
-                !selectedPending && (
-                  <div className="student-transfer-note-card">
-                    <small>
-                      REVIEW NOTE
-                    </small>
+              {selectedRequest?.reviewNote && !selectedPending && (
+                <div className="student-transfer-note-card">
+                  <small>REVIEW NOTE</small>
 
-                    <p>
-                      {
-                        selectedRequest.reviewNote
-                      }
-                    </p>
-                  </div>
-                )}
+                  <p>{selectedRequest.reviewNote}</p>
+                </div>
+              )}
 
               {/* ===========================================
                   INCOMING REVIEW NOTE INPUT
               ============================================ */}
 
-              {selectedPending &&
-                selectedIncoming && (
-                  <label className="student-transfer-review-note">
-                    <span>
-                      Review Note
+              {selectedPending && selectedIncoming && (
+                <label className="student-transfer-review-note">
+                  <span>
+                    Review Note
+                    <small>Optional</small>
+                  </span>
 
-                      <small>
-                        Optional
-                      </small>
-                    </span>
+                  <textarea
+                    rows={4}
+                    maxLength={500}
+                    value={reviewNote}
+                    disabled={actionBusy}
+                    placeholder="Add an optional note for the requesting Adviser..."
+                    onChange={(event) => {
+                      setReviewNote(event.target.value);
 
-                    <textarea
-                      rows={4}
-                      maxLength={
-                        500
-                      }
-                      value={
-                        reviewNote
-                      }
-                      disabled={
-                        actionBusy
-                      }
-                      placeholder="Add an optional note for the requesting Adviser..."
-                      onChange={(
-                        event,
-                      ) => {
-                        setReviewNote(
-                          event.target
-                            .value,
-                        );
+                      setActionError("");
+                    }}
+                  />
 
-                        setActionError(
-                          "",
-                        );
-                      }}
-                    />
-
-                    <small>
-                      {
-                        reviewNote.length
-                      }
-                      /500 characters
-                    </small>
-                  </label>
-                )}
+                  <small>
+                    {reviewNote.length}
+                    /500 characters
+                  </small>
+                </label>
+              )}
 
               {/* ===========================================
                   PENDING INFORMATION
@@ -2599,21 +1688,15 @@ function StudentTransfers() {
 
               {selectedPending && (
                 <div className="student-transfer-pending-note">
-                  <span
-                    aria-hidden="true"
-                  >
-                    i
-                  </span>
+                  <span aria-hidden="true">i</span>
 
                   <div>
-                    <strong>
-                      Attendance is temporarily paused
-                    </strong>
+                    <strong>Attendance is temporarily paused</strong>
 
                     <p>
-                      While this transfer remains pending, the student
-                      cannot be used in attendance. Approving, rejecting,
-                      or cancelling the request resolves the temporary hold.
+                      While this transfer remains pending, the student cannot be
+                      used in attendance. Approving, rejecting, or cancelling
+                      the request resolves the temporary hold.
                     </p>
                   </div>
                 </div>
@@ -2624,21 +1707,10 @@ function StudentTransfers() {
               ============================================ */}
 
               {actionError && (
-                <div
-                  className="student-transfer-modal-error"
-                  role="alert"
-                >
-                  <span
-                    aria-hidden="true"
-                  >
-                    !
-                  </span>
+                <div className="student-transfer-modal-error" role="alert">
+                  <span aria-hidden="true">!</span>
 
-                  <p>
-                    {
-                      actionError
-                    }
-                  </p>
+                  <p>{actionError}</p>
                 </div>
               )}
             </div>
@@ -2657,23 +1729,15 @@ function StudentTransfers() {
                     : "Transfer request resolved"}
                 </strong>
 
-                <span>
-                  Request ID:{" "}
-                  {selectedRequest?.id ||
-                    "Unavailable"}
-                </span>
+                <span>Request ID: {selectedRequest?.id || "Unavailable"}</span>
               </div>
 
               <div>
                 <button
                   type="button"
                   className="student-transfer-secondary-button"
-                  disabled={
-                    actionBusy
-                  }
-                  onClick={
-                    closeRequest
-                  }
+                  disabled={actionBusy}
+                  onClick={closeRequest}
                 >
                   Close
                 </button>
@@ -2682,63 +1746,42 @@ function StudentTransfers() {
                     DESTINATION ADVISER ACTIONS
                 ========================================== */}
 
-                {selectedPending &&
-                  selectedIncoming && (
-                    <>
-                      <button
-                        type="button"
-                        className="student-transfer-reject-button"
-                        disabled={
-                          actionBusy
-                        }
-                        onClick={() =>
-                          void handleReject()
-                        }
-                      >
-                        {actionBusy
-                          ? "Processing..."
-                          : "Reject"}
-                      </button>
+                {selectedPending && selectedIncoming && (
+                  <>
+                    <button
+                      type="button"
+                      className="student-transfer-reject-button"
+                      disabled={actionBusy}
+                      onClick={() => void handleReject()}
+                    >
+                      {actionBusy ? "Processing..." : "Reject"}
+                    </button>
 
-                      <button
-                        type="button"
-                        className="student-transfer-approve-button"
-                        disabled={
-                          actionBusy
-                        }
-                        onClick={() =>
-                          void handleApprove()
-                        }
-                      >
-                        {actionBusy
-                          ? "Processing..."
-                          : "Approve Transfer"}
-                      </button>
-                    </>
-                  )}
+                    <button
+                      type="button"
+                      className="student-transfer-approve-button"
+                      disabled={actionBusy}
+                      onClick={() => void handleApprove()}
+                    >
+                      {actionBusy ? "Processing..." : "Approve Transfer"}
+                    </button>
+                  </>
+                )}
 
                 {/* =========================================
                     SOURCE ADVISER ACTION
                 ========================================== */}
 
-                {selectedPending &&
-                  selectedOutgoing &&
-                  !selectedIncoming && (
-                    <button
-                      type="button"
-                      className="student-transfer-cancel-button"
-                      disabled={
-                        actionBusy
-                      }
-                      onClick={() =>
-                        void handleCancel()
-                      }
-                    >
-                      {actionBusy
-                        ? "Cancelling..."
-                        : "Cancel Transfer"}
-                    </button>
-                  )}
+                {selectedPending && selectedOutgoing && !selectedIncoming && (
+                  <button
+                    type="button"
+                    className="student-transfer-cancel-button"
+                    disabled={actionBusy}
+                    onClick={() => void handleCancel()}
+                  >
+                    {actionBusy ? "Cancelling..." : "Cancel Transfer"}
+                  </button>
+                )}
               </div>
             </footer>
           </section>

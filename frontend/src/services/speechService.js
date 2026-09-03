@@ -23,12 +23,19 @@ const setEnabled = (enabled) => {
   }
 };
 
+/* =========================================================
+   VOICE SELECTION
+========================================================= */
+
 /**
- * Prefer natural-sounding female voices when available.
+ * Prefer:
+ * 1. Filipino / Tagalog female voice
+ * 2. Any Filipino / Tagalog voice
+ * 3. Natural English female voice
+ * 4. Philippine English
+ * 5. Other English
  *
- * Browser / operating-system voices differ per device,
- * so this is intentionally preference-based with safe
- * fallbacks.
+ * Available voices depend on the browser and operating system.
  */
 const pickVoice = () => {
   if (!isSupported()) return null;
@@ -58,21 +65,54 @@ const pickVoice = () => {
     );
   };
 
-  // ---------------------------------------------------------
-  // 1. Female Philippine-English voice
-  // ---------------------------------------------------------
+  const isFilipinoVoice = (voice) => {
+    const lang = String(voice?.lang || "").toLowerCase();
 
-  const femalePhilippineVoice = voices.find(
+    return (
+      lang === "fil-ph" ||
+      lang === "tl-ph" ||
+      lang.startsWith("fil") ||
+      lang.startsWith("tl")
+    );
+  };
+
+  /* ---------------------------------------------------------
+     1. Filipino / Tagalog female
+  --------------------------------------------------------- */
+
+  const filipinoFemaleVoice = voices.find(
+    (voice) => isFilipinoVoice(voice) && isFemalePreferred(voice),
+  );
+
+  if (filipinoFemaleVoice) {
+    return filipinoFemaleVoice;
+  }
+
+  /* ---------------------------------------------------------
+     2. Any Filipino / Tagalog voice
+  --------------------------------------------------------- */
+
+  const filipinoVoice = voices.find((voice) => isFilipinoVoice(voice));
+
+  if (filipinoVoice) {
+    return filipinoVoice;
+  }
+
+  /* ---------------------------------------------------------
+     3. Philippine English female
+  --------------------------------------------------------- */
+
+  const femalePhilippineEnglishVoice = voices.find(
     (voice) => /^en-PH$/i.test(voice.lang) && isFemalePreferred(voice),
   );
 
-  if (femalePhilippineVoice) {
-    return femalePhilippineVoice;
+  if (femalePhilippineEnglishVoice) {
+    return femalePhilippineEnglishVoice;
   }
 
-  // ---------------------------------------------------------
-  // 2. Other natural English female voices
-  // ---------------------------------------------------------
+  /* ---------------------------------------------------------
+     4. Other English female voices
+  --------------------------------------------------------- */
 
   const femaleEnglishVoice = voices.find(
     (voice) => /^en/i.test(voice.lang) && isFemalePreferred(voice),
@@ -82,19 +122,21 @@ const pickVoice = () => {
     return femaleEnglishVoice;
   }
 
-  // ---------------------------------------------------------
-  // 3. Any Philippine-English voice
-  // ---------------------------------------------------------
+  /* ---------------------------------------------------------
+     5. Any Philippine English voice
+  --------------------------------------------------------- */
 
-  const philippineVoice = voices.find((voice) => /^en-PH$/i.test(voice.lang));
+  const philippineEnglishVoice = voices.find((voice) =>
+    /^en-PH$/i.test(voice.lang),
+  );
 
-  if (philippineVoice) {
-    return philippineVoice;
+  if (philippineEnglishVoice) {
+    return philippineEnglishVoice;
   }
 
-  // ---------------------------------------------------------
-  // 4. Preferred English locales
-  // ---------------------------------------------------------
+  /* ---------------------------------------------------------
+     6. Preferred English locales
+  --------------------------------------------------------- */
 
   const preferredEnglishVoice = voices.find((voice) =>
     /^en-(US|GB|AU)$/i.test(voice.lang),
@@ -104,9 +146,9 @@ const pickVoice = () => {
     return preferredEnglishVoice;
   }
 
-  // ---------------------------------------------------------
-  // 5. Any English voice
-  // ---------------------------------------------------------
+  /* ---------------------------------------------------------
+     7. Any English voice
+  --------------------------------------------------------- */
 
   const englishVoice = voices.find((voice) => /^en/i.test(voice.lang));
 
@@ -117,21 +159,34 @@ const pickVoice = () => {
   return voices[0] || null;
 };
 
+/* =========================================================
+   SPEAK
+========================================================= */
+
 const speak = (
   text,
   {
     interrupt = true,
 
-    // Slower than before so names and instructions
-    // are pronounced more completely.
-    rate = 0.88,
+    /*
+     * 0.80 = slightly slower and clearer.
+     * Good for names and camera instructions.
+     */
+    rate = 0.8,
 
-    // Slightly raised pitch for a softer/feminine sound
-    // without making it unnaturally high.
-    pitch = 1.04,
+    /*
+     * Slightly raised only.
+     * We rely primarily on the selected voice,
+     * not pitch alone, for a softer voice.
+     */
+    pitch = 1.03,
 
     volume = 1,
-    lang = "en-PH",
+
+    /*
+     * Filipino language hint.
+     */
+    lang = "fil-PH",
   } = {},
 ) => {
   const message = String(text || "").trim();
@@ -144,8 +199,10 @@ const speak = (
     window.speechSynthesis.cancel();
   }
 
-  // Helps recover speech synthesis if Chrome has
-  // temporarily paused it.
+  /*
+   * Helps Chrome recover if speech synthesis
+   * temporarily enters a paused state.
+   */
   window.speechSynthesis.resume();
 
   const utterance = new SpeechSynthesisUtterance(message);
@@ -160,7 +217,10 @@ const speak = (
   if (voice) {
     utterance.voice = voice;
 
-    // Use the selected voice's real language where available.
+    /*
+     * Use the selected voice's real language.
+     * This prevents browser inconsistencies.
+     */
     if (voice.lang) {
       utterance.lang = voice.lang;
     }
@@ -177,78 +237,104 @@ const stop = () => {
   }
 };
 
-const challengeInstruction = (challengeType, studentName = "Student") => {
-  const name = String(studentName || "Student").trim();
+/* =========================================================
+   LIVENESS / CHALLENGE INSTRUCTIONS
+========================================================= */
+
+const challengeInstruction = (challengeType, studentName = "Mag-aaral") => {
+  const name = String(studentName || "Mag-aaral").trim() || "Mag-aaral";
 
   switch (String(challengeType || "").toUpperCase()) {
     case "BLINK":
-      return `${name}, blink once now.`;
+      return `${name}, kumurap nang isang beses ngayon.`;
 
     case "TURN_LEFT":
-      return `${name}, slowly turn your head to the left now.`;
+      return `${name}, dahan-dahang lumingon sa kaliwa.`;
 
     case "TURN_RIGHT":
-      return `${name}, slowly turn your head to the right now.`;
+      return `${name}, dahan-dahang lumingon sa kanan.`;
 
     default:
-      return `${name}, follow the instruction shown on the screen now.`;
+      return `${name}, sundin ang instruksyon na nakikita sa screen.`;
   }
 };
+
+/* =========================================================
+   FACE ENROLLMENT
+========================================================= */
 
 const announceEnrollmentReady = (studentName) =>
   speak(
     `${
-      studentName || "Student"
-    }, look straight at the camera, and keep your eyes open.`,
+      studentName || "Mag-aaral"
+    }, tumingin nang diretso sa camera. Panatilihing bukas ang iyong mga mata, at huwag munang gumalaw.`,
   );
 
 const announceChallenge = (studentName, challengeType) =>
   speak(challengeInstruction(challengeType, studentName));
 
 const announceEnrollmentSuccess = (studentName) =>
-  speak(`${studentName || "Student"}, face enrollment complete.`);
+  speak(
+    `${studentName || "Mag-aaral"}, matagumpay na na-register ang iyong mukha.`,
+  );
+
+/* =========================================================
+   FACE CONFLICT
+========================================================= */
 
 const announceConflict = (studentName) =>
   speak(
-    `Identity verification is required for ${studentName || "this student"}.`,
+    `Kailangan ng identity verification para kay ${
+      studentName || "ang mag-aaral na ito"
+    }.`,
   );
 
 const announceLivenessFailure = () =>
-  speak("Live face verification failed. Please try again.");
+  speak("Hindi nakumpirma ang live face verification. Pakisubukan muli.");
 
 const announceManualReview = () =>
-  speak("Live verification passed. Adviser identity review is required.");
+  speak(
+    "Nakumpirma ang live verification. Kailangan ngayon ng pagsusuri ng adviser.",
+  );
 
 const announceDifferentPeople = (studentName) =>
   speak(
-    `Identity confirmed as different people. One final live scan will save ${
-      studentName || "the student's"
-    } face.`,
+    `Nakumpirma na magkaibang tao ang dalawang mukha. Isang huling live scan ang kailangan para ma-save ang face registration ni ${
+      studentName || "ang mag-aaral"
+    }.`,
   );
 
 const announceSamePerson = (studentName) =>
   speak(
-    `Identity review complete. Separate face enrollment is blocked for ${
-      studentName || "this student"
+    `Tapos na ang identity review. Hindi maaaring gumawa ng hiwalay na face enrollment para kay ${
+      studentName || "ang mag-aaral na ito"
     }.`,
   );
 
+/* =========================================================
+   ATTENDANCE RESULT
+========================================================= */
+
 const announceAttendanceResult = ({ studentName, name, status } = {}) => {
   const resolvedName =
-    String(studentName || name || "Student").trim() || "Student";
+    String(studentName || name || "Mag-aaral").trim() || "Mag-aaral";
 
   const normalizedStatus = String(status || "").toUpperCase();
 
   if (normalizedStatus === "LATE") {
-    return speak(`${resolvedName}, late.`);
+    return speak(`${resolvedName}, late ka.`);
   }
 
   if (normalizedStatus === "PRESENT") {
-    return speak(`${resolvedName}, present.`);
+    return speak(`${resolvedName}, present ka.`);
   }
 
-  return speak(`${resolvedName}, attendance recorded.`);
+  return speak(`${resolvedName}, naitala na ang iyong attendance.`);
 };
+
+/* =========================================================
+   EXPORT
+========================================================= */
 
 export default {
   isSupported,
@@ -257,15 +343,12 @@ export default {
   speak,
   stop,
   challengeInstruction,
-
   announceEnrollmentReady,
   announceChallenge,
   announceEnrollmentSuccess,
-
   announceConflict,
   announceLivenessFailure,
   announceManualReview,
-
   announceDifferentPeople,
   announceSamePerson,
   announceAttendanceResult,

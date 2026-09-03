@@ -4581,3 +4581,2232 @@ html[data-theme="dark"] .student-deactivate-note {
   border-color: rgba(248, 113, 113, 0.18);
   background: rgba(127, 29, 29, 0.14);
 }
+
+/* =========================================================
+   35. UI POLISH — ORGANIZED / CAMERA-FIRST
+   ---------------------------------------------------------
+   SAFE PRESENTATION-ONLY OVERRIDES
+   - No JSX or behavior changes required.
+   - Keeps current class contract intact.
+   - Keeps liveness, API, transfer, timers and enrollment logic untouched.
+========================================================= */
+
+/* ---------- PAGE RHYTHM ---------- */
+.student-management {
+  gap: 18px;
+}
+
+.student-section-overview,
+.student-panel {
+  border-color: color-mix(in srgb, var(--c-border-soft) 88%, transparent);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.025),
+    0 12px 32px rgba(15, 23, 42, 0.045);
+}
+
+.student-section-overview {
+  grid-template-columns: minmax(260px, 1fr) minmax(450px, 1.45fr) auto;
+  padding: 22px 24px;
+}
+
+.student-section-overview::before {
+  width: 5px;
+}
+
+.student-section-heading > span,
+.student-panel-header > div > span,
+.student-enroll-scanner-heading > span,
+.student-modal-heading > div:last-child > span {
+  letter-spacing: 0.1em;
+}
+
+.student-section-heading h2 {
+  margin-top: 5px;
+  font-size: clamp(23px, 2.15vw, 28px);
+}
+
+/* ---------- SECTION METRICS ---------- */
+.student-section-stats {
+  gap: 8px;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+.student-section-stats > div {
+  min-width: 104px;
+  padding: 12px 13px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+  background: var(--c-surface-soft);
+  text-align: left;
+}
+
+.student-section-stats > div + div {
+  border-left: 1px solid var(--c-border-soft);
+}
+
+.student-section-stats span {
+  overflow: hidden;
+  font-size: 9px;
+  letter-spacing: 0.055em;
+  text-overflow: ellipsis;
+}
+
+.student-section-stats strong {
+  margin-top: 7px;
+  font-size: 21px;
+}
+
+/* ---------- ROSTER HEADER ---------- */
+.student-panel-header {
+  min-height: 82px;
+  padding: 17px 19px 17px 21px;
+}
+
+.student-panel-header h2 {
+  font-size: 20px;
+}
+
+.student-panel-header p {
+  margin-top: 4px;
+}
+
+.student-panel-header .adviser-primary-button {
+  min-height: 42px;
+  padding-inline: 15px;
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(18, 61, 126, 0.12);
+}
+
+/* ---------- TOOLBAR ---------- */
+.student-toolbar {
+  padding: 11px 14px;
+  background: color-mix(in srgb, var(--c-surface-soft) 70%, var(--c-surface));
+}
+
+.student-search {
+  width: min(100%, 560px);
+  min-height: 42px;
+  border-radius: 9px;
+}
+
+.student-result-count,
+.student-filter-button {
+  min-height: 38px;
+}
+
+.student-filter-button {
+  padding-inline: 10px 12px;
+}
+
+.student-filter-count {
+  min-width: 19px;
+  height: 19px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--c-blue-900);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.student-filter-row-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--c-text-secondary);
+  font-size: 10.5px;
+  font-weight: 820;
+}
+
+.student-filter-row-label > i {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: var(--c-text-muted);
+}
+
+.student-filter-row-label > i.is-status { background: #16a34a; }
+.student-filter-row-label > i.is-face { background: #0284c7; }
+.student-filter-row-label > i.is-sort { background: #7c3aed; }
+.student-filter-row-label > i.is-rows { background: #64748b; }
+
+.student-filter-done {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--c-blue-900);
+  border-radius: 8px;
+  background: var(--c-blue-900);
+  color: #fff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+/* ---------- TABLE: DENSER, CLEARER ---------- */
+.student-table {
+  min-width: 900px;
+}
+
+.student-table th {
+  padding: 11px 14px;
+  font-size: 9.5px;
+  letter-spacing: 0.055em;
+}
+
+.student-table td {
+  padding: 12px 14px;
+}
+
+.student-table tbody tr:hover {
+  background: color-mix(in srgb, var(--c-icon-bg) 35%, var(--c-surface));
+}
+
+.student-avatar {
+  width: 36px;
+  height: 36px;
+  flex-basis: 36px;
+  border-radius: 9px;
+}
+
+.student-name-cell strong {
+  font-size: 12.5px;
+}
+
+.student-number {
+  min-height: 28px;
+  border-radius: 7px;
+  font-variant-numeric: tabular-nums;
+}
+
+.student-status-badge,
+.student-face-badge {
+  min-height: 29px;
+  padding-inline: 9px;
+}
+
+.student-actions-trigger {
+  min-width: 104px;
+  min-height: 36px;
+  border-radius: 8px;
+}
+
+/* ---------- ACTION MENU ---------- */
+.student-actions-dropdown {
+  width: 244px;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.student-actions-dropdown-item {
+  min-height: 47px;
+  border-radius: 8px;
+}
+
+.student-actions-dropdown-item:hover,
+.student-actions-dropdown-item:focus-visible {
+  background: color-mix(in srgb, var(--c-icon-bg) 62%, var(--c-surface));
+}
+
+/* ---------- MODAL FOUNDATION ---------- */
+.student-modal-backdrop {
+  padding: 18px;
+  background: rgba(5, 12, 24, 0.58);
+  backdrop-filter: blur(7px);
+}
+
+.student-enrollment-modal,
+.student-edit-modal,
+.student-record-modal,
+.student-identity-modal,
+.student-face-verification-modal,
+.student-face-modal {
+  border-radius: 16px;
+  box-shadow:
+    0 34px 90px rgba(2, 8, 23, 0.28),
+    0 8px 24px rgba(2, 8, 23, 0.08);
+}
+
+.student-modal-header {
+  padding: 15px 18px;
+}
+
+.student-modal-icon {
+  width: 40px;
+  height: 40px;
+  flex-basis: 40px;
+  border-radius: 10px;
+}
+
+.student-modal-heading h2 {
+  font-size: 19px;
+}
+
+.student-modal-heading p {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+/* ---------- ADD STUDENT DETAILS ---------- */
+.student-live-detail-step {
+  width: min(100%, 680px);
+}
+
+.student-enrollment-form {
+  gap: 15px;
+  padding: 18px;
+  border-radius: 13px;
+  box-shadow: none;
+}
+
+.student-enrollment-modal .student-form-field input {
+  min-height: 49px;
+}
+
+.student-live-explainer {
+  border-radius: 10px;
+}
+
+/* ---------- CAMERA-FIRST ENROLLMENT ---------- */
+.student-enrollment-modal.student-enrollment-step-2 {
+  width: min(1280px, calc(100vw - 32px));
+  height: min(900px, calc(100dvh - 28px));
+  max-height: calc(100dvh - 28px);
+}
+
+.student-enrollment-step-2 .student-live-enrollment-body {
+  padding: 14px 16px 16px;
+}
+
+.student-live-scan-step {
+  gap: 10px;
+}
+
+.student-liveness-student-strip {
+  padding: 9px 12px;
+  border-radius: 10px;
+}
+
+.student-liveness-avatar {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+  border-radius: 9px;
+}
+
+.student-liveness-student-strip strong {
+  font-size: 13px;
+}
+
+.student-enroll-scanner {
+  gap: 10px;
+}
+
+.student-enroll-scanner-header {
+  align-items: center;
+  gap: 14px;
+  padding-inline: 2px;
+}
+
+.student-enroll-scanner-heading h3 {
+  margin-top: 3px;
+  font-size: clamp(24px, 2.2vw, 31px);
+}
+
+.student-enroll-scanner-heading p {
+  max-width: 610px;
+  margin-top: 5px;
+  font-size: 11.5px;
+}
+
+.student-enroll-scanner-actions {
+  flex-wrap: nowrap;
+}
+
+.student-voice-toggle,
+.student-enroll-auto-toggle,
+.student-enroll-scan-now {
+  min-height: 39px;
+  border-radius: 9px;
+}
+
+.student-enroll-scan-now {
+  min-width: 108px;
+  box-shadow: 0 7px 16px rgba(12, 45, 99, 0.18);
+}
+
+.student-enroll-scanner-workspace {
+  grid-template-columns: minmax(0, 1.82fr) minmax(250px, 0.58fr);
+  gap: 11px;
+}
+
+.student-enroll-camera-shell {
+  min-height: clamp(510px, 62vh, 650px);
+  border-radius: 17px;
+  box-shadow:
+    0 18px 42px rgba(2, 8, 23, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.student-enroll-face-target {
+  top: 48%;
+  width: clamp(210px, 22vw, 270px);
+  height: clamp(285px, 30vw, 360px);
+}
+
+.student-enroll-live-badge,
+.student-enroll-mode-badge {
+  top: 12px;
+}
+
+.student-enroll-scanner-message {
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  padding: 9px 12px;
+  border-radius: 10px;
+}
+
+.student-enroll-scanner-message strong {
+  margin-top: 2px;
+  font-size: 14px;
+}
+
+.student-enroll-review-panel {
+  border-radius: 13px;
+}
+
+.student-enroll-review-header {
+  padding: 11px 12px;
+}
+
+.student-enroll-review-content,
+.student-enroll-review-empty {
+  padding: 15px;
+}
+
+.student-enroll-review-empty {
+  align-content: start;
+  padding-top: 22px;
+}
+
+.student-enroll-review-empty h3,
+.student-enroll-review-content h3 {
+  font-size: 17px;
+}
+
+.student-enroll-review-steps {
+  gap: 6px;
+}
+
+.student-enroll-review-steps > div {
+  padding: 7px 8px;
+}
+
+.student-enroll-camera-footer {
+  min-height: 32px;
+}
+
+/* ---------- FOOTERS ---------- */
+.student-enrollment-actions,
+.student-live-modal-footer,
+.student-face-modal-actions,
+.student-liveness-modal-actions,
+.student-record-modal-actions,
+.student-record-modal > .adviser-modal-actions {
+  min-height: 61px;
+  padding: 9px 16px;
+}
+
+/* ---------- FEEDBACK ---------- */
+.student-success-alert,
+.student-face-intent,
+.student-production-error,
+.student-face-feedback,
+.student-liveness-result-card {
+  border-radius: 10px;
+}
+
+/* ---------- DARK MODE POLISH ---------- */
+html[data-theme="dark"] .student-section-stats > div {
+  border-color: #293a52;
+  background: #101b2c;
+}
+
+html[data-theme="dark"] .student-table tbody tr:hover {
+  background: rgba(30, 58, 95, 0.24);
+}
+
+html[data-theme="dark"] .student-filter-done {
+  border-color: #3b82f6;
+  background: #2563eb;
+}
+
+/* ---------- DESKTOP CAMERA HEIGHT SAFETY ---------- */
+@media (min-width: 1051px) and (max-height: 820px) {
+  .student-enrollment-modal.student-enrollment-step-2 {
+    height: calc(100dvh - 20px);
+  }
+
+  .student-enrollment-step-2 .student-live-enrollment-body {
+    padding-block: 10px 12px;
+  }
+
+  .student-enroll-camera-shell {
+    min-height: 455px;
+  }
+
+  .student-enroll-scanner-heading p {
+    display: none;
+  }
+}
+
+/* ---------- TABLET ---------- */
+@media (max-width: 1050px) {
+  .student-section-overview {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .student-section-stats {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .student-enroll-scanner-workspace {
+    grid-template-columns: minmax(0, 1.45fr) minmax(235px, 0.7fr);
+  }
+}
+
+@media (max-width: 820px) {
+  .student-enroll-scanner-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .student-enroll-camera-shell {
+    min-height: 440px;
+  }
+
+  .student-enroll-review-panel {
+    min-height: 0;
+  }
+
+  .student-enroll-review-empty {
+    align-content: center;
+  }
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 650px) {
+  .student-section-overview {
+    grid-template-columns: 1fr;
+    padding: 18px 16px 18px 18px;
+  }
+
+  .student-section-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .student-section-stats > div {
+    display: block;
+    padding: 10px 11px;
+  }
+
+  .student-section-stats > div + div {
+    border-top: 1px solid var(--c-border-soft);
+  }
+
+  .student-section-stats strong {
+    margin-top: 6px;
+    font-size: 19px;
+  }
+
+  .student-panel-header {
+    gap: 13px;
+    padding: 16px;
+  }
+
+  .student-toolbar {
+    gap: 10px;
+  }
+
+  .student-enroll-camera-shell {
+    min-height: min(54dvh, 390px);
+  }
+
+  .student-enroll-scanner-heading h3 {
+    font-size: 23px;
+  }
+
+  .student-enroll-scanner-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .student-enroll-scan-now {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 430px) {
+  .student-section-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .student-enroll-camera-shell {
+    min-height: min(50dvh, 350px);
+  }
+}
+
+/* =========================================================
+   36. STUDENT MANAGEMENT — FINAL ROSTER / FILTER FIX
+   =========================================================
+   PRESENTATION ONLY.
+
+   Fixes the real layout issue visible in the current roster:
+   - Filter dropdown is no longer clipped by .student-panel.
+   - Filter header copy is properly stacked.
+   - Filter content scrolls internally on shorter screens.
+   - Toolbar stays above the roster while the menu is open.
+   - Desktop table no longer forces an unnecessary scrollbar.
+   - Smaller viewports still retain safe horizontal scrolling.
+   - Visual language follows the Attendance History page:
+     semantic mini-cards, restrained blue organization,
+     soft borders and production-style spacing.
+
+   No React/API/liveness/transfer/enrollment behavior is changed.
+========================================================= */
+
+/* =========================================================
+   36.01 WIDTH / BOX SAFETY
+========================================================= */
+
+.student-management,
+.student-section-overview,
+.student-section-overview > *,
+.student-section-stats,
+.student-section-stats > *,
+.student-panel,
+.student-panel > *,
+.student-toolbar,
+.student-toolbar > *,
+.student-toolbar-actions,
+.student-table-shell,
+.student-table,
+.student-table th,
+.student-table td {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+/* =========================================================
+   36.02 ASSIGNED SECTION — ATTENDANCE HISTORY INSPIRED
+========================================================= */
+
+.student-section-overview {
+  grid-template-columns:
+    minmax(230px, 0.9fr)
+    minmax(520px, 1.7fr)
+    auto;
+  gap: 22px;
+  padding: 22px 24px 22px 27px;
+  border-color: #d4e0ed;
+  border-radius: 15px;
+  background:
+    linear-gradient(
+      100deg,
+      rgba(239, 246, 255, 0.38) 0%,
+      rgba(255, 255, 255, 0) 31%
+    ),
+    var(--c-surface);
+  box-shadow:
+    0 1px 2px rgba(15, 35, 70, 0.025),
+    0 14px 34px rgba(15, 35, 70, 0.055);
+}
+
+.student-section-overview::before {
+  width: 4px;
+  background: linear-gradient(
+    180deg,
+    #174f96 0 55%,
+    #c62237 55% 100%
+  );
+}
+
+.student-section-heading > span {
+  color: #1d4f91;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.115em;
+}
+
+.student-section-heading h2 {
+  margin-top: 5px;
+  font-size: clamp(23px, 2.15vw, 29px);
+  font-weight: 880;
+}
+
+.student-section-heading p {
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+/*
+ * Four small information cards, following the same restrained
+ * semantic grouping used by the Attendance History summary.
+ */
+.student-section-stats {
+  width: 100%;
+  grid-template-columns: repeat(4, minmax(108px, 1fr));
+  gap: 9px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.student-section-stats > div {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  padding: 13px 13px 12px;
+  border: 1px solid #d7e1ec !important;
+  border-radius: 11px;
+  background: #ffffff;
+  text-align: left;
+}
+
+.student-section-stats > div + div {
+  border-left: 1px solid #d7e1ec !important;
+}
+
+.student-section-stats > div::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+}
+
+.student-section-stats > div:nth-child(1) {
+  border-color: #bfd7f5 !important;
+  background: linear-gradient(180deg, #f4f8ff 0%, #ffffff 76%);
+}
+
+.student-section-stats > div:nth-child(1)::before {
+  background: #2563eb;
+}
+
+.student-section-stats > div:nth-child(1) span {
+  color: #1d4ed8;
+}
+
+.student-section-stats > div:nth-child(2) {
+  border-color: #f1d89a !important;
+  background: linear-gradient(180deg, #fffaf0 0%, #ffffff 76%);
+}
+
+.student-section-stats > div:nth-child(2)::before {
+  background: #f59e0b;
+}
+
+.student-section-stats > div:nth-child(2) span {
+  color: #a85b09;
+}
+
+.student-section-stats > div:nth-child(3) {
+  border-color: #d8c7f5 !important;
+  background: linear-gradient(180deg, #faf8ff 0%, #ffffff 76%);
+}
+
+.student-section-stats > div:nth-child(3)::before {
+  background: #7c3aed;
+}
+
+.student-section-stats > div:nth-child(3) span {
+  color: #6d28d9;
+}
+
+.student-section-stats > div:nth-child(4) {
+  border-color: #b9e5c7 !important;
+  background: linear-gradient(180deg, #f2fbf5 0%, #ffffff 76%);
+}
+
+.student-section-stats > div:nth-child(4)::before {
+  background: #16a34a;
+}
+
+.student-section-stats > div:nth-child(4) span {
+  color: #15803d;
+}
+
+.student-section-stats span {
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 880;
+  line-height: 1.25;
+  letter-spacing: 0.055em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-section-stats strong {
+  margin-top: 8px;
+  font-size: 22px;
+  font-weight: 880;
+}
+
+.student-section-badge {
+  min-height: 34px;
+  padding-inline: 12px;
+  border-radius: 999px;
+  font-size: 10px;
+}
+
+/* =========================================================
+   36.03 ROSTER PANEL
+   IMPORTANT: overflow must remain VISIBLE here.
+========================================================= */
+
+.student-panel {
+  position: relative;
+  z-index: 1;
+  overflow: visible !important;
+  border-color: #d4e0ed;
+  border-radius: 15px;
+  background: var(--c-surface);
+  box-shadow:
+    0 1px 2px rgba(15, 35, 70, 0.025),
+    0 14px 34px rgba(15, 35, 70, 0.05);
+}
+
+/*
+ * Since the parent can no longer clip children, explicitly keep
+ * the visual rounding on the first and last panel sections.
+ */
+.student-panel-header {
+  min-height: 86px;
+  padding: 18px 20px 18px 22px;
+  border-radius: 15px 15px 0 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(239, 246, 255, 0.46),
+      rgba(255, 255, 255, 0) 38%
+    ),
+    var(--c-surface);
+}
+
+.student-panel-header > div > span {
+  color: #1d4f91;
+  font-size: 10px;
+}
+
+.student-panel-header h2 {
+  font-size: 21px;
+  font-weight: 880;
+}
+
+.student-panel-header p {
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.student-panel-header .adviser-primary-button {
+  min-height: 43px;
+  padding-inline: 17px;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(18, 61, 126, 0.13);
+}
+
+/* =========================================================
+   36.04 TOOLBAR — MUST SIT ABOVE TABLE
+========================================================= */
+
+.student-toolbar {
+  position: relative;
+  z-index: 100;
+  overflow: visible !important;
+  gap: 14px;
+  padding: 13px 15px 13px 17px;
+  border-bottom-color: #dce5ef;
+  background: #fbfdff;
+}
+
+.student-toolbar-main,
+.student-toolbar-actions,
+.student-filter-wrap {
+  position: relative;
+  overflow: visible !important;
+}
+
+.student-toolbar-main {
+  flex: 1 1 auto;
+}
+
+.student-toolbar-actions {
+  flex: 0 0 auto;
+}
+
+.student-search {
+  width: min(100%, 560px);
+  min-height: 43px;
+  border-color: #cad7e5;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.student-search:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.09);
+}
+
+.student-search-icon {
+  color: #7187a4;
+}
+
+.student-result-count {
+  min-height: 39px;
+  padding-inline: 12px;
+  border-color: #d8e1eb;
+  border-radius: 9px;
+  background: #ffffff;
+  font-size: 10.5px;
+}
+
+.student-result-count strong {
+  font-size: 11.5px;
+}
+
+/* =========================================================
+   36.05 FILTER BUTTON
+========================================================= */
+
+.student-filter-button {
+  min-height: 40px;
+  padding: 0 11px;
+  border-color: #cbd9e7;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #31557f;
+  font-size: 11px;
+}
+
+.student-filter-button:hover,
+.student-filter-button.is-open {
+  border-color: #8fb5e6;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.student-filter-button-icon {
+  width: 25px;
+  height: 25px;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.student-filter-count {
+  min-width: 19px;
+  height: 19px;
+  display: inline-grid;
+  place-items: center;
+  padding-inline: 5px;
+  border-radius: 999px;
+  background: #1d4ed8;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+/* =========================================================
+   36.06 FILTER DROPDOWN — ACTUAL CLIPPING FIX
+========================================================= */
+
+.student-filter-menu,
+.student-filter-popover {
+  position: absolute;
+  z-index: 400 !important;
+  top: calc(100% + 9px);
+  right: 0;
+  width: min(370px, calc(100vw - 34px));
+  max-height: min(350px, calc(100dvh - 170px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+  border: 1px solid #cbd9e7;
+  border-radius: 13px;
+  background: var(--c-surface);
+  box-shadow:
+    0 24px 58px rgba(15, 35, 70, 0.19),
+    0 6px 18px rgba(15, 35, 70, 0.09);
+  isolation: isolate;
+}
+
+/* Fixes "Filter studentsRefine the class roster" appearing joined. */
+.student-filter-menu-header,
+.student-filter-popover-header {
+  flex: 0 0 auto;
+  min-height: 58px;
+  padding: 12px 13px 11px 15px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(239, 246, 255, 0.9),
+      rgba(255, 255, 255, 0.7)
+    );
+}
+
+.student-filter-menu-header > div,
+.student-filter-popover-header > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.student-filter-menu-header strong,
+.student-filter-popover-header strong,
+.student-filter-menu-header span,
+.student-filter-popover-header span {
+  display: block;
+}
+
+.student-filter-menu-header strong,
+.student-filter-popover-header strong {
+  color: var(--c-text-primary);
+  font-size: 12.5px;
+  line-height: 1.25;
+}
+
+.student-filter-menu-header span,
+.student-filter-popover-header span {
+  color: var(--c-text-muted);
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.student-filter-menu-header > button,
+.student-filter-popover-header > button {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  font-size: 14px;
+}
+
+.student-filter-menu-body,
+.student-filter-list {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: grid;
+  align-content: start;
+  padding: 4px 13px;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.student-filter-menu-body::-webkit-scrollbar,
+.student-filter-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.student-filter-menu-body::-webkit-scrollbar-thumb,
+.student-filter-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #c6d2df;
+}
+
+.student-filter-row,
+.student-filter-field {
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 11px;
+  padding: 10px 2px;
+}
+
+.student-filter-row + .student-filter-row,
+.student-filter-field + .student-filter-field {
+  border-top-color: #e3e9f0;
+}
+
+.student-filter-row-label,
+.student-filter-label {
+  font-size: 10.5px;
+}
+
+.student-filter-row select,
+.student-filter-field select {
+  min-height: 38px;
+  border-color: #cfdae6;
+  border-radius: 9px;
+  background: #ffffff;
+  font-size: 11px;
+}
+
+.student-filter-row select:focus,
+.student-filter-field select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.student-filter-menu-footer,
+.student-filter-popover-footer {
+  flex: 0 0 auto;
+  min-height: 53px;
+  padding: 9px 12px;
+  background: #f8fbff;
+}
+
+.student-filter-reset,
+.student-filter-done {
+  min-height: 34px;
+  padding-inline: 12px;
+  border-radius: 8px;
+  font-size: 10.5px;
+}
+
+.student-filter-done {
+  border: 1px solid #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+  font-family: inherit;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.student-filter-done:hover {
+  border-color: #1e40af;
+  background: #1e40af;
+}
+
+/* =========================================================
+   36.07 TABLE — REMOVE DESKTOP MICRO-OVERFLOW
+========================================================= */
+
+.student-table-shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  border-radius: 0;
+}
+
+.student-table {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  min-width: 0;
+  table-layout: auto;
+}
+
+.student-table thead {
+  background: #f8fbff;
+}
+
+.student-table th {
+  padding: 12px 13px;
+  border-bottom-color: #d9e3ed;
+  color: #718198;
+  font-size: 9.5px;
+  letter-spacing: 0.055em;
+}
+
+.student-table td {
+  padding: 13px;
+  font-size: 11.5px;
+}
+
+.student-table th:first-child {
+  width: 48px;
+}
+
+.student-table th:nth-child(2) {
+  width: 175px;
+}
+
+.student-table th:nth-child(3) {
+  width: auto;
+}
+
+.student-table th:nth-child(4) {
+  width: 155px;
+}
+
+.student-table th:nth-child(5) {
+  width: 170px;
+}
+
+.student-table th:last-child,
+.student-table td:last-child {
+  width: 132px;
+  min-width: 132px;
+}
+
+.student-table tbody tr {
+  background: var(--c-surface);
+}
+
+.student-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--c-surface-soft) 44%, var(--c-surface));
+}
+
+.student-table tbody tr:hover {
+  background: #f6faff;
+}
+
+.student-name-cell {
+  min-width: 145px;
+}
+
+.student-name-cell strong {
+  font-size: 12.5px;
+}
+
+.student-name-cell small {
+  font-size: 10px;
+}
+
+.student-avatar {
+  width: 37px;
+  height: 37px;
+  flex-basis: 37px;
+  border-color: #c6d9ef;
+  background: #eff6ff;
+  color: #1d4f91;
+}
+
+.student-number {
+  min-height: 29px;
+  padding-inline: 9px;
+  border-color: #dbe3ec;
+  background: #f8fafc;
+  font-size: 10.5px;
+}
+
+.student-status-badge,
+.student-face-badge {
+  min-height: 30px;
+  font-size: 9.5px;
+}
+
+.student-actions-trigger {
+  min-width: 102px;
+  min-height: 36px;
+}
+
+/*
+ * Desktop should not show a scrollbar just because of an old
+ * hard min-width. Only reintroduce a safe minimum when space
+ * actually becomes constrained.
+ */
+@media (max-width: 1080px) {
+  .student-table {
+    min-width: 850px;
+  }
+}
+
+/* =========================================================
+   36.08 TABLE SCROLLBAR — ONLY VISIBLE WHEN NEEDED
+========================================================= */
+
+.student-table-shell::-webkit-scrollbar {
+  height: 7px;
+}
+
+.student-table-shell::-webkit-scrollbar-track {
+  background: #f6f8fb;
+}
+
+.student-table-shell::-webkit-scrollbar-thumb {
+  border: 2px solid #f6f8fb;
+  border-radius: 999px;
+  background: #b9c8da;
+}
+
+/* =========================================================
+   36.09 PAGINATION
+========================================================= */
+
+.student-pagination {
+  position: relative;
+  z-index: 1;
+  min-height: 64px;
+  padding: 13px 16px;
+  border-radius: 0 0 15px 15px;
+  background: #f8fbff;
+}
+
+.student-pagination-summary {
+  font-size: 10.5px;
+}
+
+.student-pagination-summary strong {
+  font-size: 11.5px;
+}
+
+.student-pagination-nav,
+.student-pagination-page,
+.student-pagination-controls button,
+.student-pagination-pages button {
+  border-color: #d1dce8;
+  background: #ffffff;
+}
+
+.student-pagination-page.is-active,
+.student-pagination-pages button.is-active {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+}
+
+/* =========================================================
+   36.10 ACTION MENU
+========================================================= */
+
+.student-actions-dropdown {
+  z-index: 1800;
+  width: 238px;
+  border-color: #cad7e5;
+  box-shadow:
+    0 22px 54px rgba(15, 35, 70, 0.2),
+    0 5px 16px rgba(15, 35, 70, 0.08);
+}
+
+.student-actions-dropdown-head {
+  padding-top: 8px;
+}
+
+.student-actions-dropdown-head small {
+  font-size: 8.5px;
+}
+
+.student-actions-dropdown-item {
+  min-height: 48px;
+}
+
+/* =========================================================
+   36.11 DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-section-overview,
+html[data-theme="dark"] .student-panel {
+  border-color: #2e4058;
+  background: var(--c-surface);
+}
+
+html[data-theme="dark"] .student-section-overview {
+  background:
+    linear-gradient(
+      100deg,
+      rgba(30, 64, 175, 0.09),
+      rgba(15, 23, 42, 0) 35%
+    ),
+    var(--c-surface);
+}
+
+html[data-theme="dark"] .student-section-stats > div:nth-child(1) {
+  border-color: #31588b !important;
+  background: rgba(30, 64, 175, 0.14);
+}
+
+html[data-theme="dark"] .student-section-stats > div:nth-child(2) {
+  border-color: #72551e !important;
+  background: rgba(146, 64, 14, 0.14);
+}
+
+html[data-theme="dark"] .student-section-stats > div:nth-child(3) {
+  border-color: #563a8a !important;
+  background: rgba(109, 40, 217, 0.14);
+}
+
+html[data-theme="dark"] .student-section-stats > div:nth-child(4) {
+  border-color: #2e6843 !important;
+  background: rgba(22, 101, 52, 0.15);
+}
+
+html[data-theme="dark"] .student-panel-header {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(30, 64, 175, 0.1),
+      rgba(15, 23, 42, 0) 40%
+    ),
+    var(--c-surface);
+}
+
+html[data-theme="dark"] .student-toolbar,
+html[data-theme="dark"] .student-pagination,
+html[data-theme="dark"] .student-filter-menu-footer,
+html[data-theme="dark"] .student-filter-popover-footer {
+  background: #101a2a;
+}
+
+html[data-theme="dark"] .student-search,
+html[data-theme="dark"] .student-result-count,
+html[data-theme="dark"] .student-filter-button,
+html[data-theme="dark"] .student-filter-row select,
+html[data-theme="dark"] .student-filter-field select {
+  border-color: #30445e;
+  background: #0d1727;
+  color: #dce6f2;
+}
+
+html[data-theme="dark"] .student-filter-button:hover,
+html[data-theme="dark"] .student-filter-button.is-open {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.15);
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"] .student-filter-menu,
+html[data-theme="dark"] .student-filter-popover {
+  border-color: #334760;
+  background: #0d1727;
+}
+
+html[data-theme="dark"] .student-filter-menu-header,
+html[data-theme="dark"] .student-filter-popover-header {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(30, 64, 175, 0.14),
+      rgba(13, 23, 39, 0.95)
+    );
+}
+
+html[data-theme="dark"] .student-table thead {
+  background: #101b2b;
+}
+
+html[data-theme="dark"] .student-table tbody tr,
+html[data-theme="dark"] .student-table tbody tr:nth-child(even) {
+  background: var(--c-surface);
+}
+
+html[data-theme="dark"] .student-table tbody tr:hover {
+  background: rgba(30, 64, 175, 0.09);
+}
+
+html[data-theme="dark"] .student-avatar {
+  border-color: #31588b;
+  background: rgba(30, 64, 175, 0.14);
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"] .student-number {
+  border-color: #334155;
+  background: rgba(51, 65, 85, 0.22);
+}
+
+html[data-theme="dark"] .student-table-shell::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+html[data-theme="dark"] .student-table-shell::-webkit-scrollbar-thumb {
+  border-color: #0f172a;
+  background: #42566f;
+}
+
+/* =========================================================
+   36.12 RESPONSIVE — LAPTOP / TABLET
+========================================================= */
+
+@media (max-width: 1260px) {
+  .student-section-overview {
+    grid-template-columns: minmax(220px, 1fr) auto;
+  }
+
+  .student-section-stats {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .student-section-badge {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 900px) {
+  .student-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-search {
+    width: 100%;
+  }
+
+  .student-toolbar-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .student-filter-wrap {
+    position: relative;
+  }
+
+  .student-filter-menu,
+  .student-filter-popover {
+    right: 0;
+    width: min(370px, calc(100vw - 34px));
+  }
+
+  .student-table {
+    min-width: 820px;
+  }
+}
+
+/* =========================================================
+   36.13 RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+  .student-management {
+    gap: 14px;
+  }
+
+  .student-section-overview {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 18px 15px 17px 19px;
+  }
+
+  .student-section-heading {
+    padding-left: 3px;
+  }
+
+  .student-section-heading h2 {
+    white-space: normal;
+  }
+
+  .student-section-stats {
+    grid-column: 1;
+    grid-row: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .student-section-stats > div {
+    min-width: 0;
+    padding: 12px 10px;
+  }
+
+  .student-section-stats > div + div {
+    border-left: 1px solid !important;
+  }
+
+  .student-section-badge {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
+
+  .student-panel-header {
+    min-height: 0;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+    padding: 17px 15px;
+  }
+
+  .student-panel-header .adviser-primary-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .student-toolbar {
+    padding: 12px;
+  }
+
+  .student-toolbar-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .student-result-count {
+    justify-content: center;
+  }
+
+  .student-filter-menu,
+  .student-filter-popover {
+    width: min(360px, calc(100vw - 28px));
+    max-height: min(340px, calc(100dvh - 130px));
+  }
+
+  .student-filter-row,
+  .student-filter-field {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+
+  .student-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-pagination-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 430px) {
+  .student-section-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .student-section-stats span {
+    white-space: normal;
+  }
+
+  .student-toolbar-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .student-filter-wrap,
+  .student-filter-button {
+    width: 100%;
+  }
+
+  .student-filter-menu,
+  .student-filter-popover {
+    right: auto;
+    left: 0;
+    width: min(100%, calc(100vw - 24px));
+  }
+
+  .student-filter-row,
+  .student-filter-field {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .student-pagination-pages {
+    flex-wrap: wrap;
+  }
+}
+
+/* =========================================================
+   36.14 SHORT VIEWPORT SAFETY
+========================================================= */
+
+@media (max-height: 720px) and (min-width: 651px) {
+  .student-filter-menu,
+  .student-filter-popover {
+    max-height: 300px;
+  }
+
+  .student-filter-row,
+  .student-filter-field {
+    padding-block: 7px;
+  }
+
+  .student-filter-row select,
+  .student-filter-field select {
+    min-height: 34px;
+  }
+}
+
+/* =========================================================
+   36.15 REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .student-filter-menu,
+  .student-filter-popover,
+  .student-section-stats > div,
+  .student-table tbody tr {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* =========================================================
+   37. STUDENT MANAGEMENT — COMFORTABLE UI + DESKTOP WIDTH FIX
+   FINAL SAFE OVERRIDES — KEEP THIS BLOCK LAST
+
+   UI ONLY:
+   - Slightly larger typography and controls.
+   - Section name no longer truncates to "ICT 12-...".
+   - Desktop roster uses the available width without a needless
+     horizontal scrollbar.
+   - Tablet/mobile can still scroll horizontally when genuinely needed.
+   - Existing filter dropdown clipping fix remains intact.
+   - No React/API/liveness/transfer/enrollment logic is changed.
+========================================================= */
+
+/* =========================================================
+   37.01 GENERAL SCALE
+========================================================= */
+
+.student-management {
+  gap: 22px;
+}
+
+/* =========================================================
+   37.02 ASSIGNED SECTION — NO MORE ELLIPSIS
+========================================================= */
+
+.student-section-overview {
+  grid-template-columns:
+    minmax(285px, 0.95fr)
+    minmax(520px, 1.7fr)
+    auto;
+  gap: 24px;
+  padding: 25px 27px 25px 30px;
+}
+
+.student-section-heading {
+  min-width: 0;
+}
+
+.student-section-heading > span {
+  font-size: 11px;
+}
+
+.student-section-heading h2 {
+  margin-top: 6px;
+
+  /* IMPORTANT: show the full section name. */
+  overflow: visible !important;
+  max-width: 100%;
+  white-space: normal !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere;
+
+  font-size: clamp(26px, 2.3vw, 32px);
+  line-height: 1.15;
+}
+
+.student-section-heading p {
+  margin-top: 7px;
+  font-size: 13px;
+}
+
+.student-section-stats > div {
+  padding: 15px 14px 14px;
+}
+
+.student-section-stats span {
+  font-size: 10px;
+}
+
+.student-section-stats strong {
+  margin-top: 8px;
+  font-size: 25px;
+}
+
+.student-section-badge {
+  min-height: 37px;
+  padding-inline: 14px;
+  font-size: 11px;
+}
+
+/* =========================================================
+   37.03 ROSTER HEADER — SLIGHTLY LARGER
+========================================================= */
+
+.student-panel-header {
+  min-height: 94px;
+  padding: 21px 23px 21px 25px;
+}
+
+.student-panel-header > div > span {
+  font-size: 11px;
+}
+
+.student-panel-header h2 {
+  font-size: 24px;
+}
+
+.student-panel-header p {
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.student-panel-header .adviser-primary-button {
+  min-height: 47px;
+  padding-inline: 19px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+/* =========================================================
+   37.04 TOOLBAR — SLIGHTLY LARGER
+========================================================= */
+
+.student-toolbar {
+  gap: 15px;
+  padding: 14px 17px 14px 19px;
+}
+
+.student-search {
+  width: min(100%, 590px);
+  min-height: 47px;
+}
+
+.student-search input {
+  font-size: 13px;
+}
+
+.student-search-icon {
+  font-size: 18px;
+}
+
+.student-result-count {
+  min-height: 42px;
+  padding-inline: 13px;
+  font-size: 11.5px;
+}
+
+.student-result-count strong {
+  font-size: 12.5px;
+}
+
+.student-filter-button {
+  min-height: 43px;
+  padding-inline: 12px;
+  font-size: 12px;
+}
+
+.student-filter-button-icon {
+  width: 27px;
+  height: 27px;
+  font-size: 13px;
+}
+
+/* =========================================================
+   37.05 FILTER MENU — READABLE, STILL NOT CLIPPED
+========================================================= */
+
+.student-filter-menu,
+.student-filter-popover {
+  z-index: 500 !important;
+  width: min(395px, calc(100vw - 34px));
+}
+
+.student-filter-menu-header,
+.student-filter-popover-header {
+  min-height: 64px;
+  padding: 14px 14px 13px 16px;
+}
+
+.student-filter-menu-header > div,
+.student-filter-popover-header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.student-filter-menu-header strong,
+.student-filter-popover-header strong {
+  font-size: 13.5px;
+}
+
+.student-filter-menu-header span,
+.student-filter-popover-header span {
+  font-size: 11px;
+}
+
+.student-filter-row,
+.student-filter-field {
+  grid-template-columns: 118px minmax(0, 1fr);
+  padding: 11px 2px;
+}
+
+.student-filter-row-label,
+.student-filter-label,
+.student-filter-row > label {
+  font-size: 11px;
+}
+
+.student-filter-row select,
+.student-filter-field select {
+  min-height: 40px;
+  font-size: 12px;
+}
+
+.student-filter-menu-footer,
+.student-filter-popover-footer {
+  min-height: 56px;
+}
+
+.student-filter-reset,
+.student-filter-done {
+  min-height: 36px;
+  font-size: 11px;
+}
+
+/* =========================================================
+   37.06 TABLE — LARGER + USE FULL DESKTOP WIDTH
+========================================================= */
+
+.student-table th {
+  padding: 13px 14px;
+  font-size: 10.5px;
+}
+
+.student-table td {
+  padding: 15px 14px;
+  font-size: 12.5px;
+}
+
+.student-table-index {
+  font-size: 11px !important;
+}
+
+.student-number {
+  min-height: 32px;
+  padding-inline: 10px;
+  font-size: 11.5px;
+}
+
+.student-avatar {
+  width: 40px;
+  height: 40px;
+  flex-basis: 40px;
+  font-size: 15px;
+}
+
+.student-name-cell {
+  min-width: 0;
+  gap: 11px;
+}
+
+.student-name-cell strong {
+  font-size: 14px;
+}
+
+.student-name-cell small {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.student-status-badge,
+.student-face-badge {
+  min-height: 33px;
+  padding-inline: 11px;
+  font-size: 10.5px;
+}
+
+.student-actions-trigger {
+  min-width: 108px;
+  min-height: 39px;
+  font-size: 11.5px;
+}
+
+/*
+ * DESKTOP FIX:
+ * The roster has enough space at normal desktop widths, so force
+ * the six columns to share the available panel width rather than
+ * creating a scrollbar from historical fixed/min widths.
+ */
+@media (min-width: 1101px) {
+  .student-table-shell {
+    overflow-x: clip !important;
+  }
+
+  .student-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+  }
+
+  .student-table th:first-child {
+    width: 5%;
+  }
+
+  .student-table th:nth-child(2) {
+    width: 18%;
+  }
+
+  .student-table th:nth-child(3) {
+    width: 27%;
+  }
+
+  .student-table th:nth-child(4) {
+    width: 15%;
+  }
+
+  .student-table th:nth-child(5) {
+    width: 19%;
+  }
+
+  .student-table th:nth-child(6),
+  .student-table th:last-child,
+  .student-table td:last-child {
+    width: 16%;
+    min-width: 0 !important;
+  }
+
+  .student-table td {
+    overflow: hidden;
+  }
+
+  .student-table td:nth-child(2),
+  .student-table td:nth-child(3) {
+    text-overflow: ellipsis;
+  }
+
+  .student-row-actions {
+    width: 100%;
+  }
+
+  .student-actions-trigger {
+    max-width: 100%;
+  }
+}
+
+/*
+ * Medium widths still get a real scroll container if all columns
+ * cannot remain readable. This is intentional and responsive.
+ */
+@media (max-width: 1100px) {
+  .student-table-shell {
+    overflow-x: auto !important;
+  }
+
+  .student-table {
+    min-width: 900px !important;
+    table-layout: auto !important;
+  }
+}
+
+/* =========================================================
+   37.07 PAGINATION
+========================================================= */
+
+.student-pagination {
+  min-height: 68px;
+  padding: 14px 17px;
+}
+
+.student-pagination-summary,
+.student-pagination-copy {
+  font-size: 11.5px;
+}
+
+.student-pagination-summary strong,
+.student-pagination-copy strong {
+  font-size: 12.5px;
+}
+
+.student-pagination-controls button,
+.student-pagination-pages button,
+.student-pagination-nav,
+.student-pagination-page {
+  min-width: 38px;
+  height: 38px;
+  font-size: 11.5px;
+}
+
+/* =========================================================
+   37.08 ACTION DROPDOWN
+========================================================= */
+
+.student-actions-dropdown {
+  width: 246px;
+}
+
+.student-actions-dropdown-head small {
+  font-size: 9px;
+}
+
+.student-actions-dropdown-head strong {
+  font-size: 13px;
+}
+
+.student-actions-dropdown-item {
+  min-height: 51px;
+}
+
+.student-actions-dropdown-item strong {
+  font-size: 12px;
+}
+
+.student-actions-dropdown-item small {
+  font-size: 9px;
+}
+
+/* =========================================================
+   37.09 ALERTS / CALLOUTS
+========================================================= */
+
+.student-success-alert {
+  padding: 15px 16px;
+}
+
+.student-success-alert strong {
+  font-size: 14px;
+}
+
+.student-success-alert p {
+  font-size: 12px;
+}
+
+.student-face-intent {
+  padding: 15px 17px;
+}
+
+.student-face-intent strong {
+  font-size: 14px;
+}
+
+.student-face-intent p {
+  font-size: 12px;
+}
+
+/* =========================================================
+   37.10 MODAL GENERAL READABILITY
+   Small bump only; camera geometry remains untouched.
+========================================================= */
+
+.student-modal-heading > div:last-child > span {
+  font-size: 11px;
+}
+
+.student-modal-heading h2 {
+  font-size: 23px;
+}
+
+.student-modal-heading p {
+  font-size: 13px;
+}
+
+.student-form-field > span {
+  font-size: 13px;
+}
+
+.student-form-field input,
+.student-form-field select,
+.student-form-field textarea {
+  font-size: 14px;
+}
+
+/* =========================================================
+   37.11 RESPONSIVE SECTION LAYOUT
+========================================================= */
+
+@media (max-width: 1320px) {
+  .student-section-overview {
+    grid-template-columns: minmax(250px, 1fr) auto;
+  }
+
+  .student-section-stats {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .student-section-badge {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 900px) {
+  .student-section-heading h2 {
+    font-size: 27px;
+  }
+
+  .student-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-search {
+    width: 100%;
+  }
+
+  .student-toolbar-actions {
+    width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .student-section-overview {
+    grid-template-columns: 1fr;
+    padding: 20px 17px 19px 21px;
+  }
+
+  .student-section-heading h2 {
+    font-size: 25px;
+  }
+
+  .student-section-stats,
+  .student-section-badge {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .student-section-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .student-section-badge {
+    justify-self: start;
+  }
+
+  .student-panel-header {
+    padding: 18px 16px;
+  }
+
+  .student-panel-header h2 {
+    font-size: 22px;
+  }
+
+  .student-toolbar {
+    padding: 13px;
+  }
+
+  .student-filter-menu,
+  .student-filter-popover {
+    width: min(370px, calc(100vw - 28px));
+  }
+
+  .student-filter-row,
+  .student-filter-field {
+    grid-template-columns: 105px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 430px) {
+  .student-section-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .student-filter-row,
+  .student-filter-field {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   37.12 DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .student-table tbody tr:hover {
+  background: rgba(30, 64, 175, 0.1);
+}
+
+/* =========================================================
+   37.13 REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .student-table tbody tr,
+  .student-actions-trigger,
+  .student-filter-button {
+    transition: none !important;
+  }
+}
+

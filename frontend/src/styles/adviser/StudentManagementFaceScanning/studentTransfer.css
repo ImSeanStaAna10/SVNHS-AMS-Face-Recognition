@@ -2475,3 +2475,1327 @@ html[data-theme="dark"] .student-transfer-pagination-page.is-active {
     transition: none;
   }
 }
+
+/* =========================================================
+   UI / UX POLISH V2
+   ---------------------------------------------------------
+   Presentation-only override.
+   Keeps all existing transfer logic and behaviors intact.
+========================================================= */
+
+/* =========================================================
+   PAGE RHYTHM + TYPOGRAPHY
+========================================================= */
+
+.student-transfers {
+  gap: 22px;
+  padding-bottom: 44px;
+}
+
+.student-transfer-overview,
+.student-transfer-panel {
+  border-radius: 16px;
+}
+
+.student-transfer-overview {
+  gap: 34px;
+  padding: 27px 29px;
+}
+
+.student-transfer-overview::before {
+  width: 5px;
+}
+
+.student-transfer-overview-copy {
+  padding-left: 8px;
+}
+
+.student-transfer-overview-copy > span,
+.student-transfer-panel-header > div > span {
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+}
+
+.student-transfer-overview-copy h2 {
+  margin-top: 7px;
+  font-size: clamp(28px, 2.8vw, 35px);
+  letter-spacing: -0.65px;
+}
+
+.student-transfer-overview-copy p {
+  max-width: 580px;
+  margin-top: 9px;
+  font-size: 12.5px;
+  line-height: 1.62;
+}
+
+/* =========================================================
+   OVERVIEW STATS — CLEARER & MORE SCANNABLE
+========================================================= */
+
+.student-transfer-overview-stats {
+  border-radius: 13px;
+  box-shadow: 0 7px 22px rgba(7, 27, 66, 0.04);
+}
+
+.student-transfer-overview-stats > button {
+  position: relative;
+  min-height: 103px;
+  padding: 17px 18px;
+}
+
+.student-transfer-overview-stats > button::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-border);
+}
+
+.student-transfer-overview-stats > button:first-child::before {
+  background: #f59e0b;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+}
+
+.student-transfer-overview-stats > button:nth-child(2)::before {
+  background: var(--c-blue-800);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--c-blue-800) 10%, transparent);
+}
+
+.student-transfer-overview-stats > button:nth-child(3)::before {
+  background: var(--c-success-dot);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--c-success-dot) 10%, transparent);
+}
+
+.student-transfer-overview-stats span {
+  padding-right: 14px;
+  font-size: 9.5px;
+}
+
+.student-transfer-overview-stats strong {
+  margin-top: 9px;
+  font-size: 28px;
+}
+
+.student-transfer-overview-stats small {
+  margin-top: 7px;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+/* =========================================================
+   PANEL HEADER
+========================================================= */
+
+.student-transfer-panel-header {
+  padding: 22px 24px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-icon-bg) 32%, var(--c-surface)),
+    var(--c-surface) 72%
+  );
+}
+
+.student-transfer-panel-header h2 {
+  margin-top: 6px;
+  font-size: 23px;
+}
+
+.student-transfer-panel-header p {
+  margin-top: 6px;
+  font-size: 11.5px;
+}
+
+.student-transfer-workspace-state {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 5px 8px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 999px;
+  background: var(--c-surface);
+}
+
+.student-transfer-workspace-state > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-blue-800);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-blue-800) 10%, transparent);
+}
+
+.student-transfer-workspace-state strong {
+  color: var(--c-text-body);
+  font-size: 8.8px;
+  font-weight: 780;
+}
+
+/* =========================================================
+   AUTO SYNC — LESS VISUALLY LOUD
+========================================================= */
+
+.student-transfer-auto-sync {
+  min-height: 44px;
+  padding: 7px 12px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--c-surface-soft) 78%, var(--c-surface));
+}
+
+.student-transfer-auto-sync strong {
+  font-size: 10.5px;
+}
+
+.student-transfer-auto-sync small {
+  font-size: 9px;
+}
+
+/* =========================================================
+   TABS — MORE DESKTOP-APP LIKE
+========================================================= */
+
+.student-transfer-tabs {
+  gap: 7px;
+  padding: 12px 14px;
+}
+
+.student-transfer-tabs > button {
+  min-height: 67px;
+  padding: 11px 14px;
+  border-radius: 10px;
+}
+
+.student-transfer-tabs > button:hover {
+  transform: translateY(-1px);
+  border-color: var(--c-border-soft);
+}
+
+.student-transfer-tabs > button.is-active {
+  border-color: var(--c-brand-border);
+  box-shadow: 0 6px 17px rgba(7, 27, 66, 0.055);
+}
+
+.student-transfer-tabs > button.is-active::after {
+  right: 14px;
+  left: 14px;
+  height: 3px;
+}
+
+.student-transfer-tabs span {
+  font-size: 13px;
+}
+
+.student-transfer-tabs small {
+  margin-top: 3px;
+  font-size: 9.5px;
+}
+
+.student-transfer-tabs strong {
+  min-width: 31px;
+  height: 31px;
+  font-size: 10.5px;
+}
+
+/* =========================================================
+   TOOLBAR — MORE BREATHING ROOM
+========================================================= */
+
+.student-transfer-toolbar {
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--c-surface);
+}
+
+.student-transfer-search {
+  width: min(100%, 530px);
+  min-height: 44px;
+  border-radius: 10px;
+}
+
+.student-transfer-search input {
+  font-size: 12px;
+}
+
+.student-transfer-toolbar-controls {
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.student-transfer-toolbar-controls > label > span {
+  font-size: 10px;
+}
+
+.student-transfer-toolbar-controls select {
+  min-height: 38px;
+  border-radius: 9px;
+  font-size: 10.5px;
+}
+
+.student-transfer-toolbar-reset {
+  min-height: 38px;
+  padding: 0 11px;
+  border: 1px solid var(--c-border);
+  border-radius: 9px;
+  background: var(--c-surface);
+  color: var(--c-blue-800);
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.student-transfer-toolbar-reset:hover {
+  transform: translateY(-1px);
+  border-color: var(--c-brand-border);
+  background: var(--c-icon-bg);
+}
+
+.student-transfer-result-count {
+  min-height: 38px;
+  border-radius: 9px;
+  font-size: 10.5px;
+}
+
+.student-transfer-result-count strong {
+  font-size: 12px;
+}
+
+/* =========================================================
+   REQUEST LIST
+========================================================= */
+
+.student-transfer-list {
+  min-height: 360px;
+  gap: 12px;
+  padding: 17px;
+  background: color-mix(in srgb, var(--c-surface-soft) 36%, var(--c-surface));
+}
+
+/* =========================================================
+   REQUEST CARD — STRONGER INFORMATION HIERARCHY
+========================================================= */
+
+.student-transfer-card {
+  border-radius: 13px;
+  box-shadow: 0 3px 10px rgba(7, 27, 66, 0.025);
+}
+
+.student-transfer-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(7, 27, 66, 0.07);
+}
+
+.student-transfer-card.is-pending::before {
+  width: 4px;
+}
+
+.student-transfer-card-main {
+  grid-template-columns:
+    minmax(230px, 0.9fr)
+    minmax(340px, 1.35fr)
+    minmax(145px, auto);
+  gap: 24px;
+  padding: 17px 18px 16px 20px;
+}
+
+/* =========================================================
+   STUDENT IDENTITY
+========================================================= */
+
+.student-transfer-student {
+  gap: 12px;
+}
+
+.student-transfer-avatar {
+  width: 46px;
+  height: 46px;
+  flex-basis: 46px;
+  border-radius: 11px;
+  font-size: 16px;
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--c-blue-800) 3%, transparent);
+}
+
+.student-transfer-student-copy small {
+  font-size: 8.5px;
+}
+
+.student-transfer-student-copy strong {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.student-transfer-student-copy span {
+  margin-top: 4px;
+  font-size: 10.5px;
+  font-weight: 650;
+}
+
+/* =========================================================
+   TRANSFER ROUTE
+========================================================= */
+
+.student-transfer-route {
+  gap: 11px;
+}
+
+.student-transfer-route-section {
+  padding: 11px 12px;
+  border-radius: 10px;
+}
+
+.student-transfer-route-section small {
+  font-size: 8.5px;
+}
+
+.student-transfer-route-section strong {
+  margin-top: 4px;
+  font-size: 11.5px;
+}
+
+.student-transfer-route-section.is-destination {
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--c-blue-800) 4%, transparent);
+}
+
+.student-transfer-route-arrow {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--c-blue-800) 5%, transparent);
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.student-transfer-card-status {
+  gap: 7px;
+}
+
+.student-transfer-status {
+  min-height: 31px;
+  padding: 0 11px;
+  font-size: 9.5px;
+}
+
+.student-transfer-card-date {
+  font-size: 9px;
+}
+
+/* =========================================================
+   CARD FOOTER
+========================================================= */
+
+.student-transfer-card-footer {
+  min-height: 57px;
+  padding: 11px 18px 11px 20px;
+}
+
+.student-transfer-meta {
+  gap: 26px;
+}
+
+.student-transfer-meta small {
+  font-size: 8px;
+}
+
+.student-transfer-meta strong {
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.student-transfer-meta-reason {
+  max-width: 390px;
+}
+
+.student-transfer-card-actions button {
+  min-width: 112px;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.student-transfer-primary-button,
+.student-transfer-secondary-button,
+.student-transfer-approve-button,
+.student-transfer-reject-button,
+.student-transfer-cancel-button {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 11px;
+}
+
+.student-transfer-primary-button,
+.student-transfer-approve-button {
+  box-shadow: 0 5px 14px rgba(18, 61, 126, 0.11);
+}
+
+.student-transfer-primary-button:hover:not(:disabled),
+.student-transfer-approve-button:hover:not(:disabled) {
+  box-shadow: 0 7px 18px rgba(18, 61, 126, 0.15);
+}
+
+/* =========================================================
+   LOADING — SKELETON INSTEAD OF LARGE EMPTY SPACE
+========================================================= */
+
+.student-transfer-loading {
+  min-height: 350px;
+  display: block;
+  padding: 18px;
+  text-align: left;
+}
+
+.student-transfer-loading-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 4px 2px 15px;
+}
+
+.student-transfer-loading-heading .student-transfer-spinner {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+}
+
+.student-transfer-loading-heading strong {
+  display: block;
+  margin: 0;
+  font-size: 13px;
+}
+
+.student-transfer-loading-heading p {
+  margin: 3px 0 0;
+  font-size: 9.5px;
+}
+
+.student-transfer-skeleton-list {
+  display: grid;
+  gap: 10px;
+}
+
+.student-transfer-skeleton-card {
+  min-height: 83px;
+  display: grid;
+  grid-template-columns: auto minmax(150px, 0.8fr) minmax(260px, 1.3fr) auto;
+  align-items: center;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid var(--c-border-soft);
+  border-radius: 11px;
+  background: var(--c-surface);
+  overflow: hidden;
+}
+
+.student-transfer-skeleton-avatar,
+.student-transfer-skeleton-copy span,
+.student-transfer-skeleton-route span,
+.student-transfer-skeleton-route i,
+.student-transfer-skeleton-status {
+  display: block;
+  background: linear-gradient(
+    90deg,
+    var(--c-surface-soft),
+    color-mix(in srgb, var(--c-icon-bg) 65%, var(--c-surface)),
+    var(--c-surface-soft)
+  );
+  background-size: 220% 100%;
+  animation: student-transfer-skeleton-shimmer 1.35s ease-in-out infinite;
+}
+
+.student-transfer-skeleton-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+}
+
+.student-transfer-skeleton-copy {
+  display: grid;
+  gap: 7px;
+}
+
+.student-transfer-skeleton-copy span:first-child {
+  width: 72%;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.student-transfer-skeleton-copy span:last-child {
+  width: 48%;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.student-transfer-skeleton-route {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.student-transfer-skeleton-route span {
+  height: 37px;
+  border-radius: 9px;
+}
+
+.student-transfer-skeleton-route i {
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+}
+
+.student-transfer-skeleton-status {
+  width: 78px;
+  height: 29px;
+  border-radius: 999px;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.student-transfer-empty {
+  min-height: 360px;
+  padding: 42px 30px;
+}
+
+.student-transfer-empty-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 15px;
+  font-size: 22px;
+}
+
+.student-transfer-empty h3 {
+  margin-top: 15px;
+  font-size: 19px;
+}
+
+.student-transfer-empty p {
+  max-width: 470px;
+  margin-top: 7px;
+  font-size: 11.5px;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.student-transfer-pagination {
+  min-height: 69px;
+  padding: 14px 17px;
+}
+
+.student-transfer-pagination-summary {
+  font-size: 11px;
+}
+
+.student-transfer-pagination-summary strong {
+  font-size: 11.5px;
+}
+
+.student-transfer-pagination-page,
+.student-transfer-pagination-nav {
+  min-height: 37px;
+  height: 37px;
+  border-radius: 9px;
+  font-size: 10.5px;
+}
+
+/* =========================================================
+   MODAL — MORE PROFESSIONAL REVIEW EXPERIENCE
+========================================================= */
+
+.student-transfer-modal {
+  width: min(760px, calc(100vw - 36px));
+  border-radius: 18px;
+}
+
+.student-transfer-modal-header {
+  padding: 20px 22px;
+}
+
+.student-transfer-modal-icon {
+  width: 46px;
+  height: 46px;
+  flex-basis: 46px;
+  border-radius: 12px;
+  font-size: 18px;
+}
+
+.student-transfer-modal-heading small {
+  font-size: 9.5px;
+}
+
+.student-transfer-modal-heading h2 {
+  margin-top: 5px;
+  font-size: 22px;
+}
+
+.student-transfer-modal-heading p {
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.student-transfer-modal-close {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+  border-radius: 10px;
+}
+
+.student-transfer-modal-body {
+  gap: 15px;
+  padding: 20px 22px;
+}
+
+.student-transfer-modal-student {
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.student-transfer-avatar.is-large {
+  width: 52px;
+  height: 52px;
+  flex-basis: 52px;
+  font-size: 18px;
+}
+
+.student-transfer-modal-student small {
+  font-size: 8.5px;
+}
+
+.student-transfer-modal-student strong {
+  margin-top: 4px;
+  font-size: 15px;
+}
+
+.student-transfer-modal-student div > span {
+  margin-top: 4px;
+  font-size: 10.5px;
+}
+
+.student-transfer-modal-route {
+  gap: 12px;
+}
+
+.student-transfer-modal-route > div {
+  padding: 14px;
+  border-radius: 12px;
+}
+
+.student-transfer-modal-route > span {
+  width: 35px;
+  height: 35px;
+}
+
+.student-transfer-modal-route small {
+  font-size: 8.5px;
+}
+
+.student-transfer-modal-route strong {
+  margin-top: 5px;
+  font-size: 13.5px;
+}
+
+.student-transfer-modal-route div > span {
+  margin-top: 5px;
+  font-size: 10px;
+}
+
+.student-transfer-detail-grid > div,
+.student-transfer-note-card {
+  padding: 12px 13px;
+  border-radius: 11px;
+}
+
+.student-transfer-detail-grid small,
+.student-transfer-note-card small {
+  font-size: 8.5px;
+}
+
+.student-transfer-detail-grid strong {
+  font-size: 10.5px;
+}
+
+.student-transfer-note-card p {
+  font-size: 11px;
+}
+
+.student-transfer-review-note > span {
+  font-size: 11.5px;
+}
+
+.student-transfer-review-note textarea {
+  min-height: 105px;
+  padding: 12px 13px;
+  border-radius: 11px;
+  font-size: 11.5px;
+}
+
+.student-transfer-pending-note {
+  padding: 13px 14px;
+  border-radius: 11px;
+}
+
+.student-transfer-pending-note strong {
+  font-size: 11.5px;
+}
+
+.student-transfer-pending-note p {
+  font-size: 10.2px;
+}
+
+.student-transfer-modal-actions {
+  min-height: 73px;
+  padding: 12px 20px;
+}
+
+.student-transfer-modal-actions > div:first-child strong {
+  font-size: 11px;
+}
+
+.student-transfer-modal-actions > div:first-child span {
+  font-size: 9px;
+}
+
+/* =========================================================
+   RESPONSIVE POLISH
+========================================================= */
+
+@media (max-width: 1180px) {
+  .student-transfer-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .student-transfer-search {
+    width: 100%;
+  }
+
+  .student-transfer-toolbar-controls {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 1080px) {
+  .student-transfer-card-main {
+    grid-template-columns:
+      minmax(220px, 0.9fr)
+      minmax(0, 1fr);
+  }
+
+  .student-transfer-card-status {
+    grid-column: 1 / -1;
+  }
+
+  .student-transfer-skeleton-card {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .student-transfer-skeleton-route {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .student-transfer-overview {
+    padding: 21px 18px;
+  }
+
+  .student-transfer-overview-copy h2 {
+    font-size: 27px;
+  }
+
+  .student-transfer-overview-copy p {
+    font-size: 11.5px;
+  }
+
+  .student-transfer-panel-header {
+    padding: 18px;
+  }
+
+  .student-transfer-tabs {
+    padding: 10px;
+  }
+
+  .student-transfer-tabs > button {
+    min-height: 61px;
+  }
+
+  .student-transfer-toolbar {
+    padding: 12px;
+  }
+
+  .student-transfer-toolbar-controls {
+    align-items: stretch;
+  }
+
+  .student-transfer-toolbar-reset,
+  .student-transfer-result-count {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .student-transfer-card-main {
+    padding: 16px;
+  }
+
+  .student-transfer-card-footer {
+    padding: 12px 16px;
+  }
+
+  .student-transfer-modal-header {
+    padding: 16px;
+  }
+
+  .student-transfer-modal-body {
+    padding: 15px;
+  }
+
+  .student-transfer-modal-actions {
+    padding: 13px 15px;
+  }
+
+  .student-transfer-skeleton-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .student-transfer-skeleton-route,
+  .student-transfer-skeleton-status {
+    grid-column: 1 / -1;
+  }
+}
+
+/* =========================================================
+   DARK MODE POLISH
+========================================================= */
+
+html[data-theme="dark"] .student-transfer-workspace-state {
+  border-color: var(--c-border);
+  background: rgba(15, 23, 42, 0.45);
+}
+
+html[data-theme="dark"] .student-transfer-skeleton-card {
+  border-color: var(--c-border);
+}
+
+html[data-theme="dark"] .student-transfer-skeleton-avatar,
+html[data-theme="dark"] .student-transfer-skeleton-copy span,
+html[data-theme="dark"] .student-transfer-skeleton-route span,
+html[data-theme="dark"] .student-transfer-skeleton-route i,
+html[data-theme="dark"] .student-transfer-skeleton-status {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 41, 59, 0.72),
+    rgba(51, 65, 85, 0.78),
+    rgba(30, 41, 59, 0.72)
+  );
+  background-size: 220% 100%;
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes student-transfer-skeleton-shimmer {
+  0% {
+    background-position: 110% 0;
+  }
+
+  100% {
+    background-position: -110% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-transfer-skeleton-avatar,
+  .student-transfer-skeleton-copy span,
+  .student-transfer-skeleton-route span,
+  .student-transfer-skeleton-route i,
+  .student-transfer-skeleton-status {
+    animation: none !important;
+  }
+}
+
+/* =========================================================
+   GRADIENT CARD POLISH
+   ---------------------------------------------------------
+   Subtle institutional gradients only.
+   No transfer logic or layout behavior is changed.
+========================================================= */
+
+/* =========================================================
+   OVERVIEW STAT CARDS
+========================================================= */
+
+.student-transfer-overview-stats > button {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-icon-bg) 34%, var(--c-surface)) 0%,
+    var(--c-surface) 58%,
+    color-mix(in srgb, var(--c-blue-800) 3%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-overview-stats > button:first-child {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, #f59e0b 7%, var(--c-surface)) 0%,
+    var(--c-surface) 58%,
+    color-mix(in srgb, #f59e0b 3%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-overview-stats > button:nth-child(2) {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-blue-800) 8%, var(--c-surface)) 0%,
+    var(--c-surface) 58%,
+    color-mix(in srgb, var(--c-blue-800) 3%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-overview-stats > button:nth-child(3) {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-success-dot) 7%, var(--c-surface)) 0%,
+    var(--c-surface) 58%,
+    color-mix(in srgb, var(--c-success-dot) 3%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-overview-stats > button:hover,
+.student-transfer-overview-stats > button.is-active {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-icon-bg) 76%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-blue-800) 7%, var(--c-surface)) 100%
+  );
+}
+
+/* =========================================================
+   MAIN REQUEST CARDS
+========================================================= */
+
+.student-transfer-card {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-icon-bg) 20%, var(--c-surface)) 0%,
+    var(--c-surface) 36%,
+    var(--c-surface) 72%,
+    color-mix(in srgb, var(--c-blue-800) 2.5%, var(--c-surface)) 100%
+  );
+}
+
+/* Pending — warm amber tint */
+.student-transfer-card.is-pending {
+  border-color: color-mix(in srgb, #f59e0b 19%, var(--c-border-soft));
+
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, #f59e0b 7%, var(--c-surface)) 0%,
+    var(--c-surface) 34%,
+    var(--c-surface) 74%,
+    color-mix(in srgb, #f59e0b 3%, var(--c-surface)) 100%
+  );
+}
+
+/* =========================================================
+   STATUS-SPECIFIC CARD COLORING
+   Uses :has() so the whole card subtly reflects its state.
+========================================================= */
+
+.student-transfer-card:has(.status-approved) {
+  border-color: color-mix(
+    in srgb,
+    var(--c-success-text) 15%,
+    var(--c-border-soft)
+  );
+
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-success-bg) 72%, var(--c-surface)) 0%,
+    var(--c-surface) 36%,
+    var(--c-surface) 76%,
+    color-mix(in srgb, var(--c-success-text) 2.5%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-card:has(.status-rejected) {
+  border-color: color-mix(in srgb, #dc2626 13%, var(--c-border-soft));
+
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, #fff2f2 70%, var(--c-surface)) 0%,
+    var(--c-surface) 38%,
+    var(--c-surface) 76%,
+    color-mix(in srgb, #dc2626 2.2%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-card:has(.status-cancelled) {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-surface-soft) 74%, var(--c-surface)) 0%,
+    var(--c-surface) 43%,
+    var(--c-surface) 77%,
+    color-mix(in srgb, var(--c-text-muted) 2%, var(--c-surface)) 100%
+  );
+}
+
+/* =========================================================
+   CARD FOOTER — CONNECTS VISUALLY TO MAIN CARD
+========================================================= */
+
+.student-transfer-card-footer {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--c-surface-soft) 74%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-icon-bg) 24%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-card.is-pending .student-transfer-card-footer {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #fff8e7 56%, var(--c-surface)) 0%,
+    color-mix(in srgb, #f59e0b 4%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-card:has(.status-approved) .student-transfer-card-footer {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--c-success-bg) 58%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-success-text) 3%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-card:has(.status-rejected) .student-transfer-card-footer {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #fff2f2 55%, var(--c-surface)) 0%,
+    color-mix(in srgb, #dc2626 2.8%, var(--c-surface)) 100%
+  );
+}
+
+/* =========================================================
+   ROUTE CARDS
+========================================================= */
+
+.student-transfer-route-section {
+  background: linear-gradient(
+    145deg,
+    var(--c-surface-soft) 0%,
+    color-mix(in srgb, var(--c-icon-bg) 34%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-route-section.is-destination {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-icon-bg) 86%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-blue-800) 6%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-route-arrow {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-icon-bg) 90%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-blue-800) 9%, var(--c-surface)) 100%
+  );
+}
+
+/* =========================================================
+   TABS AS SOFT GRADIENT CARDS
+========================================================= */
+
+.student-transfer-tabs > button {
+  background: linear-gradient(
+    145deg,
+    transparent,
+    color-mix(in srgb, var(--c-surface) 65%, transparent)
+  );
+}
+
+.student-transfer-tabs > button.is-active {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-icon-bg) 66%, var(--c-surface)) 0%,
+    var(--c-surface) 52%,
+    color-mix(in srgb, var(--c-blue-800) 4%, var(--c-surface)) 100%
+  );
+}
+
+/* =========================================================
+   MODAL CARDS
+========================================================= */
+
+.student-transfer-modal-student {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-icon-bg) 46%, var(--c-surface)) 0%,
+    var(--c-surface-soft) 58%,
+    color-mix(in srgb, var(--c-blue-800) 2.5%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-modal-route > div {
+  background: linear-gradient(
+    145deg,
+    var(--c-surface) 0%,
+    color-mix(in srgb, var(--c-surface-soft) 68%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-modal-route > div:last-child {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-icon-bg) 88%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-blue-800) 6%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-detail-grid > div {
+  background: linear-gradient(
+    145deg,
+    var(--c-surface-soft) 0%,
+    color-mix(in srgb, var(--c-icon-bg) 27%, var(--c-surface)) 100%
+  );
+}
+
+.student-transfer-note-card {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-surface-soft) 82%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-icon-bg) 24%, var(--c-surface)) 100%
+  );
+}
+
+/* Pending warning card gets its own warm gradient */
+.student-transfer-pending-note {
+  background: linear-gradient(135deg, #fffaf0 0%, #fff6df 54%, #fff9ea 100%);
+}
+
+/* =========================================================
+   EMPTY STATE ICON
+========================================================= */
+
+.student-transfer-empty-icon,
+.student-transfer-avatar {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--c-icon-bg) 94%, var(--c-surface)) 0%,
+    color-mix(in srgb, var(--c-blue-800) 7%, var(--c-surface)) 100%
+  );
+}
+
+/* =========================================================
+   DARK MODE GRADIENTS
+========================================================= */
+
+html[data-theme="dark"] .student-transfer-card {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 41, 59, 0.64) 0%,
+    var(--c-surface) 42%,
+    var(--c-surface) 76%,
+    rgba(59, 130, 246, 0.035) 100%
+  );
+}
+
+html[data-theme="dark"] .student-transfer-card.is-pending {
+  background: linear-gradient(
+    135deg,
+    rgba(120, 53, 15, 0.22) 0%,
+    var(--c-surface) 39%,
+    var(--c-surface) 78%,
+    rgba(245, 158, 11, 0.04) 100%
+  );
+}
+
+html[data-theme="dark"] .student-transfer-card:has(.status-approved) {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 83, 45, 0.18) 0%,
+    var(--c-surface) 40%,
+    var(--c-surface) 78%,
+    rgba(34, 197, 94, 0.035) 100%
+  );
+}
+
+html[data-theme="dark"] .student-transfer-card:has(.status-rejected) {
+  background: linear-gradient(
+    135deg,
+    rgba(127, 29, 29, 0.17) 0%,
+    var(--c-surface) 40%,
+    var(--c-surface) 78%,
+    rgba(248, 113, 113, 0.03) 100%
+  );
+}
+
+html[data-theme="dark"] .student-transfer-route-section,
+html[data-theme="dark"] .student-transfer-detail-grid > div,
+html[data-theme="dark"] .student-transfer-note-card {
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.66),
+    rgba(15, 23, 42, 0.48)
+  );
+}
+
+html[data-theme="dark"] .student-transfer-route-section.is-destination,
+html[data-theme="dark"] .student-transfer-modal-route > div:last-child {
+  background: linear-gradient(
+    145deg,
+    rgba(30, 64, 175, 0.16),
+    rgba(15, 23, 42, 0.52)
+  );
+}
+
+html[data-theme="dark"] .student-transfer-pending-note {
+  background: linear-gradient(
+    135deg,
+    rgba(120, 53, 15, 0.24),
+    rgba(92, 50, 12, 0.16)
+  );
+}
+
+/* =========================================================
+   HOVER POLISH
+========================================================= */
+
+.student-transfer-card:hover {
+  border-color: color-mix(in srgb, var(--c-blue-800) 25%, var(--c-border-soft));
+}
+
+.student-transfer-card.is-pending:hover {
+  border-color: color-mix(in srgb, #f59e0b 36%, var(--c-border-soft));
+}
+
+.student-transfer-card:has(.status-approved):hover {
+  border-color: color-mix(
+    in srgb,
+    var(--c-success-text) 28%,
+    var(--c-border-soft)
+  );
+}
+
+.student-transfer-card:has(.status-rejected):hover {
+  border-color: color-mix(in srgb, #dc2626 24%, var(--c-border-soft));
+}
