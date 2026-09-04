@@ -1,21 +1,22 @@
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import Login from "./features/auth/login";
 
 import authService from "./services/authService";
 
 /* =========================================================
+   PUBLIC
+========================================================= */
+
+import ParentAttendanceNotice from "./features/public/ParentAttendanceNotice";
+
+/* =========================================================
    SUPERADMIN
 ========================================================= */
 
-import SuperAdminDashboard from "./features/superadmin/SuperAdminDashboard";
-import DepartmentManagement from "./features/superadmin/DepartmentManagement";
 import CouncilorManagement from "./features/superadmin/CouncilorManagement";
+import DepartmentManagement from "./features/superadmin/DepartmentManagement";
+import SuperAdminDashboard from "./features/superadmin/SuperAdminDashboard";
 
 /* =========================================================
    ADVISER
@@ -29,6 +30,7 @@ import AttendanceHistoryDetail from "./features/adviser/AttendanceHistoryDetail"
 import AttendanceSession from "./features/adviser/AttendanceSession";
 import StudentManagement from "./features/adviser/StudentManagement";
 import StudentTransfers from "./features/adviser/StudentTransfer";
+import StudentsAtRisk from "./features/adviser/StudentAtRisk";
 
 /* =========================================================
    COUNCILOR
@@ -65,49 +67,25 @@ const getDashboardPath = (role) => {
    PROTECTED ROUTE
 ========================================================= */
 
-function ProtectedRoute({
-  children,
-  allowedRoles,
-}) {
-  const authenticated =
-    authService.isAuthenticated();
+function ProtectedRoute({ children, allowedRoles }) {
+  const authenticated = authService.isAuthenticated();
 
-  const user =
-    authService.getUser();
+  const user = authService.getUser();
 
   /* =======================================================
      NOT LOGGED IN
   ======================================================= */
 
-  if (
-    !authenticated ||
-    !user
-  ) {
-    return (
-      <Navigate
-        to="/login"
-        replace
-      />
-    );
+  if (!authenticated || !user) {
+    return <Navigate to="/login" replace />;
   }
 
   /* =======================================================
      WRONG ROLE
   ======================================================= */
 
-  if (
-    !allowedRoles.includes(
-      user.role,
-    )
-  ) {
-    return (
-      <Navigate
-        to={getDashboardPath(
-          user.role,
-        )}
-        replace
-      />
-    );
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to={getDashboardPath(user.role)} replace />;
   }
 
   /* =======================================================
@@ -126,15 +104,24 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* =================================================
-            AUTH
+            PUBLIC PARENT ATTENDANCE NOTICE
+
+            No Adviser/Councilor/SuperAdmin login required.
+
+            Access is protected by the secure token
+            contained in the email URL.
         ================================================= */}
 
         <Route
-          path="/login"
-          element={
-            <Login />
-          }
+          path="/attendance-notice/:token"
+          element={<ParentAttendanceNotice />}
         />
+
+        {/* =================================================
+            AUTH
+        ================================================= */}
+
+        <Route path="/login" element={<Login />} />
 
         {/* =================================================
             SUPERADMIN
@@ -143,11 +130,7 @@ function App() {
         <Route
           path="/superadmin/dashboard"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "SUPERADMIN",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["SUPERADMIN"]}>
               <SuperAdminDashboard />
             </ProtectedRoute>
           }
@@ -156,11 +139,7 @@ function App() {
         <Route
           path="/superadmin/departments"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "SUPERADMIN",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["SUPERADMIN"]}>
               <DepartmentManagement />
             </ProtectedRoute>
           }
@@ -169,11 +148,7 @@ function App() {
         <Route
           path="/superadmin/councilors"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "SUPERADMIN",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["SUPERADMIN"]}>
               <CouncilorManagement />
             </ProtectedRoute>
           }
@@ -186,11 +161,7 @@ function App() {
         <Route
           path="/councilor/dashboard"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "COUNCILOR",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["COUNCILOR"]}>
               <CouncilorDashboard />
             </ProtectedRoute>
           }
@@ -199,11 +170,7 @@ function App() {
         <Route
           path="/councilor/advisers"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "COUNCILOR",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["COUNCILOR"]}>
               <Advisers />
             </ProtectedRoute>
           }
@@ -212,11 +179,7 @@ function App() {
         <Route
           path="/councilor/sections"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "COUNCILOR",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["COUNCILOR"]}>
               <SectionManagement />
             </ProtectedRoute>
           }
@@ -229,11 +192,7 @@ function App() {
         <Route
           path="/councilor/attendance"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "COUNCILOR",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["COUNCILOR"]}>
               <AttendanceManagement />
             </ProtectedRoute>
           }
@@ -242,11 +201,7 @@ function App() {
         <Route
           path="/councilor/attendance/:sectionId"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "COUNCILOR",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["COUNCILOR"]}>
               <AttendanceDetails />
             </ProtectedRoute>
           }
@@ -259,11 +214,7 @@ function App() {
         <Route
           path="/councilor/attendance-records"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "COUNCILOR",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["COUNCILOR"]}>
               <CouncilorAttendanceRecords />
             </ProtectedRoute>
           }
@@ -276,11 +227,7 @@ function App() {
         <Route
           path="/adviser/dashboard"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "ADVISER",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["ADVISER"]}>
               <AdviserDashboard />
             </ProtectedRoute>
           }
@@ -293,11 +240,7 @@ function App() {
         <Route
           path="/adviser/students"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "ADVISER",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["ADVISER"]}>
               <StudentManagement />
             </ProtectedRoute>
           }
@@ -318,12 +261,17 @@ function App() {
         <Route
           path="/adviser/transfers"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "ADVISER",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["ADVISER"]}>
               <StudentTransfers />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/adviser/students-at-risk"
+          element={
+            <ProtectedRoute allowedRoles={["ADVISER"]}>
+              <StudentsAtRisk />
             </ProtectedRoute>
           }
         />
@@ -335,11 +283,7 @@ function App() {
         <Route
           path="/adviser/attendance"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "ADVISER",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["ADVISER"]}>
               <AdviserAttendance />
             </ProtectedRoute>
           }
@@ -352,11 +296,7 @@ function App() {
         <Route
           path="/adviser/attendance/history"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "ADVISER",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["ADVISER"]}>
               <AttendanceHistory />
             </ProtectedRoute>
           }
@@ -365,11 +305,7 @@ function App() {
         <Route
           path="/adviser/attendance/history/:sessionId"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "ADVISER",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["ADVISER"]}>
               <AttendanceHistoryDetail />
             </ProtectedRoute>
           }
@@ -382,11 +318,7 @@ function App() {
         <Route
           path="/adviser/attendance-records"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "ADVISER",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["ADVISER"]}>
               <AdviserAttendanceRecords />
             </ProtectedRoute>
           }
@@ -403,11 +335,7 @@ function App() {
         <Route
           path="/adviser/attendance/:sessionId"
           element={
-            <ProtectedRoute
-              allowedRoles={[
-                "ADVISER",
-              ]}
-            >
+            <ProtectedRoute allowedRoles={["ADVISER"]}>
               <AttendanceSession />
             </ProtectedRoute>
           }
@@ -417,15 +345,7 @@ function App() {
             FALLBACK
         ================================================= */}
 
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to="/login"
-              replace
-            />
-          }
-        />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );

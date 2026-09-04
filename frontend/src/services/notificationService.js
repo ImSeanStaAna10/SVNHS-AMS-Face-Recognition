@@ -82,6 +82,48 @@ const normalizeIds = (values) => {
 };
 
 /* =========================================================
+   NOTIFICATION VALUE HELPERS
+
+   These helpers intentionally support BOTH:
+
+   1. Raw backend NotificationResponse
+      type = PARENT_ATTENDANCE_RESPONDED
+
+   2. Frontend mapped notification
+      type      = ATTENDANCE
+      eventType = PARENT_ATTENDANCE_RESPONDED
+
+   This is important because openNotification() may receive
+   either form depending on where it is called.
+========================================================= */
+
+const getNotificationEventType = (
+  notification,
+) =>
+  normalizeUpper(
+    notification?.eventType ??
+      notification?.raw?.type ??
+      notification?.type,
+  );
+
+const getNotificationReferenceType = (
+  notification,
+) =>
+  normalizeUpper(
+    notification?.referenceType ??
+      notification?.raw?.referenceType,
+  );
+
+const getNotificationReferenceId = (
+  notification,
+) =>
+  normalizeString(
+    notification?.referenceId ??
+      notification?.raw?.referenceId ??
+      "",
+  );
+
+/* =========================================================
    DATE PARAMETER
 ========================================================= */
 
@@ -173,13 +215,14 @@ const getTransferAction = (
   notification,
 ) => {
   const type =
-    normalizeUpper(
-      notification?.type,
+    getNotificationEventType(
+      notification,
     );
 
   const requestId =
-    notification?.referenceId ||
-    "";
+    getNotificationReferenceId(
+      notification,
+    );
 
   switch (type) {
     case "STUDENT_TRANSFER_REQUESTED":
@@ -259,11 +302,15 @@ const getReportAction = (
 
   state: {
     notificationReferenceId:
-      notification?.referenceId ||
+      getNotificationReferenceId(
+        notification,
+      ) ||
       null,
 
     notificationType:
-      notification?.type ||
+      getNotificationEventType(
+        notification,
+      ) ||
       null,
   },
 });
@@ -278,7 +325,9 @@ const getAttendanceSessionAction = (
 
   state: {
     sessionId:
-      notification?.referenceId ||
+      getNotificationReferenceId(
+        notification,
+      ) ||
       null,
   },
 });
@@ -293,7 +342,9 @@ const getFaceConflictAction = (
 
   state: {
     faceConflictId:
-      notification?.referenceId ||
+      getNotificationReferenceId(
+        notification,
+      ) ||
       null,
   },
 });
@@ -308,21 +359,86 @@ const getAccountAction = () => ({
 });
 
 /* =========================================================
+   PARENT ATTENDANCE INTERVENTION ACTION
+
+   Parent notifications currently store:
+
+   referenceId = AttendanceIntervention ID
+
+   referenceType may be null.
+
+   Clicking the notification therefore routes to
+   Students at Risk and forwards the intervention ID.
+
+   StudentsAtRisk can later use:
+   state.openAttendanceNotice
+   state.interventionId
+
+   to automatically open the exact intervention modal.
+========================================================= */
+
+const getParentAttendanceAction = (
+  notification,
+) => {
+  const interventionId =
+    getNotificationReferenceId(
+      notification,
+    );
+
+  const notificationType =
+    getNotificationEventType(
+      notification,
+    );
+
+  return {
+    label:
+      notificationType ===
+      "PARENT_ATTENDANCE_RESPONDED"
+        ? "View Parent Response"
+        : "View Attendance Notice",
+
+    path:
+      "/adviser/students-at-risk",
+
+    state: {
+      interventionId:
+        interventionId ||
+        null,
+
+      notificationType:
+        notificationType ||
+        null,
+
+      openAttendanceNotice:
+        true,
+    },
+  };
+};
+
+/* =========================================================
    GENERIC ACTION RESOLVER
 ========================================================= */
 
 const getNotificationAction = (
   notification,
 ) => {
+  if (!notification) {
+    return null;
+  }
+
   const referenceType =
-    normalizeUpper(
-      notification?.referenceType,
+    getNotificationReferenceType(
+      notification,
     );
 
   const type =
-    normalizeUpper(
-      notification?.type,
+    getNotificationEventType(
+      notification,
     );
+
+  /* =======================================================
+     REFERENCE TYPE ROUTING
+  ======================================================= */
 
   switch (referenceType) {
     case "STUDENT_TRANSFER":
@@ -352,12 +468,13 @@ const getNotificationAction = (
       break;
   }
 
-  /*
-   * Type fallback.
-   *
-   * Useful if a legacy notification does not have
-   * referenceType populated.
-   */
+  /* =======================================================
+     TYPE FALLBACK
+
+     Useful when referenceType is null or when handling
+     legacy notifications.
+  ======================================================= */
+
   if (
     type.startsWith(
       "STUDENT_TRANSFER_",
@@ -383,6 +500,27 @@ const getNotificationAction = (
     "ATTENDANCE_SESSION_AUTO_ENDED"
   ) {
     return getAttendanceSessionAction(
+      notification,
+    );
+  }
+
+  /* =======================================================
+     PARENT ATTENDANCE
+
+     These currently have:
+     referenceType = null
+     referenceId   = intervention ID
+
+     So this type fallback is intentional.
+  ======================================================= */
+
+  if (
+    type ===
+      "PARENT_ATTENDANCE_ACKNOWLEDGED" ||
+    type ===
+      "PARENT_ATTENDANCE_RESPONDED"
+  ) {
+    return getParentAttendanceAction(
       notification,
     );
   }
@@ -425,13 +563,13 @@ const getUiNotificationType = (
   notification,
 ) => {
   const type =
-    normalizeUpper(
-      notification?.type,
+    getNotificationEventType(
+      notification,
     );
 
   const referenceType =
-    normalizeUpper(
-      notification?.referenceType,
+    getNotificationReferenceType(
+      notification,
     );
 
   if (
@@ -486,60 +624,86 @@ const mapNotification = (
     return null;
   }
 
+  /*
+   * If this is already a mapped notification, prefer
+   * the exact eventType that we preserved earlier.
+   */
+  const exactEventType =
+    getNotificationEventType(
+      notification,
+    ) ||
+    "SYSTEM_NOTICE";
+
+  const referenceType =
+    notification?.referenceType ??
+    notification?.raw?.referenceType ??
+    null;
+
+  const referenceId =
+    notification?.referenceId ??
+    notification?.raw?.referenceId ??
+    null;
+
   const read =
     notification?.read === true ||
     Boolean(
       notification?.readAt,
     );
 
-  return {
+  const mapped = {
     /*
      * Notification ID
      */
     id:
       notification?.id ||
+      notification?.raw?.id ||
       "",
 
     /*
      * Broad UI category for the existing icon/helper system.
      */
     type:
-      getUiNotificationType(
-        notification,
-      ),
+      getUiNotificationType({
+        ...notification,
+        eventType:
+          exactEventType,
+      }),
 
     /*
      * Exact backend event type.
      *
      * Example:
-     * STUDENT_TRANSFER_APPROVED
+     * PARENT_ATTENDANCE_RESPONDED
      */
     eventType:
-      notification?.type ||
-      "SYSTEM_NOTICE",
+      exactEventType,
 
     title:
       notification?.title ||
+      notification?.raw?.title ||
       "Notification",
 
     message:
       notification?.message ||
+      notification?.raw?.message ||
       "",
 
     referenceType:
-      notification?.referenceType ||
+      referenceType ||
       null,
 
     referenceId:
-      notification?.referenceId ||
+      referenceId ||
       null,
 
     createdAt:
       notification?.createdAt ||
+      notification?.raw?.createdAt ||
       null,
 
     readAt:
       notification?.readAt ||
+      notification?.raw?.readAt ||
       null,
 
     read,
@@ -565,25 +729,37 @@ const mapNotification = (
      */
     meta: {
       referenceType:
-        notification?.referenceType ||
+        referenceType ||
         null,
 
       referenceId:
-        notification?.referenceId ||
+        referenceId ||
         null,
     },
 
-    action:
-      getNotificationAction(
-        notification,
-      ),
+    action: null,
 
     /*
      * Preserve original backend response for advanced screens.
      */
     raw:
+      notification?.raw ||
       notification,
   };
+
+  /*
+   * Resolve action AFTER exact eventType/reference values
+   * have been normalized.
+   *
+   * This makes the same routing work for raw and mapped
+   * notification objects.
+   */
+  mapped.action =
+    getNotificationAction(
+      mapped,
+    );
+
+  return mapped;
 };
 
 /* =========================================================
@@ -1137,8 +1313,6 @@ const getAdviserNotifications =
 /* =========================================================
    ADVISER UNREAD TOPBAR DATA
 
-   This will be used when we update AdviserTopbar next.
-
    It fetches:
    - latest notifications
    - actual unread count
@@ -1177,12 +1351,15 @@ const getAdviserNotificationSummary =
 /* =========================================================
    MARK READ + RETURN ACTION
 
-   Handy helper for clicking a notification.
-
    UI may:
    1. mark notification read
    2. receive the route action
    3. navigate
+
+   IMPORTANT:
+   markNotificationRead() returns an already-mapped object.
+   getNotificationAction() therefore understands eventType
+   as well as raw backend type.
 ========================================================= */
 
 const openNotification =

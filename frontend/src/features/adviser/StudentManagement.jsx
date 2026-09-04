@@ -43,6 +43,15 @@ const PASSIVE_CAPTURE_SECONDS = Math.max(
 const AUTO_FACE_CHECKS = 2;
 const FACE_MONITOR_INTERVAL_MS = 180;
 
+const GUARDIAN_RELATIONSHIP_OPTIONS = [
+  { value: "MOTHER", label: "Mother" },
+  { value: "FATHER", label: "Father" },
+  { value: "GUARDIAN", label: "Guardian" },
+  { value: "GRANDPARENT", label: "Grandparent" },
+  { value: "SIBLING", label: "Sibling" },
+  { value: "OTHER", label: "Other" },
+];
+
 const normalizeArray = (value) => (Array.isArray(value) ? value : []);
 const getErrorMessage = (error, fallback) =>
   error?.response?.data?.message ||
@@ -55,6 +64,9 @@ const normalizeStudentNumberInput = (value) =>
     .replace(/\D/g, "")
     .slice(0, 12);
 const isValidStudentNumber = (value) => /^\d{12}$/.test(String(value ?? ""));
+const normalizeEmail = (value) => String(value ?? "").trim().toLowerCase();
+const isValidEmail = (value) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value ?? "").trim());
 const stopMediaStream = (stream) =>
   stream?.getTracks?.().forEach((track) => track.stop());
 const scopeStudentsToSection = (students, sectionId) =>
@@ -798,6 +810,9 @@ function StudentManagement() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [studentNumber, setStudentNumber] = useState("");
   const [studentName, setStudentName] = useState("");
+  const [guardianName, setGuardianName] = useState("");
+  const [guardianRelationship, setGuardianRelationship] = useState("MOTHER");
+  const [guardianEmail, setGuardianEmail] = useState("");
   const [creatingStudent, setCreatingStudent] = useState(false);
   const [cancellingAddEnrollment, setCancellingAddEnrollment] = useState(false);
   const [createError, setCreateError] = useState("");
@@ -808,6 +823,10 @@ function StudentManagement() {
   const [editingStudent, setEditingStudent] = useState(null);
   const [editStudentNumber, setEditStudentNumber] = useState("");
   const [editStudentName, setEditStudentName] = useState("");
+  const [editGuardianName, setEditGuardianName] = useState("");
+  const [editGuardianRelationship, setEditGuardianRelationship] =
+    useState("MOTHER");
+  const [editGuardianEmail, setEditGuardianEmail] = useState("");
   const [updatingStudent, setUpdatingStudent] = useState(false);
   const [editError, setEditError] = useState("");
 
@@ -1604,6 +1623,9 @@ function StudentManagement() {
     addStudentCommittedRef.current = false;
     setStudentNumber("");
     setStudentName("");
+    setGuardianName("");
+    setGuardianRelationship("MOTHER");
+    setGuardianEmail("");
     setCreateError("");
     setCreatedStudentRecord(null);
     setEnrollmentStep(1);
@@ -1628,19 +1650,50 @@ function StudentManagement() {
   const validateStudentDetails = () => {
     const number = studentNumber.trim();
     const name = studentName.trim();
+    const parentOrGuardianName = guardianName.trim();
+    const parentOrGuardianEmail = normalizeEmail(guardianEmail);
+
     setCreateError("");
+
     if (!number || !name) {
       setCreateError("Student number and student name are required.");
       return false;
     }
+
     if (!isValidStudentNumber(number)) {
       setCreateError("Student number must contain exactly 12 digits.");
       return false;
     }
+
+    if (!parentOrGuardianName) {
+      setCreateError("Parent or guardian name is required.");
+      return false;
+    }
+
+    if (
+      !GUARDIAN_RELATIONSHIP_OPTIONS.some(
+        (option) => option.value === guardianRelationship,
+      )
+    ) {
+      setCreateError("Choose a valid parent or guardian relationship.");
+      return false;
+    }
+
+    if (!parentOrGuardianEmail) {
+      setCreateError("Parent or guardian email is required.");
+      return false;
+    }
+
+    if (!isValidEmail(parentOrGuardianEmail)) {
+      setCreateError("Enter a valid parent or guardian email address.");
+      return false;
+    }
+
     if (!section?.id) {
       setCreateError("No assigned section is available.");
       return false;
     }
+
     return true;
   };
 
@@ -1650,6 +1703,9 @@ function StudentManagement() {
 
     const cleanNumber = studentNumber.trim();
     const cleanName = studentName.trim();
+    const cleanGuardianName = guardianName.trim();
+    const cleanGuardianEmail = normalizeEmail(guardianEmail);
+
     try {
       setCreatingStudent(true);
       setCreateError("");
@@ -1657,6 +1713,11 @@ function StudentManagement() {
         studentNumber: cleanNumber,
         name: cleanName,
         sectionId: section.id,
+        guardian: {
+          name: cleanGuardianName,
+          relationship: guardianRelationship,
+          email: cleanGuardianEmail,
+        },
       });
 
       let record = created;
@@ -1858,6 +1919,14 @@ function StudentManagement() {
       getPendingTransferForStudent(student)
     )
       return;
+
+    const currentGuardian = student?.guardian || null;
+    const currentRelationship = String(
+      currentGuardian?.relationship || "MOTHER",
+    )
+      .trim()
+      .toUpperCase();
+
     stopCamera();
     setShowAddModal(false);
     setSelectedStudent(null);
@@ -1867,6 +1936,15 @@ function StudentManagement() {
     setEditingStudent(student);
     setEditStudentNumber(student.studentNumber || "");
     setEditStudentName(student.name || "");
+    setEditGuardianName(currentGuardian?.name || "");
+    setEditGuardianRelationship(
+      GUARDIAN_RELATIONSHIP_OPTIONS.some(
+        (option) => option.value === currentRelationship,
+      )
+        ? currentRelationship
+        : "OTHER",
+    );
+    setEditGuardianEmail(currentGuardian?.email || "");
     setEditError("");
     setSuccessMessage("");
   };
@@ -1876,6 +1954,9 @@ function StudentManagement() {
     setEditingStudent(null);
     setEditStudentNumber("");
     setEditStudentName("");
+    setEditGuardianName("");
+    setEditGuardianRelationship("MOTHER");
+    setEditGuardianEmail("");
     setEditError("");
   };
 
@@ -1885,42 +1966,90 @@ function StudentManagement() {
 
     const cleanNumber = editStudentNumber.trim();
     const cleanName = editStudentName.trim();
+    const cleanGuardianName = editGuardianName.trim();
+    const cleanGuardianEmail = normalizeEmail(editGuardianEmail);
+
     if (!cleanNumber || !cleanName) {
       setEditError("Student number and student name are required.");
       return;
     }
+
     if (!isValidStudentNumber(cleanNumber)) {
       setEditError("Student number must contain exactly 12 digits.");
+      return;
+    }
+
+    if (!cleanGuardianName) {
+      setEditError("Parent or guardian name is required.");
+      return;
+    }
+
+    if (
+      !GUARDIAN_RELATIONSHIP_OPTIONS.some(
+        (option) => option.value === editGuardianRelationship,
+      )
+    ) {
+      setEditError("Choose a valid parent or guardian relationship.");
+      return;
+    }
+
+    if (!cleanGuardianEmail) {
+      setEditError("Parent or guardian email is required.");
+      return;
+    }
+
+    if (!isValidEmail(cleanGuardianEmail)) {
+      setEditError("Enter a valid parent or guardian email address.");
       return;
     }
 
     try {
       setUpdatingStudent(true);
       setEditError("");
+
       const updated = await adviserService.updateStudent(editingStudent.id, {
         studentNumber: cleanNumber,
         name: cleanName,
+        guardian: {
+          name: cleanGuardianName,
+          relationship: editGuardianRelationship,
+          email: cleanGuardianEmail,
+        },
       });
+
       if (updated?.id) {
         setStudents((current) =>
           current.map((student) =>
             student.id === updated.id ? { ...student, ...updated } : student,
           ),
         );
+
+        queryClient.setQueryData(queryKeys.adviser.allStudents(), (current) =>
+          normalizeArray(current).map((student) =>
+            String(student?.id) === String(updated.id)
+              ? { ...student, ...updated }
+              : student,
+          ),
+        );
       }
+
       try {
         await refreshStudents();
       } catch (refreshError) {
         console.warn("Unable to refresh students after update:", refreshError);
       }
+
       setSuccessMessage(
-        `${cleanName}'s student information was updated successfully.`,
+        `${cleanName}'s student and parent or guardian information was updated successfully.`,
       );
       closeEditStudent();
     } catch (requestError) {
       setEditError(
         requestError?.response?.status === 409
-          ? "That student number already belongs to another student."
+          ? getErrorMessage(
+              requestError,
+              "That student number already belongs to another student.",
+            )
           : getErrorMessage(
               requestError,
               "Unable to update the student record.",
@@ -3654,6 +3783,44 @@ function StudentManagement() {
                         onChange={(event) => setStudentName(event.target.value)}
                       />
                     </label>
+                    <label className="student-form-field">
+                      <span>Parent / Guardian Name</span>
+                      <input
+                        value={guardianName}
+                        autoComplete="name"
+                        placeholder="Complete parent or guardian name"
+                        disabled={creatingStudent || cancellingAddEnrollment}
+                        onChange={(event) => setGuardianName(event.target.value)}
+                      />
+                    </label>
+                    <label className="student-form-field">
+                      <span>Relationship</span>
+                      <select
+                        value={guardianRelationship}
+                        disabled={creatingStudent || cancellingAddEnrollment}
+                        onChange={(event) =>
+                          setGuardianRelationship(event.target.value)
+                        }
+                      >
+                        {GUARDIAN_RELATIONSHIP_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="student-form-field">
+                      <span>Parent / Guardian Email</span>
+                      <input
+                        type="email"
+                        value={guardianEmail}
+                        autoComplete="email"
+                        placeholder="Parent or guardian email"
+                        disabled={creatingStudent || cancellingAddEnrollment}
+                        onChange={(event) => setGuardianEmail(event.target.value)}
+                      />
+                      <small>Used for attendance notices and secure parent communication.</small>
+                    </label>
                     <div className="student-form-field">
                       <span>Assigned Section</span>
                       <div className="student-locked-field">
@@ -3979,6 +4146,50 @@ function StudentManagement() {
                     disabled={updatingStudent}
                     onChange={(event) => setEditStudentName(event.target.value)}
                   />
+                </label>
+                <label className="student-form-field">
+                  <span>Parent / Guardian Name</span>
+                  <input
+                    value={editGuardianName}
+                    autoComplete="name"
+                    placeholder="Complete parent or guardian name"
+                    disabled={updatingStudent}
+                    onChange={(event) =>
+                      setEditGuardianName(event.target.value)
+                    }
+                  />
+                </label>
+                <label className="student-form-field">
+                  <span>Relationship</span>
+                  <select
+                    value={editGuardianRelationship}
+                    disabled={updatingStudent}
+                    onChange={(event) =>
+                      setEditGuardianRelationship(event.target.value)
+                    }
+                  >
+                    {GUARDIAN_RELATIONSHIP_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="student-form-field">
+                  <span>Parent / Guardian Email</span>
+                  <input
+                    type="email"
+                    value={editGuardianEmail}
+                    autoComplete="email"
+                    placeholder="Parent or guardian email"
+                    disabled={updatingStudent}
+                    onChange={(event) =>
+                      setEditGuardianEmail(event.target.value)
+                    }
+                  />
+                  <small>
+                    Used for attendance notices and secure parent communication.
+                  </small>
                 </label>
                 {editError && (
                   <div className="student-face-feedback is-error">

@@ -57,6 +57,12 @@ const NAVIGATION_ITEMS = [
     exact: true,
   },
   {
+    label: "Students at Risk",
+    icon: "⚠",
+    path: "/adviser/students-at-risk",
+    exact: true,
+  },
+  {
     label: "Attendance Session",
     icon: "◷",
     path: "/adviser/attendance",

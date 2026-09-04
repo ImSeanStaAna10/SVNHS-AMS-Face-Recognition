@@ -166,17 +166,41 @@ const getStudents = async () => {
   return response.data;
 };
 
-const createStudent = async ({ studentNumber, name, sectionId }) => {
+/* =========================================================
+   CREATE STUDENT
+
+   Supports Student + Parent / Guardian creation.
+========================================================= */
+
+const createStudent = async ({
+  studentNumber,
+  name,
+  sectionId,
+  guardian = null,
+}) => {
   const response = await api.post("/students", {
     studentNumber,
     name,
     sectionId,
+    guardian,
   });
 
   return response.data;
 };
 
-const updateStudent = async (studentId, { studentNumber, name }) => {
+/* =========================================================
+   UPDATE STUDENT
+
+   Supports updating:
+   - Student Number
+   - Student Name
+   - Parent / Guardian
+========================================================= */
+
+const updateStudent = async (
+  studentId,
+  { studentNumber, name, guardian = null },
+) => {
   const normalizedStudentId = requireId(
     studentId,
     "Student ID is required to update a student.",
@@ -185,6 +209,7 @@ const updateStudent = async (studentId, { studentNumber, name }) => {
   const response = await api.patch(`/students/${normalizedStudentId}`, {
     studentNumber,
     name,
+    guardian,
   });
 
   return response.data;
@@ -1005,6 +1030,149 @@ const removeAttendance = async ({ sessionId, studentId }) => {
 };
 
 /* =========================================================
+   ATTENDANCE INTERVENTION / STUDENTS AT RISK
+========================================================= */
+
+/*
+ * Returns the current attendance-risk read model
+ * for students in the specified section.
+ *
+ * The backend determines:
+ *
+ * - finalized attendance totals
+ * - absence count
+ * - current risk level
+ * - intervention information
+ * - guardian availability
+ *
+ * We intentionally return response.data unchanged
+ * so the frontend stays compatible with the exact
+ * backend DTO shape.
+ */
+
+const getAttendanceRisksBySection = async (sectionId) => {
+  const normalizedSectionId = requireId(
+    sectionId,
+    "Section ID is required to load attendance risks.",
+  );
+
+  const response = await api.get(
+    `/attendance-risks/sections/${normalizedSectionId}`,
+  );
+
+  return response.data;
+};
+
+/* =========================================================
+   PARENT NOTIFICATION PREVIEW
+========================================================= */
+
+/*
+ * Loads the frozen-preview information before
+ * an Adviser creates/sends a parent notification.
+ *
+ * This does NOT send an email.
+ */
+
+const getParentNotificationPreview = async (interventionId) => {
+  const normalizedInterventionId = requireId(
+    interventionId,
+    "Attendance intervention ID is required to preview a parent notification.",
+  );
+
+  const response = await api.get(
+    `/attendance-interventions/${normalizedInterventionId}/parent-notification-preview`,
+  );
+
+  return response.data;
+};
+
+/* =========================================================
+   CREATE PARENT NOTIFICATION
+========================================================= */
+
+/*
+ * Creates the frozen ParentNotification snapshot.
+ *
+ * This still does NOT send the email.
+ *
+ * Flow:
+ *
+ * Intervention
+ *      ↓
+ * Preview
+ *      ↓
+ * Create notification snapshot
+ *      ↓
+ * PENDING
+ */
+
+const createParentNotification = async (
+  interventionId,
+  { adviserNote = null } = {},
+) => {
+  const normalizedInterventionId = requireId(
+    interventionId,
+    "Attendance intervention ID is required to create a parent notification.",
+  );
+
+  const response = await api.post(
+    `/attendance-interventions/${normalizedInterventionId}/parent-notifications`,
+    {
+      adviserNote: normalizeOptionalText(adviserNote),
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return response.data;
+};
+
+/* =========================================================
+   QUEUE / SEND PARENT NOTIFICATION
+========================================================= */
+
+/*
+ * Queues an already-created ParentNotification.
+ *
+ * Important:
+ *
+ * The backend's outbox worker performs the actual
+ * Gmail API send.
+ *
+ * This endpoint must therefore remain separate from
+ * createParentNotification(...).
+ *
+ * Expected flow:
+ *
+ * PENDING
+ *    ↓
+ * queueParentNotification(...)
+ *    ↓
+ * QUEUED
+ *    ↓
+ * outbox worker
+ *    ↓
+ * SENT / FAILED
+ */
+
+const queueParentNotification = async (parentNotificationId) => {
+  const normalizedNotificationId = requireId(
+    parentNotificationId,
+    "Parent notification ID is required to queue the notification.",
+  );
+
+  const response = await api.post(
+    `/parent-notifications/${normalizedNotificationId}/send`,
+  );
+
+  return response.data;
+};
+
+/* =========================================================
    ACCOUNT SECURITY
 ========================================================= */
 
@@ -1093,6 +1261,13 @@ const adviserService = {
   markManualAttendance,
   markFaceAttendance,
   removeAttendance,
+
+  /* ATTENDANCE INTERVENTION */
+
+  getAttendanceRisksBySection,
+  getParentNotificationPreview,
+  createParentNotification,
+  queueParentNotification,
 
   /* ACCOUNT SECURITY */
 

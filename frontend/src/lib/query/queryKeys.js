@@ -12,7 +12,10 @@ export const queryKeys = {
        SECTIONS
     ===================================================== */
 
-    sections: () => ["adviser", "sections"],
+    sections: () => [
+      "adviser",
+      "sections",
+    ],
 
     /* =====================================================
        STUDENTS
@@ -27,7 +30,10 @@ export const queryKeys = {
      *
      * This key represents that full Adviser student response.
      */
-    allStudents: () => ["adviser", "students"],
+    allStudents: () => [
+      "adviser",
+      "students",
+    ],
 
     /**
      * Keep this for pages / future APIs that cache students
@@ -36,12 +42,24 @@ export const queryKeys = {
      * It also remains compatible with the cache structure
      * we already started.
      */
-    students: (sectionId) => ["adviser", "students", String(sectionId || "")],
+    students: (sectionId) => [
+      "adviser",
+      "students",
+      String(
+        sectionId || "",
+      ),
+    ],
 
     /**
      * Individual student cache.
      */
-    student: (studentId) => ["adviser", "student", String(studentId || "")],
+    student: (studentId) => [
+      "adviser",
+      "student",
+      String(
+        studentId || "",
+      ),
+    ],
 
     /* =====================================================
        STUDENT TRANSFERS
@@ -54,16 +72,31 @@ export const queryKeys = {
        * Invalidating this prefix can affect both incoming
        * and outgoing transfer queries.
        */
-      all: () => ["adviser", "transfers"],
+      all: () => [
+        "adviser",
+        "transfers",
+      ],
 
-      incoming: () => ["adviser", "transfers", "incoming"],
+      incoming: () => [
+        "adviser",
+        "transfers",
+        "incoming",
+      ],
 
-      outgoing: () => ["adviser", "transfers", "outgoing"],
+      outgoing: () => [
+        "adviser",
+        "transfers",
+        "outgoing",
+      ],
 
       /**
        * Incoming pending-transfer badge used by AdviserTopbar.
        */
-      pendingCount: () => ["adviser", "transfers", "pending-count"],
+      pendingCount: () => [
+        "adviser",
+        "transfers",
+        "pending-count",
+      ],
     },
 
     /* =====================================================
@@ -74,7 +107,10 @@ export const queryKeys = {
       /**
        * Parent key for every Adviser notification query.
        */
-      all: () => ["adviser", "notifications"],
+      all: () => [
+        "adviser",
+        "notifications",
+      ],
 
       /**
        * Topbar notification summary.
@@ -102,7 +138,9 @@ export const queryKeys = {
     activeSession: (sectionId) => [
       "adviser",
       "active-session",
-      String(sectionId || ""),
+      String(
+        sectionId || "",
+      ),
     ],
 
     /* =====================================================
@@ -118,7 +156,9 @@ export const queryKeys = {
     sessionRecords: (sessionId) => [
       "adviser",
       "session-records",
-      String(sessionId || ""),
+      String(
+        sessionId || "",
+      ),
     ],
 
     /* =====================================================
@@ -132,7 +172,10 @@ export const queryKeys = {
        * Example:
        * ["adviser", "attendance-history"]
        */
-      all: () => ["adviser", "attendance-history"],
+      all: () => [
+        "adviser",
+        "attendance-history",
+      ],
 
       /**
        * Each date range / page / size gets its own cache entry.
@@ -141,11 +184,20 @@ export const queryKeys = {
        * ["adviser", "attendance-history", "2026-09-01",
        *  "2026-09-30", 0, 8]
        */
-      list: ({ fromDate = "", toDate = "", page = 0, size = 8 } = {}) => [
+      list: ({
+        fromDate = "",
+        toDate = "",
+        page = 0,
+        size = 8,
+      } = {}) => [
         "adviser",
         "attendance-history",
-        String(fromDate || ""),
-        String(toDate || ""),
+        String(
+          fromDate || "",
+        ),
+        String(
+          toDate || "",
+        ),
         Number(page) || 0,
         Number(size) || 8,
       ],
@@ -162,7 +214,159 @@ export const queryKeys = {
         "adviser",
         "attendance-history",
         "session-records",
-        String(sessionId || ""),
+        String(
+          sessionId || "",
+        ),
+      ],
+    },
+
+    /* =====================================================
+       ATTENDANCE INTERVENTION / STUDENTS AT RISK
+
+       These keys intentionally remain separate from live
+       attendance-session data.
+
+       Attendance intervention is based on finalized records,
+       so it may safely use short-lived frontend caching.
+
+       IMPORTANT:
+       - Risk data is scoped per section.
+       - Preview data is scoped per intervention.
+       - Parent communication history is scoped per intervention.
+       - No face-recognition or live attendance data is cached here.
+    ===================================================== */
+
+    attendanceIntervention: {
+      /**
+       * Root key for all Adviser attendance-intervention data.
+       *
+       * Useful when a major intervention configuration or
+       * attendance-finalization change affects several related
+       * intervention queries.
+       *
+       * Example:
+       * ["adviser", "attendance-intervention"]
+       */
+      all: () => [
+        "adviser",
+        "attendance-intervention",
+      ],
+
+      /**
+       * Root prefix for all section risk-register queries.
+       *
+       * Example:
+       * ["adviser", "attendance-intervention", "risks"]
+       */
+      allRisks: () => [
+        "adviser",
+        "attendance-intervention",
+        "risks",
+      ],
+
+      /**
+       * Current attendance-risk register for one section.
+       *
+       * Example:
+       * [
+       *   "adviser",
+       *   "attendance-intervention",
+       *   "risks",
+       *   "036c36d6-cdd7-4698-b16a-e41947647d3d"
+       * ]
+       */
+      risks: (sectionId) => [
+        "adviser",
+        "attendance-intervention",
+        "risks",
+        String(
+          sectionId || "",
+        ),
+      ],
+
+      /**
+       * Root prefix for parent-notification previews.
+       *
+       * Useful if a broader intervention mutation changes
+       * frozen-preview inputs across multiple interventions.
+       */
+      allPreviews: () => [
+        "adviser",
+        "attendance-intervention",
+        "preview",
+      ],
+
+      /**
+       * Parent-notification preview for one intervention.
+       *
+       * This contains data such as:
+       * - student
+       * - guardian
+       * - current risk
+       * - absence count
+       * - threshold
+       * - finalized absence details
+       * - suggested Adviser note
+       *
+       * Example:
+       * [
+       *   "adviser",
+       *   "attendance-intervention",
+       *   "preview",
+       *   "<interventionId>"
+       * ]
+       */
+      preview: (
+        interventionId,
+      ) => [
+        "adviser",
+        "attendance-intervention",
+        "preview",
+        String(
+          interventionId || "",
+        ),
+      ],
+
+      /**
+       * Root prefix for all parent-communication history data.
+       *
+       * This can be invalidated after global communication
+       * operations if ever needed.
+       */
+      allParentCommunications: () => [
+        "adviser",
+        "attendance-intervention",
+        "parent-communications",
+      ],
+
+      /**
+       * Parent communication history for one intervention.
+       *
+       * Includes states such as:
+       * - PENDING
+       * - QUEUED
+       * - SENT
+       * - FAILED
+       * - ACKNOWLEDGED
+       * - RESPONDED
+       *
+       * Example:
+       * [
+       *   "adviser",
+       *   "attendance-intervention",
+       *   "parent-communications",
+       *   "<interventionId>"
+       * ]
+       */
+      parentCommunications: (
+        interventionId,
+      ) => [
+        "adviser",
+        "attendance-intervention",
+        "parent-communications",
+        String(
+          interventionId || "",
+        ),
       ],
     },
   },
@@ -195,7 +399,10 @@ export const queryKeys = {
      * - Section Management
      * - Attendance filter options
      */
-    advisers: () => ["councilor", "advisers"],
+    advisers: () => [
+      "councilor",
+      "advisers",
+    ],
 
     /* =====================================================
        SECTIONS
@@ -208,7 +415,10 @@ export const queryKeys = {
      * - Attendance filter options
      * - Attendance Records filters
      */
-    sections: () => ["councilor", "sections"],
+    sections: () => [
+      "councilor",
+      "sections",
+    ],
 
     /* =====================================================
        ATTENDANCE REPORTS
@@ -218,7 +428,10 @@ export const queryKeys = {
       /**
        * Parent key for all Councilor attendance report data.
        */
-      all: () => ["councilor", "attendance-reports"],
+      all: () => [
+        "councilor",
+        "attendance-reports",
+      ],
 
       /**
        * School-wide attendance overview.
@@ -238,11 +451,21 @@ export const queryKeys = {
         "councilor",
         "attendance-reports",
         "overview",
-        String(from || ""),
-        String(to || ""),
-        String(sectionId || ""),
-        String(adviserId || ""),
-        String(search || ""),
+        String(
+          from || "",
+        ),
+        String(
+          to || "",
+        ),
+        String(
+          sectionId || "",
+        ),
+        String(
+          adviserId || "",
+        ),
+        String(
+          search || "",
+        ),
         Number(page) || 0,
         Number(size) || 9,
       ],
@@ -257,15 +480,29 @@ export const queryKeys = {
        */
       section: (
         sectionId,
-        { from = "", to = "", search = "", page = 0, size = 25 } = {},
+        {
+          from = "",
+          to = "",
+          search = "",
+          page = 0,
+          size = 25,
+        } = {},
       ) => [
         "councilor",
         "attendance-reports",
         "section",
-        String(sectionId || ""),
-        String(from || ""),
-        String(to || ""),
-        String(search || ""),
+        String(
+          sectionId || "",
+        ),
+        String(
+          from || "",
+        ),
+        String(
+          to || "",
+        ),
+        String(
+          search || "",
+        ),
         Number(page) || 0,
         Number(size) || 25,
       ],
@@ -276,6 +513,7 @@ export const queryKeys = {
      SUPERADMIN
 
      Shared cache for system-level administrative data.
+
      Dashboard, Department Management, and Councilor
      Management reuse these same query entries.
   ======================================================= */
@@ -289,12 +527,18 @@ export const queryKeys = {
     /**
      * Department directory.
      */
-    departments: () => ["superadmin", "departments"],
+    departments: () => [
+      "superadmin",
+      "departments",
+    ],
 
     /**
      * Councilor account directory.
      */
-    councilors: () => ["superadmin", "councilors"],
+    councilors: () => [
+      "superadmin",
+      "councilors",
+    ],
   },
 
   /* =======================================================
@@ -311,7 +555,9 @@ export const queryKeys = {
     /**
      * Root key for all report archive cache entries.
      */
-    all: () => ["attendance-reports"],
+    all: () => [
+      "attendance-reports",
+    ],
 
     /**
      * Role-scoped prefix.
@@ -319,10 +565,14 @@ export const queryKeys = {
      * Useful after report regeneration because regeneration can
      * affect several pages or filter combinations for that role.
      */
-    archives: (role) => [
+    archives: (
+      role,
+    ) => [
       "attendance-reports",
       "archive",
-      String(role || "")
+      String(
+        role || "",
+      )
         .trim()
         .toUpperCase(),
     ],
@@ -341,14 +591,30 @@ export const queryKeys = {
     } = {}) => [
       "attendance-reports",
       "archive",
-      String(role || "")
+      String(
+        role || "",
+      )
         .trim()
         .toUpperCase(),
-      String(type || ""),
-      String(sectionId || ""),
-      String(from || ""),
-      String(to || ""),
+
+      String(
+        type || "",
+      ),
+
+      String(
+        sectionId || "",
+      ),
+
+      String(
+        from || "",
+      ),
+
+      String(
+        to || "",
+      ),
+
       Number(page) || 0,
+
       Number(size) || 12,
     ],
   },

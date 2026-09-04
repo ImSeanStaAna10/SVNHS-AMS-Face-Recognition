@@ -1,0 +1,1884 @@
+/* =========================================================
+   SVNHS ATTENDANCE MANAGEMENT SYSTEM
+   PUBLIC PARENT ATTENDANCE NOTICE
+
+   PRODUCTION UI / UX
+   FULL CONSOLIDATED REPLACEMENT
+
+   GOALS
+   - Match the current SVNHS / Student Management theme.
+   - Match the CURRENT ParentAttendanceNotice.jsx class names.
+   - Preserve all existing React and backend behavior.
+   - Improve readability, hierarchy, trust, mobile UX,
+     accessibility, responsiveness, and visual consistency.
+========================================================= */
+
+/* =========================================================
+   01. PAGE THEME TOKENS
+========================================================= */
+
+.parent-notice-page {
+  --pn-blue-950: #092d5f;
+
+  --pn-blue-900: var(--c-blue-900, #123d7e);
+
+  --pn-blue-800: var(--c-blue-800, #174f88);
+
+  --pn-blue-700: #1e5fa6;
+
+  --pn-red-600: var(--c-red-600, #dc2626);
+
+  --pn-text-primary: var(--c-text-primary, #172033);
+
+  --pn-text-secondary: var(--c-text-secondary, #334155);
+
+  --pn-text-body: var(--c-text-body, #64748b);
+
+  --pn-text-muted: var(--c-text-muted, #8493a5);
+
+  --pn-border: var(--c-border, #d7e0ea);
+
+  --pn-border-soft: var(--c-border-soft, #e6ebf1);
+
+  --pn-surface: var(--c-surface, #ffffff);
+
+  --pn-surface-soft: var(--c-surface-soft, #f8fafc);
+
+  --pn-icon-bg: var(--c-icon-bg, #edf5ff);
+
+  --pn-brand-border: var(--c-brand-border, #c9dff5);
+
+  --pn-success-bg: var(--c-success-bg, #ecfdf3);
+
+  --pn-success-border: var(--c-success-border, #bbf7d0);
+
+  --pn-success-text: var(--c-success-text, #15803d);
+
+  --pn-error-bg: var(--c-error-bg, #fff1f2);
+
+  --pn-error-border: var(--c-error-border, #fecaca);
+
+  --pn-error-text: var(--c-error-text, #b91c1c);
+
+  --pn-warning-bg: #fffbeb;
+
+  --pn-warning-border: #fde68a;
+
+  --pn-warning-text: #92400e;
+
+  --pn-panel-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.025), 0 14px 36px rgba(15, 23, 42, 0.06);
+
+  min-height: 100vh;
+
+  min-height: 100dvh;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: center;
+
+  padding: 36px 18px 54px;
+
+  background:
+    radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.08), transparent 31%),
+    radial-gradient(
+      circle at 88% 12%,
+      rgba(220, 38, 38, 0.035),
+      transparent 25%
+    ),
+    linear-gradient(180deg, #eef5fc 0%, #f8fafc 42%, #f3f6f9 100%);
+
+  color: var(--pn-text-primary);
+
+  font-family: inherit;
+
+  -webkit-font-smoothing: antialiased;
+
+  text-rendering: optimizeLegibility;
+}
+
+.parent-notice-page *,
+.parent-notice-page *::before,
+.parent-notice-page *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   02. FOCUS / ACCESSIBILITY
+========================================================= */
+
+.parent-notice-page button:focus-visible,
+.parent-notice-page textarea:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.18);
+
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   03. MAIN SHELL
+========================================================= */
+
+.parent-notice-shell {
+  position: relative;
+
+  width: min(100%, 820px);
+
+  margin: 0 auto;
+
+  overflow: hidden;
+
+  border: 1px solid var(--pn-border-soft);
+
+  border-radius: 18px;
+
+  background: var(--pn-surface);
+
+  box-shadow:
+    0 2px 5px rgba(15, 23, 42, 0.035),
+    0 24px 70px rgba(15, 23, 42, 0.1);
+}
+
+.parent-notice-shell::before {
+  content: "";
+
+  position: absolute;
+
+  z-index: 5;
+
+  top: 0;
+
+  right: 0;
+
+  left: 0;
+
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    var(--pn-blue-900) 0%,
+    var(--pn-blue-800) 72%,
+    var(--pn-red-600) 72%,
+    var(--pn-red-600) 100%
+  );
+}
+
+/* =========================================================
+   04. PUBLIC STATE SHELL
+   LOADING / INVALID / EXPIRED
+========================================================= */
+
+.parent-notice-shell--state {
+  min-height: 410px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-direction: column;
+
+  padding: 56px 34px;
+
+  text-align: center;
+}
+
+.parent-notice-shell--state h1 {
+  margin: 4px 0 0;
+
+  color: var(--pn-text-primary);
+
+  font-size: clamp(23px, 3vw, 28px);
+
+  font-weight: 850;
+
+  line-height: 1.2;
+
+  letter-spacing: -0.35px;
+}
+
+.parent-notice-shell--state > p:not(.parent-notice-eyebrow) {
+  max-width: 500px;
+
+  margin: 10px auto 0;
+
+  color: var(--pn-text-body);
+
+  font-size: 13px;
+
+  line-height: 1.65;
+}
+
+.parent-notice-state-mark {
+  width: 56px;
+
+  height: 56px;
+
+  display: grid;
+
+  place-items: center;
+
+  margin-bottom: 16px;
+
+  border: 1px solid var(--pn-error-border);
+
+  border-radius: 15px;
+
+  background: var(--pn-error-bg);
+
+  color: var(--pn-error-text);
+
+  font-size: 23px;
+
+  font-weight: 900;
+}
+
+.parent-notice-state-help {
+  margin-top: 22px !important;
+
+  padding: 13px 15px;
+
+  border: 1px solid var(--pn-border-soft);
+
+  border-radius: 10px;
+
+  background: var(--pn-surface-soft);
+}
+
+/* =========================================================
+   05. LOADING SPINNER
+========================================================= */
+
+.parent-notice-spinner {
+  width: 42px;
+
+  height: 42px;
+
+  margin-bottom: 20px;
+
+  border: 3px solid var(--pn-brand-border);
+
+  border-top-color: var(--pn-blue-900);
+
+  border-radius: 50%;
+
+  animation: parent-notice-spin 0.75s linear infinite;
+}
+
+/* =========================================================
+   06. HEADER
+========================================================= */
+
+.parent-notice-header {
+  position: relative;
+
+  min-height: 92px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 24px;
+
+  padding: 23px 28px;
+
+  background: linear-gradient(
+    135deg,
+    var(--pn-blue-950) 0%,
+    var(--pn-blue-900) 56%,
+    #174f88 100%
+  );
+
+  color: #ffffff;
+}
+
+.parent-notice-header::after {
+  content: "";
+
+  position: absolute;
+
+  inset: auto 0 0 0;
+
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* =========================================================
+   07. BRAND
+========================================================= */
+
+.parent-notice-brand {
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.parent-notice-brand-mark {
+  width: 44px;
+
+  height: 44px;
+
+  flex: 0 0 44px;
+
+  display: grid;
+
+  place-items: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.22);
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.11);
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.11);
+
+  color: #ffffff;
+
+  font-size: 18px;
+
+  font-weight: 900;
+
+  letter-spacing: -0.03em;
+}
+
+.parent-notice-brand > div:last-child {
+  min-width: 0;
+}
+
+.parent-notice-school {
+  color: #ffffff;
+
+  font-size: 16px;
+
+  font-weight: 900;
+
+  line-height: 1.15;
+
+  letter-spacing: 0.035em;
+}
+
+.parent-notice-system-name {
+  margin-top: 4px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  line-height: 1.35;
+
+  letter-spacing: 0.025em;
+}
+
+/* =========================================================
+   08. SECURE NOTICE CHIP
+========================================================= */
+
+.parent-notice-secure {
+  min-height: 34px;
+
+  flex: 0 0 auto;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.09);
+
+  color: rgba(255, 255, 255, 0.92);
+
+  font-size: 9.5px;
+
+  font-weight: 850;
+
+  letter-spacing: 0.045em;
+
+  white-space: nowrap;
+}
+
+.parent-notice-secure::before {
+  content: "";
+
+  width: 7px;
+
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #86efac;
+
+  box-shadow: 0 0 0 4px rgba(134, 239, 172, 0.11);
+}
+
+/* =========================================================
+   09. CONTENT
+========================================================= */
+
+.parent-notice-content {
+  display: grid;
+
+  gap: 0;
+
+  padding: 30px 30px 34px;
+}
+
+/* =========================================================
+   10. MAIN HEADING
+========================================================= */
+
+.parent-notice-heading {
+  position: relative;
+
+  padding-bottom: 24px;
+
+  border-bottom: 1px solid var(--pn-border-soft);
+}
+
+.parent-notice-eyebrow {
+  display: block;
+
+  margin: 0 0 6px;
+
+  color: var(--pn-blue-800);
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.parent-notice-heading h1 {
+  margin: 0;
+
+  color: var(--pn-text-primary);
+
+  font-size: clamp(27px, 4vw, 34px);
+
+  font-weight: 880;
+
+  line-height: 1.14;
+
+  letter-spacing: -0.55px;
+}
+
+.parent-notice-heading p {
+  max-width: 650px;
+
+  margin: 10px 0 0;
+
+  color: var(--pn-text-body);
+
+  font-size: 13px;
+
+  line-height: 1.65;
+}
+
+.parent-notice-heading p strong {
+  color: var(--pn-text-secondary);
+
+  font-weight: 850;
+}
+
+/* =========================================================
+   11. SHARED LABEL
+========================================================= */
+
+.parent-notice-label {
+  display: block;
+
+  color: var(--pn-text-muted);
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  line-height: 1.3;
+
+  letter-spacing: 0.09em;
+
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   12. STUDENT CARD
+========================================================= */
+
+.parent-notice-student-card {
+  position: relative;
+
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 22px;
+
+  margin-top: 22px;
+
+  overflow: hidden;
+
+  padding: 17px 18px 17px 21px;
+
+  border: 1px solid var(--pn-border-soft);
+
+  border-radius: 13px;
+
+  background: var(--pn-surface-soft);
+}
+
+.parent-notice-student-card::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0 auto 0 0;
+
+  width: 4px;
+
+  background: linear-gradient(180deg, var(--pn-blue-900), var(--pn-red-600));
+}
+
+.parent-notice-student-card > div {
+  min-width: 0;
+}
+
+.parent-notice-student-card h2 {
+  margin: 5px 0 0;
+
+  overflow-wrap: anywhere;
+
+  color: var(--pn-text-primary);
+
+  font-size: 20px;
+
+  font-weight: 860;
+
+  line-height: 1.25;
+
+  letter-spacing: -0.25px;
+}
+
+.parent-notice-student-card p {
+  margin: 5px 0 0;
+
+  color: var(--pn-text-body);
+
+  font-size: 11px;
+
+  line-height: 1.45;
+}
+
+.parent-notice-student-card p strong {
+  color: var(--pn-text-secondary);
+
+  font-weight: 850;
+}
+
+/* =========================================================
+   13. RISK BADGES
+   MATCH CURRENT JSX:
+   --normal
+   --warning
+   --at-risk
+   --critical
+========================================================= */
+
+.parent-notice-risk {
+  min-height: 31px;
+
+  flex: 0 0 auto;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 0 11px;
+
+  border: 1px solid var(--pn-border);
+
+  border-radius: 999px;
+
+  background: var(--pn-surface);
+
+  color: var(--pn-text-secondary);
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.055em;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+.parent-notice-risk--normal {
+  border-color: #bbf7d0;
+
+  background: #ecfdf3;
+
+  color: #15803d;
+}
+
+.parent-notice-risk--warning {
+  border-color: #fde68a;
+
+  background: #fffbeb;
+
+  color: #a16207;
+}
+
+.parent-notice-risk--at-risk {
+  border-color: #fed7aa;
+
+  background: #fff7ed;
+
+  color: #c2410c;
+}
+
+.parent-notice-risk--critical {
+  border-color: #fecaca;
+
+  background: #fff1f2;
+
+  color: #b91c1c;
+}
+
+/* =========================================================
+   14. SUMMARY GRID
+========================================================= */
+
+.parent-notice-summary-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 9px;
+
+  margin-top: 9px;
+}
+
+.parent-notice-summary-card {
+  min-width: 0;
+
+  min-height: 92px;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  flex-direction: column;
+
+  gap: 12px;
+
+  padding: 14px 15px;
+
+  border: 1px solid var(--pn-border-soft);
+
+  border-radius: 11px;
+
+  background: var(--pn-surface);
+
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.parent-notice-summary-card > strong {
+  max-width: 100%;
+
+  overflow-wrap: anywhere;
+
+  color: var(--pn-text-secondary);
+
+  font-size: 13px;
+
+  font-weight: 880;
+
+  line-height: 1.3;
+}
+
+.parent-notice-summary-number {
+  color: var(--pn-text-primary) !important;
+
+  font-size: 25px !important;
+
+  font-weight: 900 !important;
+
+  line-height: 1 !important;
+}
+
+/* =========================================================
+   15. CONTENT SECTIONS
+========================================================= */
+
+.parent-notice-section {
+  margin-top: 27px;
+}
+
+.parent-notice-section-heading {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 11px;
+}
+
+.parent-notice-section-heading > div {
+  min-width: 0;
+}
+
+.parent-notice-section-heading h2 {
+  margin: 4px 0 0;
+
+  color: var(--pn-text-primary);
+
+  font-size: 17px;
+
+  font-weight: 850;
+
+  line-height: 1.25;
+}
+
+/* =========================================================
+   16. ATTENDANCE RECORD LIST
+========================================================= */
+
+.parent-notice-record-list {
+  overflow: hidden;
+
+  border: 1px solid var(--pn-border-soft);
+
+  border-radius: 12px;
+
+  background: var(--pn-surface);
+}
+
+.parent-notice-record {
+  min-height: 66px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 13px 15px;
+
+  transition: background-color 0.15s ease;
+}
+
+.parent-notice-record + .parent-notice-record {
+  border-top: 1px solid var(--pn-border-soft);
+}
+
+.parent-notice-record:hover {
+  background: var(--pn-surface-soft);
+}
+
+.parent-notice-record-main {
+  min-width: 0;
+
+  display: grid;
+
+  gap: 4px;
+}
+
+.parent-notice-record-main strong {
+  color: var(--pn-text-secondary);
+
+  font-size: 12px;
+
+  font-weight: 850;
+}
+
+.parent-notice-record-main span {
+  color: var(--pn-text-muted);
+
+  font-size: 10px;
+
+  line-height: 1.4;
+}
+
+.parent-notice-absence-badge {
+  min-height: 27px;
+
+  flex: 0 0 auto;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 0 9px;
+
+  border: 1px solid #fecaca;
+
+  border-radius: 999px;
+
+  background: #fff1f2;
+
+  color: #b91c1c;
+
+  font-size: 8.5px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.045em;
+
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   17. EMPTY RECORD STATE
+========================================================= */
+
+.parent-notice-empty {
+  min-height: 90px;
+
+  display: grid;
+
+  place-items: center;
+
+  padding: 20px;
+
+  border: 1px dashed var(--pn-border);
+
+  border-radius: 11px;
+
+  background: var(--pn-surface-soft);
+
+  color: var(--pn-text-muted);
+
+  font-size: 11px;
+
+  line-height: 1.55;
+
+  text-align: center;
+}
+
+/* =========================================================
+   18. ADVISER NOTE
+========================================================= */
+
+.parent-notice-adviser-note {
+  position: relative;
+
+  margin-top: 25px;
+
+  padding: 16px 17px 16px 19px;
+
+  overflow: hidden;
+
+  border: 1px solid var(--pn-brand-border);
+
+  border-radius: 11px;
+
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 100%);
+}
+
+.parent-notice-adviser-note::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0 auto 0 0;
+
+  width: 3px;
+
+  background: var(--pn-blue-800);
+}
+
+.parent-notice-adviser-note p {
+  margin: 8px 0 0;
+
+  overflow-wrap: anywhere;
+
+  color: var(--pn-text-secondary);
+
+  font-size: 12px;
+
+  line-height: 1.7;
+
+  white-space: pre-wrap;
+}
+
+/* =========================================================
+   19. RESULT ALERTS
+========================================================= */
+
+.parent-notice-alert {
+  margin-top: 18px;
+
+  padding: 12px 14px;
+
+  border: 1px solid;
+
+  border-radius: 10px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  line-height: 1.55;
+}
+
+.parent-notice-alert--success {
+  border-color: var(--pn-success-border);
+
+  background: var(--pn-success-bg);
+
+  color: var(--pn-success-text);
+}
+
+.parent-notice-alert--error {
+  border-color: var(--pn-error-border);
+
+  background: var(--pn-error-bg);
+
+  color: var(--pn-error-text);
+}
+
+/* =========================================================
+   20. ACTION CARD
+   ACKNOWLEDGEMENT / RESPONSE
+========================================================= */
+
+.parent-notice-action-card {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+
+  gap: 22px;
+
+  margin-top: 23px;
+
+  padding: 18px;
+
+  border: 1px solid var(--pn-border-soft);
+
+  border-radius: 13px;
+
+  background: var(--pn-surface);
+
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.parent-notice-action-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 14px;
+
+  bottom: 14px;
+
+  left: 0;
+
+  width: 3px;
+
+  border-radius: 0 999px 999px 0;
+
+  background: var(--pn-blue-800);
+}
+
+.parent-notice-action-copy {
+  min-width: 0;
+
+  padding-left: 4px;
+}
+
+.parent-notice-action-copy h2 {
+  margin: 5px 0 0;
+
+  color: var(--pn-text-primary);
+
+  font-size: 16px;
+
+  font-weight: 850;
+
+  line-height: 1.3;
+
+  letter-spacing: -0.15px;
+}
+
+.parent-notice-action-copy p {
+  max-width: 540px;
+
+  margin: 6px 0 0;
+
+  color: var(--pn-text-body);
+
+  font-size: 11px;
+
+  line-height: 1.55;
+}
+
+/* =========================================================
+   21. PRIMARY BUTTON
+========================================================= */
+
+.parent-notice-primary-button {
+  min-height: 42px;
+
+  flex: 0 0 auto;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 16px;
+
+  border: 1px solid var(--pn-blue-900);
+
+  border-radius: 9px;
+
+  background: var(--pn-blue-900);
+
+  box-shadow: 0 6px 14px rgba(18, 61, 126, 0.14);
+
+  color: #ffffff;
+
+  font: inherit;
+
+  font-size: 11px;
+
+  font-weight: 850;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.parent-notice-primary-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  border-color: var(--pn-blue-800);
+
+  background: var(--pn-blue-800);
+
+  box-shadow: 0 8px 18px rgba(18, 61, 126, 0.18);
+}
+
+.parent-notice-primary-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.parent-notice-primary-button:disabled {
+  transform: none;
+
+  cursor: not-allowed;
+
+  opacity: 0.52;
+
+  box-shadow: none;
+}
+
+/* =========================================================
+   22. ACKNOWLEDGED STATE
+========================================================= */
+
+.parent-notice-complete {
+  min-width: 210px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px 12px;
+
+  border: 1px solid var(--pn-success-border);
+
+  border-radius: 10px;
+
+  background: var(--pn-success-bg);
+
+  color: var(--pn-success-text);
+}
+
+.parent-notice-complete-icon {
+  width: 29px;
+
+  height: 29px;
+
+  flex: 0 0 29px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #dcfce7;
+
+  color: #15803d;
+
+  font-size: 11px;
+
+  font-weight: 900;
+}
+
+.parent-notice-complete > div:last-child {
+  min-width: 0;
+}
+
+.parent-notice-complete strong {
+  display: block;
+
+  color: inherit;
+
+  font-size: 10.5px;
+
+  font-weight: 850;
+}
+
+.parent-notice-complete span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: inherit;
+
+  font-size: 8.5px;
+
+  line-height: 1.4;
+
+  opacity: 0.82;
+}
+
+/* =========================================================
+   23. RESPONSE FORM
+========================================================= */
+
+.parent-notice-response-form {
+  width: min(100%, 390px);
+
+  display: grid;
+
+  gap: 8px;
+}
+
+.parent-notice-response-label {
+  color: var(--pn-text-secondary);
+
+  font-size: 10px;
+
+  font-weight: 850;
+}
+
+.parent-notice-response-form textarea {
+  width: 100%;
+
+  min-height: 124px;
+
+  resize: vertical;
+
+  padding: 11px 12px;
+
+  border: 1px solid var(--pn-border);
+
+  border-radius: 9px;
+
+  outline: 0;
+
+  background: var(--pn-surface);
+
+  color: var(--pn-text-primary);
+
+  font: inherit;
+
+  font-size: 12px;
+
+  line-height: 1.55;
+
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+.parent-notice-response-form textarea::placeholder {
+  color: var(--pn-text-muted);
+}
+
+.parent-notice-response-form textarea:focus {
+  border-color: var(--pn-blue-800);
+
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.08);
+}
+
+.parent-notice-response-form textarea:disabled {
+  resize: none;
+
+  background: var(--pn-surface-soft);
+
+  cursor: not-allowed;
+}
+
+.parent-notice-response-meta {
+  min-height: 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+}
+
+.parent-notice-character-count {
+  color: var(--pn-text-muted);
+
+  font-size: 9px;
+
+  font-weight: 750;
+}
+
+.parent-notice-character-count--error {
+  color: var(--pn-error-text);
+
+  font-weight: 850;
+}
+
+.parent-notice-response-form .parent-notice-primary-button {
+  justify-self: end;
+}
+
+/* =========================================================
+   24. SUBMITTED RESPONSE
+========================================================= */
+
+.parent-notice-submitted-response {
+  width: min(100%, 400px);
+
+  padding: 13px 14px;
+
+  border: 1px solid #b7ead1;
+
+  border-radius: 10px;
+
+  background: linear-gradient(145deg, #f0fdf7, #f8fffb);
+}
+
+.parent-notice-submitted-response p {
+  margin: 7px 0 0;
+
+  overflow-wrap: anywhere;
+
+  color: #245445;
+
+  font-size: 11.5px;
+
+  font-weight: 650;
+
+  line-height: 1.65;
+
+  white-space: pre-wrap;
+}
+
+.parent-notice-submitted-response small {
+  display: block;
+
+  margin-top: 8px;
+
+  color: #5c8174;
+
+  font-size: 8.5px;
+
+  line-height: 1.4;
+}
+
+/* =========================================================
+   25. SECURITY NOTE
+========================================================= */
+
+.parent-notice-security-note {
+  position: relative;
+
+  margin-top: 27px;
+
+  padding: 15px 16px 15px 44px;
+
+  border: 1px solid var(--pn-border-soft);
+
+  border-radius: 11px;
+
+  background: var(--pn-surface-soft);
+
+  color: var(--pn-text-body);
+}
+
+.parent-notice-security-note::before {
+  content: "✓";
+
+  position: absolute;
+
+  top: 15px;
+
+  left: 15px;
+
+  width: 20px;
+
+  height: 20px;
+
+  display: grid;
+
+  place-items: center;
+
+  border: 1px solid var(--pn-brand-border);
+
+  border-radius: 6px;
+
+  background: var(--pn-icon-bg);
+
+  color: var(--pn-blue-800);
+
+  font-size: 9px;
+
+  font-weight: 900;
+}
+
+.parent-notice-security-note strong {
+  display: block;
+
+  color: var(--pn-text-secondary);
+
+  font-size: 10.5px;
+
+  font-weight: 850;
+}
+
+.parent-notice-security-note p {
+  margin: 5px 0 0;
+
+  font-size: 10px;
+
+  line-height: 1.55;
+}
+
+.parent-notice-security-note > span {
+  display: block;
+
+  margin-top: 7px;
+
+  color: var(--pn-text-muted);
+
+  font-size: 9px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
+   26. FOOTER
+========================================================= */
+
+.parent-notice-footer {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding: 17px 28px;
+
+  border-top: 1px solid var(--pn-border-soft);
+
+  background: var(--pn-surface-soft);
+
+  color: var(--pn-text-muted);
+}
+
+.parent-notice-footer strong {
+  color: var(--pn-text-secondary);
+
+  font-size: 9.5px;
+
+  font-weight: 850;
+
+  white-space: nowrap;
+}
+
+.parent-notice-footer span {
+  max-width: 440px;
+
+  font-size: 8.5px;
+
+  line-height: 1.45;
+
+  text-align: right;
+}
+
+/* =========================================================
+   27. DARK MODE
+========================================================= */
+
+html[data-theme="dark"] .parent-notice-page {
+  --pn-blue-950: #071b33;
+
+  --pn-blue-900: #173b65;
+
+  --pn-blue-800: #4d89c8;
+
+  --pn-red-600: #ef4444;
+
+  --pn-text-primary: #e8eef6;
+
+  --pn-text-secondary: #d2dce9;
+
+  --pn-text-body: #9fb0c4;
+
+  --pn-text-muted: #778da6;
+
+  --pn-border: #32475e;
+
+  --pn-border-soft: #26394d;
+
+  --pn-surface: #101d2a;
+
+  --pn-surface-soft: #132434;
+
+  --pn-icon-bg: #17304b;
+
+  --pn-brand-border: #315272;
+
+  --pn-success-bg: rgba(20, 83, 45, 0.23);
+
+  --pn-success-border: rgba(74, 222, 128, 0.25);
+
+  --pn-success-text: #86efac;
+
+  --pn-error-bg: rgba(127, 29, 29, 0.22);
+
+  --pn-error-border: rgba(248, 113, 113, 0.26);
+
+  --pn-error-text: #fca5a5;
+
+  background:
+    radial-gradient(
+      circle at 12% 0%,
+      rgba(59, 130, 246, 0.09),
+      transparent 30%
+    ),
+    linear-gradient(180deg, #091521 0%, #0b1723 48%, #09131d 100%);
+}
+
+html[data-theme="dark"] .parent-notice-shell {
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] .parent-notice-header {
+  background: linear-gradient(135deg, #071b33, #123152);
+}
+
+html[data-theme="dark"] .parent-notice-risk--normal {
+  border-color: rgba(74, 222, 128, 0.28);
+
+  background: rgba(20, 83, 45, 0.25);
+
+  color: #86efac;
+}
+
+html[data-theme="dark"] .parent-notice-risk--warning {
+  border-color: rgba(250, 204, 21, 0.28);
+
+  background: rgba(113, 63, 18, 0.25);
+
+  color: #fde68a;
+}
+
+html[data-theme="dark"] .parent-notice-risk--at-risk {
+  border-color: rgba(251, 146, 60, 0.3);
+
+  background: rgba(124, 45, 18, 0.25);
+
+  color: #fdba74;
+}
+
+html[data-theme="dark"] .parent-notice-risk--critical,
+html[data-theme="dark"] .parent-notice-absence-badge {
+  border-color: rgba(248, 113, 113, 0.27);
+
+  background: rgba(127, 29, 29, 0.22);
+
+  color: #fca5a5;
+}
+
+html[data-theme="dark"] .parent-notice-adviser-note {
+  border-color: #315272;
+
+  background: linear-gradient(135deg, #142b42, #122538);
+}
+
+html[data-theme="dark"] .parent-notice-submitted-response {
+  border-color: #246651;
+
+  background: linear-gradient(145deg, #103329, #0f2823);
+}
+
+html[data-theme="dark"] .parent-notice-submitted-response p {
+  color: #d6f6e9;
+}
+
+html[data-theme="dark"] .parent-notice-submitted-response small {
+  color: #7ec7aa;
+}
+
+/* =========================================================
+   28. TABLET
+========================================================= */
+
+@media (max-width: 760px) {
+  .parent-notice-page {
+    padding: 22px 12px 36px;
+  }
+
+  .parent-notice-header {
+    padding: 21px 22px;
+  }
+
+  .parent-notice-content {
+    padding: 26px 22px 30px;
+  }
+
+  .parent-notice-summary-grid {
+    gap: 8px;
+  }
+
+  .parent-notice-summary-card {
+    padding: 13px;
+  }
+
+  .parent-notice-action-card {
+    grid-template-columns: 1fr;
+
+    gap: 15px;
+  }
+
+  .parent-notice-response-form,
+  .parent-notice-submitted-response {
+    width: 100%;
+  }
+
+  .parent-notice-response-form .parent-notice-primary-button {
+    justify-self: start;
+  }
+}
+
+/* =========================================================
+   29. MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .parent-notice-page {
+    display: block;
+
+    padding: 0;
+
+    background: var(--pn-surface);
+  }
+
+  .parent-notice-shell {
+    width: 100%;
+
+    min-height: 100vh;
+
+    min-height: 100dvh;
+
+    border: 0;
+
+    border-radius: 0;
+
+    box-shadow: none;
+  }
+
+  .parent-notice-shell::before {
+    height: 3px;
+  }
+
+  .parent-notice-header {
+    min-height: 84px;
+
+    align-items: flex-start;
+
+    padding: 20px 17px;
+
+    gap: 12px;
+  }
+
+  .parent-notice-brand {
+    gap: 10px;
+  }
+
+  .parent-notice-brand-mark {
+    width: 39px;
+
+    height: 39px;
+
+    flex-basis: 39px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+  }
+
+  .parent-notice-school {
+    font-size: 14px;
+  }
+
+  .parent-notice-system-name {
+    max-width: 170px;
+
+    font-size: 8.5px;
+  }
+
+  .parent-notice-secure {
+    min-height: 29px;
+
+    padding: 0 9px;
+
+    font-size: 8px;
+  }
+
+  .parent-notice-secure::before {
+    width: 6px;
+
+    height: 6px;
+  }
+
+  .parent-notice-content {
+    padding: 23px 16px 27px;
+  }
+
+  .parent-notice-heading {
+    padding-bottom: 19px;
+  }
+
+  .parent-notice-heading h1 {
+    font-size: 26px;
+  }
+
+  .parent-notice-heading p {
+    font-size: 12px;
+
+    line-height: 1.6;
+  }
+
+  .parent-notice-student-card {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 13px;
+
+    padding: 15px 15px 15px 19px;
+  }
+
+  .parent-notice-student-card h2 {
+    font-size: 18px;
+  }
+
+  .parent-notice-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .parent-notice-summary-card {
+    min-height: 74px;
+
+    flex-direction: row;
+
+    align-items: center;
+
+    gap: 14px;
+  }
+
+  .parent-notice-summary-number {
+    font-size: 21px !important;
+  }
+
+  .parent-notice-section {
+    margin-top: 23px;
+  }
+
+  .parent-notice-record {
+    min-height: 0;
+
+    align-items: flex-start;
+
+    padding: 13px;
+  }
+
+  .parent-notice-action-card {
+    margin-top: 19px;
+
+    padding: 16px;
+  }
+
+  .parent-notice-action-card::before {
+    top: 12px;
+
+    bottom: 12px;
+  }
+
+  .parent-notice-primary-button {
+    width: 100%;
+
+    min-height: 44px;
+  }
+
+  .parent-notice-response-form .parent-notice-primary-button {
+    justify-self: stretch;
+  }
+
+  .parent-notice-complete {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+  .parent-notice-security-note {
+    margin-top: 22px;
+  }
+
+  .parent-notice-footer {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding: 16px;
+
+    text-align: left;
+  }
+
+  .parent-notice-footer strong {
+    white-space: normal;
+  }
+
+  .parent-notice-footer span {
+    max-width: none;
+
+    text-align: left;
+  }
+
+  .parent-notice-shell--state {
+    min-height: 100vh;
+
+    min-height: 100dvh;
+
+    padding: 42px 20px;
+  }
+}
+
+/* =========================================================
+   30. VERY SMALL PHONES
+========================================================= */
+
+@media (max-width: 390px) {
+  .parent-notice-header {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .parent-notice-secure {
+    width: fit-content;
+
+    margin-left: 49px;
+  }
+
+  .parent-notice-content {
+    padding-inline: 14px;
+  }
+
+  .parent-notice-record {
+    flex-direction: column;
+
+    gap: 9px;
+  }
+
+  .parent-notice-absence-badge {
+    align-self: flex-start;
+  }
+}
+
+/* =========================================================
+   31. ANIMATION
+========================================================= */
+
+@keyframes parent-notice-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   32. REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .parent-notice-spinner {
+    animation: none;
+  }
+
+  .parent-notice-primary-button,
+  .parent-notice-record {
+    transition: none;
+  }
+}
