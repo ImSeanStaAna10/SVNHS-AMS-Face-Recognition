@@ -2,29 +2,41 @@ package com.example.attendancemanagementbackend.service;
 
 import com.example.attendancemanagementbackend.dto.AdviserAttendanceHistoryResponse;
 import com.example.attendancemanagementbackend.dto.attendance.PagedResponse;
+
 import com.example.attendancemanagementbackend.entity.AttendanceRecord;
 import com.example.attendancemanagementbackend.entity.AttendanceSession;
 import com.example.attendancemanagementbackend.entity.AttendanceSessionStatus;
 import com.example.attendancemanagementbackend.entity.AttendanceStatus;
 import com.example.attendancemanagementbackend.entity.Section;
 import com.example.attendancemanagementbackend.entity.Student;
+
+import com.example.attendancemanagementbackend.event.AttendanceSessionFinalizedEvent;
+
 import com.example.attendancemanagementbackend.exception.ApiException;
+
 import com.example.attendancemanagementbackend.repository.AdviserAttendanceHistoryProjection;
 import com.example.attendancemanagementbackend.repository.AttendanceRecordRepository;
 import com.example.attendancemanagementbackend.repository.AttendanceSessionRepository;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
 import com.example.attendancemanagementbackend.repository.StudentRepository;
+
 import com.example.attendancemanagementbackend.util.AppTime;
+
+import org.springframework.context.ApplicationEventPublisher;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+
 import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,12 +56,17 @@ public class AttendanceSessionService {
     private final StudentRepository
             studentRepository;
 
+    private final ApplicationEventPublisher
+            eventPublisher;
+
     public AttendanceSessionService(
             AttendanceSessionRepository attendanceSessionRepository,
             AttendanceRecordRepository attendanceRecordRepository,
             SectionRepository sectionRepository,
-            StudentRepository studentRepository
+            StudentRepository studentRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
+
         this.attendanceSessionRepository =
                 attendanceSessionRepository;
 
@@ -61,6 +78,9 @@ public class AttendanceSessionService {
 
         this.studentRepository =
                 studentRepository;
+
+        this.eventPublisher =
+                eventPublisher;
     }
 
     /* =========================================================
@@ -596,7 +616,10 @@ public class AttendanceSessionService {
          * Defensive idempotency protection.
          *
          * If the session was already finalized,
-         * don't create duplicate ABSENT records.
+         * don't:
+         *
+         * - create duplicate ABSENT records
+         * - publish duplicate finalization events
          */
         if (session.getStatus() ==
                 AttendanceSessionStatus.ENDED) {
@@ -625,10 +648,43 @@ public class AttendanceSessionService {
                 endedAt
         );
 
-        return attendanceSessionRepository
-                .save(
-                        session
-                );
+        /* =====================================================
+           SAVE FINALIZED SESSION
+        ===================================================== */
+
+        AttendanceSession savedSession =
+                attendanceSessionRepository
+                        .save(
+                                session
+                        );
+
+        /* =====================================================
+           PUBLISH FINALIZATION EVENT
+
+           IMPORTANT:
+
+           This event is published while the current
+           attendance transaction is still active.
+
+           The corresponding listener uses:
+
+           TransactionPhase.AFTER_COMMIT
+
+           Therefore the intervention engine will only
+           execute after the attendance transaction has
+           successfully committed.
+
+           If this attendance transaction rolls back,
+           the intervention listener will not run.
+        ===================================================== */
+
+        eventPublisher.publishEvent(
+                new AttendanceSessionFinalizedEvent(
+                        savedSession.getId()
+                )
+        );
+
+        return savedSession;
     }
 
     /* =========================================================
@@ -656,7 +712,8 @@ public class AttendanceSessionService {
         List<AttendanceRecord> absentRecords =
                 new ArrayList<>();
 
-        for (Student student : students) {
+        for (Student student :
+                students) {
 
             /*
              * Ignore inactive students.

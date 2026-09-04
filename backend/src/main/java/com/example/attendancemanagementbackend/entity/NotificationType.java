@@ -26,6 +26,13 @@ public enum NotificationType {
     ATTENDANCE_SESSION_AUTO_ENDED,
 
     /* =========================================================
+       ATTENDANCE INTERVENTION / PARENT COMMUNICATION
+    ========================================================= */
+
+    PARENT_ATTENDANCE_ACKNOWLEDGED,
+    PARENT_ATTENDANCE_RESPONDED,
+
+    /* =========================================================
        FACE / MANUAL REVIEW
     ========================================================= */
 

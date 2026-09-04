@@ -3,13 +3,31 @@ package com.example.attendancemanagementbackend.dto.student;
 public class StudentResponse {
 
     private String id;
+
     private String studentNumber;
+
     private String name;
+
     private String sectionId;
+
     private String sectionName;
+
     private boolean active;
+
     private boolean faceRegistered;
 
+    private StudentGuardianResponse guardian;
+
+    public StudentResponse() {
+    }
+
+    /*
+     * Existing constructor preserved.
+     *
+     * This keeps older code compatible
+     * if it still creates StudentResponse
+     * using only the original 7 arguments.
+     */
     public StudentResponse(
             String id,
             String studentNumber,
@@ -19,6 +37,31 @@ public class StudentResponse {
             boolean active,
             boolean faceRegistered
     ) {
+        this(
+                id,
+                studentNumber,
+                name,
+                sectionId,
+                sectionName,
+                active,
+                faceRegistered,
+                null
+        );
+    }
+
+    /*
+     * New constructor with Guardian support.
+     */
+    public StudentResponse(
+            String id,
+            String studentNumber,
+            String name,
+            String sectionId,
+            String sectionName,
+            boolean active,
+            boolean faceRegistered,
+            StudentGuardianResponse guardian
+    ) {
         this.id = id;
         this.studentNumber = studentNumber;
         this.name = name;
@@ -26,6 +69,7 @@ public class StudentResponse {
         this.sectionName = sectionName;
         this.active = active;
         this.faceRegistered = faceRegistered;
+        this.guardian = guardian;
     }
 
     public String getId() {
@@ -54,5 +98,15 @@ public class StudentResponse {
 
     public boolean isFaceRegistered() {
         return faceRegistered;
+    }
+
+    public StudentGuardianResponse getGuardian() {
+        return guardian;
+    }
+
+    public void setGuardian(
+            StudentGuardianResponse guardian
+    ) {
+        this.guardian = guardian;
     }
 }

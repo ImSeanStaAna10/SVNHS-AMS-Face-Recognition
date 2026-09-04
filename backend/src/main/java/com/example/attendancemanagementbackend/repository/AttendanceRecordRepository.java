@@ -810,4 +810,219 @@ public interface AttendanceRecordRepository
 
             Pageable pageable
     );
+
+    /* =========================================================
+   STUDENT ATTENDANCE RISK SUMMARY
+
+   Used by the Attendance Intervention / Risk system.
+
+   IMPORTANT:
+
+   - Only ACTIVE students currently belonging to the
+     requested Section are returned.
+
+   - Attendance is counted only from ENDED sessions.
+
+   - Attendance must fall inside the configured
+     intervention period.
+
+   - Historical attendance is intentionally NOT limited
+     to the student's current Section.
+
+     This means a transferred student's finalized
+     attendance history follows the student during the
+     same intervention period instead of resetting when
+     the student changes Section.
+
+   - ACTIVE attendance sessions never affect risk.
+========================================================= */
+
+    @Query(
+            value = """
+                SELECT
+                    st.id AS "studentId",
+
+                    st.student_number AS "studentNumber",
+
+                    st.name AS "studentName",
+
+                    COUNT(
+                        DISTINCT ats.id
+                    ) AS "sessionCount",
+
+                    COUNT(
+                        ar.id
+                    ) FILTER (
+                        WHERE
+                            ats.id IS NOT NULL
+                            AND ar.status = 'PRESENT'
+                    ) AS "presentCount",
+
+                    COUNT(
+                        ar.id
+                    ) FILTER (
+                        WHERE
+                            ats.id IS NOT NULL
+                            AND ar.status = 'LATE'
+                    ) AS "lateCount",
+
+                    COUNT(
+                        ar.id
+                    ) FILTER (
+                        WHERE
+                            ats.id IS NOT NULL
+                            AND ar.status = 'ABSENT'
+                    ) AS "absentCount",
+
+                    COUNT(
+                        ar.id
+                    ) FILTER (
+                        WHERE ats.id IS NOT NULL
+                    ) AS "totalRecords"
+
+                FROM public.students st
+
+                LEFT JOIN public.attendance_records ar
+                    ON ar.student_id = st.id
+
+                LEFT JOIN public.attendance_sessions ats
+                    ON ats.id = ar.session_id
+
+                    AND ats.status = 'ENDED'
+
+                    AND ats.attendance_date
+                        BETWEEN :fromDate AND :toDate
+
+                WHERE
+                    st.section_id = :sectionId
+
+                    AND st.active = true
+
+                GROUP BY
+                    st.id,
+                    st.student_number,
+                    st.name
+
+                ORDER BY
+                    LOWER(st.name) ASC,
+                    st.student_number ASC
+                """,
+            nativeQuery = true
+    )
+    List<StudentAttendanceRiskProjection>
+    findCurrentSectionStudentRiskSummary(
+
+            @Param("sectionId")
+            String sectionId,
+
+            @Param("fromDate")
+            LocalDate fromDate,
+
+            @Param("toDate")
+            LocalDate toDate
+    );
+
+
+    /* =========================================================
+   ATTENDANCE INTERVENTION
+   STUDENT ABSENCE COUNTS
+
+   Used after a finalized attendance session.
+
+   IMPORTANT:
+   - Only ABSENT records are counted.
+   - Only ENDED sessions are counted.
+   - Attendance follows the student across sections
+     inside the configured intervention period.
+========================================================= */
+
+    @Query(
+            value = """
+                SELECT
+                    ar.student_id AS "studentId",
+
+                    COUNT(
+                        ar.id
+                    ) AS "absentCount"
+
+                FROM public.attendance_records ar
+
+                INNER JOIN public.attendance_sessions ats
+                    ON ats.id = ar.session_id
+
+                WHERE
+                    ar.student_id IN (:studentIds)
+
+                    AND ar.status = 'ABSENT'
+
+                    AND ats.status = 'ENDED'
+
+                    AND ats.attendance_date
+                        BETWEEN :fromDate AND :toDate
+
+                GROUP BY
+                    ar.student_id
+                """,
+            nativeQuery = true
+    )
+    List<StudentAbsenceCountProjection>
+    findStudentAbsenceCountsForRisk(
+
+            @Param("studentIds")
+            List<String> studentIds,
+
+            @Param("fromDate")
+            LocalDate fromDate,
+
+            @Param("toDate")
+            LocalDate toDate
+    );
+
+    /* =========================================================
+   PARENT NOTIFICATION
+   FINALIZED STUDENT ABSENCES
+
+   Returns the exact ABSENT records that will be frozen
+   into a Parent Notification snapshot.
+
+   IMPORTANT:
+   - ABSENT only
+   - ENDED sessions only
+   - Risk period only
+   - Attendance follows the student across sections
+========================================================= */
+
+    @Query("""
+       SELECT ar
+       FROM AttendanceRecord ar
+
+       JOIN FETCH ar.session ats
+
+       WHERE ar.student.id = :studentId
+
+         AND ar.status =
+             com.example.attendancemanagementbackend.entity.AttendanceStatus.ABSENT
+
+         AND ats.status =
+             com.example.attendancemanagementbackend.entity.AttendanceSessionStatus.ENDED
+
+         AND ats.attendanceDate
+             BETWEEN :fromDate AND :toDate
+
+       ORDER BY
+           ats.attendanceDate ASC,
+           ats.startedAt ASC
+       """)
+    List<AttendanceRecord>
+    findFinalizedStudentAbsencesForNotification(
+
+            @Param("studentId")
+            String studentId,
+
+            @Param("fromDate")
+            LocalDate fromDate,
+
+            @Param("toDate")
+            LocalDate toDate
+    );
 }

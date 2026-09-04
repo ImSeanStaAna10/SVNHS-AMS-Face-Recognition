@@ -5,7 +5,9 @@ import com.example.attendancemanagementbackend.dto.student.StudentResponse;
 import com.example.attendancemanagementbackend.dto.student.TransferStudentRequest;
 import com.example.attendancemanagementbackend.dto.student.UpdateStudentRequest;
 import com.example.attendancemanagementbackend.service.StudentService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,19 +22,33 @@ public class StudentController {
     public StudentController(
             StudentService studentService
     ) {
-        this.studentService = studentService;
+        this.studentService =
+                studentService;
     }
 
     /* =====================================================
        CREATE STUDENT
     ===================================================== */
 
-    // Adviser registers a student
+    /*
+     * Adviser registers a new student.
+     *
+     * Supported information:
+     *
+     * - student number
+     * - student name
+     * - section
+     * - optional primary guardian information
+     *
+     * Guardian information is optional so existing
+     * student creation requests remain compatible.
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public StudentResponse createStudent(
             @Valid @RequestBody CreateStudentRequest request
     ) {
+
         return studentService.createStudent(
                 request
         );
@@ -42,9 +58,16 @@ public class StudentController {
        GET STUDENTS
     ===================================================== */
 
-    // Adviser views students under their sections
+    /*
+     * Adviser views students belonging to
+     * sections assigned to the logged-in Adviser.
+     *
+     * Student responses may include the current
+     * active primary guardian when available.
+     */
     @GetMapping
     public List<StudentResponse> getMyStudents() {
+
         return studentService.getMyStudents();
     }
 
@@ -60,6 +83,16 @@ public class StudentController {
      *
      * - studentNumber
      * - name
+     * - optional primary guardian information
+     *
+     * Guardian behavior:
+     *
+     * - guardian omitted:
+     *   existing guardian remains unchanged
+     *
+     * - guardian supplied:
+     *   existing primary guardian is updated,
+     *   or created when none exists
      *
      * Student section, face registration,
      * attendance history, and student ID
@@ -70,6 +103,7 @@ public class StudentController {
             @PathVariable String studentId,
             @Valid @RequestBody UpdateStudentRequest request
     ) {
+
         return studentService.updateStudent(
                 studentId,
                 request
@@ -84,21 +118,28 @@ public class StudentController {
      * Transfers an ACTIVE student to another ACTIVE section.
      *
      * IMPORTANT:
+     *
      * This Adviser endpoint only allows transfers between
      * sections assigned to the currently logged-in Adviser.
      *
-     * Student ID, student number, face registration,
-     * and historical attendance remain preserved.
+     * Preserved:
      *
-     * For cross-Adviser transfers, use a higher-level
-     * Councilor-controlled workflow instead of weakening
-     * this Adviser ownership rule.
+     * - student ID
+     * - student number
+     * - face registration
+     * - guardian information
+     * - historical attendance
+     *
+     * For cross-Adviser transfers, use the existing
+     * Councilor-controlled transfer workflow instead
+     * of weakening Adviser ownership rules.
      */
     @PatchMapping("/{studentId}/section")
     public StudentResponse transferStudentSection(
             @PathVariable String studentId,
             @Valid @RequestBody TransferStudentRequest request
     ) {
+
         return studentService.transferStudentSection(
                 studentId,
                 request
@@ -114,15 +155,22 @@ public class StudentController {
      * This does NOT permanently delete
      * the student from the database.
      *
-     * The student is only marked inactive
-     * so historical attendance records and
-     * face registration remain preserved.
+     * The student is only marked inactive.
+     *
+     * Preserved:
+     *
+     * - student identity
+     * - guardian information
+     * - face registration
+     * - attendance history
+     * - transfer history
      */
     @DeleteMapping("/{studentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteStudent(
             @PathVariable String studentId
     ) {
+
         studentService.deactivateStudent(
                 studentId
         );
@@ -135,13 +183,15 @@ public class StudentController {
     /*
      * Restores an inactive student to the active roster.
      *
-     * Existing student ID, face registration, section,
-     * and historical attendance remain unchanged.
+     * Existing student ID, guardian information,
+     * face registration, section, and historical
+     * attendance remain unchanged.
      */
     @PatchMapping("/{studentId}/reactivate")
     public StudentResponse reactivateStudent(
             @PathVariable String studentId
     ) {
+
         return studentService.reactivateStudent(
                 studentId
         );

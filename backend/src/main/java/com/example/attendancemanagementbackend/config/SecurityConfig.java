@@ -98,6 +98,33 @@ public class SecurityConfig {
                                 .permitAll()
 
                                 /* =================================
+                                   PUBLIC PARENT ATTENDANCE NOTICE
+
+                                   These endpoints are intentionally
+                                   public because access is protected
+                                   by the long cryptographically opaque
+                                   parent notification token.
+
+                                   No JWT/login is required.
+
+                                   Supported routes:
+
+                                   GET
+                                   /api/public/parent-notifications/{token}
+
+                                   POST
+                                   /api/public/parent-notifications/{token}/acknowledge
+
+                                   POST
+                                   /api/public/parent-notifications/{token}/response
+                                ================================= */
+
+                                .requestMatchers(
+                                        "/api/public/parent-notifications/**"
+                                )
+                                .permitAll()
+
+                                /* =================================
                                    DISABLED PUBLIC REGISTRATION
 
                                    User accounts are managed through

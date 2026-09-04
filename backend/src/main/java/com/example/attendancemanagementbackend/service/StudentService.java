@@ -1,6 +1,7 @@
 package com.example.attendancemanagementbackend.service;
 
 import com.example.attendancemanagementbackend.dto.student.CreateStudentRequest;
+import com.example.attendancemanagementbackend.dto.student.StudentGuardianResponse;
 import com.example.attendancemanagementbackend.dto.student.StudentResponse;
 import com.example.attendancemanagementbackend.dto.student.TransferStudentRequest;
 import com.example.attendancemanagementbackend.dto.student.UpdateStudentRequest;
@@ -16,36 +17,56 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StudentService {
 
     private final StudentRepository studentRepository;
+
     private final SectionRepository sectionRepository;
-    private final StudentFaceRepository studentFaceRepository;
+
+    private final StudentFaceRepository
+            studentFaceRepository;
+
     private final StudentTransferRequestRepository
             studentTransferRequestRepository;
+
+    private final StudentGuardianService
+            studentGuardianService;
 
     public StudentService(
             StudentRepository studentRepository,
             SectionRepository sectionRepository,
             StudentFaceRepository studentFaceRepository,
-            StudentTransferRequestRepository studentTransferRequestRepository
+            StudentTransferRequestRepository studentTransferRequestRepository,
+            StudentGuardianService studentGuardianService
     ) {
-        this.studentRepository = studentRepository;
-        this.sectionRepository = sectionRepository;
-        this.studentFaceRepository = studentFaceRepository;
+        this.studentRepository =
+                studentRepository;
+
+        this.sectionRepository =
+                sectionRepository;
+
+        this.studentFaceRepository =
+                studentFaceRepository;
+
         this.studentTransferRequestRepository =
                 studentTransferRequestRepository;
+
+        this.studentGuardianService =
+                studentGuardianService;
     }
 
     /* =====================================================
        CREATE STUDENT
     ===================================================== */
 
+    @Transactional
     public StudentResponse createStudent(
             CreateStudentRequest request
     ) {
@@ -126,8 +147,33 @@ public class StudentService {
                         student
                 );
 
+        /*
+         * Guardian is optional.
+         *
+         * Existing student creation requests without
+         * guardian information continue to work.
+         *
+         * Because this method is @Transactional,
+         * Student + Guardian are saved atomically.
+         */
+        StudentGuardianResponse guardian =
+                null;
+
+        if (
+                request.getGuardian() !=
+                        null
+        ) {
+            guardian =
+                    studentGuardianService
+                            .createPrimaryGuardian(
+                                    savedStudent,
+                                    request.getGuardian()
+                            );
+        }
+
         return mapToResponse(
-                savedStudent
+                savedStudent,
+                guardian
         );
     }
 
@@ -135,17 +181,54 @@ public class StudentService {
        GET STUDENTS FOR LOGGED-IN ADVISER
     ===================================================== */
 
+    @Transactional(readOnly = true)
     public List<StudentResponse> getMyStudents() {
 
         String adviserId =
                 getAuthenticatedAdviserId();
 
-        return studentRepository
-                .findBySectionAdviserId(
-                        adviserId
-                )
+        List<Student> students =
+                studentRepository
+                        .findBySectionAdviserId(
+                                adviserId
+                        );
+
+        if (students.isEmpty()) {
+            return List.of();
+        }
+
+        /*
+         * Load all primary guardians in one query.
+         *
+         * This avoids introducing an additional N+1
+         * guardian query problem on Student Management.
+         */
+        List<String> studentIds =
+                students
+                        .stream()
+                        .map(
+                                Student::getId
+                        )
+                        .toList();
+
+        Map<String, StudentGuardianResponse>
+                guardianByStudentId =
+                studentGuardianService
+                        .getPrimaryGuardians(
+                                studentIds
+                        );
+
+        return students
                 .stream()
-                .map(this::mapToResponse)
+                .map(student ->
+                        mapToResponse(
+                                student,
+                                guardianByStudentId
+                                        .get(
+                                                student.getId()
+                                        )
+                        )
+                )
                 .toList();
     }
 
@@ -153,6 +236,7 @@ public class StudentService {
        UPDATE STUDENT
     ===================================================== */
 
+    @Transactional
     public StudentResponse updateStudent(
             String studentId,
             UpdateStudentRequest request
@@ -210,11 +294,8 @@ public class StudentService {
         }
 
         /*
-         * Only editable student information
-         * is changed here.
-         *
          * Student ID, section, face record,
-         * and attendance history are preserved.
+         * and attendance history remain preserved.
          */
         student.setStudentNumber(
                 studentNumber
@@ -233,8 +314,39 @@ public class StudentService {
                         student
                 );
 
+        /*
+         * guardian == null means:
+         *
+         * KEEP the current guardian unchanged.
+         *
+         * A supplied guardian object means:
+         *
+         * CREATE a primary guardian if missing,
+         * otherwise UPDATE the current primary guardian.
+         */
+        StudentGuardianResponse guardian;
+
+        if (
+                request.getGuardian() !=
+                        null
+        ) {
+            guardian =
+                    studentGuardianService
+                            .upsertPrimaryGuardian(
+                                    savedStudent,
+                                    request.getGuardian()
+                            );
+        } else {
+            guardian =
+                    studentGuardianService
+                            .getPrimaryGuardian(
+                                    savedStudent.getId()
+                            );
+        }
+
         return mapToResponse(
-                savedStudent
+                savedStudent,
+                guardian
         );
     }
 
@@ -242,6 +354,7 @@ public class StudentService {
        TRANSFER STUDENT SECTION
     ===================================================== */
 
+    @Transactional
     public StudentResponse transferStudentSection(
             String studentId,
             TransferStudentRequest request
@@ -330,6 +443,8 @@ public class StudentService {
         /*
          * Only the student's CURRENT section changes.
          *
+         * Guardian information is also preserved.
+         *
          * We do not recreate the Student.
          * We do not modify the StudentFace.
          * We do not modify historical AttendanceRecord rows.
@@ -358,6 +473,7 @@ public class StudentService {
        SOFT DELETE
     ===================================================== */
 
+    @Transactional
     public void deactivateStudent(
             String studentId
     ) {
@@ -373,8 +489,6 @@ public class StudentService {
 
         /*
          * Student is already inactive.
-         *
-         * Nothing else needs to be changed.
          */
         if (!student.isActive()) {
             return;
@@ -383,15 +497,9 @@ public class StudentService {
         /*
          * IMPORTANT:
          *
-         * This is intentionally a soft delete.
+         * This remains a soft delete.
          *
-         * We DO NOT call:
-         *
-         * studentRepository.delete(...)
-         *
-         * The Student row remains in the database
-         * so existing attendance records and the
-         * registered face remain intact.
+         * Student guardian information is also preserved.
          */
         student.setActive(
                 false
@@ -410,6 +518,7 @@ public class StudentService {
        REACTIVATE STUDENT
     ===================================================== */
 
+    @Transactional
     public StudentResponse reactivateStudent(
             String studentId
     ) {
@@ -428,8 +537,7 @@ public class StudentService {
          * operationally inactive for attendance.
          *
          * Do not allow the normal Reactivate endpoint to bypass
-         * the transfer workflow. The destination Adviser must
-         * approve or reject the pending request first.
+         * the transfer workflow.
          */
         if (
                 studentTransferRequestRepository
@@ -446,8 +554,6 @@ public class StudentService {
 
         /*
          * Already active.
-         *
-         * Keep the operation idempotent.
          */
         if (student.isActive()) {
             return mapToResponse(
@@ -480,8 +586,8 @@ public class StudentService {
          * getOwnedStudent(...) already verifies that
          * this section belongs to the logged-in Adviser.
          *
-         * Only the active flag is restored.
-         * Student ID, face, section, and history stay intact.
+         * Guardian information, Student ID, face,
+         * section, and history stay intact.
          */
         student.setActive(
                 true
@@ -577,7 +683,9 @@ public class StudentService {
                         section.getAdviser().getId() == null ||
                         !section.getAdviser()
                                 .getId()
-                                .equals(adviserId)
+                                .equals(
+                                        adviserId
+                                )
         ) {
             throw new ApiException(
                     HttpStatus.FORBIDDEN,
@@ -592,6 +700,27 @@ public class StudentService {
 
     private StudentResponse mapToResponse(
             Student student
+    ) {
+
+        StudentGuardianResponse guardian =
+                studentGuardianService
+                        .getPrimaryGuardian(
+                                student.getId()
+                        );
+
+        return mapToResponse(
+                student,
+                guardian
+        );
+    }
+
+    /* =====================================================
+       MAP STUDENT + PRELOADED GUARDIAN
+    ===================================================== */
+
+    private StudentResponse mapToResponse(
+            Student student,
+            StudentGuardianResponse guardian
     ) {
 
         boolean faceRegistered =
@@ -614,7 +743,8 @@ public class StudentService {
                         ? section.getName()
                         : null,
                 student.isActive(),
-                faceRegistered
+                faceRegistered,
+                guardian
         );
     }
 }
