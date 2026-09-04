@@ -18,6 +18,10 @@ import CouncilorLayout from "../../layouts/CouncilorLayout";
 
 import councilorService from "../../services/councilorService";
 
+import {
+  useCouncilorSectionAttendanceReport,
+} from "../../hooks/queries/useCouncilorQueries";
+
 import depedLogo from "../../assets/kagawaran-educ-logo.svg";
 import seniorHighSchoolLogo from "../../assets/shs-logo.svg";
 
@@ -1038,25 +1042,6 @@ function AttendanceDetail() {
     }, []);
 
   /* =======================================================
-     REPORT STATE
-  ======================================================= */
-
-  const [
-    report,
-    setReport,
-  ] = useState(null);
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
-  const [
-    error,
-    setError,
-  ] = useState("");
-
-  /* =======================================================
      SEARCH STATE
   ======================================================= */
 
@@ -1151,99 +1136,29 @@ function AttendanceDetail() {
   ]);
 
   /* =======================================================
-     LOAD DAILY REPORT
+     CACHED DAILY REPORT
   ======================================================= */
 
-  useEffect(() => {
-    if (!sectionId) {
-      return undefined;
-    }
-
-    const controller =
-      new AbortController();
-
-    const loadReport =
-      async () => {
-        setLoading(true);
-
-        setError("");
-
-        try {
-          const data =
-            await councilorService.getSectionAttendanceReport(
-              sectionId,
-              {
-                /*
-                 * Backend still receives from/to,
-                 * but both represent one school day.
-                 */
-
-                from:
-                  selectedDate,
-
-                to:
-                  selectedDate,
-
-                search:
-                  debouncedSearch,
-
-                page,
-
-                size:
-                  PAGE_SIZE,
-
-                signal:
-                  controller.signal,
-              },
-            );
-
-          setReport(data);
-        } catch (
-          requestError
-        ) {
-          if (
-            requestError
-              ?.code ===
-              "ERR_CANCELED" ||
-            requestError
-              ?.name ===
-              "CanceledError"
-          ) {
-            return;
-          }
-
-          setReport(null);
-
-          setError(
-            requestError
-              ?.response
-              ?.data
-              ?.message ||
-              "Unable to load the attendance record.",
-          );
-        } finally {
-          if (
-            !controller.signal
-              .aborted
-          ) {
-            setLoading(
-              false,
-            );
-          }
-        }
-      };
-
-    void loadReport();
-
-    return () => {
-      controller.abort();
-    };
-  }, [
+  const reportQuery = useCouncilorSectionAttendanceReport(
     sectionId,
-    selectedDate,
-    debouncedSearch,
-    page,
-  ]);
+    {
+      from: selectedDate,
+      to: selectedDate,
+      search: debouncedSearch,
+      page,
+      size: PAGE_SIZE,
+    },
+  );
+
+  const report = reportQuery.data ?? null;
+
+  const loading = reportQuery.isLoading;
+
+  const error =
+    reportQuery.data === undefined && reportQuery.error
+      ? reportQuery.error?.response?.data?.message ||
+        "Unable to load the attendance record."
+      : "";
 
   /* =======================================================
      DERIVED DATA

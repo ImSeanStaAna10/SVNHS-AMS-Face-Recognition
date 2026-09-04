@@ -8,9 +8,22 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import {
+  useQueryClient,
+} from "@tanstack/react-query";
+
 import SuperAdminLayout from "../../layouts/SuperAdminLayout";
 
 import superAdminService from "../../services/superAdminService";
+
+import {
+  useSuperAdminCouncilors,
+  useSuperAdminDepartments,
+} from "../../hooks/queries/useSuperAdminQueries";
+
+import {
+  invalidateSuperAdminDepartmentCache,
+} from "../../hooks/queries/invalidateSuperAdminCache";
 
 import "../../styles/superadmin/departments.css";
 
@@ -133,6 +146,19 @@ function DepartmentManagement() {
   const navigate =
     useNavigate();
 
+  const queryClient =
+    useQueryClient();
+
+  /* =======================================================
+     REUSABLE SERVER CACHE
+  ======================================================= */
+
+  const departmentsQuery =
+    useSuperAdminDepartments();
+
+  const councilorsQuery =
+    useSuperAdminCouncilors();
+
   /* =======================================================
      DATA
   ======================================================= */
@@ -250,88 +276,100 @@ function DepartmentManagement() {
   ] = useState(false);
 
   /* =======================================================
-     LOAD DATA
+     SERVER CACHE → LOCAL VIEW STATE
   ======================================================= */
 
   useEffect(() => {
-    let cancelled = false;
+    if (
+      departmentsQuery.data !==
+      undefined
+    ) {
+      setDepartments(
+        sortDepartments(
+          Array.isArray(
+            departmentsQuery.data,
+          )
+            ? departmentsQuery.data
+            : [],
+        ),
+      );
+    } else if (
+      departmentsQuery.isError
+    ) {
+      setDepartments([]);
+    }
 
-    Promise.allSettled([
-      superAdminService.getDepartments(),
-      superAdminService.getCouncilors(),
-    ]).then(
-      ([
-        departmentResult,
-        councilorResult,
-      ]) => {
-        if (cancelled) {
-          return;
-        }
+    if (
+      councilorsQuery.data !==
+      undefined
+    ) {
+      setCouncilors(
+        Array.isArray(
+          councilorsQuery.data,
+        )
+          ? councilorsQuery.data
+          : [],
+      );
+    } else if (
+      councilorsQuery.isError
+    ) {
+      setCouncilors([]);
+    }
 
-        if (
-          departmentResult.status ===
-          "fulfilled"
-        ) {
-          const departmentData =
-            Array.isArray(
-              departmentResult.value,
-            )
-              ? departmentResult.value
-              : [];
+    const initialLoading =
+      (
+        departmentsQuery.isFetching &&
+        departmentsQuery.data ===
+          undefined
+      ) ||
+      (
+        councilorsQuery.isFetching &&
+        councilorsQuery.data ===
+          undefined
+      );
 
-          setDepartments(
-            sortDepartments(
-              departmentData,
-            ),
-          );
-        } else {
-          setDepartments([]);
-        }
-
-        if (
-          councilorResult.status ===
-          "fulfilled"
-        ) {
-          setCouncilors(
-            Array.isArray(
-              councilorResult.value,
-            )
-              ? councilorResult.value
-              : [],
-          );
-        } else {
-          setCouncilors([]);
-        }
-
-        if (
-          departmentResult.status ===
-          "rejected"
-        ) {
-          setError(
-            getErrorMessage(
-              departmentResult.reason,
-              "Unable to load departments.",
-            ),
-          );
-        } else if (
-          councilorResult.status ===
-          "rejected"
-        ) {
-          setError(
-            "Departments loaded, but Councilor assignment information is temporarily unavailable.",
-          );
-        } else {
-          setError("");
-        }
-
-        setLoading(false);
-      },
+    setLoading(
+      initialLoading,
     );
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (
+      departmentsQuery.isError &&
+      departmentsQuery.data ===
+        undefined
+    ) {
+      setError(
+        getErrorMessage(
+          departmentsQuery.error,
+          "Unable to load departments.",
+        ),
+      );
+
+      return;
+    }
+
+    if (
+      councilorsQuery.isError &&
+      councilorsQuery.data ===
+        undefined
+    ) {
+      setError(
+        "Departments loaded, but Councilor assignment information is temporarily unavailable.",
+      );
+
+      return;
+    }
+
+    setError("");
+  }, [
+    departmentsQuery.data,
+    departmentsQuery.error,
+    departmentsQuery.isError,
+    departmentsQuery.isFetching,
+    councilorsQuery.data,
+    councilorsQuery.error,
+    councilorsQuery.isError,
+    councilorsQuery.isFetching,
+  ]);
 
   /* =======================================================
      AUTO-HIDE SUCCESS MESSAGE
@@ -907,6 +945,10 @@ function DepartmentManagement() {
               ]),
           );
 
+          void invalidateSuperAdminDepartmentCache(
+            queryClient,
+          );
+
           setSuccess(
             `${created.name} was created successfully.`,
           );
@@ -928,6 +970,10 @@ function DepartmentManagement() {
                       : department,
                 ),
               ),
+          );
+
+          void invalidateSuperAdminDepartmentCache(
+            queryClient,
           );
 
           setSuccess(
@@ -1066,6 +1112,10 @@ function DepartmentManagement() {
                     : department,
               ),
             ),
+        );
+
+        void invalidateSuperAdminDepartmentCache(
+          queryClient,
         );
 
         setSuccess(

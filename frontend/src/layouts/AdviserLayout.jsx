@@ -57,7 +57,7 @@ const NAVIGATION_ITEMS = [
     exact: true,
   },
   {
-    label: "Attendance",
+    label: "Attendance Session",
     icon: "◷",
     path: "/adviser/attendance",
     exact: true,

@@ -1,28 +1,19 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useMemo } from "react";
 
 import CouncilorLayout from "../../layouts/CouncilorLayout";
-
 import AttendanceRecords from "../attendance-records/AttendanceRecords";
 
-import councilorService from "../../services/councilorService";
+import {
+  useCouncilorSections,
+} from "../../hooks/queries/useCouncilorQueries";
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
-const normalizeArray = (value) => {
-  return Array.isArray(value)
-    ? value
-    : [];
-};
+const normalizeArray = (value) => (Array.isArray(value) ? value : []);
 
-const getErrorMessage = (
-  error,
-  fallbackMessage,
-) =>
+const getErrorMessage = (error, fallbackMessage) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   error?.message ||
@@ -33,113 +24,31 @@ const getErrorMessage = (
 ========================================================= */
 
 function CouncilorAttendanceRecords() {
-  /* =======================================================
-     STATE
-  ======================================================= */
+  const sectionsQuery = useCouncilorSections();
 
-  const [
-    sections,
-    setSections,
-  ] = useState([]);
-
-  const [
-    loadingSections,
-    setLoadingSections,
-  ] = useState(true);
-
-  const [
-    sectionError,
-    setSectionError,
-  ] = useState("");
-
-  /* =======================================================
-     LOAD SECTIONS
-
-     Councilor needs sections only for the filter.
-
-     AttendanceRecords itself loads the report archive.
-  ======================================================= */
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadSections = async () => {
-      try {
-        setLoadingSections(true);
-        setSectionError("");
-
-        const response =
-          await councilorService
-            .getSections();
-
-        if (!mounted) {
-          return;
-        }
-
-        const normalizedSections =
-          normalizeArray(
-            response,
-          )
-            .filter(
-              (section) =>
-                section?.id,
-            )
-            .sort(
-              (first, second) =>
-                String(
-                  first?.name || "",
-                ).localeCompare(
-                  String(
-                    second?.name || "",
-                  ),
-                  "en",
-                  {
-                    sensitivity:
-                      "base",
-                  },
-                ),
-            );
-
-        setSections(
-          normalizedSections,
-        );
-      } catch (error) {
-        console.error(
-          "Unable to load sections for attendance records:",
-          error,
-        );
-
-        if (!mounted) {
-          return;
-        }
-
-        setSections([]);
-
-        setSectionError(
-          getErrorMessage(
-            error,
-            "Unable to load section filters.",
+  const sections = useMemo(
+    () =>
+      normalizeArray(sectionsQuery.data)
+        .filter((section) => section?.id)
+        .sort((first, second) =>
+          String(first?.name || "").localeCompare(
+            String(second?.name || ""),
+            "en",
+            { sensitivity: "base" },
           ),
-        );
-      } finally {
-        if (mounted) {
-          setLoadingSections(
-            false,
-          );
-        }
-      }
-    };
+        ),
+    [sectionsQuery.data],
+  );
 
-    void loadSections();
+  const loadingSections = sectionsQuery.isLoading;
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  /* =======================================================
-     RENDER
-  ======================================================= */
+  const sectionError =
+    sectionsQuery.data === undefined && sectionsQuery.error
+      ? getErrorMessage(
+          sectionsQuery.error,
+          "Unable to load section filters.",
+        )
+      : "";
 
   return (
     <CouncilorLayout>
@@ -162,10 +71,7 @@ function CouncilorAttendanceRecords() {
         </div>
       )}
 
-      <AttendanceRecords
-        role="COUNCILOR"
-        sections={sections}
-      />
+      <AttendanceRecords role="COUNCILOR" sections={sections} />
     </CouncilorLayout>
   );
 }

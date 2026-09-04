@@ -168,6 +168,136 @@ export const queryKeys = {
   },
 
   /* =======================================================
+     COUNCILOR
+
+     Councilor cache is intentionally separated from Adviser
+     cache so data from the two roles never shares the same
+     TanStack Query entries.
+  ======================================================= */
+
+  councilor: {
+    /**
+     * Root key for all Councilor-related cached data.
+     *
+     * Useful for broad invalidation only when necessary:
+     * ["councilor"]
+     */
+    all: ["councilor"],
+
+    /* =====================================================
+       ADVISERS
+    ===================================================== */
+
+    /**
+     * Shared adviser directory used by:
+     * - Councilor Dashboard
+     * - Adviser Management
+     * - Section Management
+     * - Attendance filter options
+     */
+    advisers: () => ["councilor", "advisers"],
+
+    /* =====================================================
+       SECTIONS
+    ===================================================== */
+
+    /**
+     * Shared section directory used by:
+     * - Councilor Dashboard
+     * - Section Management
+     * - Attendance filter options
+     * - Attendance Records filters
+     */
+    sections: () => ["councilor", "sections"],
+
+    /* =====================================================
+       ATTENDANCE REPORTS
+    ===================================================== */
+
+    attendanceReports: {
+      /**
+       * Parent key for all Councilor attendance report data.
+       */
+      all: () => ["councilor", "attendance-reports"],
+
+      /**
+       * School-wide attendance overview.
+       *
+       * Every filter combination and page receives its own
+       * cache entry.
+       */
+      overview: ({
+        from = "",
+        to = "",
+        sectionId = "",
+        adviserId = "",
+        search = "",
+        page = 0,
+        size = 9,
+      } = {}) => [
+        "councilor",
+        "attendance-reports",
+        "overview",
+        String(from || ""),
+        String(to || ""),
+        String(sectionId || ""),
+        String(adviserId || ""),
+        String(search || ""),
+        Number(page) || 0,
+        Number(size) || 9,
+      ],
+
+      /**
+       * Section-level attendance report.
+       *
+       * Used by AttendanceDetail.
+       *
+       * Section, date range, search, page, and page size are
+       * all part of the key so cached pages cannot collide.
+       */
+      section: (
+        sectionId,
+        { from = "", to = "", search = "", page = 0, size = 25 } = {},
+      ) => [
+        "councilor",
+        "attendance-reports",
+        "section",
+        String(sectionId || ""),
+        String(from || ""),
+        String(to || ""),
+        String(search || ""),
+        Number(page) || 0,
+        Number(size) || 25,
+      ],
+    },
+  },
+
+  /* =======================================================
+     SUPERADMIN
+
+     Shared cache for system-level administrative data.
+     Dashboard, Department Management, and Councilor
+     Management reuse these same query entries.
+  ======================================================= */
+
+  superadmin: {
+    /**
+     * Root key for all SuperAdmin-related cached data.
+     */
+    all: ["superadmin"],
+
+    /**
+     * Department directory.
+     */
+    departments: () => ["superadmin", "departments"],
+
+    /**
+     * Councilor account directory.
+     */
+    councilors: () => ["superadmin", "councilors"],
+  },
+
+  /* =======================================================
      ATTENDANCE REPORT ARCHIVE
 
      This is intentionally top-level because AttendanceRecords

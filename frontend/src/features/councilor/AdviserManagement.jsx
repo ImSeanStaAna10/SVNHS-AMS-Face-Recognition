@@ -1,8 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { useQueryClient } from "@tanstack/react-query";
+
 import CouncilorLayout from "../../layouts/CouncilorLayout";
 
 import councilorService from "../../services/councilorService";
+
+import { useCouncilorAdvisers } from "../../hooks/queries/useCouncilorQueries";
+import { invalidateCouncilorAdviserCache } from "../../hooks/queries/invalidateCouncilorCache";
+import queryKeys from "../../lib/query/queryKeys";
 
 import seniorHighSchoolLogo from "../../assets/shs-logo.svg";
 
@@ -129,7 +135,14 @@ function Advisers() {
      DATA STATE
   ======================================================= */
 
-  const [advisers, setAdvisers] = useState([]);
+  const queryClient = useQueryClient();
+
+  const advisersQuery = useCouncilorAdvisers();
+
+  const advisers = useMemo(
+    () => normalizeAdvisers(advisersQuery.data),
+    [advisersQuery.data],
+  );
 
   const [search, setSearch] = useState("");
 
@@ -137,7 +150,7 @@ function Advisers() {
      REQUEST STATE
   ======================================================= */
 
-  const [loading, setLoading] = useState(true);
+  const loading = advisersQuery.isLoading;
 
   const [creating, setCreating] = useState(false);
 
@@ -150,6 +163,13 @@ function Advisers() {
   ======================================================= */
 
   const [error, setError] = useState("");
+
+  const adviserQueryError =
+    advisersQuery.data === undefined && advisersQuery.error
+      ? getErrorMessage(advisersQuery.error, "Unable to load advisers.")
+      : "";
+
+  const displayedError = error || adviserQueryError;
 
   const [success, setSuccess] = useState("");
 
@@ -190,46 +210,6 @@ function Advisers() {
   const [editFormData, setEditFormData] = useState(INITIAL_EDIT_FORM);
 
   const [editFormError, setEditFormError] = useState("");
-
-  /* =======================================================
-     INITIAL LOAD
-  ======================================================= */
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadAdvisers = async () => {
-      try {
-        const data = await councilorService.getAdvisers();
-
-        if (!isMounted) {
-          return;
-        }
-
-        setAdvisers(normalizeAdvisers(data));
-
-        setError("");
-      } catch (err) {
-        console.error("Unable to load advisers:", err);
-
-        if (!isMounted) {
-          return;
-        }
-
-        setError(getErrorMessage(err, "Unable to load advisers."));
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadAdvisers();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   /* =======================================================
      MODAL SIDE EFFECTS
@@ -421,16 +401,6 @@ function Advisers() {
   };
 
   /* =======================================================
-     REFRESH ADVISERS
-  ======================================================= */
-
-  const refreshAdvisers = async () => {
-    const data = await councilorService.getAdvisers();
-
-    setAdvisers(normalizeAdvisers(data));
-  };
-
-  /* =======================================================
      CREATE ADVISER
   ======================================================= */
 
@@ -454,7 +424,7 @@ function Advisers() {
 
       await councilorService.createAdviser(validation.data);
 
-      await refreshAdvisers();
+      await invalidateCouncilorAdviserCache(queryClient);
 
       setShowModal(false);
 
@@ -765,23 +735,27 @@ function Advisers() {
       );
 
       if (updatedAdviser?.id) {
-        setAdvisers((currentAdvisers) =>
-          currentAdvisers.map((adviser) =>
-            adviser.id === updatedAdviser.id
-              ? {
-                  ...adviser,
-                  ...updatedAdviser,
-                }
-              : adviser,
-          ),
+        queryClient.setQueryData(
+          queryKeys.councilor.advisers(),
+          (current) =>
+            Array.isArray(current)
+              ? current.map((adviser) =>
+                  adviser.id === updatedAdviser.id
+                    ? {
+                        ...adviser,
+                        ...updatedAdviser,
+                      }
+                    : adviser,
+                )
+              : current,
         );
       }
 
       try {
-        await refreshAdvisers();
+        await invalidateCouncilorAdviserCache(queryClient);
       } catch (refreshError) {
         console.warn(
-          "Unable to refresh advisers after update:",
+          "Unable to synchronize adviser cache after update:",
           refreshError,
         );
       }
@@ -1013,11 +987,11 @@ function Advisers() {
               ERROR
           ================================================ */}
 
-          {error && (
+          {displayedError && (
             <div className="councilor-error" role="alert">
               <span aria-hidden="true">!</span>
 
-              <p>{error}</p>
+              <p>{displayedError}</p>
             </div>
           )}
 

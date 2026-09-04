@@ -8,8 +8,22 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import {
+  useQueryClient,
+} from "@tanstack/react-query";
+
 import SuperAdminLayout from "../../layouts/SuperAdminLayout";
 import superAdminService from "../../services/superAdminService";
+
+import {
+  useSuperAdminCouncilors,
+  useSuperAdminDepartments,
+} from "../../hooks/queries/useSuperAdminQueries";
+
+import {
+  invalidateSuperAdminCouncilorCache,
+} from "../../hooks/queries/invalidateSuperAdminCache";
+
 import "../../styles/superadmin/councilor.css";
 
 /* =========================================================
@@ -232,6 +246,19 @@ function CouncilorManagement() {
   const navigate =
     useNavigate();
 
+  const queryClient =
+    useQueryClient();
+
+  /* =======================================================
+     REUSABLE SERVER CACHE
+  ======================================================= */
+
+  const councilorsQuery =
+    useSuperAdminCouncilors();
+
+  const departmentsQuery =
+    useSuperAdminDepartments();
+
   /* =======================================================
      DATA
   ======================================================= */
@@ -420,87 +447,107 @@ function CouncilorManagement() {
   });
 
   /* =======================================================
-     LOAD PAGE DATA
+     SERVER CACHE → LOCAL VIEW STATE
+
+     The page keeps its existing local arrays because the
+     create/edit/status UI already updates those arrays
+     immediately. TanStack Query is now the shared server
+     state source used across SuperAdmin pages.
   ======================================================= */
 
   useEffect(() => {
-    let cancelled = false;
+    if (
+      councilorsQuery.data !==
+      undefined
+    ) {
+      setCouncilors(
+        sortCouncilors(
+          Array.isArray(
+            councilorsQuery.data,
+          )
+            ? councilorsQuery.data
+            : [],
+        ),
+      );
+    } else if (
+      councilorsQuery.isError
+    ) {
+      setCouncilors([]);
+    }
 
-    Promise.allSettled([
-      superAdminService.getCouncilors(),
-      superAdminService.getDepartments(),
-    ]).then(
-      ([
-        councilorResult,
-        departmentResult,
-      ]) => {
-        if (cancelled) {
-          return;
-        }
+    if (
+      departmentsQuery.data !==
+      undefined
+    ) {
+      setDepartments(
+        sortDepartments(
+          Array.isArray(
+            departmentsQuery.data,
+          )
+            ? departmentsQuery.data
+            : [],
+        ),
+      );
+    } else if (
+      departmentsQuery.isError
+    ) {
+      setDepartments([]);
+    }
 
-        if (
-          councilorResult.status ===
-          "fulfilled"
-        ) {
-          setCouncilors(
-            sortCouncilors(
-              Array.isArray(
-                councilorResult.value,
-              )
-                ? councilorResult.value
-                : [],
-            ),
-          );
-        } else {
-          setCouncilors([]);
-        }
+    const initialLoading =
+      (
+        councilorsQuery.isFetching &&
+        councilorsQuery.data ===
+          undefined
+      ) ||
+      (
+        departmentsQuery.isFetching &&
+        departmentsQuery.data ===
+          undefined
+      );
 
-        if (
-          departmentResult.status ===
-          "fulfilled"
-        ) {
-          setDepartments(
-            sortDepartments(
-              Array.isArray(
-                departmentResult.value,
-              )
-                ? departmentResult.value
-                : [],
-            ),
-          );
-        } else {
-          setDepartments([]);
-        }
-
-        if (
-          councilorResult.status ===
-          "rejected"
-        ) {
-          setError(
-            getErrorMessage(
-              councilorResult.reason,
-              "Unable to load Councilor accounts.",
-            ),
-          );
-        } else if (
-          departmentResult.status ===
-          "rejected"
-        ) {
-          setError(
-            "Councilor accounts loaded, but department information is temporarily unavailable.",
-          );
-        } else {
-          setError("");
-        }
-
-        setLoading(false);
-      },
+    setLoading(
+      initialLoading,
     );
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (
+      councilorsQuery.isError &&
+      councilorsQuery.data ===
+        undefined
+    ) {
+      setError(
+        getErrorMessage(
+          councilorsQuery.error,
+          "Unable to load Councilor accounts.",
+        ),
+      );
+
+      return;
+    }
+
+    if (
+      departmentsQuery.isError &&
+      departmentsQuery.data ===
+        undefined
+    ) {
+      setError(
+        "Councilor accounts loaded, but department information is temporarily unavailable.",
+      );
+
+      return;
+    }
+
+    setError("");
+  }, [
+    councilorsQuery.data,
+    councilorsQuery.error,
+    councilorsQuery.isError,
+    councilorsQuery.isFetching,
+    departmentsQuery.data,
+    departmentsQuery.error,
+    departmentsQuery.isError,
+    departmentsQuery.isFetching,
+  ]);
 
   /* =======================================================
      AUTO-HIDE SUCCESS
@@ -1162,6 +1209,13 @@ function CouncilorManagement() {
             ]),
         );
 
+        /*
+         * Keep every SuperAdmin page synchronized.
+         */
+        void invalidateSuperAdminCouncilorCache(
+          queryClient,
+        );
+
         setSuccess(
           `${created.name} was created successfully.`,
         );
@@ -1418,6 +1472,10 @@ function CouncilorManagement() {
             ),
         );
 
+        void invalidateSuperAdminCouncilorCache(
+          queryClient,
+        );
+
         setSuccess(
           `${updated.name} was updated successfully.`,
         );
@@ -1558,6 +1616,10 @@ function CouncilorManagement() {
                     : councilor,
               ),
             ),
+        );
+
+        void invalidateSuperAdminCouncilorCache(
+          queryClient,
         );
 
         setSuccess(

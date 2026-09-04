@@ -1,7 +1,5 @@
 import {
-  useEffect,
   useMemo,
-  useState,
 } from "react";
 
 import { useNavigate } from "react-router-dom";
@@ -9,21 +7,16 @@ import { useNavigate } from "react-router-dom";
 import SuperAdminLayout from "../../layouts/SuperAdminLayout";
 
 import authService from "../../services/authService";
-import superadminService from "../../services/superAdminService";
+
+import {
+  useSuperAdminCouncilors,
+  useSuperAdminDepartments,
+} from "../../hooks/queries/useSuperAdminQueries";
 
 import schoolBuilding from "../../assets/school-background.png";
 import seniorHighSchoolLogo from "../../assets/shs-logo.svg";
 
 import "../../styles/superadmin/dashboard.css";
-
-/* =========================================================
-   CONSTANTS
-========================================================= */
-
-const INITIAL_DATA_STATUS = {
-  departments: "loading",
-  councilors: "loading",
-};
 
 /* =========================================================
    HELPERS
@@ -124,154 +117,94 @@ function SuperAdminDashboard() {
     );
 
   /* =======================================================
-     DATA
+     REUSABLE SERVER CACHE
   ======================================================= */
 
-  const [
-    departments,
-    setDepartments,
-  ] = useState([]);
+  const departmentsQuery =
+    useSuperAdminDepartments();
 
-  const [
-    councilors,
-    setCouncilors,
-  ] = useState([]);
+  const councilorsQuery =
+    useSuperAdminCouncilors();
 
-  /* =======================================================
-     REQUEST STATE
-  ======================================================= */
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
-  const [
-    dataStatus,
-    setDataStatus,
-  ] = useState(
-    INITIAL_DATA_STATUS,
-  );
-
-  const [
-    error,
-    setError,
-  ] = useState("");
-
-  const [
-    retryKey,
-    setRetryKey,
-  ] = useState(0);
-
-  /* =======================================================
-     LOAD DASHBOARD
-  ======================================================= */
-
-  useEffect(() => {
-    let cancelled = false;
-
-    Promise.allSettled([
-      superadminService.getDepartments(),
-      superadminService.getCouncilors(),
-    ]).then(
-      ([
-        departmentResult,
-        councilorResult,
-      ]) => {
-        if (cancelled) {
-          return;
-        }
-
-        const nextStatus = {
-          departments:
-            departmentResult.status ===
-            "fulfilled"
-              ? "ready"
-              : "error",
-
-          councilors:
-            councilorResult.status ===
-            "fulfilled"
-              ? "ready"
-              : "error",
-        };
-
-        if (
-          departmentResult.status ===
-          "fulfilled"
-        ) {
-          setDepartments(
-            Array.isArray(
-              departmentResult.value,
-            )
-              ? departmentResult.value
-              : [],
-          );
-        } else {
-          setDepartments([]);
-        }
-
-        if (
-          councilorResult.status ===
-          "fulfilled"
-        ) {
-          setCouncilors(
-            Array.isArray(
-              councilorResult.value,
-            )
-              ? councilorResult.value
-              : [],
-          );
-        } else {
-          setCouncilors([]);
-        }
-
-        setDataStatus(
-          nextStatus,
-        );
-
-        const unavailable = [];
-
-        if (
-          nextStatus.departments ===
-          "error"
-        ) {
-          unavailable.push(
-            "departments",
-          );
-        }
-
-        if (
-          nextStatus.councilors ===
-          "error"
-        ) {
-          unavailable.push(
-            "Councilor accounts",
-          );
-        }
-
-        if (
-          unavailable.length > 0
-        ) {
-          setError(
-            `Some dashboard data could not be loaded: ${unavailable.join(
-              ", ",
-            )}.`,
-          );
-        } else {
-          setError("");
-        }
-
-        setLoading(false);
-      },
+  const departments =
+    useMemo(
+      () =>
+        Array.isArray(
+          departmentsQuery.data,
+        )
+          ? departmentsQuery.data
+          : [],
+      [
+        departmentsQuery.data,
+      ],
     );
 
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    retryKey,
-  ]);
+  const councilors =
+    useMemo(
+      () =>
+        Array.isArray(
+          councilorsQuery.data,
+        )
+          ? councilorsQuery.data
+          : [],
+      [
+        councilorsQuery.data,
+      ],
+    );
+
+  /*
+   * Only block the dashboard during a fetch when no cached
+   * copy exists yet. Background refetches keep cached data
+   * visible.
+   */
+  const loading =
+    (
+      departmentsQuery.isFetching &&
+      departmentsQuery.data ===
+        undefined
+    ) ||
+    (
+      councilorsQuery.isFetching &&
+      councilorsQuery.data ===
+        undefined
+    );
+
+  const error =
+    useMemo(() => {
+      const unavailable = [];
+
+      if (
+        departmentsQuery.isError &&
+        departmentsQuery.data ===
+          undefined
+      ) {
+        unavailable.push(
+          "departments",
+        );
+      }
+
+      if (
+        councilorsQuery.isError &&
+        councilorsQuery.data ===
+          undefined
+      ) {
+        unavailable.push(
+          "Councilor accounts",
+        );
+      }
+
+      return unavailable.length >
+        0
+        ? `Some dashboard data could not be loaded: ${unavailable.join(
+            ", ",
+          )}.`
+        : "";
+    }, [
+      departmentsQuery.data,
+      departmentsQuery.isError,
+      councilorsQuery.data,
+      councilorsQuery.isError,
+    ]);
 
   /* =======================================================
      USER
@@ -288,12 +221,12 @@ function SuperAdminDashboard() {
   ======================================================= */
 
   const departmentsReady =
-    dataStatus.departments ===
-    "ready";
+    departmentsQuery.data !==
+    undefined;
 
   const councilorsReady =
-    dataStatus.councilors ===
-    "ready";
+    councilorsQuery.data !==
+    undefined;
 
   /* =======================================================
      DEPARTMENT METRICS
@@ -479,8 +412,7 @@ function SuperAdminDashboard() {
   /* =======================================================
      ERROR RETRY
 
-     This is not a routine refresh.
-     It is only used after an actual API load failure.
+     Retry only the two shared SuperAdmin queries.
   ======================================================= */
 
   const handleRetry = () => {
@@ -488,17 +420,10 @@ function SuperAdminDashboard() {
       return;
     }
 
-    setLoading(true);
-    setError("");
-
-    setDataStatus(
-      INITIAL_DATA_STATUS,
-    );
-
-    setRetryKey(
-      (current) =>
-        current + 1,
-    );
+    void Promise.all([
+      departmentsQuery.refetch(),
+      councilorsQuery.refetch(),
+    ]);
   };
 
   /* =======================================================
