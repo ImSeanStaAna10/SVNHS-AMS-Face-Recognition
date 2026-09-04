@@ -1,9 +1,12 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { useQueryClient } from "@tanstack/react-query";
 
 import attendanceReportService from "../../services/attendanceReportService";
+
+import { useAttendanceReportArchive } from "../../hooks/queries/useReportQueries";
+
+import queryKeys from "../../lib/query/queryKeys";
 
 import ReportFilters from "./components/ReportFilter";
 import ReportHero from "./components/ReportHero";
@@ -11,9 +14,7 @@ import ReportPagination from "./components/ReportPagination";
 import ReportSummary from "./components/ReportSummary";
 import ReportTable from "./components/ReportTable";
 
-import {
-  resolveRequestError,
-} from "./utils/reportFormatter";
+import { resolveRequestError } from "./utils/reportFormatter";
 
 import "./AttendanceRecords.css";
 
@@ -52,252 +53,167 @@ const EMPTY_PAGE = {
    ATTENDANCE RECORDS
 ========================================================= */
 
-function AttendanceRecords({
-  role,
-  sections = [],
-}) {
-  const isCouncilor =
-    role === "COUNCILOR";
+function AttendanceRecords({ role, sections = [] }) {
+  const isCouncilor = role === "COUNCILOR";
+
+  const queryClient = useQueryClient();
 
   /* =========================================================
      FILTER STATE
   ========================================================= */
 
-  const [
-    filters,
-    setFilters,
-  ] = useState(
-    DEFAULT_FILTERS
-  );
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
-  const [
-    appliedFilters,
-    setAppliedFilters,
-  ] = useState(
-    DEFAULT_FILTERS
-  );
+  const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
 
   /* =========================================================
      PAGINATION STATE
   ========================================================= */
 
-  const [
-    page,
-    setPage,
-  ] = useState(0);
-
-  const [
-    reportPage,
-    setReportPage,
-  ] = useState(
-    EMPTY_PAGE
-  );
+  const [page, setPage] = useState(0);
 
   /* =========================================================
      UI STATE
   ========================================================= */
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+  const [actionKey, setActionKey] = useState("");
 
-  const [
-    actionKey,
-    setActionKey,
-  ] = useState("");
+  const [downloadingAll, setDownloadingAll] = useState(false);
 
-  const [
-    downloadingAll,
-    setDownloadingAll,
-  ] = useState(false);
+  const [actionError, setActionError] = useState("");
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [archiveError, setArchiveError] = useState("");
 
-  const [
-    success,
-    setSuccess,
-  ] = useState("");
+  const [success, setSuccess] = useState("");
 
   /* =========================================================
-     RELOAD KEY
+     CACHED REPORT ARCHIVE
 
-     Incrementing this forces the archive effect to
-     retrieve fresh data without duplicating the
-     loading function.
+     Every role + filter set + page gets a separate TanStack
+     Query cache entry.
   ========================================================= */
 
-  const [
-    reloadKey,
-    setReloadKey,
-  ] = useState(0);
+  const archiveQuery = useAttendanceReportArchive({
+    role,
+
+    type: appliedFilters.type,
+
+    sectionId: isCouncilor ? appliedFilters.sectionId : "",
+
+    from: appliedFilters.from,
+
+    to: appliedFilters.to,
+
+    page,
+
+    size: PAGE_SIZE,
+  });
+
+  const reportPage = useMemo(
+    () => ({
+      ...EMPTY_PAGE,
+
+      ...(archiveQuery.data || {}),
+
+      page: Number(archiveQuery.data?.page ?? page) || 0,
+
+      size: Number(archiveQuery.data?.size ?? PAGE_SIZE) || PAGE_SIZE,
+
+      content: Array.isArray(archiveQuery.data?.content)
+        ? archiveQuery.data.content
+        : [],
+    }),
+    [archiveQuery.data, page],
+  );
+
+  /*
+   * Preserve the existing table/control loading behavior.
+   *
+   * Fresh cached pages render immediately because no fetch is
+   * needed. A real network refresh still shows loading.
+   */
+  const loading = archiveQuery.isLoading || archiveQuery.isFetching;
 
   /* =========================================================
-     LOAD ARCHIVE
-
-     Automatically runs when:
-     - filters are applied
-     - page changes
-     - report is regenerated
-     - role changes
+     ARCHIVE QUERY ERROR
   ========================================================= */
 
   useEffect(() => {
     let cancelled = false;
 
-    const fetchReports = async () => {
-      try {
-        const response =
-          await attendanceReportService
-            .getAttendanceReportArchive({
-              type:
-                appliedFilters.type,
+    if (!archiveQuery.error || archiveQuery.data != null) {
+      setArchiveError("");
 
-              sectionId:
-                isCouncilor
-                  ? appliedFilters.sectionId
-                  : undefined,
+      return () => {
+        cancelled = true;
+      };
+    }
 
-              from:
-                appliedFilters.from,
+    const resolveArchiveError = async () => {
+      const message = await resolveRequestError(
+        archiveQuery.error,
+        "Unable to load attendance reports.",
+      );
 
-              to:
-                appliedFilters.to,
-
-              page,
-
-              size: PAGE_SIZE,
-            });
-
-        if (cancelled) {
-          return;
-        }
-
-        setReportPage({
-          ...EMPTY_PAGE,
-          ...response,
-
-          content:
-            response?.content ||
-            [],
-        });
-      } catch (requestError) {
-        if (cancelled) {
-          return;
-        }
-
-        const message =
-          await resolveRequestError(
-            requestError,
-            "Unable to load attendance reports."
-          );
-
-        if (cancelled) {
-          return;
-        }
-
-        setError(
-          message
-        );
-
-        setReportPage({
-          ...EMPTY_PAGE,
-          page,
-        });
-      } finally {
-        if (!cancelled) {
-          setLoading(
-            false
-          );
-        }
+      if (!cancelled) {
+        setArchiveError(message);
       }
     };
 
-    fetchReports();
+    void resolveArchiveError();
 
     return () => {
       cancelled = true;
     };
-  }, [
-    appliedFilters.type,
-    appliedFilters.sectionId,
-    appliedFilters.from,
-    appliedFilters.to,
-    isCouncilor,
-    page,
-    reloadKey,
-  ]);
+  }, [archiveQuery.error, archiveQuery.data]);
+
+  const error = actionError || archiveError;
 
   /* =========================================================
      AUTO CLEAR ALERTS
   ========================================================= */
 
   useEffect(() => {
-    if (
-      !success &&
-      !error
-    ) {
+    if (!success && !error) {
       return undefined;
     }
 
-    const timer =
-      window.setTimeout(
-        () => {
-          setSuccess("");
-          setError("");
-        },
-        5000
-      );
+    const timer = window.setTimeout(() => {
+      setSuccess("");
+      setActionError("");
+      setArchiveError("");
+    }, 5000);
 
     return () => {
-      window.clearTimeout(
-        timer
-      );
+      window.clearTimeout(timer);
     };
-  }, [
-    success,
-    error,
-  ]);
+  }, [success, error]);
 
   /* =========================================================
      CURRENT REPORTS
   ========================================================= */
 
-  const reports =
-    reportPage?.content ||
-    [];
+  const reports = reportPage?.content || [];
 
   /* =========================================================
      APPLY FILTERS
   ========================================================= */
 
   const handleApplyFilters = () => {
-    setLoading(
-      true
-    );
-
-    setError("");
+    setActionError("");
+    setArchiveError("");
     setSuccess("");
 
     setPage(0);
 
     setAppliedFilters({
-      type:
-        filters.type,
+      type: filters.type,
 
-      sectionId:
-        isCouncilor
-          ? filters.sectionId
-          : "",
+      sectionId: isCouncilor ? filters.sectionId : "",
 
-      from:
-        filters.from,
+      from: filters.from,
 
-      to:
-        filters.to,
+      to: filters.to,
     });
   };
 
@@ -306,12 +222,16 @@ function AttendanceRecords({
   ========================================================= */
 
   const handleResetFilters = () => {
-    setLoading(
-      true
-    );
-
-    setError("");
+    setActionError("");
+    setArchiveError("");
     setSuccess("");
+
+    const alreadyDefault =
+      page === 0 &&
+      appliedFilters.type === "" &&
+      appliedFilters.sectionId === "" &&
+      appliedFilters.from === "" &&
+      appliedFilters.to === "";
 
     setFilters({
       ...DEFAULT_FILTERS,
@@ -321,25 +241,15 @@ function AttendanceRecords({
       ...DEFAULT_FILTERS,
     });
 
-    /*
-     * If already on page zero with default filters,
-     * changing the filters may not trigger the effect.
-     * reloadKey guarantees a refresh.
-     */
-    if (
-      page === 0 &&
-      appliedFilters.type === "" &&
-      appliedFilters.sectionId === "" &&
-      appliedFilters.from === "" &&
-      appliedFilters.to === ""
-    ) {
-      setReloadKey(
-        (current) =>
-          current + 1
-      );
-    }
-
     setPage(0);
+
+    /*
+     * If the query key does not change, explicitly refresh the
+     * current archive instead of using the old reload counter.
+     */
+    if (alreadyDefault) {
+      void archiveQuery.refetch();
+    }
   };
 
   /* =========================================================
@@ -352,45 +262,32 @@ function AttendanceRecords({
     callback,
     successMessage,
   }) => {
-    if (
-      !report?.id
-    ) {
+    if (!report?.id) {
       return;
     }
 
-    if (
-      actionKey
-    ) {
+    if (actionKey) {
       return;
     }
 
-    setActionKey(
-      `${report.id}:${action}`
-    );
+    setActionKey(`${report.id}:${action}`);
 
-    setError("");
+    setActionError("");
     setSuccess("");
 
     try {
       await callback();
 
-      if (
-        successMessage
-      ) {
-        setSuccess(
-          successMessage
-        );
+      if (successMessage) {
+        setSuccess(successMessage);
       }
     } catch (requestError) {
-      const message =
-        await resolveRequestError(
-          requestError,
-          "Unable to complete the report action."
-        );
-
-      setError(
-        message
+      const message = await resolveRequestError(
+        requestError,
+        "Unable to complete the report action.",
       );
+
+      setActionError(message);
     } finally {
       setActionKey("");
     }
@@ -400,21 +297,14 @@ function AttendanceRecords({
      VIEW PDF
   ========================================================= */
 
-  const handleViewPdf = (
-    report
-  ) => {
+  const handleViewPdf = (report) => {
     void runReportAction({
       report,
 
-      action:
-        "view",
+      action: "view",
 
-      callback:
-        () =>
-          attendanceReportService
-            .viewAttendanceReportPdf(
-              report.id
-            ),
+      callback: () =>
+        attendanceReportService.viewAttendanceReportPdf(report.id),
     });
   };
 
@@ -422,25 +312,18 @@ function AttendanceRecords({
      DOWNLOAD PDF
   ========================================================= */
 
-  const handleDownloadPdf = (
-    report
-  ) => {
+  const handleDownloadPdf = (report) => {
     void runReportAction({
       report,
 
-      action:
-        "pdf",
+      action: "pdf",
 
-      callback:
-        () =>
-          attendanceReportService
-            .downloadAttendanceReportPdf({
-              id:
-                report.id,
+      callback: () =>
+        attendanceReportService.downloadAttendanceReportPdf({
+          id: report.id,
 
-              pdfFileName:
-                report.pdfFileName,
-            }),
+          pdfFileName: report.pdfFileName,
+        }),
     });
   };
 
@@ -448,25 +331,18 @@ function AttendanceRecords({
      DOWNLOAD EXCEL
   ========================================================= */
 
-  const handleDownloadExcel = (
-    report
-  ) => {
+  const handleDownloadExcel = (report) => {
     void runReportAction({
       report,
 
-      action:
-        "excel",
+      action: "excel",
 
-      callback:
-        () =>
-          attendanceReportService
-            .downloadAttendanceReportExcel({
-              id:
-                report.id,
+      callback: () =>
+        attendanceReportService.downloadAttendanceReportExcel({
+          id: report.id,
 
-              excelFileName:
-                report.excelFileName,
-            }),
+          excelFileName: report.excelFileName,
+        }),
     });
   };
 
@@ -475,54 +351,37 @@ function AttendanceRecords({
 
      COUNCILOR ONLY
 
-     Instead of calling the removed loadReports()
-     function, we increment reloadKey.
+     After successful regeneration, invalidate the
+     role-scoped report archive so the active query refreshes.
   ========================================================= */
 
-  const handleRegenerate = (
-    report
-  ) => {
-    if (
-      !isCouncilor
-    ) {
+  const handleRegenerate = (report) => {
+    if (!isCouncilor) {
       return;
     }
 
     void runReportAction({
       report,
 
-      action:
-        "regenerate",
+      action: "regenerate",
 
-      callback:
-        async () => {
-          await attendanceReportService
-            .generateAttendanceReport({
-              sectionId:
-                report.sectionId,
+      callback: async () => {
+        await attendanceReportService.generateAttendanceReport({
+          sectionId: report.sectionId,
 
-              type:
-                report.reportType,
+          type: report.reportType,
 
-              from:
-                report.periodStart,
+          from: report.periodStart,
 
-              to:
-                report.periodEnd,
-            });
+          to: report.periodEnd,
+        });
 
-          setLoading(
-            true
-          );
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.attendanceReports.archives(role),
+        });
+      },
 
-          setReloadKey(
-            (current) =>
-              current + 1
-          );
-        },
-
-      successMessage:
-        "Attendance report regenerated successfully.",
+      successMessage: "Attendance report regenerated successfully.",
     });
   };
 
@@ -532,105 +391,67 @@ function AttendanceRecords({
      Uses currently applied filters.
   ========================================================= */
 
-  const handleDownloadAll =
-    async (
-      format
-    ) => {
-      if (
-        downloadingAll
-      ) {
-        return;
-      }
+  const handleDownloadAll = async (format) => {
+    if (downloadingAll) {
+      return;
+    }
 
-      setDownloadingAll(
-        true
+    setDownloadingAll(true);
+
+    setActionError("");
+    setSuccess("");
+
+    try {
+      await attendanceReportService.downloadAttendanceReportsZip({
+        type: appliedFilters.type,
+
+        sectionId: isCouncilor ? appliedFilters.sectionId : undefined,
+
+        from: appliedFilters.from,
+
+        to: appliedFilters.to,
+
+        format,
+      });
+
+      setSuccess("Attendance report archive downloaded successfully.");
+    } catch (requestError) {
+      const message = await resolveRequestError(
+        requestError,
+        "Unable to download attendance reports.",
       );
 
-      setError("");
-      setSuccess("");
-
-      try {
-        await attendanceReportService
-          .downloadAttendanceReportsZip({
-            type:
-              appliedFilters.type,
-
-            sectionId:
-              isCouncilor
-                ? appliedFilters.sectionId
-                : undefined,
-
-            from:
-              appliedFilters.from,
-
-            to:
-              appliedFilters.to,
-
-            format,
-          });
-
-        setSuccess(
-          "Attendance report archive downloaded successfully."
-        );
-      } catch (requestError) {
-        const message =
-          await resolveRequestError(
-            requestError,
-            "Unable to download attendance reports."
-          );
-
-        setError(
-          message
-        );
-      } finally {
-        setDownloadingAll(
-          false
-        );
-      }
-    };
+      setActionError(message);
+    } finally {
+      setDownloadingAll(false);
+    }
+  };
 
   /* =========================================================
      PAGE CHANGE
   ========================================================= */
 
-  const handlePageChange = (
-    nextPage
-  ) => {
-    if (
-      loading
-    ) {
+  const handlePageChange = (nextPage) => {
+    if (loading) {
       return;
     }
 
-    if (
-      nextPage < 0
-    ) {
+    if (nextPage < 0) {
       return;
     }
 
-    if (
-      nextPage >=
-      reportPage.totalPages
-    ) {
+    if (nextPage >= reportPage.totalPages) {
       return;
     }
 
-    if (
-      nextPage === page
-    ) {
+    if (nextPage === page) {
       return;
     }
 
-    setLoading(
-      true
-    );
-
-    setError("");
+    setActionError("");
     setSuccess("");
 
-    setPage(
-      nextPage
-    );
+    setPage(nextPage);
 
     window.scrollTo({
       top: 0,
@@ -650,15 +471,9 @@ function AttendanceRecords({
 
       <ReportHero
         role={role}
-        totalReports={
-          reportPage.totalElements
-        }
-        onDownloadAll={
-          handleDownloadAll
-        }
-        downloading={
-          downloadingAll
-        }
+        totalReports={reportPage.totalElements}
+        onDownloadAll={handleDownloadAll}
+        downloading={downloadingAll}
       />
 
       {/* =====================================================
@@ -685,24 +500,12 @@ function AttendanceRecords({
 
       <ReportFilters
         role={role}
-        sections={
-          sections
-        }
-        filters={
-          filters
-        }
-        onChange={
-          setFilters
-        }
-        onApply={
-          handleApplyFilters
-        }
-        onReset={
-          handleResetFilters
-        }
-        loading={
-          loading
-        }
+        sections={sections}
+        filters={filters}
+        onChange={setFilters}
+        onApply={handleApplyFilters}
+        onReset={handleResetFilters}
+        loading={loading}
       />
 
       {/* =====================================================
@@ -710,12 +513,8 @@ function AttendanceRecords({
       ===================================================== */}
 
       <ReportSummary
-        totalReports={
-          reportPage.totalElements
-        }
-        reports={
-          reports
-        }
+        totalReports={reportPage.totalElements}
+        reports={reports}
       />
 
       {/* =====================================================
@@ -725,65 +524,35 @@ function AttendanceRecords({
       <section className="attendance-records-list-card">
         <div className="attendance-records-section-heading attendance-records-table-heading">
           <div>
-            <span>
-              REPORT ARCHIVE
-            </span>
+            <span>REPORT ARCHIVE</span>
 
-            <h2>
-              Generated attendance reports
-            </h2>
+            <h2>Generated attendance reports</h2>
           </div>
 
           <p>
-            PDF and Excel files are securely stored and
-            retrieved through the attendance report service.
+            PDF and Excel files are securely stored and retrieved through the
+            attendance report service.
           </p>
         </div>
 
         <ReportTable
           role={role}
-          reports={
-            reports
-          }
-          loading={
-            loading
-          }
-          actionKey={
-            actionKey
-          }
-          onViewPdf={
-            handleViewPdf
-          }
-          onDownloadPdf={
-            handleDownloadPdf
-          }
-          onDownloadExcel={
-            handleDownloadExcel
-          }
-          onRegenerate={
-            handleRegenerate
-          }
+          reports={reports}
+          loading={loading}
+          actionKey={actionKey}
+          onViewPdf={handleViewPdf}
+          onDownloadPdf={handleDownloadPdf}
+          onDownloadExcel={handleDownloadExcel}
+          onRegenerate={handleRegenerate}
         />
 
         <ReportPagination
-          page={
-            reportPage.page
-          }
-          size={
-            reportPage.size
-          }
-          totalPages={
-            reportPage.totalPages
-          }
-          totalElements={
-            reportPage.totalElements
-          }
-          onPageChange={
-            handlePageChange
-          }
-          loading={
-            loading
-          }
+          page={reportPage.page}
+          size={reportPage.size}
+          totalPages={reportPage.totalPages}
+          totalElements={reportPage.totalElements}
+          onPageChange={handlePageChange}
+          loading={loading}
         />
       </section>
     </main>

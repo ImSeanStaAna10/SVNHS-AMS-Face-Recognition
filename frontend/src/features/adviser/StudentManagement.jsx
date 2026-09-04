@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -5,6 +6,16 @@ import AdviserLayout from "../../layouts/AdviserLayout";
 import adviserService from "../../services/adviserService";
 import authService from "../../services/authService";
 import speechService from "../../services/speechService";
+
+import {
+  useAdviserSections,
+  useAdviserStudents,
+} from "../../hooks/queries/useStudentsQueries";
+import { useOutgoingTransfers } from "../../hooks/queries/useTransferQueries";
+
+import { invalidateTransferCache } from "../../hooks/queries/invalidateCache";
+import queryKeys from "../../lib/query/queryKeys";
+
 import faceReadiness from "../../utils/FaceReadiness";
 import {
   captureFrameBurst,
@@ -700,6 +711,68 @@ function LiveScanner({
 function StudentManagement() {
   const location = useLocation();
   const user = authService.getUser();
+  const queryClient = useQueryClient();
+
+  /* =======================================================
+     REUSABLE SERVER CACHE
+
+     These three requests used to be fetched manually together
+     every time Student Management mounted.
+
+     TanStack Query now owns:
+     - request deduplication
+     - stale/fresh timing
+     - window-focus refresh
+     - reconnect refresh
+     - shared cache with Student Transfers
+  ======================================================= */
+
+  const sectionsQuery = useAdviserSections();
+  const studentsQuery = useAdviserStudents();
+  const outgoingTransfersQuery = useOutgoingTransfers();
+
+  const section = useMemo(() => {
+    const sections = normalizeArray(sectionsQuery.data);
+
+    return (
+      sections.find((item) => item?.active !== false) || sections[0] || null
+    );
+  }, [sectionsQuery.data]);
+
+  /*
+   * Keep local roster state because this page already performs
+   * immediate optimistic UI updates after successful mutations.
+   *
+   * TanStack Query remains the server-state source and the
+   * effects below synchronize fresh query data into this local
+   * presentation state.
+   */
+  const [students, setStudents] = useState(() =>
+    scopeStudentsToSection(normalizeArray(studentsQuery.data), section?.id),
+  );
+
+  const [outgoingTransferRequests, setOutgoingTransferRequests] = useState(() =>
+    normalizeArray(outgoingTransfersQuery.data),
+  );
+
+  const loading =
+    sectionsQuery.isLoading ||
+    studentsQuery.isLoading ||
+    outgoingTransfersQuery.isLoading;
+
+  const loadingTransferStatuses =
+    outgoingTransfersQuery.isFetching && !outgoingTransfersQuery.isLoading;
+
+  const initialQueryError =
+    (sectionsQuery.data == null && sectionsQuery.error) ||
+    (studentsQuery.data == null && studentsQuery.error) ||
+    (outgoingTransfersQuery.data == null && outgoingTransfersQuery.error) ||
+    null;
+
+  const error = initialQueryError
+    ? getErrorMessage(initialQueryError, "Unable to load student records.")
+    : "";
+
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const scanRunRef = useRef(0);
@@ -712,10 +785,6 @@ function StudentManagement() {
   const lastSpokenGuidanceRef = useRef({ key: "", at: 0 });
   const addStudentCommittedRef = useRef(false);
 
-  const [section, setSection] = useState(null);
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
@@ -725,8 +794,6 @@ function StudentManagement() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [studentActionMenu, setStudentActionMenu] = useState(null);
-  const [outgoingTransferRequests, setOutgoingTransferRequests] = useState([]);
-  const [loadingTransferStatuses, setLoadingTransferStatuses] = useState(false);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [studentNumber, setStudentNumber] = useState("");
@@ -797,43 +864,26 @@ function StudentManagement() {
   const [pendingDecision, setPendingDecision] = useState("");
   const [conflictBusy, setConflictBusy] = useState(false);
 
+  /* =======================================================
+     QUERY DATA -> EXISTING LOCAL PRESENTATION STATE
+
+     This preserves the current UI/mutation behavior while
+     moving network ownership into TanStack Query.
+  ======================================================= */
+
   useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        const [sectionData, studentData, outgoingTransferData] =
-          await Promise.all([
-            adviserService.getSections(),
-            adviserService.getStudents(),
-            adviserService.getOutgoingStudentTransferRequests(),
-          ]);
-        if (!mounted) return;
-        const sections = normalizeArray(sectionData);
-        const assigned =
-          sections.find((item) => item?.active !== false) ||
-          sections[0] ||
-          null;
-        setSection(assigned);
-        setStudents(
-          scopeStudentsToSection(normalizeArray(studentData), assigned?.id),
-        );
-        setOutgoingTransferRequests(normalizeArray(outgoingTransferData));
-      } catch (requestError) {
-        if (mounted)
-          setError(
-            getErrorMessage(requestError, "Unable to load student records."),
-          );
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    void load();
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    if (studentsQuery.data == null) return;
+
+    setStudents(
+      scopeStudentsToSection(normalizeArray(studentsQuery.data), section?.id),
+    );
+  }, [studentsQuery.data, section?.id]);
+
+  useEffect(() => {
+    if (outgoingTransfersQuery.data == null) return;
+
+    setOutgoingTransferRequests(normalizeArray(outgoingTransfersQuery.data));
+  }, [outgoingTransfersQuery.data]);
 
   useEffect(
     () => () => {
@@ -1106,51 +1156,43 @@ function StudentManagement() {
   };
 
   const refreshStudents = async () => {
+    const result = await studentsQuery.refetch();
+
+    if (result.isError) {
+      throw result.error;
+    }
+
     const data = scopeStudentsToSection(
-      normalizeArray(await adviserService.getStudents()),
+      normalizeArray(result.data),
       section?.id,
     );
+
     setStudents(data);
     return data;
   };
 
   const refreshTransferRequests = async () => {
-    try {
-      setLoadingTransferStatuses(true);
-      const data = await adviserService.getOutgoingStudentTransferRequests();
+    const result = await outgoingTransfersQuery.refetch();
 
-      const normalized = normalizeArray(data);
-      setOutgoingTransferRequests(normalized);
-      return normalized;
-    } finally {
-      setLoadingTransferStatuses(false);
+    if (result.isError) {
+      throw result.error;
     }
+
+    const normalized = normalizeArray(result.data);
+
+    setOutgoingTransferRequests(normalized);
+    return normalized;
   };
 
-  useEffect(() => {
-    if (!section?.id) return undefined;
-
-    const refreshWhenVisible = () => {
-      if (document.visibilityState !== "visible") return;
-
-      void Promise.all([refreshStudents(), refreshTransferRequests()]).catch(
-        (requestError) => {
-          console.warn(
-            "Unable to refresh pending transfer statuses:",
-            requestError,
-          );
-        },
-      );
-    };
-
-    window.addEventListener("focus", refreshWhenVisible);
-    document.addEventListener("visibilitychange", refreshWhenVisible);
-
-    return () => {
-      window.removeEventListener("focus", refreshWhenVisible);
-      document.removeEventListener("visibilitychange", refreshWhenVisible);
-    };
-  }, [section?.id]);
+  /*
+   * Manual window focus / visibility listeners are intentionally
+   * removed here. QueryClient already has:
+   *
+   * refetchOnWindowFocus: true
+   * refetchOnReconnect: true
+   *
+   * and it only refreshes stale data, avoiding duplicate calls.
+   */
 
   const handleVoiceChange = (enabled) => {
     speechService.setEnabled(enabled);
@@ -1629,6 +1671,25 @@ function StudentManagement() {
             ? current
             : [...current, record],
         );
+
+        /*
+         * The backend already returned the created student, so
+         * update the shared roster cache without making another
+         * GET request.
+         */
+        queryClient.setQueryData(queryKeys.adviser.allStudents(), (current) => {
+          const list = normalizeArray(current);
+
+          return list.some(
+            (student) => String(student?.id) === String(record.id),
+          )
+            ? list.map((student) =>
+                String(student?.id) === String(record.id)
+                  ? { ...student, ...record }
+                  : student,
+              )
+            : [...list, record];
+        });
       }
 
       if (!record?.id)
@@ -1668,6 +1729,13 @@ function StudentManagement() {
       setStudents((current) =>
         current.filter((item) => String(item?.id) !== String(student.id)),
       );
+
+      queryClient.setQueryData(queryKeys.adviser.allStudents(), (current) =>
+        normalizeArray(current).filter(
+          (item) => String(item?.id) !== String(student.id),
+        ),
+      );
+
       setLocallyRegisteredFaceIds((current) => {
         const next = new Set(current);
         next.delete(student.id);
@@ -2128,6 +2196,13 @@ function StudentManagement() {
         ),
       );
 
+      /*
+       * Keep Student Transfers, Student Management, and any
+       * cached roster consumer synchronized with the successful
+       * transfer mutation.
+       */
+      await invalidateTransferCache(queryClient);
+
       setSuccessMessage(
         `Transfer request for ${studentNameToTransfer} was sent to ${destinationSection.adviserName || "the destination Adviser"} for ${destinationSection.name || "the selected section"}. The student is now marked Being Transferred and attendance is paused until the request is approved, rejected, or cancelled.`,
       );
@@ -2198,8 +2273,9 @@ function StudentManagement() {
       setCancelTransferError("");
       setSuccessMessage("");
 
-      const cancelled =
-        await adviserService.cancelStudentTransferRequest(request.id);
+      const cancelled = await adviserService.cancelStudentTransferRequest(
+        request.id,
+      );
 
       setOutgoingTransferRequests((current) =>
         normalizeArray(current).map((item) =>
@@ -2223,10 +2299,10 @@ function StudentManagement() {
       );
 
       try {
-        await Promise.all([refreshStudents(), refreshTransferRequests()]);
+        await invalidateTransferCache(queryClient);
       } catch (refreshError) {
         console.warn(
-          "Unable to refresh records after transfer cancellation:",
+          "Unable to synchronize cached records after transfer cancellation:",
           refreshError,
         );
       }
@@ -2240,10 +2316,7 @@ function StudentManagement() {
     } catch (requestError) {
       console.error("Unable to cancel student transfer request:", requestError);
       setCancelTransferError(
-        getErrorMessage(
-          requestError,
-          "Unable to cancel the transfer request.",
-        ),
+        getErrorMessage(requestError, "Unable to cancel the transfer request."),
       );
 
       /*
@@ -2252,9 +2325,7 @@ function StudentManagement() {
        * server state instead of leaving a stale pending badge.
        */
       if (requestError?.response?.status === 409) {
-        void Promise.all([refreshStudents(), refreshTransferRequests()]).catch(
-          () => {},
-        );
+        void invalidateTransferCache(queryClient);
       }
     } finally {
       setCancellingTransfer(false);
@@ -3224,7 +3295,8 @@ function StudentManagement() {
                       <small>
                         Waiting for{" "}
                         {getPendingTransferForStudent(studentActionMenu.student)
-                          ?.destinationSectionName || "destination section"}{" "}
+                          ?.destinationSectionName ||
+                          "destination section"}{" "}
                         to review this request. Attendance is paused while the
                         request is pending.
                       </small>

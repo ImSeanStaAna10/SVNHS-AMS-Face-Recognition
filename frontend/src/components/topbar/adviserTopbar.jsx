@@ -1,21 +1,21 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import {
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { useNavigate } from "react-router-dom";
 
 import NotificationBell from "../../common/notifications/NotificationBell";
 import ThemeToggle from "../../common/themeToggle";
 
-import adviserService from "../../services/adviserService";
 import authService from "../../services/authService";
 import notificationService from "../../services/notificationService";
+
+import {
+  useAdviserNotificationSummary,
+  useIncomingPendingTransferCount,
+} from "../../hooks/queries/useNotificationQueries";
+
+import queryKeys from "../../lib/query/queryKeys";
 
 import bagongPilipinasLogo from "../../assets/bagong-pilipinas-logo.svg";
 import depedLogo from "../../assets/kagawaran-educ-logo.svg";
@@ -28,17 +28,13 @@ import "../../styles/common/notifications.css";
    CONSTANTS
 ========================================================= */
 
-const NOTIFICATION_SYNC_INTERVAL_MS =
-  30_000;
+const NOTIFICATION_SYNC_INTERVAL_MS = 60_000;
 
-const TOPBAR_NOTIFICATION_LIMIT =
-  10;
+const TOPBAR_NOTIFICATION_LIMIT = 5;
 
-const TRANSFER_UPDATED_EVENT =
-  "student-transfer-updated";
+const TRANSFER_UPDATED_EVENT = "student-transfer-updated";
 
-const DEFAULT_NOTIFICATION_UPDATED_EVENT =
-  "notification-updated";
+const DEFAULT_NOTIFICATION_UPDATED_EVENT = "notification-updated";
 
 const INSTITUTIONAL_LOGOS = [
   {
@@ -63,19 +59,12 @@ const INSTITUTIONAL_LOGOS = [
    HELPERS
 ========================================================= */
 
-const normalizeArray = (value) =>
-  Array.isArray(value)
-    ? value
-    : [];
+const normalizeArray = (value) => (Array.isArray(value) ? value : []);
 
 const normalizeCount = (value) => {
-  let candidate =
-    value;
+  let candidate = value;
 
-  if (
-    value !== null &&
-    typeof value === "object"
-  ) {
+  if (value !== null && typeof value === "object") {
     candidate =
       value?.pendingCount ??
       value?.count ??
@@ -84,23 +73,16 @@ const normalizeCount = (value) => {
       0;
   }
 
-  const parsed =
-    Number(candidate);
+  const parsed = Number(candidate);
 
-  if (
-    !Number.isFinite(parsed) ||
-    parsed < 0
-  ) {
+  if (!Number.isFinite(parsed) || parsed < 0) {
     return 0;
   }
 
   return Math.floor(parsed);
 };
 
-const getErrorMessage = (
-  error,
-  fallback,
-) =>
+const getErrorMessage = (error, fallback) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   error?.response?.data?.detail ||
@@ -127,560 +109,276 @@ function AdviserTopbar({
    */
   onNotificationCountChange,
 }) {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
-  const location =
-    useLocation();
+  const queryClient = useQueryClient();
 
-  const user =
-    authService.getUser();
+  const user = authService.getUser();
 
   /* =======================================================
-     NOTIFICATION STATE
+     NOTIFICATION / BADGE QUERIES
   ======================================================= */
 
-  const [
-    notifications,
-    setNotifications,
-  ] = useState([]);
+  const notificationSummaryQuery = useAdviserNotificationSummary(
+    {
+      size: TOPBAR_NOTIFICATION_LIMIT,
+    },
+    {
+      refetchInterval: NOTIFICATION_SYNC_INTERVAL_MS,
 
-  const [
-    unreadNotificationCount,
-    setUnreadNotificationCount,
-  ] = useState(0);
+      refetchIntervalInBackground: false,
+    },
+  );
 
-  const [
-    loadingNotifications,
-    setLoadingNotifications,
-  ] = useState(true);
+  const pendingTransferCountQuery = useIncomingPendingTransferCount({
+    refetchInterval: NOTIFICATION_SYNC_INTERVAL_MS,
 
-  const [
-    notificationError,
-    setNotificationError,
-  ] = useState("");
+    refetchIntervalInBackground: false,
+  });
 
-  const [
-    notificationActionBusy,
-    setNotificationActionBusy,
-  ] = useState(false);
+  const notificationSummary = notificationSummaryQuery.data || {};
 
-  const [
-    markAllBusy,
-    setMarkAllBusy,
-  ] = useState(false);
+  const notifications = normalizeArray(notificationSummary?.notifications);
 
-  /* =======================================================
-     REFS
-  ======================================================= */
+  const unreadNotificationCount = normalizeCount(
+    notificationSummary?.unreadCount,
+  );
 
-  const notificationCountCallbackRef =
-    useRef(
-      onNotificationCountChange,
-    );
+  /*
+   * Initial uncached load only.
+   * Background synchronization keeps the existing dropdown
+   * content visible.
+   */
+  const loadingNotifications = notificationSummaryQuery.isLoading;
 
-  const requestInFlightRef =
-    useRef(false);
+  const notificationError =
+    notificationSummaryQuery.data == null && notificationSummaryQuery.error
+      ? getErrorMessage(
+          notificationSummaryQuery.error,
+          "Unable to load notifications.",
+        )
+      : "";
 
-  const mountedRef =
-    useRef(false);
+  const [notificationActionBusy, setNotificationActionBusy] = useState(false);
+
+  const [markAllBusy, setMarkAllBusy] = useState(false);
 
   /* =======================================================
      USER
   ======================================================= */
 
-  const userName =
-    user?.name?.trim() ||
-    "Adviser";
+  const userName = user?.name?.trim() || "Adviser";
 
-  const userInitial =
-    userName
-      .charAt(0)
-      .toUpperCase() ||
-    "A";
+  const userInitial = userName.charAt(0).toUpperCase() || "A";
 
   const notificationUpdatedEvent =
-    notificationService
-      .getNotificationUpdatedEventName?.() ||
+    notificationService.getNotificationUpdatedEventName?.() ||
     DEFAULT_NOTIFICATION_UPDATED_EVENT;
 
   /* =======================================================
-     CALLBACK REF
+     PENDING TRANSFER SIDEBAR BADGE
   ======================================================= */
 
   useEffect(() => {
-    notificationCountCallbackRef.current =
-      onNotificationCountChange;
-  }, [
-    onNotificationCountChange,
-  ]);
+    if (pendingTransferCountQuery.data === undefined) {
+      return;
+    }
 
-  /* =======================================================
-     MOUNT
-  ======================================================= */
+    onNotificationCountChange?.(normalizeCount(pendingTransferCountQuery.data));
+  }, [pendingTransferCountQuery.data, onNotificationCountChange]);
 
   useEffect(() => {
-    mountedRef.current =
-      true;
+    if (!pendingTransferCountQuery.error) {
+      return;
+    }
 
-    return () => {
-      mountedRef.current =
-        false;
-    };
-  }, []);
-
-  /* =======================================================
-     LOAD TOPBAR DATA
-  ======================================================= */
-
-  const loadTopbarData =
-    useCallback(
-      async ({
-        silent = false,
-      } = {}) => {
-        if (
-          requestInFlightRef.current
-        ) {
-          return;
-        }
-
-        requestInFlightRef.current =
-          true;
-
-        try {
-          if (
-            !silent &&
-            mountedRef.current
-          ) {
-            setLoadingNotifications(
-              true,
-            );
-          }
-
-          const [
-            notificationResult,
-            transferCountResult,
-          ] =
-            await Promise.allSettled([
-              notificationService
-                .getAdviserNotificationSummary(
-                  {
-                    size:
-                      TOPBAR_NOTIFICATION_LIMIT,
-                  },
-                ),
-
-              adviserService
-                .getIncomingPendingTransferCount(),
-            ]);
-
-          if (
-            !mountedRef.current
-          ) {
-            return;
-          }
-
-          /* ===============================================
-             NOTIFICATIONS
-          =============================================== */
-
-          if (
-            notificationResult.status ===
-            "fulfilled"
-          ) {
-            const summary =
-              notificationResult.value ||
-              {};
-
-            setNotifications(
-              normalizeArray(
-                summary?.notifications,
-              ),
-            );
-
-            setUnreadNotificationCount(
-              normalizeCount(
-                summary?.unreadCount,
-              ),
-            );
-
-            setNotificationError(
-              "",
-            );
-          } else {
-            const error =
-              notificationResult.reason;
-
-            if (silent) {
-              console.warn(
-                "Unable to automatically synchronize notifications:",
-                error,
-              );
-            } else {
-              console.error(
-                "Unable to load notifications:",
-                error,
-              );
-
-              setNotificationError(
-                getErrorMessage(
-                  error,
-                  "Unable to load notifications.",
-                ),
-              );
-            }
-          }
-
-          /* ===============================================
-             PENDING TRANSFER SIDEBAR COUNT
-          =============================================== */
-
-          if (
-            transferCountResult.status ===
-            "fulfilled"
-          ) {
-            notificationCountCallbackRef
-              .current?.(
-                normalizeCount(
-                  transferCountResult.value,
-                ),
-              );
-          } else {
-            console.warn(
-              "Unable to synchronize pending transfer count:",
-              transferCountResult.reason,
-            );
-          }
-        } finally {
-          requestInFlightRef.current =
-            false;
-
-          if (
-            !silent &&
-            mountedRef.current
-          ) {
-            setLoadingNotifications(
-              false,
-            );
-          }
-        }
-      },
-      [],
+    console.warn(
+      "Unable to synchronize pending transfer count:",
+      pendingTransferCountQuery.error,
     );
+  }, [pendingTransferCountQuery.error]);
 
   /* =======================================================
-     INITIAL / ROUTE LOAD
+     CUSTOM UPDATE EVENTS
+
+     TanStack Query already owns:
+     - route cache reuse
+     - window-focus refresh for stale data
+     - reconnect refresh
+     - 60-second polling
+
+     Custom app events only invalidate the affected shared
+     cache so active consumers can synchronize immediately.
   ======================================================= */
 
   useEffect(() => {
-    void loadTopbarData();
-  }, [
-    loadTopbarData,
-    location.pathname,
-  ]);
-
-  /* =======================================================
-     AUTO SYNC
-  ======================================================= */
-
-  useEffect(() => {
-    const synchronize = () => {
-      if (
-        document.visibilityState !==
-        "visible"
-      ) {
-        return;
-      }
-
-      void loadTopbarData({
-        silent: true,
+    const synchronizeTransfers = () => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.adviser.transfers.pendingCount(),
       });
     };
 
-    const handleWindowFocus =
-      () => {
-        synchronize();
-      };
-
-    const handleVisibilityChange =
-      () => {
-        if (
-          document.visibilityState ===
-          "visible"
-        ) {
-          synchronize();
-        }
-      };
-
-    const intervalId =
-      window.setInterval(
-        synchronize,
-        NOTIFICATION_SYNC_INTERVAL_MS,
-      );
-
-    window.addEventListener(
-      "focus",
-      handleWindowFocus,
-    );
-
-    window.addEventListener(
-      TRANSFER_UPDATED_EVENT,
-      synchronize,
-    );
-
-    window.addEventListener(
-      notificationUpdatedEvent,
-      synchronize,
-    );
-
-    document.addEventListener(
-      "visibilitychange",
-      handleVisibilityChange,
-    );
+    window.addEventListener(TRANSFER_UPDATED_EVENT, synchronizeTransfers);
 
     return () => {
-      window.clearInterval(
-        intervalId,
-      );
+      window.removeEventListener(TRANSFER_UPDATED_EVENT, synchronizeTransfers);
+    };
+  }, [queryClient]);
 
-      window.removeEventListener(
-        "focus",
-        handleWindowFocus,
-      );
+  useEffect(() => {
+    const synchronizeNotifications = () => {
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.adviser.notifications.all(),
+      });
+    };
 
-      window.removeEventListener(
-        TRANSFER_UPDATED_EVENT,
-        synchronize,
-      );
+    window.addEventListener(notificationUpdatedEvent, synchronizeNotifications);
 
+    return () => {
       window.removeEventListener(
         notificationUpdatedEvent,
-        synchronize,
-      );
-
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibilityChange,
+        synchronizeNotifications,
       );
     };
-  }, [
-    loadTopbarData,
-    notificationUpdatedEvent,
-  ]);
+  }, [queryClient, notificationUpdatedEvent]);
+
+  /* =======================================================
+     TOPBAR SUMMARY CACHE UPDATE
+  ======================================================= */
+
+  const updateNotificationSummary = useCallback(
+    (updater) => {
+      queryClient.setQueryData(
+        queryKeys.adviser.notifications.topbar(TOPBAR_NOTIFICATION_LIMIT),
+        (current) => {
+          if (!current) {
+            return current;
+          }
+
+          return updater(current);
+        },
+      );
+    },
+    [queryClient],
+  );
 
   /* =======================================================
      REPLACE ONE LOCALLY
   ======================================================= */
 
-  const replaceNotificationLocally =
-    useCallback(
-      (
-        notificationId,
-        updatedNotification,
-      ) => {
-        if (
-          !notificationId ||
-          !updatedNotification
-        ) {
-          return;
-        }
+  const replaceNotificationLocally = useCallback(
+    (notificationId, updatedNotification) => {
+      if (!notificationId || !updatedNotification) {
+        return;
+      }
 
-        setNotifications(
-          (current) =>
-            current.map(
-              (notification) =>
-                notification?.id ===
-                notificationId
-                  ? updatedNotification
-                  : notification,
-            ),
-        );
-      },
-      [],
-    );
+      updateNotificationSummary((current) => ({
+        ...current,
+
+        notifications: normalizeArray(current?.notifications).map(
+          (notification) =>
+            notification?.id === notificationId
+              ? updatedNotification
+              : notification,
+        ),
+      }));
+    },
+    [updateNotificationSummary],
+  );
 
   /* =======================================================
      MARK ONE READ
   ======================================================= */
 
-  const handleMarkRead =
-    async (
-      notification,
-    ) => {
-      if (
-        !notification?.id ||
-        notification?.read
-      ) {
-        return;
-      }
+  const handleMarkRead = async (notification) => {
+    if (!notification?.id || notification?.read) {
+      return;
+    }
 
-      try {
-        setNotificationActionBusy(
-          true,
-        );
+    try {
+      setNotificationActionBusy(true);
 
-        const updatedNotification =
-          await notificationService
-            .markNotificationRead(
-              notification.id,
-            );
+      const updatedNotification =
+        await notificationService.markNotificationRead(notification.id);
 
-        if (
-          !mountedRef.current
-        ) {
-          return;
-        }
+      replaceNotificationLocally(notification.id, updatedNotification);
 
-        replaceNotificationLocally(
-          notification.id,
-          updatedNotification,
-        );
+      updateNotificationSummary((current) => ({
+        ...current,
 
-        setUnreadNotificationCount(
-          (current) =>
-            Math.max(
-              0,
-              current - 1,
-            ),
-        );
-      } catch (error) {
-        console.error(
-          "Unable to mark notification as read:",
-          error,
-        );
-      } finally {
-        if (
-          mountedRef.current
-        ) {
-          setNotificationActionBusy(
-            false,
-          );
-        }
-      }
-    };
+        unreadCount: Math.max(0, normalizeCount(current?.unreadCount) - 1),
+      }));
+    } catch (error) {
+      console.error("Unable to mark notification as read:", error);
+    } finally {
+      setNotificationActionBusy(false);
+    }
+  };
 
   /* =======================================================
      MARK ONE UNREAD
   ======================================================= */
 
-  const handleMarkUnread =
-    async (
-      notification,
-    ) => {
-      if (
-        !notification?.id ||
-        !notification?.read
-      ) {
-        return;
-      }
+  const handleMarkUnread = async (notification) => {
+    if (!notification?.id || !notification?.read) {
+      return;
+    }
 
-      try {
-        setNotificationActionBusy(
-          true,
-        );
+    try {
+      setNotificationActionBusy(true);
 
-        const updatedNotification =
-          await notificationService
-            .markNotificationUnread(
-              notification.id,
-            );
+      const updatedNotification =
+        await notificationService.markNotificationUnread(notification.id);
 
-        if (
-          !mountedRef.current
-        ) {
-          return;
-        }
+      replaceNotificationLocally(notification.id, updatedNotification);
 
-        replaceNotificationLocally(
-          notification.id,
-          updatedNotification,
-        );
+      updateNotificationSummary((current) => ({
+        ...current,
 
-        setUnreadNotificationCount(
-          (current) =>
-            current + 1,
-        );
-      } catch (error) {
-        console.error(
-          "Unable to mark notification as unread:",
-          error,
-        );
-      } finally {
-        if (
-          mountedRef.current
-        ) {
-          setNotificationActionBusy(
-            false,
-          );
-        }
-      }
-    };
+        unreadCount: normalizeCount(current?.unreadCount) + 1,
+      }));
+    } catch (error) {
+      console.error("Unable to mark notification as unread:", error);
+    } finally {
+      setNotificationActionBusy(false);
+    }
+  };
 
   /* =======================================================
      DELETE ONE
   ======================================================= */
 
-  const handleDeleteNotification =
-    async (
-      notification,
-    ) => {
-      if (!notification?.id) {
-        return;
-      }
+  const handleDeleteNotification = async (notification) => {
+    if (!notification?.id) {
+      return;
+    }
 
-      const wasUnread =
-        notification?.read !==
-        true;
+    const wasUnread = notification?.read !== true;
 
-      try {
-        setNotificationActionBusy(
-          true,
-        );
+    try {
+      setNotificationActionBusy(true);
 
-        await notificationService
-          .deleteNotification(
-            notification.id,
-          );
+      await notificationService.deleteNotification(notification.id);
 
-        if (
-          !mountedRef.current
-        ) {
-          return;
-        }
+      updateNotificationSummary((current) => ({
+        ...current,
 
-        setNotifications(
-          (current) =>
-            current.filter(
-              (item) =>
-                item?.id !==
-                notification.id,
-            ),
-        );
+        notifications: normalizeArray(current?.notifications).filter(
+          (item) => item?.id !== notification.id,
+        ),
 
-        if (wasUnread) {
-          setUnreadNotificationCount(
-            (current) =>
-              Math.max(
-                0,
-                current - 1,
-              ),
-          );
-        }
-      } catch (error) {
-        console.error(
-          "Unable to delete notification:",
-          error,
-        );
-      } finally {
-        if (
-          mountedRef.current
-        ) {
-          setNotificationActionBusy(
-            false,
-          );
-        }
-      }
-    };
+        unreadCount: wasUnread
+          ? Math.max(0, normalizeCount(current?.unreadCount) - 1)
+          : normalizeCount(current?.unreadCount),
+
+        totalElements: Math.max(0, normalizeCount(current?.totalElements) - 1),
+      }));
+    } catch (error) {
+      console.error("Unable to delete notification:", error);
+    } finally {
+      setNotificationActionBusy(false);
+    }
+  };
 
   /* =======================================================
      BULK DELETE
@@ -689,187 +387,105 @@ function AdviserTopbar({
      POST /notifications/bulk/delete
   ======================================================= */
 
-  const handleBulkDeleteNotifications =
-    async (
-      notificationIds,
-    ) => {
-      const ids =
-        Array.isArray(
-          notificationIds,
-        )
-          ? [
-              ...new Set(
-                notificationIds.filter(
-                  Boolean,
-                ),
-              ),
-            ]
-          : [];
+  const handleBulkDeleteNotifications = async (notificationIds) => {
+    const ids = Array.isArray(notificationIds)
+      ? [...new Set(notificationIds.filter(Boolean))]
+      : [];
 
-      if (
-        ids.length === 0
-      ) {
-        return;
+    if (ids.length === 0) {
+      return;
+    }
+
+    const idSet = new Set(ids);
+
+    /*
+     * Count how many selected items are currently unread
+     * before removing them locally.
+     */
+    const selectedUnreadCount = notifications.reduce((count, notification) => {
+      if (!idSet.has(notification?.id)) {
+        return count;
       }
 
-      const idSet =
-        new Set(ids);
+      return notification?.read === true ? count : count + 1;
+    }, 0);
+
+    try {
+      setNotificationActionBusy(true);
+
+      await notificationService.deleteNotifications(ids);
+
+      updateNotificationSummary((current) => ({
+        ...current,
+
+        notifications: normalizeArray(current?.notifications).filter(
+          (notification) => !idSet.has(notification?.id),
+        ),
+
+        unreadCount: Math.max(
+          0,
+          normalizeCount(current?.unreadCount) - selectedUnreadCount,
+        ),
+
+        totalElements: Math.max(
+          0,
+          normalizeCount(current?.totalElements) - ids.length,
+        ),
+      }));
+    } catch (error) {
+      console.error("Unable to delete selected notifications:", error);
 
       /*
-       * Count how many selected items are currently unread
-       * before removing them locally.
+       * Important:
+       * Re-throw so NotificationDropdown knows the
+       * operation failed and can keep Manage mode open.
        */
-      const selectedUnreadCount =
-        notifications.reduce(
-          (
-            count,
-            notification,
-          ) => {
-            if (
-              !idSet.has(
-                notification?.id,
-              )
-            ) {
-              return count;
-            }
-
-            return notification?.read ===
-              true
-              ? count
-              : count + 1;
-          },
-          0,
-        );
-
-      try {
-        setNotificationActionBusy(
-          true,
-        );
-
-        await notificationService
-          .deleteNotifications(
-            ids,
-          );
-
-        if (
-          !mountedRef.current
-        ) {
-          return;
-        }
-
-        setNotifications(
-          (current) =>
-            current.filter(
-              (notification) =>
-                !idSet.has(
-                  notification?.id,
-                ),
-            ),
-        );
-
-        if (
-          selectedUnreadCount >
-          0
-        ) {
-          setUnreadNotificationCount(
-            (current) =>
-              Math.max(
-                0,
-                current -
-                  selectedUnreadCount,
-              ),
-          );
-        }
-      } catch (error) {
-        console.error(
-          "Unable to delete selected notifications:",
-          error,
-        );
-
-        /*
-         * Important:
-         * Re-throw so NotificationDropdown knows the
-         * operation failed and can keep Manage mode open.
-         */
-        throw error;
-      } finally {
-        if (
-          mountedRef.current
-        ) {
-          setNotificationActionBusy(
-            false,
-          );
-        }
-      }
-    };
+      throw error;
+    } finally {
+      setNotificationActionBusy(false);
+    }
+  };
 
   /* =======================================================
      MARK ALL READ
   ======================================================= */
 
-  const handleMarkAllRead =
-    async () => {
-      if (
-        unreadNotificationCount <=
-        0
-      ) {
-        return;
-      }
+  const handleMarkAllRead = async () => {
+    if (unreadNotificationCount <= 0) {
+      return;
+    }
 
-      try {
-        setMarkAllBusy(
-          true,
-        );
+    try {
+      setMarkAllBusy(true);
 
-        await notificationService
-          .markAllNotificationsRead();
+      await notificationService.markAllNotificationsRead();
 
-        if (
-          !mountedRef.current
-        ) {
-          return;
-        }
+      const now = new Date().toISOString();
 
-        const now =
-          new Date().toISOString();
+      updateNotificationSummary((current) => ({
+        ...current,
 
-        setNotifications(
-          (current) =>
-            current.map(
-              (notification) => ({
-                ...notification,
+        notifications: normalizeArray(current?.notifications).map(
+          (notification) => ({
+            ...notification,
 
-                read: true,
-                unread: false,
+            read: true,
+            unread: false,
 
-                requiresAction:
-                  false,
+            requiresAction: false,
 
-                readAt:
-                  notification?.readAt ||
-                  now,
-              }),
-            ),
-        );
+            readAt: notification?.readAt || now,
+          }),
+        ),
 
-        setUnreadNotificationCount(
-          0,
-        );
-      } catch (error) {
-        console.error(
-          "Unable to mark all notifications as read:",
-          error,
-        );
-      } finally {
-        if (
-          mountedRef.current
-        ) {
-          setMarkAllBusy(
-            false,
-          );
-        }
-      }
-    };
+        unreadCount: 0,
+      }));
+    } catch (error) {
+      console.error("Unable to mark all notifications as read:", error);
+    } finally {
+      setMarkAllBusy(false);
+    }
+  };
 
   /* =======================================================
      OPEN NOTIFICATION
@@ -879,69 +495,40 @@ function AdviserTopbar({
      - navigate to feature
   ======================================================= */
 
-  const handleNotificationSelect =
-    async (
-      notification,
-    ) => {
-      if (!notification) {
-        return;
+  const handleNotificationSelect = async (notification) => {
+    if (!notification) {
+      return;
+    }
+
+    const action =
+      notification?.action ||
+      notificationService.getNotificationAction?.(notification);
+
+    if (notification?.id && !notification?.read) {
+      try {
+        const updatedNotification =
+          await notificationService.markNotificationRead(notification.id);
+
+        replaceNotificationLocally(notification.id, updatedNotification);
+
+        updateNotificationSummary((current) => ({
+          ...current,
+
+          unreadCount: Math.max(0, normalizeCount(current?.unreadCount) - 1),
+        }));
+      } catch (error) {
+        console.warn("Unable to mark notification as read:", error);
       }
+    }
 
-      const action =
-        notification?.action ||
-        notificationService
-          .getNotificationAction?.(
-            notification,
-          );
+    if (!action?.path) {
+      return;
+    }
 
-      if (
-        notification?.id &&
-        !notification?.read
-      ) {
-        try {
-          const updatedNotification =
-            await notificationService
-              .markNotificationRead(
-                notification.id,
-              );
-
-          if (
-            mountedRef.current
-          ) {
-            replaceNotificationLocally(
-              notification.id,
-              updatedNotification,
-            );
-
-            setUnreadNotificationCount(
-              (current) =>
-                Math.max(
-                  0,
-                  current - 1,
-                ),
-            );
-          }
-        } catch (error) {
-          console.warn(
-            "Unable to mark notification as read:",
-            error,
-          );
-        }
-      }
-
-      if (!action?.path) {
-        return;
-      }
-
-      navigate(
-        action.path,
-        {
-          state:
-            action?.state ??
-            null,
-        },
-      );
-    };
+    navigate(action.path, {
+      state: action?.state ?? null,
+    });
+  };
 
   /* =======================================================
      RENDER
@@ -957,13 +544,9 @@ function AdviserTopbar({
         <button
           type="button"
           className="adviser-mobile-menu-button"
-          onClick={
-            onMenuOpen
-          }
+          onClick={onMenuOpen}
           aria-label="Open navigation menu"
-          aria-expanded={
-            menuOpen
-          }
+          aria-expanded={menuOpen}
           aria-controls="adviser-mobile-sidebar"
         >
           <span aria-hidden="true" />
@@ -972,17 +555,11 @@ function AdviserTopbar({
         </button>
 
         <div className="councilor-header-copy">
-          <span className="councilor-eyebrow">
-            {eyebrow}
-          </span>
+          <span className="councilor-eyebrow">{eyebrow}</span>
 
-          <h1>
-            {title}
-          </h1>
+          <h1>{title}</h1>
 
-          <p>
-            {description}
-          </p>
+          <p>{description}</p>
         </div>
       </div>
 
@@ -995,67 +572,35 @@ function AdviserTopbar({
           className="councilor-header-logos"
           aria-label="Institutional logos"
         >
-          {INSTITUTIONAL_LOGOS.map(
-            (logo) => (
-              <img
-                key={logo.alt}
-                src={logo.src}
-                alt={logo.alt}
-                title={logo.alt}
-              />
-            ),
-          )}
+          {INSTITUTIONAL_LOGOS.map((logo) => (
+            <img
+              key={logo.alt}
+              src={logo.src}
+              alt={logo.alt}
+              title={logo.alt}
+            />
+          ))}
         </div>
 
-        <div
-          className="councilor-header-divider"
-          aria-hidden="true"
-        />
+        <div className="councilor-header-divider" aria-hidden="true" />
 
         <ThemeToggle />
 
-        <div
-          className="councilor-header-divider"
-          aria-hidden="true"
-        />
+        <div className="councilor-header-divider" aria-hidden="true" />
 
         <NotificationBell
-          notifications={
-            notifications
-          }
-          badgeCount={
-            unreadNotificationCount
-          }
-          loading={
-            loadingNotifications
-          }
-          error={
-            notificationError
-          }
-          onNotificationSelect={
-            handleNotificationSelect
-          }
-          onMarkRead={
-            handleMarkRead
-          }
-          onMarkUnread={
-            handleMarkUnread
-          }
-          onDelete={
-            handleDeleteNotification
-          }
-          onMarkAllRead={
-            handleMarkAllRead
-          }
-          onBulkDelete={
-            handleBulkDeleteNotifications
-          }
-          actionsDisabled={
-            notificationActionBusy
-          }
-          markAllBusy={
-            markAllBusy
-          }
+          notifications={notifications}
+          badgeCount={unreadNotificationCount}
+          loading={loadingNotifications}
+          error={notificationError}
+          onNotificationSelect={handleNotificationSelect}
+          onMarkRead={handleMarkRead}
+          onMarkUnread={handleMarkUnread}
+          onDelete={handleDeleteNotification}
+          onMarkAllRead={handleMarkAllRead}
+          onBulkDelete={handleBulkDeleteNotifications}
+          actionsDisabled={notificationActionBusy}
+          markAllBusy={markAllBusy}
         />
 
         <div
@@ -1064,18 +609,12 @@ function AdviserTopbar({
         />
 
         <div className="councilor-user">
-          <div className="councilor-avatar">
-            {userInitial}
-          </div>
+          <div className="councilor-avatar">{userInitial}</div>
 
           <div className="councilor-user-copy">
-            <strong>
-              {userName}
-            </strong>
+            <strong>{userName}</strong>
 
-            <span>
-              Class Adviser
-            </span>
+            <span>Class Adviser</span>
           </div>
         </div>
       </div>

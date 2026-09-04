@@ -1,9 +1,21 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import adviserService from "../../services/adviserService";
 import authService from "../../services/authService";
 import speechService from "../../services/speechService";
+
+import {
+  useActiveAttendanceSession,
+  useAttendanceSessionRecords,
+} from "../../hooks/queries/useAttendanceQueries";
+import {
+  useAdviserSections,
+  useAdviserStudents,
+} from "../../hooks/queries/useStudentsQueries";
+
+import queryKeys from "../../lib/query/queryKeys";
 import faceReadiness from "../../utils/FaceReadiness";
 import {
   captureFrameBurst,
@@ -514,6 +526,7 @@ const formatSchoolDate = (value = new Date()) =>
 function AttendanceSession() {
   const { sessionId } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const user = authService.getUser();
 
   const videoRef = useRef(null);
@@ -535,13 +548,83 @@ function AttendanceSession() {
   const voiceCooldownRef = useRef({ key: "", time: 0 });
   const faceMonitorBusyRef = useRef(false);
 
-  const [section, setSection] = useState(null);
-  const [students, setStudents] = useState([]);
-  const [activeSession, setActiveSession] = useState(null);
-  const [sessionRecords, setSessionRecords] = useState([]);
+  /*
+   * Shared TanStack Query server state.
+   *
+   * Sections and students reuse the same adviser cache used by
+   * Student Management and Dashboard. Active-session and session-record
+   * queries deliberately keep the live cache policy.
+   *
+   * Face recognition responses themselves are NOT cached. Mutations
+   * still go directly to the existing adviserService endpoints, then
+   * refresh the shared live session-record query.
+   */
+  const sectionsQuery = useAdviserSections();
+  const studentsQuery = useAdviserStudents();
 
-  const [loading, setLoading] = useState(true);
-  const [pageError, setPageError] = useState("");
+  const section = useMemo(() => {
+    const sections = normalizeArray(sectionsQuery.data);
+
+    return (
+      sections.find((item) => item?.active !== false) || sections[0] || null
+    );
+  }, [sectionsQuery.data]);
+
+  const students = useMemo(() => {
+    const allStudents = normalizeArray(studentsQuery.data);
+
+    if (!section?.id) return allStudents;
+
+    return allStudents.filter((student) => {
+      const studentSectionId = getStudentSectionId(student);
+      return (
+        !studentSectionId || String(studentSectionId) === String(section.id)
+      );
+    });
+  }, [studentsQuery.data, section?.id]);
+
+  const activeSessionQuery = useActiveAttendanceSession(section?.id);
+  const sessionRecordsQuery = useAttendanceSessionRecords(sessionId);
+
+  const activeSession = activeSessionQuery.data || null;
+  const sessionRecords = normalizeArray(sessionRecordsQuery.data);
+  const refetchSessionRecords = sessionRecordsQuery.refetch;
+
+  const [localPageError, setLocalPageError] = useState("");
+
+  const loading =
+    sectionsQuery.isLoading ||
+    studentsQuery.isLoading ||
+    sessionRecordsQuery.isLoading ||
+    (Boolean(section?.id) && activeSessionQuery.isLoading);
+
+  const queryError =
+    (sectionsQuery.data == null && sectionsQuery.error) ||
+    (studentsQuery.data == null && studentsQuery.error) ||
+    (sessionRecordsQuery.data == null && sessionRecordsQuery.error) ||
+    (section?.id &&
+      activeSessionQuery.data === undefined &&
+      activeSessionQuery.error) ||
+    null;
+
+  const sessionStateError = !sessionId
+    ? "Attendance session ID is missing."
+    : !loading && sectionsQuery.isSuccess && !section?.id
+      ? "No assigned section is available."
+      : !loading &&
+          section?.id &&
+          activeSessionQuery.isSuccess &&
+          (!activeSession ||
+            String(getSessionId(activeSession)) !== String(sessionId))
+        ? "This attendance session is no longer active."
+        : "";
+
+  const pageError =
+    localPageError ||
+    sessionStateError ||
+    (queryError
+      ? getErrorMessage(queryError, "Unable to load attendance session.")
+      : "");
   const [liveClock, setLiveClock] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState("");
   const [attendanceStatusFilter, setAttendanceStatusFilter] = useState("ALL");
@@ -620,84 +703,10 @@ function AttendanceSession() {
       );
   }, [voiceEnabled, voiceSupported]);
 
-  useEffect(() => {
-    let mounted = true;
-
-    const load = async () => {
-      try {
-        setLoading(true);
-        setPageError("");
-        if (!sessionId) throw new Error("Attendance session ID is missing.");
-
-        const [sectionData, studentData, recordData] = await Promise.all([
-          adviserService.getSections(),
-          adviserService.getStudents(),
-          adviserService.getSessionRecords(sessionId),
-        ]);
-
-        if (!mounted) return;
-
-        const sections = normalizeArray(sectionData);
-        const allStudents = normalizeArray(studentData);
-        const records = normalizeArray(recordData);
-        const assignedSection =
-          sections.find((item) => item.active !== false) || sections[0] || null;
-
-        setSection(assignedSection);
-        setStudents(
-          assignedSection?.id
-            ? allStudents.filter((student) => {
-                const studentSectionId = getStudentSectionId(student);
-                return (
-                  !studentSectionId ||
-                  String(studentSectionId) === String(assignedSection.id)
-                );
-              })
-            : allStudents,
-        );
-        setSessionRecords(records);
-
-        if (!assignedSection?.id) {
-          setActiveSession(null);
-          setPageError("No assigned section is available.");
-          return;
-        }
-
-        const currentSession = await adviserService.getActiveSession(
-          assignedSection.id,
-        );
-        if (!mounted) return;
-
-        if (
-          !currentSession ||
-          String(getSessionId(currentSession)) !== String(sessionId)
-        ) {
-          setActiveSession(null);
-          setPageError("This attendance session is no longer active.");
-          return;
-        }
-
-        setActiveSession(currentSession);
-      } catch (requestError) {
-        console.error("Unable to load attendance session:", requestError);
-        if (mounted) {
-          setPageError(
-            getErrorMessage(
-              requestError,
-              requestError?.message || "Unable to load attendance session.",
-            ),
-          );
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    void load();
-    return () => {
-      mounted = false;
-    };
-  }, [sessionId]);
+  /*
+   * Initial server loading is handled by the shared query hooks above.
+   * No page-local duplicate sections / students / records request is needed.
+   */
 
   useEffect(() => {
     const interval = window.setInterval(() => setLiveClock(new Date()), 1000);
@@ -948,12 +957,18 @@ function AttendanceSession() {
 
   const refreshRecords = useCallback(async () => {
     if (!sessionId) return [];
-    const records = normalizeArray(
-      await adviserService.getSessionRecords(sessionId),
-    );
-    setSessionRecords(records);
-    return records;
-  }, [sessionId]);
+
+    const refreshedResult = await refetchSessionRecords();
+
+    if (refreshedResult.isError) {
+      throw (
+        refreshedResult.error ||
+        new Error("Unable to refresh attendance records.")
+      );
+    }
+
+    return normalizeArray(refreshedResult.data);
+  }, [sessionId, refetchSessionRecords]);
 
   const releaseCamera = useCallback(() => {
     captureRunRef.current += 1;
@@ -1104,7 +1119,7 @@ function AttendanceSession() {
     setRecognitionResult(null);
     setCameraHoldReason("");
     releaseCamera();
-    setPageError(
+    setLocalPageError(
       "This attendance session has reached its scheduled end time. Attendance recording is now closed.",
     );
     speakGuidance("session-ended", "Attendance session ended.", {
@@ -1174,10 +1189,7 @@ function AttendanceSession() {
 
         if (cancelled) return;
 
-        const nextFaceCount = Math.max(
-          0,
-          Number(analysis?.faceCount || 0),
-        );
+        const nextFaceCount = Math.max(0, Number(analysis?.faceCount || 0));
 
         setDetectedFaceCount(nextFaceCount);
 
@@ -1605,7 +1617,7 @@ function AttendanceSession() {
           voiceMessage = "Attendance session ended.";
           resultOutcome = "SESSION_ENDED";
 
-          setPageError(responseMessage || message);
+          setLocalPageError(responseMessage || message);
           cameraRequestedRef.current = false;
           setAutoScanEnabled(false);
           releaseCamera();
@@ -1758,10 +1770,7 @@ function AttendanceSession() {
        * Re-check face presence before the countdown begins.
        * If the face left or a second face entered, do nothing.
        */
-      if (
-        !cameraRequestedRef.current ||
-        detectedFaceCount !== 1
-      ) {
+      if (!cameraRequestedRef.current || detectedFaceCount !== 1) {
         setCountdown(null);
         setScannerState("waiting-face");
         return;
@@ -1778,10 +1787,7 @@ function AttendanceSession() {
 
       const runStep = (currentValue) => {
         autoTimerRef.current = window.setTimeout(() => {
-          if (
-            !cameraRequestedRef.current ||
-            detectedFaceCount !== 1
-          ) {
+          if (!cameraRequestedRef.current || detectedFaceCount !== 1) {
             setCountdown(null);
             setScannerState("waiting-face");
             return;
@@ -2177,6 +2183,24 @@ function AttendanceSession() {
       setEndingSession(true);
       setEndError("");
       await adviserService.endAttendanceSession(sessionId);
+
+      /*
+       * Keep the shared cache synchronized with the successful mutation.
+       * The active-session cache is cleared immediately, while completed
+       * history is invalidated so its finalized PRESENT / LATE / ABSENT
+       * totals are fetched when the adviser opens history next.
+       */
+      if (section?.id) {
+        queryClient.setQueryData(
+          queryKeys.adviser.activeSession(section.id),
+          null,
+        );
+      }
+
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.adviser.attendanceHistory.all(),
+      });
+
       speechService.stop();
       cameraRequestedRef.current = false;
       stopCamera();

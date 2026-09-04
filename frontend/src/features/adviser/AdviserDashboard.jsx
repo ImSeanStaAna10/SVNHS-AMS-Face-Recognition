@@ -1,15 +1,20 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useMemo } from "react";
 
 import { useNavigate } from "react-router-dom";
 
 import AdviserLayout from "../../layouts/AdviserLayout";
 
-import adviserService from "../../services/adviserService";
 import authService from "../../services/authService";
+
+import {
+  useAdviserSections,
+  useAdviserStudents,
+} from "../../hooks/queries/useStudentsQueries";
+
+import {
+  useActiveAttendanceSession,
+  useAttendanceSessionRecords,
+} from "../../hooks/queries/useAttendanceQueries";
 
 import "../../styles/adviser.css";
 
@@ -17,27 +22,18 @@ import "../../styles/adviser.css";
    HELPERS
 ========================================================= */
 
-const getErrorMessage = (
-  error,
-  fallbackMessage,
-) =>
+const getErrorMessage = (error, fallbackMessage) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   fallbackMessage;
 
-const normalizeArray = (data) =>
-  Array.isArray(data)
-    ? data
-    : [];
+const normalizeArray = (data) => (Array.isArray(data) ? data : []);
 
 /**
  * AttendanceSession responses use sessionId in the
  * verified API tests. "id" is kept as a defensive fallback.
  */
-const getSessionId = (session) =>
-  session?.sessionId ||
-  session?.id ||
-  "";
+const getSessionId = (session) => session?.sessionId || session?.id || "";
 
 /**
  * Handles ISO timestamps as well as simple HH:mm / HH:mm:ss
@@ -48,360 +44,179 @@ const formatTime = (value) => {
     return "—";
   }
 
-  const rawValue =
-    String(value);
+  const rawValue = String(value);
 
-  const timeMatch =
-    rawValue.match(
-      /(?:T|\s|^)(\d{2}):(\d{2})/,
-    );
+  const timeMatch = rawValue.match(/(?:T|\s|^)(\d{2}):(\d{2})/);
 
   if (timeMatch) {
-    const hours =
-      Number(timeMatch[1]);
+    const hours = Number(timeMatch[1]);
 
-    const minutes =
-      timeMatch[2];
+    const minutes = timeMatch[2];
 
-    const period =
-      hours >= 12
-        ? "PM"
-        : "AM";
+    const period = hours >= 12 ? "PM" : "AM";
 
-    const normalizedHours =
-      hours % 12 || 12;
+    const normalizedHours = hours % 12 || 12;
 
     return `${normalizedHours}:${minutes} ${period}`;
   }
 
-  const parsedDate =
-    new Date(value);
+  const parsedDate = new Date(value);
 
-  if (
-    !Number.isNaN(
-      parsedDate.getTime(),
-    )
-  ) {
-    return new Intl.DateTimeFormat(
-      "en-PH",
-      {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      },
-    ).format(parsedDate);
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return new Intl.DateTimeFormat("en-PH", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(parsedDate);
   }
 
   return rawValue;
 };
 
 const formatToday = () =>
-  new Intl.DateTimeFormat(
-    "en-PH",
-    {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    },
-  ).format(new Date());
+  new Intl.DateTimeFormat("en-PH", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date());
 
 /* =========================================================
    COMPONENT
 ========================================================= */
 
 function AdviserDashboard() {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
-  const user =
-    authService.getUser();
+  const user = authService.getUser();
 
   /* =======================================================
-     DATA STATE
+     REUSABLE SERVER CACHE
+
+     Sections and students reuse the same shared cache already
+     used by Student Management.
+
+     Attendance session + records use the live cache policy
+     because they are operational data that can change while
+     attendance is in progress.
   ======================================================= */
 
-  const [
-    section,
-    setSection,
-  ] = useState(null);
+  const sectionsQuery = useAdviserSections();
 
-  const [
-    students,
-    setStudents,
-  ] = useState([]);
+  const studentsQuery = useAdviserStudents();
 
-  const [
-    activeSession,
-    setActiveSession,
-  ] = useState(null);
+  const section = useMemo(() => {
+    const sections = normalizeArray(sectionsQuery.data);
 
-  const [
-    sessionRecords,
-    setSessionRecords,
-  ] = useState([]);
+    return (
+      sections.find((item) => item?.active !== false) || sections[0] || null
+    );
+  }, [sectionsQuery.data]);
 
-  /* =======================================================
-     REQUEST STATE
-  ======================================================= */
+  const students = useMemo(() => {
+    const allStudents = normalizeArray(studentsQuery.data);
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+    /*
+     * GET /students is already Adviser-scoped by
+     * the backend.
+     *
+     * Keep the existing frontend section safeguard.
+     */
+    return section?.id
+      ? allStudents.filter(
+          (student) => !student?.sectionId || student.sectionId === section.id,
+        )
+      : allStudents;
+  }, [studentsQuery.data, section?.id]);
 
-  /* =======================================================
-     FEEDBACK STATE
-  ======================================================= */
+  const activeSessionQuery = useActiveAttendanceSession(section?.id);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const activeSession = activeSessionQuery.data || null;
 
-  /* =======================================================
-     LOAD DASHBOARD
-  ======================================================= */
+  const sessionId = getSessionId(activeSession);
 
-  useEffect(() => {
-    let isMounted = true;
+  const sessionRecordsQuery = useAttendanceSessionRecords(sessionId);
 
-    const loadDashboard =
-      async () => {
-        try {
-          setLoading(true);
-          setError("");
+  const sessionRecords = normalizeArray(sessionRecordsQuery.data);
 
-          /*
-           * Sections and students can be fetched
-           * independently.
-           */
-          const [
-            sectionData,
-            studentData,
-          ] =
-            await Promise.all([
-              adviserService.getSections(),
-              adviserService.getStudents(),
-            ]);
+  /*
+   * Full loading state is shown only while data needed for
+   * the initial dashboard render has not arrived yet.
+   *
+   * Background refetches keep the current dashboard visible.
+   */
+  const loading =
+    sectionsQuery.isLoading ||
+    studentsQuery.isLoading ||
+    (Boolean(section?.id) && activeSessionQuery.isLoading) ||
+    (Boolean(sessionId) && sessionRecordsQuery.isLoading);
 
-          if (!isMounted) {
-            return;
-          }
+  /*
+   * If cached data already exists and a background refresh
+   * temporarily fails, keep rendering the cached dashboard
+   * rather than replacing it with an error state.
+   */
+  const dashboardQueryError =
+    (sectionsQuery.data == null && sectionsQuery.error) ||
+    (studentsQuery.data == null && studentsQuery.error) ||
+    (section?.id &&
+      activeSessionQuery.data === undefined &&
+      activeSessionQuery.error) ||
+    (sessionId &&
+      sessionRecordsQuery.data == null &&
+      sessionRecordsQuery.error) ||
+    null;
 
-          const sections =
-            normalizeArray(
-              sectionData,
-            );
-
-          const allStudents =
-            normalizeArray(
-              studentData,
-            );
-
-          /*
-           * Adviser normally owns one assigned section.
-           *
-           * Prefer an active one if the backend ever
-           * returns more than one.
-           */
-          const assignedSection =
-            sections.find(
-              (item) =>
-                item.active !== false,
-            ) ||
-            sections[0] ||
-            null;
-
-          setSection(
-            assignedSection,
-          );
-
-          /*
-           * GET /students is already Adviser-scoped by
-           * the backend.
-           *
-           * We still filter by sectionId when available
-           * for an additional frontend safeguard.
-           */
-          const scopedStudents =
-            assignedSection?.id
-              ? allStudents.filter(
-                  (student) =>
-                    !student.sectionId ||
-                    student.sectionId ===
-                      assignedSection.id,
-                )
-              : allStudents;
-
-          setStudents(
-            scopedStudents,
-          );
-
-          /*
-           * No section means there is nothing else
-           * to query.
-           */
-          if (
-            !assignedSection?.id
-          ) {
-            setActiveSession(
-              null,
-            );
-
-            setSessionRecords(
-              [],
-            );
-
-            return;
-          }
-
-          const session =
-            await adviserService.getActiveSession(
-              assignedSection.id,
-            );
-
-          if (!isMounted) {
-            return;
-          }
-
-          setActiveSession(
-            session,
-          );
-
-          const sessionId =
-            getSessionId(
-              session,
-            );
-
-          if (!sessionId) {
-            setSessionRecords(
-              [],
-            );
-
-            return;
-          }
-
-          const records =
-            await adviserService.getSessionRecords(
-              sessionId,
-            );
-
-          if (!isMounted) {
-            return;
-          }
-
-          setSessionRecords(
-            normalizeArray(
-              records,
-            ),
-          );
-        } catch (requestError) {
-          console.error(
-            "Unable to load Adviser dashboard:",
-            requestError,
-          );
-
-          if (!isMounted) {
-            return;
-          }
-
-          setError(
-            getErrorMessage(
-              requestError,
-              "Unable to load your Adviser dashboard.",
-            ),
-          );
-        } finally {
-          if (isMounted) {
-            setLoading(false);
-          }
-        }
-      };
-
-    void loadDashboard();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const error = dashboardQueryError
+    ? getErrorMessage(
+        dashboardQueryError,
+        "Unable to load your Adviser dashboard.",
+      )
+    : "";
 
   /* =======================================================
      DERIVED DATA
   ======================================================= */
 
-  const activeStudents =
-    useMemo(
-      () =>
-        students.filter(
-          (student) =>
-            student.active !==
-            false,
-        ),
-      [students],
+  const activeStudents = useMemo(
+    () => students.filter((student) => student.active !== false),
+    [students],
+  );
+
+  const attendanceCounts = useMemo(() => {
+    return sessionRecords.reduce(
+      (counts, record) => {
+        const status = String(record?.status || "")
+          .trim()
+          .toUpperCase();
+
+        if (status === "PRESENT") {
+          counts.present += 1;
+          counts.attended += 1;
+        } else if (status === "LATE") {
+          counts.late += 1;
+          counts.attended += 1;
+        }
+
+        return counts;
+      },
+      {
+        present: 0,
+        late: 0,
+        attended: 0,
+      },
     );
+  }, [sessionRecords]);
 
-  const attendanceCounts =
-    useMemo(() => {
-      return sessionRecords.reduce(
-        (counts, record) => {
-          const status =
-            String(
-              record?.status || "",
-            )
-              .trim()
-              .toUpperCase();
+  const presentCount = attendanceCounts.present;
 
-          if (
-            status ===
-            "PRESENT"
-          ) {
-            counts.present += 1;
-            counts.attended += 1;
-          } else if (
-            status ===
-            "LATE"
-          ) {
-            counts.late += 1;
-            counts.attended += 1;
-          }
+  const lateCount = attendanceCounts.late;
 
-          return counts;
-        },
-        {
-          present: 0,
-          late: 0,
-          attended: 0,
-        },
-      );
-    }, [sessionRecords]);
+  const attendedCount = attendanceCounts.attended;
 
-  const presentCount =
-    attendanceCounts.present;
+  const remainingCount = Math.max(activeStudents.length - attendedCount, 0);
 
-  const lateCount =
-    attendanceCounts.late;
-
-  const attendedCount =
-    attendanceCounts.attended;
-
-  const remainingCount =
-    Math.max(
-      activeStudents.length -
-        attendedCount,
-      0,
-    );
-
-  const sessionId =
-    getSessionId(
-      activeSession,
-    );
-
-  const hasActiveSession =
-    Boolean(
-      activeSession &&
-        sessionId,
-    );
+  const hasActiveSession = Boolean(activeSession && sessionId);
 
   const sessionStartedAt =
     activeSession?.startedAt ||
@@ -409,70 +224,47 @@ function AdviserDashboard() {
     activeSession?.createdAt ||
     null;
 
-  const adviserName =
-    user?.name?.trim() ||
-    section?.adviserName ||
-    "Adviser";
+  const adviserName = user?.name?.trim() || section?.adviserName || "Adviser";
 
-  const firstName =
-    adviserName
-      .split(/\s+/)
-      .filter(Boolean)[0] ||
-    "Adviser";
+  const firstName = adviserName.split(/\s+/).filter(Boolean)[0] || "Adviser";
 
-  const sectionName =
-    section?.name ||
-    "No assigned section";
+  const sectionName = section?.name || "No assigned section";
 
   /* =======================================================
      NAVIGATION
   ======================================================= */
 
   const goToStudents = () => {
-    navigate(
-      "/adviser/students",
-    );
+    navigate("/adviser/students");
   };
 
-  const goToFaceRegistration =
-    () => {
-      /*
-       * Face registration is student-specific,
-       * so Adviser first chooses a Student.
-       */
-      navigate(
-        "/adviser/students",
-        {
-          state: {
-            action:
-              "register-face",
-          },
-        },
-      );
-    };
+  const goToFaceRegistration = () => {
+    /*
+     * Face registration is student-specific,
+     * so Adviser first chooses a Student.
+     */
+    navigate("/adviser/students", {
+      state: {
+        action: "register-face",
+      },
+    });
+  };
 
-  const openAttendance =
-    () => {
-      if (
-        hasActiveSession
-      ) {
-        navigate(
-          `/adviser/attendance/${sessionId}`,
-        );
+  const openAttendance = () => {
+    if (hasActiveSession) {
+      navigate(`/adviser/attendance/${sessionId}`);
 
-        return;
-      }
+      return;
+    }
 
-      /*
-       * Session creation and policy configuration now live
-       * in the Adviser Attendance page. This keeps one
-       * source of truth for late allowance and optional
-       * automatic session ending.
-       */
-      navigate(
-        "/adviser/attendance",
-      );
-    };
+    /*
+     * Session creation and policy configuration now live
+     * in the Adviser Attendance page. This keeps one
+     * source of truth for late allowance and optional
+     * automatic session ending.
+     */
+    navigate("/adviser/attendance");
+  };
 
   /* =======================================================
      RENDER
@@ -490,25 +282,15 @@ function AdviserDashboard() {
         ================================================== */}
 
         {error && (
-          <div
-            className="adviser-alert adviser-alert-error"
-            role="alert"
-          >
-            <span
-              className="adviser-alert-icon"
-              aria-hidden="true"
-            >
+          <div className="adviser-alert adviser-alert-error" role="alert">
+            <span className="adviser-alert-icon" aria-hidden="true">
               !
             </span>
 
             <div>
-              <strong>
-                Dashboard unavailable
-              </strong>
+              <strong>Dashboard unavailable</strong>
 
-              <p>
-                {error}
-              </p>
+              <p>{error}</p>
             </div>
           </div>
         )}
@@ -523,45 +305,26 @@ function AdviserDashboard() {
               CLASS ADVISER WORKSPACE
             </span>
 
-            <h2>
-              Good day,{" "}
-              {firstName}.
-            </h2>
+            <h2>Good day, {firstName}.</h2>
 
             <p>
-              Manage your assigned
-              section, prepare student
-              records, and conduct
-              today's attendance from
-              one workspace.
+              Manage your assigned section, prepare student records, and conduct
+              today's attendance from one workspace.
             </p>
 
             <div className="adviser-dashboard-date">
-              <span
-                aria-hidden="true"
-              >
-                ◷
-              </span>
+              <span aria-hidden="true">◷</span>
 
               {formatToday()}
             </div>
           </div>
 
           <div className="adviser-dashboard-hero-context">
-            <span>
-              ASSIGNED SECTION
-            </span>
+            <span>ASSIGNED SECTION</span>
 
-            <strong>
-              {loading
-                ? "Loading..."
-                : sectionName}
-            </strong>
+            <strong>{loading ? "Loading..." : sectionName}</strong>
 
-            <small>
-              Signal Village National
-              High School
-            </small>
+            <small>Signal Village National High School</small>
           </div>
         </section>
 
@@ -587,29 +350,19 @@ function AdviserDashboard() {
           ================================================== */
 
           <section className="adviser-no-section">
-            <div
-              className="adviser-no-section-icon"
-              aria-hidden="true"
-            >
+            <div className="adviser-no-section-icon" aria-hidden="true">
               ◇
             </div>
 
             <div>
-              <span>
-                SECTION ASSIGNMENT
-              </span>
+              <span>SECTION ASSIGNMENT</span>
 
-              <h2>
-                No section assigned
-              </h2>
+              <h2>No section assigned</h2>
 
               <p>
-                Your Adviser account
-                does not currently have
-                an assigned section.
-                Contact the Councilor
-                before managing students
-                or starting attendance.
+                Your Adviser account does not currently have an assigned
+                section. Contact the Councilor before managing students or
+                starting attendance.
               </p>
             </div>
           </section>
@@ -627,31 +380,20 @@ function AdviserDashboard() {
 
               <article className="adviser-summary-card">
                 <div className="adviser-summary-card-top">
-                  <span
-                    className="adviser-summary-icon"
-                    aria-hidden="true"
-                  >
+                  <span className="adviser-summary-icon" aria-hidden="true">
                     ♙
                   </span>
 
-                  <span className="adviser-summary-label">
-                    CLASS ROSTER
-                  </span>
+                  <span className="adviser-summary-label">CLASS ROSTER</span>
                 </div>
 
                 <strong className="adviser-summary-value">
                   {students.length}
                 </strong>
 
-                <h3>
-                  Total Students
-                </h3>
+                <h3>Total Students</h3>
 
-                <p>
-                  Students currently
-                  visible in your
-                  assigned section.
-                </p>
+                <p>Students currently visible in your assigned section.</p>
               </article>
 
               {/* ACTIVE STUDENTS */}
@@ -665,25 +407,17 @@ function AdviserDashboard() {
                     ✓
                   </span>
 
-                  <span className="adviser-summary-label">
-                    ACTIVE
-                  </span>
+                  <span className="adviser-summary-label">ACTIVE</span>
                 </div>
 
                 <strong className="adviser-summary-value">
-                  {
-                    activeStudents.length
-                  }
+                  {activeStudents.length}
                 </strong>
 
-                <h3>
-                  Active Students
-                </h3>
+                <h3>Active Students</h3>
 
                 <p>
-                  Active student records
-                  eligible for current
-                  class operations.
+                  Active student records eligible for current class operations.
                 </p>
               </article>
 
@@ -691,50 +425,36 @@ function AdviserDashboard() {
 
               <article
                 className={`adviser-summary-card ${
-                  hasActiveSession
-                    ? "adviser-summary-card-active"
-                    : ""
+                  hasActiveSession ? "adviser-summary-card-active" : ""
                 }`}
               >
                 <div className="adviser-summary-card-top">
                   <span
                     className={`adviser-summary-icon ${
-                      hasActiveSession
-                        ? "adviser-summary-icon-success"
-                        : ""
+                      hasActiveSession ? "adviser-summary-icon-success" : ""
                     }`}
                     aria-hidden="true"
                   >
                     ◷
                   </span>
 
-                  <span className="adviser-summary-label">
-                    ATTENDANCE
-                  </span>
+                  <span className="adviser-summary-label">ATTENDANCE</span>
                 </div>
 
                 <strong
                   className={`adviser-summary-session ${
-                    hasActiveSession
-                      ? "is-active"
-                      : ""
+                    hasActiveSession ? "is-active" : ""
                   }`}
                 >
-                  {hasActiveSession
-                    ? "ACTIVE"
-                    : "READY"}
+                  {hasActiveSession ? "ACTIVE" : "READY"}
                 </strong>
 
-                <h3>
-                  Session Status
-                </h3>
+                <h3>Session Status</h3>
 
                 <p>
                   {hasActiveSession
                     ? `${presentCount} present${
-                        lateCount > 0
-                          ? ` • ${lateCount} late`
-                          : ""
+                        lateCount > 0 ? ` • ${lateCount} late` : ""
                       } recorded.`
                     : "No attendance session is currently active."}
                 </p>
@@ -757,130 +477,78 @@ function AdviserDashboard() {
                       ASSIGNED SECTION
                     </span>
 
-                    <h2>
-                      Class Overview
-                    </h2>
+                    <h2>Class Overview</h2>
 
-                    <p>
-                      Your current
-                      teaching and
-                      attendance scope.
-                    </p>
+                    <p>Your current teaching and attendance scope.</p>
                   </div>
 
                   <span
                     className={`adviser-section-status ${
-                      section.active ===
-                      false
-                        ? "is-inactive"
-                        : ""
+                      section.active === false ? "is-inactive" : ""
                     }`}
                   >
-                    <span
-                      aria-hidden="true"
-                    />
+                    <span aria-hidden="true" />
 
-                    {section.active ===
-                    false
-                      ? "Inactive"
-                      : "Active"}
+                    {section.active === false ? "Inactive" : "Active"}
                   </span>
                 </header>
 
                 <div className="adviser-section-identity">
                   <div className="adviser-section-mark">
-                    <span>
-                      SECTION
-                    </span>
+                    <span>SECTION</span>
 
                     <strong>
-                      {section.name
-                        ?.charAt(0)
-                        ?.toUpperCase() ||
-                        "S"}
+                      {section.name?.charAt(0)?.toUpperCase() || "S"}
                     </strong>
                   </div>
 
                   <div className="adviser-section-copy">
-                    <span>
-                      SIGNAL VILLAGE NATIONAL
-                      HIGH SCHOOL
-                    </span>
+                    <span>SIGNAL VILLAGE NATIONAL HIGH SCHOOL</span>
 
-                    <h3>
-                      {sectionName}
-                    </h3>
+                    <h3>{sectionName}</h3>
 
                     <p>
                       Adviser:{" "}
-                      <strong>
-                        {section.adviserName ||
-                          adviserName}
-                      </strong>
+                      <strong>{section.adviserName || adviserName}</strong>
                     </p>
                   </div>
                 </div>
 
                 <div className="adviser-section-metrics">
                   <div>
-                    <span>
-                      TOTAL STUDENTS
-                    </span>
+                    <span>TOTAL STUDENTS</span>
 
-                    <strong>
-                      {
-                        students.length
-                      }
-                    </strong>
+                    <strong>{students.length}</strong>
                   </div>
 
                   <div>
-                    <span>
-                      ACTIVE STUDENTS
-                    </span>
+                    <span>ACTIVE STUDENTS</span>
 
-                    <strong>
-                      {
-                        activeStudents.length
-                      }
-                    </strong>
+                    <strong>{activeStudents.length}</strong>
                   </div>
 
                   <div>
-                    <span>
-                      SECTION STATUS
-                    </span>
+                    <span>SECTION STATUS</span>
 
                     <strong>
-                      {section.active ===
-                      false
-                        ? "Inactive"
-                        : "Active"}
+                      {section.active === false ? "Inactive" : "Active"}
                     </strong>
                   </div>
                 </div>
 
                 <footer className="adviser-panel-footer">
                   <p>
-                    Student records and
-                    face registration are
-                    managed within this
-                    assigned section.
+                    Student records and face registration are managed within
+                    this assigned section.
                   </p>
 
                   <button
                     type="button"
                     className="adviser-secondary-button"
-                    onClick={
-                      goToStudents
-                    }
+                    onClick={goToStudents}
                   >
                     Manage Students
-                    <span
-                      aria-hidden="true"
-                    >
-                      →
-                    </span>
+                    <span aria-hidden="true">→</span>
                   </button>
                 </footer>
               </article>
@@ -891,9 +559,7 @@ function AdviserDashboard() {
 
               <article
                 className={`adviser-panel adviser-session-panel ${
-                  hasActiveSession
-                    ? "is-active"
-                    : ""
+                  hasActiveSession ? "is-active" : ""
                 }`}
               >
                 <header className="adviser-panel-header">
@@ -902,9 +568,7 @@ function AdviserDashboard() {
                       TODAY'S ATTENDANCE
                     </span>
 
-                    <h2>
-                      Attendance Session
-                    </h2>
+                    <h2>Attendance Session</h2>
 
                     <p>
                       {hasActiveSession
@@ -915,18 +579,12 @@ function AdviserDashboard() {
 
                   <span
                     className={`adviser-session-badge ${
-                      hasActiveSession
-                        ? "is-active"
-                        : ""
+                      hasActiveSession ? "is-active" : ""
                     }`}
                   >
-                    <span
-                      aria-hidden="true"
-                    />
+                    <span aria-hidden="true" />
 
-                    {hasActiveSession
-                      ? "ACTIVE"
-                      : "NO ACTIVE SESSION"}
+                    {hasActiveSession ? "ACTIVE" : "NO ACTIVE SESSION"}
                   </span>
                 </header>
 
@@ -940,94 +598,52 @@ function AdviserDashboard() {
                         />
 
                         <div>
-                          <span>
-                            ATTENDANCE IN
-                            PROGRESS
-                          </span>
+                          <span>ATTENDANCE IN PROGRESS</span>
 
-                          <strong>
-                            {sectionName}
-                          </strong>
+                          <strong>{sectionName}</strong>
                         </div>
                       </div>
 
                       <div className="adviser-session-start">
-                        <span>
-                          STARTED
-                        </span>
+                        <span>STARTED</span>
 
-                        <strong>
-                          {formatTime(
-                            sessionStartedAt,
-                          )}
-                        </strong>
+                        <strong>{formatTime(sessionStartedAt)}</strong>
                       </div>
                     </div>
 
                     <div className="adviser-session-metrics">
                       <div>
-                        <span>
-                          TOTAL
-                        </span>
+                        <span>TOTAL</span>
 
-                        <strong>
-                          {
-                            activeStudents.length
-                          }
-                        </strong>
+                        <strong>{activeStudents.length}</strong>
 
-                        <small>
-                          Students
-                        </small>
+                        <small>Students</small>
                       </div>
 
                       <div className="is-present">
-                        <span>
-                          PRESENT
-                        </span>
+                        <span>PRESENT</span>
 
-                        <strong>
-                          {
-                            presentCount
-                          }
-                        </strong>
+                        <strong>{presentCount}</strong>
 
-                        <small>
-                          Recorded
-                        </small>
+                        <small>Recorded</small>
                       </div>
 
                       <div>
-                        <span>
-                          REMAINING
-                        </span>
+                        <span>REMAINING</span>
 
-                        <strong>
-                          {
-                            remainingCount
-                          }
-                        </strong>
+                        <strong>{remainingCount}</strong>
 
-                        <small>
-                          Pending
-                        </small>
+                        <small>Pending</small>
                       </div>
                     </div>
 
                     <button
                       type="button"
                       className="adviser-primary-button adviser-session-primary-action"
-                      onClick={
-                        openAttendance
-                      }
+                      onClick={openAttendance}
                     >
-                      Open Attendance
-                      Session
-                      <span
-                        aria-hidden="true"
-                      >
-                        →
-                      </span>
+                      Open Attendance Session
+                      <span aria-hidden="true">→</span>
                     </button>
                   </>
                 ) : (
@@ -1040,43 +656,23 @@ function AdviserDashboard() {
                     </div>
 
                     <div>
-                      <span>
-                        NO ACTIVE SESSION
-                      </span>
+                      <span>NO ACTIVE SESSION</span>
 
-                      <h3>
-                        Ready for today's
-                        attendance
-                      </h3>
+                      <h3>Ready for today's attendance</h3>
 
                       <p>
-                        Start a session
-                        for{" "}
-                        <strong>
-                          {sectionName}
-                        </strong>{" "}
-                        when you are
-                        ready to record
-                        student
-                        attendance.
+                        Start a session for <strong>{sectionName}</strong> when
+                        you are ready to record student attendance.
                       </p>
                     </div>
 
                     <button
                       type="button"
                       className="adviser-primary-button"
-                      onClick={
-                        openAttendance
-                      }
+                      onClick={openAttendance}
                     >
-                      <span
-                        aria-hidden="true"
-                      >
-                        +
-                      </span>
-
-                      Start Attendance
-                      Session
+                      <span aria-hidden="true">+</span>
+                      Start Attendance Session
                     </button>
                   </div>
                 )}
@@ -1090,30 +686,20 @@ function AdviserDashboard() {
             <section className="adviser-quick-panel">
               <header className="adviser-quick-header">
                 <div>
-                  <span>
-                    QUICK ACTIONS
-                  </span>
+                  <span>QUICK ACTIONS</span>
 
-                  <h2>
-                    Adviser Operations
-                  </h2>
+                  <h2>Adviser Operations</h2>
 
                   <p>
-                    Common actions for
-                    managing your class
-                    and today's
+                    Common actions for managing your class and today's
                     attendance.
                   </p>
                 </div>
 
                 <div className="adviser-quick-section">
-                  <span>
-                    CURRENT SECTION
-                  </span>
+                  <span>CURRENT SECTION</span>
 
-                  <strong>
-                    {sectionName}
-                  </strong>
+                  <strong>{sectionName}</strong>
                 </div>
               </header>
 
@@ -1123,33 +709,21 @@ function AdviserDashboard() {
                 <button
                   type="button"
                   className="adviser-quick-card"
-                  onClick={
-                    goToStudents
-                  }
+                  onClick={goToStudents}
                 >
-                  <span
-                    className="adviser-quick-icon"
-                    aria-hidden="true"
-                  >
+                  <span className="adviser-quick-icon" aria-hidden="true">
                     +
                   </span>
 
                   <span className="adviser-quick-copy">
-                    <strong>
-                      Add Student
-                    </strong>
+                    <strong>Add Student</strong>
 
                     <small>
-                      Add a student
-                      record to your
-                      assigned section.
+                      Add a student record to your assigned section.
                     </small>
                   </span>
 
-                  <span
-                    className="adviser-quick-arrow"
-                    aria-hidden="true"
-                  >
+                  <span className="adviser-quick-arrow" aria-hidden="true">
                     →
                   </span>
                 </button>
@@ -1159,34 +733,21 @@ function AdviserDashboard() {
                 <button
                   type="button"
                   className="adviser-quick-card"
-                  onClick={
-                    goToFaceRegistration
-                  }
+                  onClick={goToFaceRegistration}
                 >
-                  <span
-                    className="adviser-quick-icon"
-                    aria-hidden="true"
-                  >
+                  <span className="adviser-quick-icon" aria-hidden="true">
                     ◎
                   </span>
 
                   <span className="adviser-quick-copy">
-                    <strong>
-                      Register Student
-                      Face
-                    </strong>
+                    <strong>Register Student Face</strong>
 
                     <small>
-                      Select a student
-                      and enroll their
-                      face identity.
+                      Select a student and enroll their face identity.
                     </small>
                   </span>
 
-                  <span
-                    className="adviser-quick-arrow"
-                    aria-hidden="true"
-                  >
+                  <span className="adviser-quick-arrow" aria-hidden="true">
                     →
                   </span>
                 </button>
@@ -1196,18 +757,11 @@ function AdviserDashboard() {
                 <button
                   type="button"
                   className={`adviser-quick-card adviser-quick-attendance ${
-                    hasActiveSession
-                      ? "is-active"
-                      : ""
+                    hasActiveSession ? "is-active" : ""
                   }`}
-                  onClick={
-                    openAttendance
-                  }
+                  onClick={openAttendance}
                 >
-                  <span
-                    className="adviser-quick-icon"
-                    aria-hidden="true"
-                  >
+                  <span className="adviser-quick-icon" aria-hidden="true">
                     ◷
                   </span>
 
@@ -1221,18 +775,13 @@ function AdviserDashboard() {
                     <small>
                       {hasActiveSession
                         ? `${presentCount} present${
-                            lateCount > 0
-                              ? ` • ${lateCount} late`
-                              : ""
+                            lateCount > 0 ? ` • ${lateCount} late` : ""
                           } • ${remainingCount} remaining`
                         : "Begin today's attendance session."}
                     </small>
                   </span>
 
-                  <span
-                    className="adviser-quick-arrow"
-                    aria-hidden="true"
-                  >
+                  <span className="adviser-quick-arrow" aria-hidden="true">
                     →
                   </span>
                 </button>
@@ -1241,7 +790,6 @@ function AdviserDashboard() {
           </>
         )}
       </section>
-
     </AdviserLayout>
   );
 }

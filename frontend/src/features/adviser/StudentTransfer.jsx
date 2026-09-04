@@ -1,7 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { useQueryClient } from "@tanstack/react-query";
 
 import AdviserLayout from "../../layouts/AdviserLayout";
 import adviserService from "../../services/adviserService";
+
+import {
+  useIncomingTransfers,
+  useOutgoingTransfers,
+} from "../../hooks/queries/useTransferQueries";
+
+import { invalidateTransferCache } from "../../hooks/queries/invalidateCache";
 
 import "../../styles/adviser/StudentManagementFaceScanning/studentTransfer.css";
 
@@ -416,22 +425,58 @@ function TransferRequestCard({ request, activeTab, onOpen }) {
 
 function StudentTransfers() {
   /* =======================================================
-     DATA
+     REUSABLE SERVER CACHE
   ======================================================= */
 
-  const [incomingRequests, setIncomingRequests] = useState([]);
+  const queryClient = useQueryClient();
 
-  const [outgoingRequests, setOutgoingRequests] = useState([]);
+  const incomingTransfersQuery = useIncomingTransfers({
+    refetchInterval: AUTO_REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+  });
+
+  const outgoingTransfersQuery = useOutgoingTransfers({
+    refetchInterval: AUTO_REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+  });
+
+  const incomingRequests = useMemo(
+    () => normalizeArray(incomingTransfersQuery.data),
+    [incomingTransfersQuery.data],
+  );
+
+  const outgoingRequests = useMemo(
+    () => normalizeArray(outgoingTransfersQuery.data),
+    [outgoingTransfersQuery.data],
+  );
+
+  const loading =
+    incomingTransfersQuery.isLoading || outgoingTransfersQuery.isLoading;
+
+  const transferQueryError =
+    (!incomingTransfersQuery.data && incomingTransfersQuery.error) ||
+    (!outgoingTransfersQuery.data && outgoingTransfersQuery.error) ||
+    null;
+
+  const error = transferQueryError
+    ? getErrorMessage(
+        transferQueryError,
+        "Unable to load student transfer requests.",
+      )
+    : "";
+
+  const refetchTransfers = async () => {
+    await Promise.all([
+      incomingTransfersQuery.refetch(),
+      outgoingTransfersQuery.refetch(),
+    ]);
+  };
 
   /* =======================================================
      VIEW
   ======================================================= */
 
   const [activeTab, setActiveTab] = useState("INCOMING");
-
-  const [loading, setLoading] = useState(true);
-
-  const [error, setError] = useState("");
 
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -466,128 +511,36 @@ function StudentTransfers() {
   const [actionBusy, setActionBusy] = useState(false);
 
   /* =======================================================
-     LOAD DATA
+     TRANSFER UPDATE EVENT
 
-     silent=true:
-     Used by automatic synchronization so the full-page
-     loading state does not flash every 30 seconds.
-  ======================================================= */
+     TanStack Query already handles:
+     - initial server fetch
+     - 30-second auto refresh
+     - window-focus refresh
+     - reconnect refresh
 
-  const loadTransfers = useCallback(async ({ silent = false } = {}) => {
-    try {
-      if (!silent) {
-        setLoading(true);
-
-        setError("");
-      }
-
-      const [incoming, outgoing] = await Promise.all([
-        adviserService.getIncomingStudentTransferRequests(),
-        adviserService.getOutgoingStudentTransferRequests(),
-      ]);
-
-      setIncomingRequests(normalizeArray(incoming));
-
-      setOutgoingRequests(normalizeArray(outgoing));
-
-      /*
-       * Successful automatic sync may clear an earlier
-       * initial-load error if one was being displayed.
-       */
-      setError("");
-    } catch (requestError) {
-      if (silent) {
-        /*
-         * Silent auto-sync failure must not destroy
-         * already visible transfer data.
-         */
-        console.warn(
-          "Automatic transfer synchronization failed:",
-          requestError,
-        );
-
-        return;
-      }
-
-      console.error("Unable to load transfer requests:", requestError);
-
-      setError(
-        getErrorMessage(
-          requestError,
-          "Unable to load student transfer requests.",
-        ),
-      );
-    } finally {
-      if (!silent) {
-        setLoading(false);
-      }
-    }
-  }, []);
-
-  /* =======================================================
-     INITIAL LOAD
+     This event keeps compatibility with AdviserLayout and
+     other SVNHS pages that announce transfer changes.
   ======================================================= */
 
   useEffect(() => {
-    void loadTransfers();
-  }, [loadTransfers]);
-
-  /* =======================================================
-     AUTOMATIC SYNCHRONIZATION
-
-     Refreshes:
-     - every 30 seconds while this page is open
-     - when browser window gets focus
-     - when browser tab becomes visible again
-     - when transfer update event fires
-  ======================================================= */
-
-  useEffect(() => {
-    const synchronize = () => {
-      if (document.visibilityState !== "visible") {
+    const handleTransferUpdated = (event) => {
+      if (
+        event instanceof CustomEvent &&
+        event?.detail?.source === "student-transfers"
+      ) {
         return;
       }
 
-      void loadTransfers({
-        silent: true,
-      });
+      void invalidateTransferCache(queryClient);
     };
-
-    const handleFocus = () => {
-      synchronize();
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        synchronize();
-      }
-    };
-
-    const handleTransferUpdated = () => {
-      synchronize();
-    };
-
-    const intervalId = window.setInterval(
-      synchronize,
-      AUTO_REFRESH_INTERVAL_MS,
-    );
-
-    window.addEventListener("focus", handleFocus);
 
     window.addEventListener(TRANSFER_UPDATED_EVENT, handleTransferUpdated);
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
-      window.clearInterval(intervalId);
-
-      window.removeEventListener("focus", handleFocus);
-
       window.removeEventListener(TRANSFER_UPDATED_EVENT, handleTransferUpdated);
-
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [loadTransfers]);
+  }, [queryClient]);
 
   /* =======================================================
      COUNTS
@@ -840,7 +793,13 @@ function StudentTransfers() {
   ======================================================= */
 
   const announceTransferUpdated = () => {
-    window.dispatchEvent(new Event(TRANSFER_UPDATED_EVENT));
+    window.dispatchEvent(
+      new CustomEvent(TRANSFER_UPDATED_EVENT, {
+        detail: {
+          source: "student-transfers",
+        },
+      }),
+    );
   };
 
   /* =======================================================
@@ -876,11 +835,10 @@ function StudentTransfers() {
       );
 
       /*
-       * Reload this page immediately.
+       * The transfer changed on the backend, so refresh the
+       * reusable transfer cache and mark student rosters stale.
        */
-      await loadTransfers({
-        silent: true,
-      });
+      await invalidateTransferCache(queryClient);
 
       /*
        * Tell layout/sidebar to refresh its pending count.
@@ -894,9 +852,7 @@ function StudentTransfers() {
           "This transfer request is no longer pending. The latest transfer status is being synchronized.",
         );
 
-        void loadTransfers({
-          silent: true,
-        });
+        void invalidateTransferCache(queryClient);
 
         return;
       }
@@ -941,9 +897,7 @@ function StudentTransfers() {
         `${studentName}'s transfer request was rejected. The student remains in the original section.`,
       );
 
-      await loadTransfers({
-        silent: true,
-      });
+      await invalidateTransferCache(queryClient);
 
       announceTransferUpdated();
     } catch (requestError) {
@@ -954,9 +908,7 @@ function StudentTransfers() {
           "This transfer request is no longer pending. The latest transfer status is being synchronized.",
         );
 
-        void loadTransfers({
-          silent: true,
-        });
+        void invalidateTransferCache(queryClient);
 
         return;
       }
@@ -998,9 +950,7 @@ function StudentTransfers() {
         `${studentName}'s pending transfer was cancelled successfully. The student is active in the original section again.`,
       );
 
-      await loadTransfers({
-        silent: true,
-      });
+      await invalidateTransferCache(queryClient);
 
       announceTransferUpdated();
     } catch (requestError) {
@@ -1011,9 +961,7 @@ function StudentTransfers() {
           "This request was already approved, rejected, or cancelled and can no longer be cancelled.",
         );
 
-        void loadTransfers({
-          silent: true,
-        });
+        void invalidateTransferCache(queryClient);
 
         return;
       }
@@ -1074,7 +1022,7 @@ function StudentTransfers() {
               <p>{error}</p>
             </div>
 
-            <button type="button" onClick={() => void loadTransfers()}>
+            <button type="button" onClick={() => void refetchTransfers()}>
               Retry
             </button>
           </div>
@@ -1181,23 +1129,6 @@ function StudentTransfers() {
                       ? "Tracking outgoing requests"
                       : "Viewing transfer history"}
                 </strong>
-              </div>
-            </div>
-
-            {/* =============================================
-                AUTO SYNC INDICATOR
-            ============================================== */}
-
-            <div
-              className="student-transfer-auto-sync"
-              title="Transfer data automatically synchronizes every 30 seconds"
-            >
-              <span aria-hidden="true" />
-
-              <div>
-                <strong>Auto sync</strong>
-
-                <small>Every 30 seconds</small>
               </div>
             </div>
           </header>

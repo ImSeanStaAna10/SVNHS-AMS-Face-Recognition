@@ -1,5 +1,4 @@
 import {
-  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -8,7 +7,9 @@ import { useNavigate } from "react-router-dom";
 
 import AdviserLayout from "../../layouts/AdviserLayout";
 
-import adviserService from "../../services/adviserService";
+import {
+  useAttendanceHistory,
+} from "../../hooks/queries/useAttendanceQueries";
 
 import "../../styles/adviser/attendanceHistory.css";
 
@@ -666,120 +667,76 @@ function AttendanceHistory() {
   ] = useState(8);
 
   /* =======================================================
-     DATA
+     CACHED ATTENDANCE HISTORY
+
+     Each date range + page + page size has its own
+     TanStack Query cache entry.
+
+     Completed attendance history uses cachePolicy.history
+     through useAttendanceHistory().
   ======================================================= */
 
   const [
-    history,
-    setHistory,
-  ] = useState([]);
-
-  const [
-    totalElements,
-    setTotalElements,
-  ] = useState(0);
-
-  const [
-    totalPages,
-    setTotalPages,
-  ] = useState(0);
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
-  const [
-    error,
-    setError,
+    filterError,
+    setFilterError,
   ] = useState("");
 
-  /* =======================================================
-     LOAD HISTORY
-  ======================================================= */
+  const historyQuery =
+    useAttendanceHistory({
+      fromDate:
+        appliedFromDate,
+      toDate:
+        appliedToDate,
+      page,
+      size:
+        pageSize,
+    });
 
-  useEffect(() => {
-    let mounted = true;
+  const normalizedHistory =
+    useMemo(
+      () =>
+        normalizeHistoryResponse(
+          historyQuery.data,
+        ),
+      [
+        historyQuery.data,
+      ],
+    );
 
-    const loadHistory =
-      async () => {
-        try {
-          setLoading(true);
-          setError("");
+  const history =
+    normalizedHistory.content;
 
-          const response =
-            await adviserService.getAttendanceHistory(
-              {
-                fromDate:
-                  appliedFromDate,
-                toDate:
-                  appliedToDate,
-                page,
-                size:
-                  pageSize,
-              },
-            );
+  const totalElements =
+    normalizedHistory.totalElements;
 
-          if (!mounted) {
-            return;
-          }
+  const totalPages =
+    normalizedHistory.totalPages;
 
-          const normalized =
-            normalizeHistoryResponse(
-              response,
-            );
+  /*
+   * isLoading only covers an uncached initial query.
+   *
+   * Returning to a still-cached filter/page renders
+   * immediately instead of showing the loading state again.
+   */
+  const loading =
+    historyQuery.isLoading;
 
-          setHistory(
-            normalized.content,
-          );
+  /*
+   * Keep cached history visible if a background refresh fails.
+   * Only show the API error when there is no usable query data.
+   */
+  const queryError =
+    historyQuery.data == null &&
+    historyQuery.error
+      ? getErrorMessage(
+          historyQuery.error,
+          "Unable to load attendance history.",
+        )
+      : "";
 
-          setTotalElements(
-            normalized.totalElements,
-          );
-
-          setTotalPages(
-            normalized.totalPages,
-          );
-        } catch (
-          requestError
-        ) {
-          console.error(
-            "Unable to load attendance history:",
-            requestError,
-          );
-
-          if (!mounted) {
-            return;
-          }
-
-          setHistory([]);
-          setTotalElements(0);
-          setTotalPages(0);
-
-          setError(
-            getErrorMessage(
-              requestError,
-              "Unable to load attendance history.",
-            ),
-          );
-        } finally {
-          if (mounted) {
-            setLoading(false);
-          }
-        }
-      };
-
-    void loadHistory();
-
-    return () => {
-      mounted = false;
-    };
-  }, [
-    appliedFromDate,
-    appliedToDate,
-    page,
-    pageSize,
-  ]);
+  const error =
+    filterError ||
+    queryError;
 
   /* =======================================================
      FILTER HANDLERS
@@ -827,7 +784,7 @@ function AttendanceHistory() {
         !fromDate ||
         !toDate
       ) {
-        setError(
+        setFilterError(
           "Select both the start and end date.",
         );
 
@@ -837,14 +794,14 @@ function AttendanceHistory() {
       if (
         fromDate > toDate
       ) {
-        setError(
+        setFilterError(
           "Start date cannot be after end date.",
         );
 
         return;
       }
 
-      setError("");
+      setFilterError("");
 
       setActiveFilter(
         "custom",

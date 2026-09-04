@@ -1,9 +1,6 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
 import AdviserLayout from "../../layouts/AdviserLayout";
@@ -11,101 +8,76 @@ import AdviserLayout from "../../layouts/AdviserLayout";
 import adviserService from "../../services/adviserService";
 import authService from "../../services/authService";
 
+import {
+  useAdviserSections,
+  useAdviserStudents,
+} from "../../hooks/queries/useStudentsQueries";
+
+import { useActiveAttendanceSession } from "../../hooks/queries/useAttendanceQueries";
+
+import queryKeys from "../../lib/query/queryKeys";
+
 import "../../styles/adviser/adviserAttendance.css";
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
-const normalizeArray = (data) =>
-  Array.isArray(data) ? data : [];
+const normalizeArray = (data) => (Array.isArray(data) ? data : []);
 
-const getErrorMessage = (
-  error,
-  fallbackMessage,
-) =>
+const getErrorMessage = (error, fallbackMessage) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   error?.response?.data?.detail ||
   fallbackMessage;
 
-const getSessionId = (session) =>
-  session?.sessionId ||
-  session?.id ||
-  "";
+const getSessionId = (session) => session?.sessionId || session?.id || "";
 
-const getStudentSectionId = (
-  student,
-) =>
-  student?.sectionId ||
-  student?.section?.id ||
-  "";
+const getStudentSectionId = (student) =>
+  student?.sectionId || student?.section?.id || "";
 
-const hasRegisteredFace = (
-  student,
-) =>
+const hasRegisteredFace = (student) =>
   student?.faceRegistered === true ||
   student?.hasFace === true ||
   student?.faceEnrolled === true;
 
 const formatDate = () =>
-  new Intl.DateTimeFormat(
-    "en-PH",
-    {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    },
-  ).format(new Date());
+  new Intl.DateTimeFormat("en-PH", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date());
 
 const formatTime = (value) => {
   if (!value) {
     return "—";
   }
 
-  const rawValue =
-    String(value);
+  const rawValue = String(value);
 
-  const match =
-    rawValue.match(
-      /(?:T|\s|^)(\d{2}):(\d{2})/,
-    );
+  const match = rawValue.match(/(?:T|\s|^)(\d{2}):(\d{2})/);
 
   if (match) {
-    const hours =
-      Number(match[1]);
+    const hours = Number(match[1]);
 
-    const minutes =
-      match[2];
+    const minutes = match[2];
 
-    const period =
-      hours >= 12
-        ? "PM"
-        : "AM";
+    const period = hours >= 12 ? "PM" : "AM";
 
-    const normalizedHour =
-      hours % 12 || 12;
+    const normalizedHour = hours % 12 || 12;
 
     return `${normalizedHour}:${minutes} ${period}`;
   }
 
-  const parsed =
-    new Date(value);
+  const parsed = new Date(value);
 
-  if (
-    !Number.isNaN(
-      parsed.getTime(),
-    )
-  ) {
-    return new Intl.DateTimeFormat(
-      "en-PH",
-      {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      },
-    ).format(parsed);
+  if (!Number.isNaN(parsed.getTime())) {
+    return new Intl.DateTimeFormat("en-PH", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(parsed);
   }
 
   return rawValue;
@@ -116,265 +88,125 @@ const formatTime = (value) => {
 ========================================================= */
 
 function AdviserAttendance() {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
-  const user =
-    authService.getUser();
+  const queryClient = useQueryClient();
+
+  const user = authService.getUser();
 
   /* =======================================================
-     DATA STATE
+     SHARED SERVER CACHE
+
+     Sections and students reuse the shared cache already
+     used by Student Management and the Dashboard.
+
+     Active session remains live operational data.
   ======================================================= */
 
-  const [
-    section,
-    setSection,
-  ] = useState(null);
+  const sectionsQuery = useAdviserSections();
 
-  const [
-    students,
-    setStudents,
-  ] = useState([]);
+  const studentsQuery = useAdviserStudents();
 
-  const [
-    activeSession,
-    setActiveSession,
-  ] = useState(null);
+  const section = useMemo(() => {
+    const sections = normalizeArray(sectionsQuery.data);
+
+    return (
+      sections.find((item) => item?.active !== false) || sections[0] || null
+    );
+  }, [sectionsQuery.data]);
+
+  const students = useMemo(() => {
+    if (!section?.id) {
+      return [];
+    }
+
+    const allStudents = normalizeArray(studentsQuery.data);
+
+    return allStudents.filter((student) => {
+      const studentSectionId = getStudentSectionId(student);
+
+      return (
+        !studentSectionId || String(studentSectionId) === String(section.id)
+      );
+    });
+  }, [studentsQuery.data, section?.id]);
+
+  const activeSessionQuery = useActiveAttendanceSession(section?.id);
+
+  const activeSession = activeSessionQuery.data || null;
 
   /* =======================================================
      PAGE STATE
   ======================================================= */
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+  const [startingSession, setStartingSession] = useState(false);
 
-  const [
-    startingSession,
-    setStartingSession,
-  ] = useState(false);
+  const [pageError, setPageError] = useState("");
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const loading =
+    sectionsQuery.isLoading ||
+    studentsQuery.isLoading ||
+    (Boolean(section?.id) && activeSessionQuery.isLoading);
+
+  const queryError =
+    (sectionsQuery.data == null && sectionsQuery.error) ||
+    (studentsQuery.data == null && studentsQuery.error) ||
+    (section?.id &&
+      activeSessionQuery.data === undefined &&
+      activeSessionQuery.error) ||
+    null;
+
+  const error =
+    pageError ||
+    (queryError
+      ? getErrorMessage(queryError, "Unable to load attendance information.")
+      : "");
 
   /* =======================================================
      START SESSION SETTINGS
   ======================================================= */
 
-  const [
-    showStartModal,
-    setShowStartModal,
-  ] = useState(false);
+  const [showStartModal, setShowStartModal] = useState(false);
 
-  const [
-    lateAfterMinutes,
-    setLateAfterMinutes,
-  ] = useState(15);
+  const [lateAfterMinutes, setLateAfterMinutes] = useState(15);
 
-  const [
-    autoEndEnabled,
-    setAutoEndEnabled,
-  ] = useState(false);
+  const [autoEndEnabled, setAutoEndEnabled] = useState(false);
 
-  const [
-    scheduledEndTime,
-    setScheduledEndTime,
-  ] = useState("");
+  const [scheduledEndTime, setScheduledEndTime] = useState("");
 
-  const [
-    startSessionError,
-    setStartSessionError,
-  ] = useState("");
-
-  /* =======================================================
-     LOAD ATTENDANCE PAGE
-  ======================================================= */
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadAttendancePage =
-      async () => {
-        try {
-          setLoading(true);
-
-          setError("");
-
-          const [
-            sectionData,
-            studentData,
-          ] =
-            await Promise.all([
-              adviserService.getSections(),
-              adviserService.getStudents(),
-            ]);
-
-          if (!mounted) {
-            return;
-          }
-
-          const sections =
-            normalizeArray(
-              sectionData,
-            );
-
-          const allStudents =
-            normalizeArray(
-              studentData,
-            );
-
-          const assignedSection =
-            sections.find(
-              (item) =>
-                item.active !==
-                false,
-            ) ||
-            sections[0] ||
-            null;
-
-          setSection(
-            assignedSection,
-          );
-
-          if (
-            !assignedSection?.id
-          ) {
-            setStudents(
-              [],
-            );
-
-            setActiveSession(
-              null,
-            );
-
-            return;
-          }
-
-          const scopedStudents =
-            allStudents.filter(
-              (student) => {
-                const studentSectionId =
-                  getStudentSectionId(
-                    student,
-                  );
-
-                return (
-                  !studentSectionId ||
-                  String(studentSectionId) ===
-                    String(assignedSection.id)
-                );
-              },
-            );
-
-          setStudents(
-            scopedStudents,
-          );
-
-          const currentSession =
-            await adviserService.getActiveSession(
-              assignedSection.id,
-            );
-
-          if (!mounted) {
-            return;
-          }
-
-          setActiveSession(
-            currentSession,
-          );
-        } catch (
-          requestError
-        ) {
-          console.error(
-            "Unable to load attendance page:",
-            requestError,
-          );
-
-          if (!mounted) {
-            return;
-          }
-
-          setError(
-            getErrorMessage(
-              requestError,
-              "Unable to load attendance information.",
-            ),
-          );
-        } finally {
-          if (mounted) {
-            setLoading(false);
-          }
-        }
-      };
-
-    void loadAttendancePage();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const [startSessionError, setStartSessionError] = useState("");
 
   /* =======================================================
      DERIVED DATA
   ======================================================= */
 
   const adviserName =
-    user?.name?.trim() ||
-    section?.adviserName ||
-    "Class Adviser";
+    user?.name?.trim() || section?.adviserName || "Class Adviser";
 
-  const sectionName =
-    section?.name ||
-    "No assigned section";
+  const sectionName = section?.name || "No assigned section";
 
-  const activeStudents =
-    useMemo(
-      () =>
-        students.filter(
-          (student) =>
-            student.active !==
-            false,
-        ),
-      [students],
-    );
+  const activeStudents = useMemo(
+    () => students.filter((student) => student.active !== false),
+    [students],
+  );
 
-  const faceRegisteredStudents =
-    useMemo(
-      () =>
-        activeStudents.filter(
-          hasRegisteredFace,
-        ),
-      [activeStudents],
-    );
+  const faceRegisteredStudents = useMemo(
+    () => activeStudents.filter(hasRegisteredFace),
+    [activeStudents],
+  );
 
-  const facePendingCount =
-    Math.max(
-      activeStudents.length -
-        faceRegisteredStudents.length,
-      0,
-    );
+  const facePendingCount = Math.max(
+    activeStudents.length - faceRegisteredStudents.length,
+    0,
+  );
 
-  const faceEnrollmentPercentage =
-    activeStudents.length
-      ? Math.round(
-          (faceRegisteredStudents.length /
-            activeStudents.length) *
-            100,
-        )
-      : 0;
+  const faceEnrollmentPercentage = activeStudents.length
+    ? Math.round((faceRegisteredStudents.length / activeStudents.length) * 100)
+    : 0;
 
-  const activeSessionId =
-    getSessionId(
-      activeSession,
-    );
+  const activeSessionId = getSessionId(activeSession);
 
-  const hasActiveSession =
-    Boolean(
-      activeSessionId,
-    );
+  const hasActiveSession = Boolean(activeSessionId);
 
   const sessionStartedAt =
     activeSession?.startedAt ||
@@ -382,259 +214,186 @@ function AdviserAttendance() {
     activeSession?.createdAt ||
     null;
 
-  const sessionLateAfterMinutes =
-    activeSession?.lateAfterMinutes ??
-    null;
+  const sessionLateAfterMinutes = activeSession?.lateAfterMinutes ?? null;
 
-  const sessionLateCutoffAt =
-    activeSession?.lateCutoffAt ||
-    null;
+  const sessionLateCutoffAt = activeSession?.lateCutoffAt || null;
 
-  const sessionScheduledEndAt =
-    activeSession?.scheduledEndAt ||
-    null;
+  const sessionScheduledEndAt = activeSession?.scheduledEndAt || null;
 
-  const canStartSession =
-    Boolean(
-      section?.id &&
-        activeStudents.length >
-          0,
-    );
+  const canStartSession = Boolean(section?.id && activeStudents.length > 0);
 
   /* =======================================================
      OPEN START SESSION SETTINGS
   ======================================================= */
 
-  const handleAttendanceAction =
-    () => {
-      if (startingSession) {
-        return;
-      }
+  const handleAttendanceAction = () => {
+    if (startingSession) {
+      return;
+    }
 
-      setError("");
+    setPageError("");
 
-      /*
-       * ACTIVE SESSION:
-       * Continue directly to the attendance workspace.
-       */
-      if (hasActiveSession) {
-        navigate(
-          `/adviser/attendance/${activeSessionId}`,
-        );
+    /*
+     * ACTIVE SESSION:
+     * Continue directly to the attendance workspace.
+     */
+    if (hasActiveSession) {
+      navigate(`/adviser/attendance/${activeSessionId}`);
 
-        return;
-      }
+      return;
+    }
 
-      if (!section?.id) {
-        setError(
-          "No assigned section is available.",
-        );
+    if (!section?.id) {
+      setPageError("No assigned section is available.");
 
-        return;
-      }
+      return;
+    }
 
-      if (
-        activeStudents.length ===
-        0
-      ) {
-        setError(
-          "Add at least one active student before starting attendance.",
-        );
-
-        return;
-      }
-
-      setStartSessionError("");
-
-      setShowStartModal(
-        true,
+    if (activeStudents.length === 0) {
+      setPageError(
+        "Add at least one active student before starting attendance.",
       );
-    };
+
+      return;
+    }
+
+    setStartSessionError("");
+
+    setShowStartModal(true);
+  };
 
   /* =======================================================
      START CONFIGURED SESSION
   ======================================================= */
 
-  const handleStartSession =
-    async () => {
-      if (
-        startingSession ||
-        !section?.id
-      ) {
-        return;
-      }
+  const handleStartSession = async () => {
+    if (startingSession || !section?.id) {
+      return;
+    }
 
-      setStartSessionError("");
+    setStartSessionError("");
 
-      /* ===================================================
+    /* ===================================================
          VALIDATE LATE ALLOWANCE
       =================================================== */
 
-      const parsedLateMinutes =
-        Number(
-          lateAfterMinutes,
-        );
+    const parsedLateMinutes = Number(lateAfterMinutes);
 
-      if (
-        !Number.isInteger(
-          parsedLateMinutes,
-        ) ||
-        parsedLateMinutes <
-          1
-      ) {
-        setStartSessionError(
-          "Late allowance must be at least 1 minute.",
-        );
+    if (!Number.isInteger(parsedLateMinutes) || parsedLateMinutes < 1) {
+      setStartSessionError("Late allowance must be at least 1 minute.");
 
-        return;
-      }
+      return;
+    }
 
-      /* ===================================================
+    /* ===================================================
          VALIDATE AUTOMATIC END
       =================================================== */
 
-      if (
-        autoEndEnabled &&
-        !scheduledEndTime
-      ) {
-        setStartSessionError(
-          "Select an automatic session end time.",
-        );
+    if (autoEndEnabled && !scheduledEndTime) {
+      setStartSessionError("Select an automatic session end time.");
 
-        return;
+      return;
+    }
+
+    try {
+      setStartingSession(true);
+
+      const createdSession = await adviserService.startAttendanceSession({
+        sectionId: section.id,
+
+        lateAfterMinutes: parsedLateMinutes,
+
+        scheduledEndTime: autoEndEnabled ? scheduledEndTime : null,
+      });
+
+      let createdSessionId = getSessionId(createdSession);
+
+      /*
+       * Defensive fallback in case
+       * the start endpoint does not
+       * directly return the session ID.
+       */
+      if (!createdSessionId) {
+        /*
+         * Defensive fallback:
+         * refetch the shared active-session query.
+         */
+        const refreshedResult = await activeSessionQuery.refetch();
+
+        if (refreshedResult.isError) {
+          throw (
+            refreshedResult.error ||
+            new Error("Unable to resolve the active attendance session.")
+          );
+        }
+
+        const refreshedSession = refreshedResult.data;
+
+        createdSessionId = getSessionId(refreshedSession);
+      } else {
+        /*
+         * Start endpoint already returned the session.
+         * Put it directly into the shared cache.
+         */
+        queryClient.setQueryData(
+          queryKeys.adviser.activeSession(section.id),
+          createdSession,
+        );
       }
 
-      try {
-        setStartingSession(
-          true,
+      if (!createdSessionId) {
+        throw new Error(
+          "Attendance session started, but the session ID could not be resolved.",
         );
+      }
 
-        const createdSession =
-          await adviserService.startAttendanceSession(
-            {
-              sectionId:
-                section.id,
+      setShowStartModal(false);
 
-              lateAfterMinutes:
-                parsedLateMinutes,
+      navigate(`/adviser/attendance/${createdSessionId}`);
+    } catch (requestError) {
+      console.error("Unable to start attendance session:", requestError);
 
-              scheduledEndTime:
-                autoEndEnabled
-                  ? scheduledEndTime
-                  : null,
-            },
-          );
+      /*
+       * If backend says there is already
+       * an active session, recover it.
+       */
+      if (requestError?.response?.status === 409) {
+        try {
+          const recoveryResult = await activeSessionQuery.refetch();
 
-        let createdSessionId =
-          getSessionId(
-            createdSession,
-          );
-
-        /*
-         * Defensive fallback in case
-         * the start endpoint does not
-         * directly return the session ID.
-         */
-        if (!createdSessionId) {
-          const refreshedSession =
-            await adviserService.getActiveSession(
-              section.id,
-            );
-
-          createdSessionId =
-            getSessionId(
-              refreshedSession,
-            );
-
-          setActiveSession(
-            refreshedSession,
-          );
-        } else {
-          setActiveSession(
-            createdSession,
-          );
-        }
-
-        if (!createdSessionId) {
-          throw new Error(
-            "Attendance session started, but the session ID could not be resolved.",
-          );
-        }
-
-        setShowStartModal(
-          false,
-        );
-
-        navigate(
-          `/adviser/attendance/${createdSessionId}`,
-        );
-      } catch (
-        requestError
-      ) {
-        console.error(
-          "Unable to start attendance session:",
-          requestError,
-        );
-
-        /*
-         * If backend says there is already
-         * an active session, recover it.
-         */
-        if (
-          requestError?.response
-            ?.status === 409
-        ) {
-          try {
-            const currentSession =
-              await adviserService.getActiveSession(
-                section.id,
-              );
-
-            const currentSessionId =
-              getSessionId(
-                currentSession,
-              );
-
-            if (
-              currentSessionId
-            ) {
-              setActiveSession(
-                currentSession,
-              );
-
-              setShowStartModal(
-                false,
-              );
-
-              navigate(
-                `/adviser/attendance/${currentSessionId}`,
-              );
-
-              return;
-            }
-          } catch (
-            recoveryError
-          ) {
-            console.error(
-              "Unable to recover active session:",
-              recoveryError,
+          if (recoveryResult.isError) {
+            throw (
+              recoveryResult.error ||
+              new Error("Unable to recover the active attendance session.")
             );
           }
-        }
 
-        setStartSessionError(
-          getErrorMessage(
-            requestError,
-            requestError?.message ||
-              "Unable to start the attendance session.",
-          ),
-        );
-      } finally {
-        setStartingSession(
-          false,
-        );
+          const currentSession = recoveryResult.data;
+
+          const currentSessionId = getSessionId(currentSession);
+
+          if (currentSessionId) {
+            setShowStartModal(false);
+
+            navigate(`/adviser/attendance/${currentSessionId}`);
+
+            return;
+          }
+        } catch (recoveryError) {
+          console.error("Unable to recover active session:", recoveryError);
+        }
       }
-    };
+
+      setStartSessionError(
+        getErrorMessage(
+          requestError,
+          requestError?.message || "Unable to start the attendance session.",
+        ),
+      );
+    } finally {
+      setStartingSession(false);
+    }
+  };
 
   /* =======================================================
      START MODAL SCROLL LOCK
@@ -645,30 +404,22 @@ function AdviserAttendance() {
       return undefined;
     }
 
-    const previousOverflow =
-      document.body.style.overflow;
+    const previousOverflow = document.body.style.overflow;
 
-    document.body.style.overflow =
-      "hidden";
+    document.body.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
+      document.body.style.overflow = previousOverflow;
     };
-  }, [
-    showStartModal,
-  ]);
+  }, [showStartModal]);
 
   /* =======================================================
      STUDENT MANAGEMENT
   ======================================================= */
 
-  const handleManageStudents =
-    () => {
-      navigate(
-        "/adviser/students",
-      );
-    };
+  const handleManageStudents = () => {
+    navigate("/adviser/students");
+  };
 
   /* =======================================================
      RENDER
@@ -686,25 +437,15 @@ function AdviserAttendance() {
         ================================================== */}
 
         {error && (
-          <div
-            className="adviser-alert adviser-alert-error"
-            role="alert"
-          >
-            <span
-              className="adviser-alert-icon"
-              aria-hidden="true"
-            >
+          <div className="adviser-alert adviser-alert-error" role="alert">
+            <span className="adviser-alert-icon" aria-hidden="true">
               !
             </span>
 
             <div>
-              <strong>
-                Attendance unavailable
-              </strong>
+              <strong>Attendance unavailable</strong>
 
-              <p>
-                {error}
-              </p>
+              <p>{error}</p>
             </div>
           </div>
         )}
@@ -715,42 +456,26 @@ function AdviserAttendance() {
 
         <section className="adviser-attendance-hero">
           <div className="adviser-attendance-hero-copy">
-            <span>
-              TODAY&apos;S ATTENDANCE
-            </span>
+            <span>TODAY&apos;S ATTENDANCE</span>
 
-            <h2>
-              {loading
-                ? "Preparing attendance..."
-                : sectionName}
-            </h2>
+            <h2>{loading ? "Preparing attendance..." : sectionName}</h2>
 
-            <p>
-              {formatDate()}
-            </p>
+            <p>{formatDate()}</p>
           </div>
 
           <div className="adviser-attendance-hero-side">
             <div className="adviser-attendance-adviser">
-              <span>
-                CLASS ADVISER
-              </span>
+              <span>CLASS ADVISER</span>
 
-              <strong>
-                {adviserName}
-              </strong>
+              <strong>{adviserName}</strong>
             </div>
 
             <span
               className={`adviser-attendance-session-badge ${
-                hasActiveSession
-                  ? "is-active"
-                  : ""
+                hasActiveSession ? "is-active" : ""
               }`}
             >
-              <span
-                aria-hidden="true"
-              />
+              <span aria-hidden="true" />
 
               {loading
                 ? "CHECKING"
@@ -767,68 +492,38 @@ function AdviserAttendance() {
 
         <section className="adviser-attendance-summary-grid">
           <article className="adviser-attendance-summary-card">
-            <div className="adviser-attendance-summary-icon">
-              ♙
-            </div>
+            <div className="adviser-attendance-summary-icon">♙</div>
 
             <div>
-              <span>
-                CLASS ROSTER
-              </span>
+              <span>CLASS ROSTER</span>
 
-              <strong>
-                {loading
-                  ? "—"
-                  : activeStudents.length}
-              </strong>
+              <strong>{loading ? "—" : activeStudents.length}</strong>
 
-              <p>
-                Active students
-              </p>
+              <p>Active students</p>
             </div>
           </article>
 
           <article className="adviser-attendance-summary-card is-face">
-            <div className="adviser-attendance-summary-icon">
-              ◎
-            </div>
+            <div className="adviser-attendance-summary-icon">◎</div>
 
             <div>
-              <span>
-                FACE READY
-              </span>
+              <span>FACE READY</span>
 
-              <strong>
-                {loading
-                  ? "—"
-                  : faceRegisteredStudents.length}
-              </strong>
+              <strong>{loading ? "—" : faceRegisteredStudents.length}</strong>
 
-              <p>
-                Registered identities
-              </p>
+              <p>Registered identities</p>
             </div>
           </article>
 
           <article className="adviser-attendance-summary-card">
-            <div className="adviser-attendance-summary-icon">
-              ◷
-            </div>
+            <div className="adviser-attendance-summary-icon">◷</div>
 
             <div>
-              <span>
-                FACE PENDING
-              </span>
+              <span>FACE PENDING</span>
 
-              <strong>
-                {loading
-                  ? "—"
-                  : facePendingCount}
-              </strong>
+              <strong>{loading ? "—" : facePendingCount}</strong>
 
-              <p>
-                Students to enroll
-              </p>
+              <p>Students to enroll</p>
             </div>
           </article>
         </section>
@@ -844,32 +539,24 @@ function AdviserAttendance() {
 
           <article
             className={`adviser-attendance-session-card ${
-              hasActiveSession
-                ? "is-active"
-                : ""
+              hasActiveSession ? "is-active" : ""
             }`}
           >
             <div className="adviser-attendance-session-visual">
               <div className="adviser-attendance-session-icon">
-                {hasActiveSession
-                  ? "▶"
-                  : "◷"}
+                {hasActiveSession ? "▶" : "◷"}
               </div>
 
               <span
                 className={`adviser-attendance-live-dot ${
-                  hasActiveSession
-                    ? "is-active"
-                    : ""
+                  hasActiveSession ? "is-active" : ""
                 }`}
               />
             </div>
 
             <div className="adviser-attendance-session-copy">
               <span>
-                {hasActiveSession
-                  ? "ACTIVE SESSION"
-                  : "ATTENDANCE SESSION"}
+                {hasActiveSession ? "ACTIVE SESSION" : "ATTENDANCE SESSION"}
               </span>
 
               <h2>
@@ -889,79 +576,47 @@ function AdviserAttendance() {
               {hasActiveSession && (
                 <div className="adviser-attendance-session-meta">
                   <div>
-                    <span>
-                      SECTION
-                    </span>
+                    <span>SECTION</span>
 
-                    <strong>
-                      {sectionName}
-                    </strong>
+                    <strong>{sectionName}</strong>
                   </div>
 
                   <div>
-                    <span>
-                      STARTED
-                    </span>
+                    <span>STARTED</span>
 
-                    <strong>
-                      {formatTime(
-                        sessionStartedAt,
-                      )}
-                    </strong>
+                    <strong>{formatTime(sessionStartedAt)}</strong>
                   </div>
 
-                  {sessionLateAfterMinutes !==
-                    null && (
+                  {sessionLateAfterMinutes !== null && (
                     <div>
-                      <span>
-                        LATE AFTER
-                      </span>
+                      <span>LATE AFTER</span>
 
-                      <strong>
-                        {
-                          sessionLateAfterMinutes
-                        }{" "}
-                        min
-                      </strong>
+                      <strong>{sessionLateAfterMinutes} min</strong>
                     </div>
                   )}
 
                   {sessionLateCutoffAt && (
                     <div>
-                      <span>
-                        LATE CUTOFF
-                      </span>
+                      <span>LATE CUTOFF</span>
 
-                      <strong>
-                        {formatTime(
-                          sessionLateCutoffAt,
-                        )}
-                      </strong>
+                      <strong>{formatTime(sessionLateCutoffAt)}</strong>
                     </div>
                   )}
 
                   <div>
-                    <span>
-                      AUTO END
-                    </span>
+                    <span>AUTO END</span>
 
                     <strong>
                       {sessionScheduledEndAt
-                        ? formatTime(
-                            sessionScheduledEndAt,
-                          )
+                        ? formatTime(sessionScheduledEndAt)
                         : "Manual"}
                     </strong>
                   </div>
 
                   <div>
-                    <span>
-                      STATUS
-                    </span>
+                    <span>STATUS</span>
 
-                    <strong className="is-active">
-                      Active
-                    </strong>
+                    <strong className="is-active">Active</strong>
                   </div>
                 </div>
               )}
@@ -974,18 +629,12 @@ function AdviserAttendance() {
                 disabled={
                   loading ||
                   startingSession ||
-                  (!hasActiveSession &&
-                    !canStartSession)
+                  (!hasActiveSession && !canStartSession)
                 }
-                onClick={
-                  handleAttendanceAction
-                }
+                onClick={handleAttendanceAction}
               >
                 {startingSession && (
-                  <span
-                    className="adviser-button-spinner"
-                    aria-hidden="true"
-                  />
+                  <span className="adviser-button-spinner" aria-hidden="true" />
                 )}
 
                 <span>
@@ -996,20 +645,12 @@ function AdviserAttendance() {
                       : "Start Attendance"}
                 </span>
 
-                {!startingSession && (
-                  <strong
-                    aria-hidden="true"
-                  >
-                    →
-                  </strong>
-                )}
+                {!startingSession && <strong aria-hidden="true">→</strong>}
               </button>
 
               {!hasActiveSession && (
                 <small>
-                  Configure attendance rules
-                  before opening the live
-                  scanner.
+                  Configure attendance rules before opening the live scanner.
                 </small>
               )}
             </div>
@@ -1022,18 +663,12 @@ function AdviserAttendance() {
           <aside className="adviser-attendance-readiness">
             <header>
               <div>
-                <span>
-                  CLASS READINESS
-                </span>
+                <span>CLASS READINESS</span>
 
-                <h2>
-                  Face Enrollment
-                </h2>
+                <h2>Face Enrollment</h2>
               </div>
 
-              <strong>
-                {faceEnrollmentPercentage}%
-              </strong>
+              <strong>{faceEnrollmentPercentage}%</strong>
             </header>
 
             <div className="adviser-attendance-readiness-progress">
@@ -1046,89 +681,54 @@ function AdviserAttendance() {
 
             <div className="adviser-attendance-readiness-list">
               <div>
-                <span>
-                  Active students
-                </span>
+                <span>Active students</span>
 
-                <strong>
-                  {activeStudents.length}
-                </strong>
+                <strong>{activeStudents.length}</strong>
               </div>
 
               <div>
-                <span>
-                  Face registered
-                </span>
+                <span>Face registered</span>
 
                 <strong className="is-success">
-                  {
-                    faceRegisteredStudents.length
-                  }
+                  {faceRegisteredStudents.length}
                 </strong>
               </div>
 
               <div>
-                <span>
-                  Registration pending
-                </span>
+                <span>Registration pending</span>
 
                 <strong
-                  className={
-                    facePendingCount >
-                    0
-                      ? "is-warning"
-                      : "is-success"
-                  }
+                  className={facePendingCount > 0 ? "is-warning" : "is-success"}
                 >
                   {facePendingCount}
                 </strong>
               </div>
             </div>
 
-            {facePendingCount >
-            0 ? (
+            {facePendingCount > 0 ? (
               <div className="adviser-attendance-readiness-note">
-                <span
-                  aria-hidden="true"
-                >
-                  !
-                </span>
+                <span aria-hidden="true">!</span>
 
                 <p>
-                  Students without registered
-                  faces can still have their
+                  Students without registered faces can still have their
                   attendance recorded manually.
                 </p>
               </div>
-            ) : activeStudents.length >
-              0 ? (
+            ) : activeStudents.length > 0 ? (
               <div className="adviser-attendance-readiness-note is-ready">
-                <span
-                  aria-hidden="true"
-                >
-                  ✓
-                </span>
+                <span aria-hidden="true">✓</span>
 
-                <p>
-                  All active students are
-                  ready for face recognition.
-                </p>
+                <p>All active students are ready for face recognition.</p>
               </div>
             ) : null}
 
             <button
               type="button"
               className="adviser-attendance-manage-button"
-              onClick={
-                handleManageStudents
-              }
+              onClick={handleManageStudents}
             >
               Manage Student Faces
-              <span
-                aria-hidden="true"
-              >
-                →
-              </span>
+              <span aria-hidden="true">→</span>
             </button>
           </aside>
         </section>
@@ -1140,42 +740,28 @@ function AdviserAttendance() {
         <section className="adviser-attendance-methods">
           <header className="adviser-attendance-section-header">
             <div>
-              <span>
-                ATTENDANCE METHODS
-              </span>
+              <span>ATTENDANCE METHODS</span>
 
-              <h2>
-                Available during the session
-              </h2>
+              <h2>Available during the session</h2>
 
               <p>
-                Use either method depending
-                on the situation in your
-                classroom.
+                Use either method depending on the situation in your classroom.
               </p>
             </div>
           </header>
 
           <div className="adviser-attendance-method-grid">
             <article className="adviser-attendance-method-card is-face">
-              <div className="adviser-attendance-method-icon">
-                ◎
-              </div>
+              <div className="adviser-attendance-method-icon">◎</div>
 
               <div>
-                <span>
-                  FACE RECOGNITION
-                </span>
+                <span>FACE RECOGNITION</span>
 
-                <h3>
-                  Biometric Attendance
-                </h3>
+                <h3>Biometric Attendance</h3>
 
                 <p>
-                  Scan a registered student&apos;s
-                  face and automatically record
-                  the recognized student&apos;s
-                  attendance.
+                  Scan a registered student&apos;s face and automatically record
+                  the recognized student&apos;s attendance.
                 </p>
               </div>
 
@@ -1185,24 +771,16 @@ function AdviserAttendance() {
             </article>
 
             <article className="adviser-attendance-method-card">
-              <div className="adviser-attendance-method-icon">
-                ✓
-              </div>
+              <div className="adviser-attendance-method-icon">✓</div>
 
               <div>
-                <span>
-                  MANUAL ENTRY
-                </span>
+                <span>MANUAL ENTRY</span>
 
-                <h3>
-                  Manual Attendance
-                </h3>
+                <h3>Manual Attendance</h3>
 
                 <p>
-                  Search the class roster and
-                  manually record attendance
-                  when face recognition is not
-                  available.
+                  Search the class roster and manually record attendance when
+                  face recognition is not available.
                 </p>
               </div>
 
@@ -1212,24 +790,16 @@ function AdviserAttendance() {
             </article>
 
             <article className="adviser-attendance-method-card">
-              <div className="adviser-attendance-method-icon">
-                ⇩
-              </div>
+              <div className="adviser-attendance-method-icon">⇩</div>
 
               <div>
-                <span>
-                  ATTENDANCE REPORT
-                </span>
+                <span>ATTENDANCE REPORT</span>
 
-                <h3>
-                  PDF & Excel Export
-                </h3>
+                <h3>PDF & Excel Export</h3>
 
                 <p>
-                  Review the official
-                  attendance sheet and export
-                  session records for
-                  reporting.
+                  Review the official attendance sheet and export session
+                  records for reporting.
                 </p>
               </div>
 
@@ -1249,18 +819,10 @@ function AdviserAttendance() {
             className="adviser-attendance-start-backdrop"
             role="presentation"
             onMouseDown={(event) => {
-              if (
-                event.target ===
-                  event.currentTarget &&
-                !startingSession
-              ) {
-                setShowStartModal(
-                  false,
-                );
+              if (event.target === event.currentTarget && !startingSession) {
+                setShowStartModal(false);
 
-                setStartSessionError(
-                  "",
-                );
+                setStartSessionError("");
               }
             }}
           >
@@ -1271,24 +833,18 @@ function AdviserAttendance() {
               aria-labelledby="attendance-session-settings-title"
             >
               <header className="adviser-attendance-start-modal-header">
-                <div className="adviser-attendance-start-modal-icon">
-                  ◷
-                </div>
+                <div className="adviser-attendance-start-modal-icon">◷</div>
 
                 <div>
-                  <span>
-                    ATTENDANCE SESSION
-                  </span>
+                  <span>ATTENDANCE SESSION</span>
 
                   <h2 id="attendance-session-settings-title">
                     Configure session
                   </h2>
 
                   <p>
-                    Set the late allowance and
-                    choose whether this
-                    attendance session should
-                    end automatically.
+                    Set the late allowance and choose whether this attendance
+                    session should end automatically.
                   </p>
                 </div>
 
@@ -1296,17 +852,11 @@ function AdviserAttendance() {
                   type="button"
                   className="adviser-attendance-start-modal-close"
                   aria-label="Close session settings"
-                  disabled={
-                    startingSession
-                  }
+                  disabled={startingSession}
                   onClick={() => {
-                    setShowStartModal(
-                      false,
-                    );
+                    setShowStartModal(false);
 
-                    setStartSessionError(
-                      "",
-                    );
+                    setStartSessionError("");
                   }}
                 >
                   ×
@@ -1315,37 +865,21 @@ function AdviserAttendance() {
 
               <div className="adviser-attendance-start-overview">
                 <div>
-                  <span>
-                    SECTION
-                  </span>
+                  <span>SECTION</span>
 
-                  <strong>
-                    {sectionName}
-                  </strong>
+                  <strong>{sectionName}</strong>
                 </div>
 
                 <div>
-                  <span>
-                    STUDENTS
-                  </span>
+                  <span>STUDENTS</span>
 
-                  <strong>
-                    {
-                      activeStudents.length
-                    }
-                  </strong>
+                  <strong>{activeStudents.length}</strong>
                 </div>
 
                 <div>
-                  <span>
-                    FACE READY
-                  </span>
+                  <span>FACE READY</span>
 
-                  <strong>
-                    {
-                      faceRegisteredStudents.length
-                    }
-                  </strong>
+                  <strong>{faceRegisteredStudents.length}</strong>
                 </div>
               </div>
 
@@ -1357,19 +891,13 @@ function AdviserAttendance() {
                 <section className="adviser-attendance-policy-card">
                   <div className="adviser-attendance-policy-card-heading">
                     <div>
-                      <span>
-                        LATE POLICY
-                      </span>
+                      <span>LATE POLICY</span>
 
-                      <h3>
-                        Late allowance
-                      </h3>
+                      <h3>Late allowance</h3>
 
                       <p>
-                        Students recorded after
-                        this allowance will
-                        automatically be marked
-                        Late.
+                        Students recorded after this allowance will
+                        automatically be marked Late.
                       </p>
                     </div>
 
@@ -1380,53 +908,28 @@ function AdviserAttendance() {
                         min="1"
                         step="1"
                         inputMode="numeric"
-                        value={
-                          lateAfterMinutes
-                        }
-                        disabled={
-                          startingSession
-                        }
-                        onChange={(
-                          event,
-                        ) =>
-                          setLateAfterMinutes(
-                            event.target
-                              .value,
-                          )
+                        value={lateAfterMinutes}
+                        disabled={startingSession}
+                        onChange={(event) =>
+                          setLateAfterMinutes(event.target.value)
                         }
                       />
 
-                      <span>
-                        minutes
-                      </span>
+                      <span>minutes</span>
                     </div>
                   </div>
 
                   <div className="adviser-attendance-policy-preview">
-                    <span>
-                      Example
-                    </span>
+                    <span>Example</span>
 
                     <p>
-                      If the session starts at{" "}
+                      If the session starts at <strong>7:30 AM</strong> with a{" "}
                       <strong>
-                        7:30 AM
-                      </strong>{" "}
-                      with a{" "}
-                      <strong>
-                        {
-                          lateAfterMinutes ||
-                          "—"
-                        }
+                        {lateAfterMinutes || "—"}
                         -minute
                       </strong>{" "}
-                      allowance, students
-                      recorded after the cutoff
-                      will be marked{" "}
-                      <strong>
-                        LATE
-                      </strong>
-                      .
+                      allowance, students recorded after the cutoff will be
+                      marked <strong>LATE</strong>.
                     </p>
                   </div>
                 </section>
@@ -1437,112 +940,67 @@ function AdviserAttendance() {
 
                 <section
                   className={`adviser-attendance-policy-card ${
-                    autoEndEnabled
-                      ? "is-enabled"
-                      : ""
+                    autoEndEnabled ? "is-enabled" : ""
                   }`}
                 >
                   <div className="adviser-attendance-policy-card-heading">
                     <div>
-                      <span>
-                        SESSION END
-                      </span>
+                      <span>SESSION END</span>
 
-                      <h3>
-                        Automatic ending
-                      </h3>
+                      <h3>Automatic ending</h3>
 
                       <p>
-                        The session can close
-                        automatically at a
-                        selected time. Manual
-                        ending remains
-                        available.
+                        The session can close automatically at a selected time.
+                        Manual ending remains available.
                       </p>
                     </div>
 
                     <button
                       type="button"
                       className={`adviser-attendance-auto-end-toggle ${
-                        autoEndEnabled
-                          ? "is-on"
-                          : ""
+                        autoEndEnabled ? "is-on" : ""
                       }`}
-                      disabled={
-                        startingSession
-                      }
-                      aria-pressed={
-                        autoEndEnabled
-                      }
+                      disabled={startingSession}
+                      aria-pressed={autoEndEnabled}
                       onClick={() => {
-                        setAutoEndEnabled(
-                          (current) =>
-                            !current,
-                        );
+                        setAutoEndEnabled((current) => !current);
 
-                        setStartSessionError(
-                          "",
-                        );
+                        setStartSessionError("");
                       }}
                     >
-                      <span
-                        aria-hidden="true"
-                      />
+                      <span aria-hidden="true" />
 
-                      {autoEndEnabled
-                        ? "ON"
-                        : "OFF"}
+                      {autoEndEnabled ? "ON" : "OFF"}
                     </button>
                   </div>
 
                   {autoEndEnabled ? (
                     <label className="adviser-attendance-end-time-field">
-                      <span>
-                        AUTOMATIC END TIME
-                      </span>
+                      <span>AUTOMATIC END TIME</span>
 
                       <input
                         type="time"
-                        value={
-                          scheduledEndTime
-                        }
-                        disabled={
-                          startingSession
-                        }
-                        onChange={(
-                          event,
-                        ) => {
-                          setScheduledEndTime(
-                            event.target
-                              .value,
-                          );
+                        value={scheduledEndTime}
+                        disabled={startingSession}
+                        onChange={(event) => {
+                          setScheduledEndTime(event.target.value);
 
-                          setStartSessionError(
-                            "",
-                          );
+                          setStartSessionError("");
                         }}
                       />
 
                       <small>
-                        Attendance will stop at
-                        this exact time. The
-                        remaining unrecorded
-                        students will be
-                        finalized as absent.
+                        Attendance will stop at this exact time. The remaining
+                        unrecorded students will be finalized as absent.
                       </small>
                     </label>
                   ) : (
                     <div className="adviser-attendance-manual-end-note">
-                      <span>
-                        MANUAL END
-                      </span>
+                      <span>MANUAL END</span>
 
                       <p>
-                        No automatic end time is
-                        configured. You must use
-                        the End Session button
-                        when attendance is
-                        finished.
+                        No automatic end time is configured. You must use the
+                        End Session button when attendance is finished.
                       </p>
                     </div>
                   )}
@@ -1550,48 +1008,27 @@ function AdviserAttendance() {
               </div>
 
               {startSessionError && (
-                <div
-                  className="adviser-attendance-start-error"
-                  role="alert"
-                >
-                  <span
-                    aria-hidden="true"
-                  >
-                    !
-                  </span>
+                <div className="adviser-attendance-start-error" role="alert">
+                  <span aria-hidden="true">!</span>
 
-                  <p>
-                    {
-                      startSessionError
-                    }
-                  </p>
+                  <p>{startSessionError}</p>
                 </div>
               )}
 
               <div className="adviser-attendance-start-summary">
                 <div>
-                  <span>
-                    LATE AFTER
-                  </span>
+                  <span>LATE AFTER</span>
 
-                  <strong>
-                    {lateAfterMinutes ||
-                      "—"}{" "}
-                    min
-                  </strong>
+                  <strong>{lateAfterMinutes || "—"} min</strong>
                 </div>
 
                 <div>
-                  <span>
-                    SESSION END
-                  </span>
+                  <span>SESSION END</span>
 
                   <strong>
                     {autoEndEnabled
                       ? scheduledEndTime
-                        ? formatTime(
-                            scheduledEndTime,
-                          )
+                        ? formatTime(scheduledEndTime)
                         : "Select time"
                       : "Manual"}
                   </strong>
@@ -1601,17 +1038,11 @@ function AdviserAttendance() {
               <footer className="adviser-attendance-start-actions">
                 <button
                   type="button"
-                  disabled={
-                    startingSession
-                  }
+                  disabled={startingSession}
                   onClick={() => {
-                    setShowStartModal(
-                      false,
-                    );
+                    setShowStartModal(false);
 
-                    setStartSessionError(
-                      "",
-                    );
+                    setStartSessionError("");
                   }}
                 >
                   Cancel
@@ -1620,12 +1051,8 @@ function AdviserAttendance() {
                 <button
                   type="button"
                   className="is-primary"
-                  disabled={
-                    startingSession
-                  }
-                  onClick={() =>
-                    void handleStartSession()
-                  }
+                  disabled={startingSession}
+                  onClick={() => void handleStartSession()}
                 >
                   {startingSession && (
                     <span
@@ -1634,17 +1061,9 @@ function AdviserAttendance() {
                     />
                   )}
 
-                  {startingSession
-                    ? "Starting Session..."
-                    : "Start Attendance"}
+                  {startingSession ? "Starting Session..." : "Start Attendance"}
 
-                  {!startingSession && (
-                    <span
-                      aria-hidden="true"
-                    >
-                      →
-                    </span>
-                  )}
+                  {!startingSession && <span aria-hidden="true">→</span>}
                 </button>
               </footer>
             </section>
