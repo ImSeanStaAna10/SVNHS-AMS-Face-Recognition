@@ -1030,6 +1030,60 @@ const removeAttendance = async ({ sessionId, studentId }) => {
 };
 
 /* =========================================================
+   ATTENDANCE INTERVENTION CONFIGURATION
+========================================================= */
+
+/*
+ * Loads the attendance intervention configuration
+ * for the specified section.
+ *
+ * A 404 response means the section does not have
+ * a configuration yet and should complete first-time setup.
+ */
+
+const getAttendanceInterventionConfig = async (sectionId) => {
+  const normalizedSectionId = requireId(
+    sectionId,
+    "Section ID is required to load attendance intervention settings.",
+  );
+
+  const response = await api.get(
+    `/attendance-intervention-configs/sections/${normalizedSectionId}`,
+  );
+
+  return response.data;
+};
+
+/*
+ * Creates the section configuration when none exists.
+ *
+ * If a configuration already exists, the backend updates
+ * the same one because there is only one config per section.
+ */
+
+const saveAttendanceInterventionConfig = async (
+  sectionId,
+  configuration,
+) => {
+  const normalizedSectionId = requireId(
+    sectionId,
+    "Section ID is required to save attendance intervention settings.",
+  );
+
+  const response = await api.put(
+    `/attendance-intervention-configs/sections/${normalizedSectionId}`,
+    configuration,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  return response.data;
+};
+
+/* =========================================================
    ATTENDANCE INTERVENTION / STUDENTS AT RISK
 ========================================================= */
 
@@ -1264,6 +1318,8 @@ const adviserService = {
 
   /* ATTENDANCE INTERVENTION */
 
+  getAttendanceInterventionConfig,
+  saveAttendanceInterventionConfig,
   getAttendanceRisksBySection,
   getParentNotificationPreview,
   createParentNotification,
@@ -1272,6 +1328,11 @@ const adviserService = {
   /* ACCOUNT SECURITY */
 
   changePassword,
+
+
+  
 };
+
+
 
 export default adviserService;
