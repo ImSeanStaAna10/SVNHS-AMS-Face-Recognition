@@ -116,6 +116,56 @@ const createEmptyInterventionConfigForm = () => ({
   defaultAdviserMessage: "",
 });
 
+const createInterventionConfigFormFromData = (
+  config,
+) => ({
+  enabled:
+    config?.enabled !==
+    false,
+
+  periodStart:
+    String(
+      config?.periodStart ??
+        "",
+    ),
+
+  periodEnd:
+    String(
+      config?.periodEnd ??
+        "",
+    ),
+
+  warningAbsenceCount:
+    config?.warningAbsenceCount ??
+    "",
+
+  atRiskAbsenceCount:
+    config?.atRiskAbsenceCount ??
+    "",
+
+  criticalAbsenceCount:
+    config?.criticalAbsenceCount ??
+    "",
+
+  parentNotificationEnabled:
+    config?.parentNotificationEnabled !==
+    false,
+
+  allowParentAcknowledgement:
+    config?.allowParentAcknowledgement !==
+    false,
+
+  allowParentResponse:
+    config?.allowParentResponse !==
+    false,
+
+  defaultAdviserMessage:
+    String(
+      config?.defaultAdviserMessage ??
+        "",
+    ),
+});
+
 const getInterventionConfigQueryKey = (
   sectionId,
 ) => [
@@ -834,6 +884,14 @@ function StudentsAtRisk() {
       "",
     );
 
+  const [
+    configEditing,
+    setConfigEditing,
+  ] =
+    useState(
+      false,
+    );
+
   const configQuery =
     useQuery({
       queryKey:
@@ -913,11 +971,67 @@ function StudentsAtRisk() {
       setConfigSaveError(
         "",
       );
+
+      setConfigEditing(
+        false,
+      );
     },
     [
       sectionId,
     ],
   );
+
+  /* =======================================================
+     CONFIGURATION EDITING
+  ======================================================= */
+
+  const openConfigEditor =
+    () => {
+      if (
+        !configReady
+      ) {
+        return;
+      }
+
+      setConfigForm(
+        createInterventionConfigFormFromData(
+          configQuery
+            .data,
+        ),
+      );
+
+      setConfigSaveError(
+        "",
+      );
+
+      setConfigEditing(
+        true,
+      );
+    };
+
+  const closeConfigEditor =
+    () => {
+      if (
+        configSaving
+      ) {
+        return;
+      }
+
+      setConfigForm(
+        createInterventionConfigFormFromData(
+          configQuery
+            .data,
+        ),
+      );
+
+      setConfigSaveError(
+        "",
+      );
+
+      setConfigEditing(
+        false,
+      );
+    };
 
   /* =======================================================
      CACHED ATTENDANCE RISK QUERY
@@ -2034,7 +2148,11 @@ function StudentsAtRisk() {
     };
 
   /* =======================================================
-     SAVE FIRST-TIME INTERVENTION CONFIGURATION
+     SAVE INTERVENTION CONFIGURATION
+
+     Used for:
+     - first-time setup
+     - later Risk Settings edits
   ======================================================= */
 
   const saveInterventionConfig =
@@ -2188,17 +2306,34 @@ function StudentsAtRisk() {
                   ),
 
                 /*
-                 * MANUAL is the current safe/default mode in
-                 * the backend entity. We do not invent any
-                 * unsupported enum values in the setup UI.
+                 * First-time setup starts in MANUAL mode.
+                 *
+                 * When editing an existing configuration,
+                 * preserve whatever mode is already stored
+                 * instead of silently overwriting it.
                  */
                 warningNotificationMode:
+                  upper(
+                    configQuery
+                      .data
+                      ?.warningNotificationMode,
+                  ) ||
                   "MANUAL",
 
                 atRiskNotificationMode:
+                  upper(
+                    configQuery
+                      .data
+                      ?.atRiskNotificationMode,
+                  ) ||
                   "MANUAL",
 
                 criticalNotificationMode:
+                  upper(
+                    configQuery
+                      .data
+                      ?.criticalNotificationMode,
+                  ) ||
                   "MANUAL",
 
                 allowParentAcknowledgement:
@@ -2235,6 +2370,16 @@ function StudentsAtRisk() {
                   sectionId,
                 ),
           });
+
+        setConfigForm(
+          createInterventionConfigFormFromData(
+            saved,
+          ),
+        );
+
+        setConfigEditing(
+          false,
+        );
       } catch (
         error
       ) {
@@ -2440,22 +2585,52 @@ function StudentsAtRisk() {
             </p>
           </section>
         ) : section &&
-          configMissing ? (
+          (
+            configMissing ||
+            configEditing
+          ) ? (
           <section className="students-risk-panel students-risk-config-panel">
             <header className="students-risk-panel-head">
               <div>
                 <span>
-                  FIRST-TIME SETUP
+                  {
+                    configEditing
+                      ? "RISK SETTINGS"
+                      : "FIRST-TIME SETUP"
+                  }
                 </span>
 
                 <h3>
-                  Set up Attendance Risk Monitoring
+                  {
+                    configEditing
+                      ? "Attendance Risk Settings"
+                      : "Set up Attendance Risk Monitoring"
+                  }
                 </h3>
 
                 <p>
-                  This section exists, but it does not have attendance intervention settings yet. Configure the monitoring period and absence thresholds once to activate Students at Risk.
+                  {
+                    configEditing
+                      ? "Review or update the monitoring period, absence thresholds, and parent communication options for this section."
+                      : "This section exists, but it does not have attendance intervention settings yet. Configure the monitoring period and absence thresholds once to activate Students at Risk."
+                  }
                 </p>
               </div>
+
+              {configEditing && (
+                <button
+                  type="button"
+                  className="students-risk-review"
+                  disabled={
+                    configSaving
+                  }
+                  onClick={
+                    closeConfigEditor
+                  }
+                >
+                  ← Back to Risk Register
+                </button>
+              )}
             </header>
 
             <form
@@ -2904,7 +3079,11 @@ function StudentsAtRisk() {
                   </strong>
 
                   <small>
-                    Configuration is saved once per section and can be updated later through the same backend endpoint.
+                    {
+                      configEditing
+                        ? "Saving changes updates the same section configuration and refreshes the risk register."
+                        : "Configuration is saved once per section and can be updated later through Risk Settings."
+                    }
                   </small>
                 </div>
 
@@ -2917,7 +3096,9 @@ function StudentsAtRisk() {
                   {
                     configSaving
                       ? "Saving..."
-                      : "Save & Start Monitoring"
+                      : configEditing
+                        ? "Save Changes"
+                        : "Save & Start Monitoring"
                   }
                 </button>
               </footer>
@@ -3039,6 +3220,18 @@ function StudentsAtRisk() {
                     }
                   </p>
                 </div>
+
+                {configReady && (
+                  <button
+                    type="button"
+                    className="students-risk-review"
+                    onClick={
+                      openConfigEditor
+                    }
+                  >
+                    ⚙ Risk Settings
+                  </button>
+                )}
               </header>
 
               {/* ===========================================
