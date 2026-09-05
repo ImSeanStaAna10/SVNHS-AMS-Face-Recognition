@@ -1,5 +1,6 @@
 package com.example.attendancemanagementbackend.service;
 
+import com.example.attendancemanagementbackend.event.AttendanceInterventionConfigUpdatedEvent;
 import com.example.attendancemanagementbackend.event.AttendanceSessionFinalizedEvent;
 
 import org.slf4j.Logger;
@@ -89,6 +90,77 @@ public class AttendanceInterventionEventListener {
             logger.error(
                     "Attendance intervention evaluation failed after attendance session finalization: sessionId={}",
                     event.sessionId(),
+                    exception
+            );
+        }
+    }
+
+    /* =====================================================
+       INTERVENTION CONFIGURATION UPDATED
+    ===================================================== */
+
+    /**
+     * Runs ONLY after the intervention configuration
+     * transaction has successfully committed.
+     *
+     * A configuration change can immediately change the
+     * student's current risk without a new attendance
+     * session being finalized.
+     *
+     * Examples:
+     *
+     * - monitoring period expands
+     * - WARNING threshold changes
+     * - AT_RISK threshold changes
+     * - CRITICAL threshold changes
+     *
+     * Reconciliation is therefore performed after every
+     * successful configuration save.
+     */
+    @TransactionalEventListener(
+            phase = TransactionPhase.AFTER_COMMIT
+    )
+    public void handleAttendanceInterventionConfigUpdated(
+            AttendanceInterventionConfigUpdatedEvent event
+    ) {
+
+        if (event == null ||
+                event.sectionId() == null ||
+                event.sectionId().isBlank()) {
+
+            return;
+        }
+
+        try {
+
+            int createdCount =
+                    attendanceInterventionEngineService
+                            .reconcileSection(
+                                    event.sectionId()
+                            );
+
+            if (createdCount > 0) {
+
+                logger.info(
+                        "Attendance intervention reconciliation completed after configuration update: sectionId={}, createdInterventions={}",
+                        event.sectionId(),
+                        createdCount
+                );
+            }
+
+        } catch (Exception exception) {
+
+            /*
+             * IMPORTANT:
+             *
+             * Configuration has ALREADY been committed.
+             *
+             * Reconciliation failures must not make the
+             * already-saved configuration appear to fail.
+             */
+            logger.error(
+                    "Attendance intervention reconciliation failed after configuration update: sectionId={}",
+                    event.sectionId(),
                     exception
             );
         }

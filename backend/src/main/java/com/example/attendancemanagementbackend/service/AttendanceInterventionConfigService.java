@@ -4,10 +4,12 @@ import com.example.attendancemanagementbackend.dto.intervention.AttendanceInterv
 import com.example.attendancemanagementbackend.dto.intervention.AttendanceInterventionConfigResponse;
 import com.example.attendancemanagementbackend.entity.AttendanceInterventionConfig;
 import com.example.attendancemanagementbackend.entity.Section;
+import com.example.attendancemanagementbackend.event.AttendanceInterventionConfigUpdatedEvent;
 import com.example.attendancemanagementbackend.exception.ApiException;
 import com.example.attendancemanagementbackend.repository.AttendanceInterventionConfigRepository;
 import com.example.attendancemanagementbackend.repository.SectionRepository;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,15 +27,22 @@ public class AttendanceInterventionConfigService {
     private final SectionRepository
             sectionRepository;
 
+    private final ApplicationEventPublisher
+            eventPublisher;
+
     public AttendanceInterventionConfigService(
             AttendanceInterventionConfigRepository configRepository,
-            SectionRepository sectionRepository
+            SectionRepository sectionRepository,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.configRepository =
                 configRepository;
 
         this.sectionRepository =
                 sectionRepository;
+
+        this.eventPublisher =
+                eventPublisher;
     }
 
     /* =====================================================
@@ -182,6 +191,32 @@ public class AttendanceInterventionConfigService {
                 configRepository.save(
                         config
                 );
+
+        /* =================================================
+           PUBLISH CONFIGURATION UPDATED EVENT
+
+           IMPORTANT:
+
+           This event is published while the current
+           configuration transaction is still active.
+
+           The corresponding listener uses:
+
+           TransactionPhase.AFTER_COMMIT
+
+           Therefore reconciliation will only run after
+           the new configuration has successfully
+           committed.
+
+           If this transaction rolls back, the
+           reconciliation listener will not run.
+        ================================================= */
+
+        eventPublisher.publishEvent(
+                new AttendanceInterventionConfigUpdatedEvent(
+                        section.getId()
+                )
+        );
 
         return mapToResponse(
                 savedConfig

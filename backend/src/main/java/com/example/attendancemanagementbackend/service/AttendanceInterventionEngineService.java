@@ -8,12 +8,14 @@ import com.example.attendancemanagementbackend.entity.AttendanceSession;
 import com.example.attendancemanagementbackend.entity.AttendanceSessionStatus;
 import com.example.attendancemanagementbackend.entity.AttendanceStatus;
 import com.example.attendancemanagementbackend.entity.Section;
+import com.example.attendancemanagementbackend.entity.Student;
 
 import com.example.attendancemanagementbackend.repository.AttendanceInterventionConfigRepository;
 import com.example.attendancemanagementbackend.repository.AttendanceInterventionRepository;
 import com.example.attendancemanagementbackend.repository.AttendanceRecordRepository;
 import com.example.attendancemanagementbackend.repository.AttendanceSessionRepository;
 import com.example.attendancemanagementbackend.repository.StudentAbsenceCountProjection;
+import com.example.attendancemanagementbackend.repository.StudentRepository;
 
 import org.springframework.stereotype.Service;
 
@@ -44,11 +46,15 @@ public class AttendanceInterventionEngineService {
     private final AttendanceInterventionRepository
             interventionRepository;
 
+    private final StudentRepository
+            studentRepository;
+
     public AttendanceInterventionEngineService(
             AttendanceSessionRepository attendanceSessionRepository,
             AttendanceRecordRepository attendanceRecordRepository,
             AttendanceInterventionConfigRepository configRepository,
-            AttendanceInterventionRepository interventionRepository
+            AttendanceInterventionRepository interventionRepository,
+            StudentRepository studentRepository
     ) {
         this.attendanceSessionRepository =
                 attendanceSessionRepository;
@@ -61,6 +67,9 @@ public class AttendanceInterventionEngineService {
 
         this.interventionRepository =
                 interventionRepository;
+
+        this.studentRepository =
+                studentRepository;
     }
 
     /* =====================================================
@@ -493,6 +502,261 @@ public class AttendanceInterventionEngineService {
         /* =====================================================
            SAVE NEW INTERVENTIONS
         ===================================================== */
+
+        interventionRepository
+                .saveAll(
+                        newInterventions
+                );
+
+        return newInterventions.size();
+    }
+
+    /* =====================================================
+       RECONCILE SECTION AFTER CONFIGURATION CHANGE
+    ===================================================== */
+
+    /**
+     * Re-evaluates ACTIVE students currently assigned to
+     * the Section against the CURRENT saved configuration.
+     *
+     * This is required because a Risk Settings change can
+     * change the current risk without a new attendance
+     * session being finalized.
+     *
+     * Examples:
+     *
+     * - Period changes from Sep 5 only to Sep 4 - Sep 5.
+     * - WARNING changes from 3 absences to 2.
+     * - AT_RISK changes from 4 absences to 2.
+     *
+     * Existing intervention rows are preserved as
+     * historical snapshots.
+     *
+     * A missing CURRENT-period + CURRENT-risk intervention
+     * is created with triggerSession = null because the
+     * intervention was produced by reconciliation/backfill
+     * rather than one specific session finalization.
+     */
+    @Transactional(
+            propagation = Propagation.REQUIRES_NEW
+    )
+    public int reconcileSection(
+            String sectionId
+    ) {
+
+        if (sectionId == null ||
+                sectionId.isBlank()) {
+
+            return 0;
+        }
+
+        /* =====================================================
+           LOAD CURRENT CONFIGURATION
+        ===================================================== */
+
+        AttendanceInterventionConfig config =
+                configRepository
+                        .findBySection_Id(
+                                sectionId
+                        )
+                        .orElse(null);
+
+        if (config == null) {
+            return 0;
+        }
+
+        if (!config.isEnabled()) {
+            return 0;
+        }
+
+        if (config.getPeriodStart() == null ||
+                config.getPeriodEnd() == null) {
+
+            return 0;
+        }
+
+        /* =====================================================
+           LOAD CURRENT SECTION SNAPSHOT
+        ===================================================== */
+
+        Section section =
+                config.getSection();
+
+        if (section == null ||
+                section.getId() == null ||
+                section.getId().isBlank()) {
+
+            return 0;
+        }
+
+        /* =====================================================
+           LOAD CURRENT SECTION STUDENTS
+        ===================================================== */
+
+        List<Student> sectionStudents =
+                studentRepository
+                        .findBySectionId(
+                                sectionId
+                        );
+
+        if (sectionStudents == null ||
+                sectionStudents.isEmpty()) {
+
+            return 0;
+        }
+
+        List<Student> activeStudents =
+                sectionStudents
+                        .stream()
+                        .filter(student ->
+                                student != null &&
+                                        student.isActive() &&
+                                        student.getId() != null &&
+                                        !student.getId().isBlank()
+                        )
+                        .toList();
+
+        if (activeStudents.isEmpty()) {
+            return 0;
+        }
+
+        /* =====================================================
+           COLLECT ACTIVE STUDENT IDS
+        ===================================================== */
+
+        List<String> activeStudentIds =
+                activeStudents
+                        .stream()
+                        .map(
+                                Student::getId
+                        )
+                        .toList();
+
+        /* =====================================================
+           COUNT ABSENCES ACROSS CURRENT RISK PERIOD
+
+           IMPORTANT:
+
+           This uses the same repository query as normal
+           session-finalization evaluation.
+
+           Historical attendance intentionally follows
+           the student across Sections within the same
+           configured intervention period.
+        ===================================================== */
+
+        List<StudentAbsenceCountProjection> counts =
+                attendanceRecordRepository
+                        .findStudentAbsenceCountsForRisk(
+                                activeStudentIds,
+                                config.getPeriodStart(),
+                                config.getPeriodEnd()
+                        );
+
+        /* =====================================================
+           BUILD STUDENT -> ABSENCE COUNT MAP
+        ===================================================== */
+
+        Map<String, Long> absenceCountByStudent =
+                new HashMap<>();
+
+        if (counts != null) {
+
+            for (StudentAbsenceCountProjection count :
+                    counts) {
+
+                if (count == null ||
+                        count.getStudentId() == null) {
+
+                    continue;
+                }
+
+                long absentCount =
+                        count.getAbsentCount();
+
+                absenceCountByStudent.put(
+                        count.getStudentId(),
+                        absentCount
+                );
+            }
+        }
+
+        /* =====================================================
+           BUILD MISSING CURRENT-RISK INTERVENTIONS
+        ===================================================== */
+
+        List<AttendanceIntervention> newInterventions =
+                new ArrayList<>();
+
+        for (Student student :
+                activeStudents) {
+
+            String studentId =
+                    student.getId();
+
+            long absentCount =
+                    absenceCountByStudent
+                            .getOrDefault(
+                                    studentId,
+                                    0L
+                            );
+
+            AttendanceRiskLevel riskLevel =
+                    calculateRiskLevel(
+                            absentCount,
+                            config
+                    );
+
+            if (riskLevel ==
+                    AttendanceRiskLevel.NORMAL) {
+
+                continue;
+            }
+
+            boolean alreadyExists =
+                    interventionRepository
+                            .existsByStudent_IdAndPeriodStartAndPeriodEndAndRiskLevel(
+                                    studentId,
+                                    config.getPeriodStart(),
+                                    config.getPeriodEnd(),
+                                    riskLevel
+                            );
+
+            if (alreadyExists) {
+                continue;
+            }
+
+            int threshold =
+                    getThresholdForRiskLevel(
+                            riskLevel,
+                            config
+                    );
+
+            int actualAbsenceCount =
+                    Math.toIntExact(
+                            absentCount
+                    );
+
+            AttendanceIntervention intervention =
+                    new AttendanceIntervention(
+                            student,
+                            section,
+                            riskLevel,
+                            config.getPeriodStart(),
+                            config.getPeriodEnd(),
+                            threshold,
+                            actualAbsenceCount,
+                            null
+                    );
+
+            newInterventions.add(
+                    intervention
+            );
+        }
+
+        if (newInterventions.isEmpty()) {
+            return 0;
+        }
 
         interventionRepository
                 .saveAll(

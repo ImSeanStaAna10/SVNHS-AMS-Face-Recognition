@@ -1,4 +1,6 @@
 package com.example.attendancemanagementbackend.event;
 
-public class AttendanceInterventionConfigUpdatedEvent {
+public record AttendanceInterventionConfigUpdatedEvent(
+        String sectionId
+) {
 }
