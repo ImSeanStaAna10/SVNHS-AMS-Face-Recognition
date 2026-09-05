@@ -70,6 +70,12 @@ const COMMUNICATION_GC_TIME_MS =
 const COMMUNICATION_BACKGROUND_REFRESH_MS =
   60_000;
 
+const CONFIG_STALE_TIME_MS =
+  5 * 60_000;
+
+const CONFIG_GC_TIME_MS =
+  10 * 60_000;
+
 const RISK_FILTERS = [
   [
     "ALL",
@@ -92,6 +98,41 @@ const RISK_FILTERS = [
     "Normal",
   ],
 ];
+
+/* =========================================================
+   INTERVENTION CONFIG HELPERS
+========================================================= */
+
+const createEmptyInterventionConfigForm = () => ({
+  enabled: true,
+  periodStart: "",
+  periodEnd: "",
+  warningAbsenceCount: "",
+  atRiskAbsenceCount: "",
+  criticalAbsenceCount: "",
+  parentNotificationEnabled: true,
+  allowParentAcknowledgement: true,
+  allowParentResponse: true,
+  defaultAdviserMessage: "",
+});
+
+const getInterventionConfigQueryKey = (
+  sectionId,
+) => [
+  "adviser",
+  "attendance-intervention",
+  "config",
+  String(
+    sectionId ||
+      "",
+  ),
+];
+
+const isNotFoundError = (
+  error,
+) =>
+  error?.response?.status ===
+  404;
 
 /* =========================================================
    GENERIC HELPERS
@@ -744,6 +785,141 @@ function StudentsAtRisk() {
     "No assigned section";
 
   /* =======================================================
+     INTERVENTION CONFIGURATION
+
+     A section can exist without intervention settings.
+
+     This commonly happens after:
+     - a fresh database
+     - a database cleanup
+     - creating a brand-new section
+
+     We intentionally check configuration BEFORE the risk
+     endpoint so a missing config becomes a first-time setup
+     state instead of a raw 404 error page.
+  ======================================================= */
+
+  const interventionConfigQueryKey =
+    useMemo(
+      () =>
+        getInterventionConfigQueryKey(
+          sectionId,
+        ),
+      [
+        sectionId,
+      ],
+    );
+
+  const [
+    configForm,
+    setConfigForm,
+  ] =
+    useState(
+      createEmptyInterventionConfigForm,
+    );
+
+  const [
+    configSaving,
+    setConfigSaving,
+  ] =
+    useState(
+      false,
+    );
+
+  const [
+    configSaveError,
+    setConfigSaveError,
+  ] =
+    useState(
+      "",
+    );
+
+  const configQuery =
+    useQuery({
+      queryKey:
+        interventionConfigQueryKey,
+
+      queryFn:
+        () =>
+          adviserService
+            .getAttendanceInterventionConfig(
+              sectionId,
+            ),
+
+      enabled:
+        Boolean(
+          sectionId,
+        ),
+
+      staleTime:
+        CONFIG_STALE_TIME_MS,
+
+      gcTime:
+        CONFIG_GC_TIME_MS,
+
+      retry:
+        (
+          failureCount,
+          error,
+        ) => {
+          if (
+            isNotFoundError(
+              error,
+            )
+          ) {
+            return false;
+          }
+
+          return failureCount <
+            1;
+        },
+
+      refetchOnMount:
+        true,
+
+      refetchOnWindowFocus:
+        true,
+
+      refetchOnReconnect:
+        true,
+    });
+
+  const configMissing =
+    Boolean(
+      sectionId,
+    ) &&
+    isNotFoundError(
+      configQuery
+        .error,
+    );
+
+  const configReady =
+    Boolean(
+      sectionId,
+    ) &&
+    configQuery
+      .isSuccess;
+
+  useEffect(
+    () => {
+      setConfigForm(
+        createEmptyInterventionConfigForm(),
+      );
+
+      setConfigSaving(
+        false,
+      );
+
+      setConfigSaveError(
+        "",
+      );
+    },
+    [
+      sectionId,
+    ],
+  );
+
+  /* =======================================================
      CACHED ATTENDANCE RISK QUERY
   ======================================================= */
 
@@ -766,7 +942,8 @@ function StudentsAtRisk() {
 
       enabled:
         Boolean(
-          sectionId,
+          sectionId &&
+            configReady,
         ),
 
       staleTime:
@@ -1857,6 +2034,229 @@ function StudentsAtRisk() {
     };
 
   /* =======================================================
+     SAVE FIRST-TIME INTERVENTION CONFIGURATION
+  ======================================================= */
+
+  const saveInterventionConfig =
+    async (
+      event,
+    ) => {
+      event
+        ?.preventDefault?.();
+
+      if (
+        !sectionId ||
+        configSaving
+      ) {
+        return;
+      }
+
+      const periodStart =
+        String(
+          configForm
+            .periodStart ||
+            "",
+        ).trim();
+
+      const periodEnd =
+        String(
+          configForm
+            .periodEnd ||
+            "",
+        ).trim();
+
+      const warning =
+        Number(
+          configForm
+            .warningAbsenceCount,
+        );
+
+      const atRisk =
+        Number(
+          configForm
+            .atRiskAbsenceCount,
+        );
+
+      const critical =
+        Number(
+          configForm
+            .criticalAbsenceCount,
+        );
+
+      if (
+        !periodStart ||
+        !periodEnd
+      ) {
+        setConfigSaveError(
+          "Choose the start and end dates for attendance-risk monitoring.",
+        );
+
+        return;
+      }
+
+      if (
+        periodStart >
+        periodEnd
+      ) {
+        setConfigSaveError(
+          "The risk period start date cannot be after the end date.",
+        );
+
+        return;
+      }
+
+      if (
+        !Number.isInteger(
+          warning,
+        ) ||
+        !Number.isInteger(
+          atRisk,
+        ) ||
+        !Number.isInteger(
+          critical,
+        ) ||
+        warning <
+          1 ||
+        atRisk <
+          1 ||
+        critical <
+          1
+      ) {
+        setConfigSaveError(
+          "All risk thresholds must be whole numbers of at least 1 absence.",
+        );
+
+        return;
+      }
+
+      if (
+        warning >=
+        atRisk ||
+        atRisk >=
+        critical
+      ) {
+        setConfigSaveError(
+          "Thresholds must follow Warning < At Risk < Critical.",
+        );
+
+        return;
+      }
+
+      const defaultAdviserMessage =
+        String(
+          configForm
+            .defaultAdviserMessage ||
+            "",
+        ).trim();
+
+      try {
+        setConfigSaving(
+          true,
+        );
+
+        setConfigSaveError(
+          "",
+        );
+
+        const saved =
+          await adviserService
+            .saveAttendanceInterventionConfig(
+              sectionId,
+              {
+                enabled:
+                  Boolean(
+                    configForm
+                      .enabled,
+                  ),
+
+                periodStart,
+                periodEnd,
+
+                warningAbsenceCount:
+                  warning,
+
+                atRiskAbsenceCount:
+                  atRisk,
+
+                criticalAbsenceCount:
+                  critical,
+
+                parentNotificationEnabled:
+                  Boolean(
+                    configForm
+                      .parentNotificationEnabled,
+                  ),
+
+                /*
+                 * MANUAL is the current safe/default mode in
+                 * the backend entity. We do not invent any
+                 * unsupported enum values in the setup UI.
+                 */
+                warningNotificationMode:
+                  "MANUAL",
+
+                atRiskNotificationMode:
+                  "MANUAL",
+
+                criticalNotificationMode:
+                  "MANUAL",
+
+                allowParentAcknowledgement:
+                  Boolean(
+                    configForm
+                      .allowParentAcknowledgement,
+                  ),
+
+                allowParentResponse:
+                  Boolean(
+                    configForm
+                      .allowParentResponse,
+                  ),
+
+                defaultAdviserMessage:
+                  defaultAdviserMessage ||
+                  null,
+              },
+            );
+
+        queryClient
+          .setQueryData(
+            interventionConfigQueryKey,
+            saved,
+          );
+
+        await queryClient
+          .invalidateQueries({
+            queryKey:
+              queryKeys
+                .adviser
+                .attendanceIntervention
+                .risks(
+                  sectionId,
+                ),
+          });
+      } catch (
+        error
+      ) {
+        console.error(
+          "Unable to save attendance intervention configuration:",
+          error,
+        );
+
+        setConfigSaveError(
+          getErrorMessage(
+            error,
+            "Unable to save attendance intervention settings.",
+          ),
+        );
+      } finally {
+        setConfigSaving(
+          false,
+        );
+      }
+    };
+
+  /* =======================================================
      PAGE STATUS
   ======================================================= */
 
@@ -1866,6 +2266,14 @@ function StudentsAtRisk() {
     (
       Boolean(
         sectionId,
+      ) &&
+      configQuery
+        .isLoading
+    ) ||
+    (
+      Boolean(
+        sectionId &&
+          configReady,
       ) &&
       risksQuery
         .isLoading
@@ -1879,14 +2287,22 @@ function StudentsAtRisk() {
             .error,
           "Unable to load the assigned section.",
         )
-      : risksQuery
-          .error
+      : configQuery
+          .error &&
+        !configMissing
         ? getErrorMessage(
-            risksQuery
+            configQuery
               .error,
-            "Unable to load attendance-risk information.",
+            "Unable to load attendance intervention settings.",
           )
-        : "";
+        : risksQuery
+            .error
+          ? getErrorMessage(
+              risksQuery
+                .error,
+              "Unable to load attendance-risk information.",
+            )
+          : "";
 
   /* =======================================================
      PREVIEW DERIVED DATA
@@ -1980,9 +2396,21 @@ function StudentsAtRisk() {
               <button
                 type="button"
                 onClick={
-                  () =>
+                  () => {
+                    if (
+                      configQuery
+                        .error &&
+                      !configMissing
+                    ) {
+                      void configQuery
+                        .refetch();
+
+                      return;
+                    }
+
                     void risksQuery
-                      .refetch()
+                      .refetch();
+                  }
                 }
               >
                 Try Again
@@ -2010,6 +2438,490 @@ function StudentsAtRisk() {
             <p>
               Attendance-risk monitoring becomes available after a section is assigned.
             </p>
+          </section>
+        ) : section &&
+          configMissing ? (
+          <section className="students-risk-panel students-risk-config-panel">
+            <header className="students-risk-panel-head">
+              <div>
+                <span>
+                  FIRST-TIME SETUP
+                </span>
+
+                <h3>
+                  Set up Attendance Risk Monitoring
+                </h3>
+
+                <p>
+                  This section exists, but it does not have attendance intervention settings yet. Configure the monitoring period and absence thresholds once to activate Students at Risk.
+                </p>
+              </div>
+            </header>
+
+            <form
+              className="students-risk-config-form"
+              onSubmit={
+                (
+                  event,
+                ) =>
+                  void saveInterventionConfig(
+                    event,
+                  )
+              }
+            >
+              <div className="students-risk-config-grid">
+                <label>
+                  <span>
+                    PERIOD START
+                  </span>
+
+                  <input
+                    type="date"
+                    required
+                    value={
+                      configForm
+                        .periodStart
+                    }
+                    onChange={
+                      (
+                        event,
+                      ) => {
+                        setConfigForm(
+                          (
+                            current,
+                          ) => ({
+                            ...current,
+                            periodStart:
+                              event
+                                .target
+                                .value,
+                          }),
+                        );
+
+                        setConfigSaveError(
+                          "",
+                        );
+                      }
+                    }
+                  />
+                </label>
+
+                <label>
+                  <span>
+                    PERIOD END
+                  </span>
+
+                  <input
+                    type="date"
+                    required
+                    value={
+                      configForm
+                        .periodEnd
+                    }
+                    onChange={
+                      (
+                        event,
+                      ) => {
+                        setConfigForm(
+                          (
+                            current,
+                          ) => ({
+                            ...current,
+                            periodEnd:
+                              event
+                                .target
+                                .value,
+                          }),
+                        );
+
+                        setConfigSaveError(
+                          "",
+                        );
+                      }
+                    }
+                  />
+                </label>
+
+                <label>
+                  <span>
+                    WARNING
+                  </span>
+
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                    placeholder="e.g. 2"
+                    value={
+                      configForm
+                        .warningAbsenceCount
+                    }
+                    onChange={
+                      (
+                        event,
+                      ) => {
+                        setConfigForm(
+                          (
+                            current,
+                          ) => ({
+                            ...current,
+                            warningAbsenceCount:
+                              event
+                                .target
+                                .value,
+                          }),
+                        );
+
+                        setConfigSaveError(
+                          "",
+                        );
+                      }
+                    }
+                  />
+
+                  <small>
+                    Absences before early intervention
+                  </small>
+                </label>
+
+                <label>
+                  <span>
+                    AT RISK
+                  </span>
+
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                    placeholder="e.g. 4"
+                    value={
+                      configForm
+                        .atRiskAbsenceCount
+                    }
+                    onChange={
+                      (
+                        event,
+                      ) => {
+                        setConfigForm(
+                          (
+                            current,
+                          ) => ({
+                            ...current,
+                            atRiskAbsenceCount:
+                              event
+                                .target
+                                .value,
+                          }),
+                        );
+
+                        setConfigSaveError(
+                          "",
+                        );
+                      }
+                    }
+                  />
+
+                  <small>
+                    Must be higher than Warning
+                  </small>
+                </label>
+
+                <label>
+                  <span>
+                    CRITICAL
+                  </span>
+
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                    placeholder="e.g. 6"
+                    value={
+                      configForm
+                        .criticalAbsenceCount
+                    }
+                    onChange={
+                      (
+                        event,
+                      ) => {
+                        setConfigForm(
+                          (
+                            current,
+                          ) => ({
+                            ...current,
+                            criticalAbsenceCount:
+                              event
+                                .target
+                                .value,
+                          }),
+                        );
+
+                        setConfigSaveError(
+                          "",
+                        );
+                      }
+                    }
+                  />
+
+                  <small>
+                    Must be higher than At Risk
+                  </small>
+                </label>
+              </div>
+
+              <section className="students-risk-config-options">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={
+                      configForm
+                        .enabled
+                    }
+                    onChange={
+                      (
+                        event,
+                      ) =>
+                        setConfigForm(
+                          (
+                            current,
+                          ) => ({
+                            ...current,
+                            enabled:
+                              event
+                                .target
+                                .checked,
+                          }),
+                        )
+                    }
+                  />
+
+                  <span>
+                    <strong>
+                      Enable attendance-risk monitoring
+                    </strong>
+
+                    <small>
+                      Finalized attendance inside the selected period will be evaluated.
+                    </small>
+                  </span>
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={
+                      configForm
+                        .parentNotificationEnabled
+                    }
+                    onChange={
+                      (
+                        event,
+                      ) =>
+                        setConfigForm(
+                          (
+                            current,
+                          ) => ({
+                            ...current,
+                            parentNotificationEnabled:
+                              event
+                                .target
+                                .checked,
+                          }),
+                        )
+                    }
+                  />
+
+                  <span>
+                    <strong>
+                      Enable parent notifications
+                    </strong>
+
+                    <small>
+                      Warning, At Risk, and Critical notifications start in Manual mode.
+                    </small>
+                  </span>
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    disabled={
+                      !configForm
+                        .parentNotificationEnabled
+                    }
+                    checked={
+                      configForm
+                        .allowParentAcknowledgement
+                    }
+                    onChange={
+                      (
+                        event,
+                      ) =>
+                        setConfigForm(
+                          (
+                            current,
+                          ) => ({
+                            ...current,
+                            allowParentAcknowledgement:
+                              event
+                                .target
+                                .checked,
+                          }),
+                        )
+                    }
+                  />
+
+                  <span>
+                    <strong>
+                      Allow parent acknowledgement
+                    </strong>
+
+                    <small>
+                      Guardians may confirm that they reviewed the secure attendance notice.
+                    </small>
+                  </span>
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    disabled={
+                      !configForm
+                        .parentNotificationEnabled
+                    }
+                    checked={
+                      configForm
+                        .allowParentResponse
+                    }
+                    onChange={
+                      (
+                        event,
+                      ) =>
+                        setConfigForm(
+                          (
+                            current,
+                          ) => ({
+                            ...current,
+                            allowParentResponse:
+                              event
+                                .target
+                                .checked,
+                          }),
+                        )
+                    }
+                  />
+
+                  <span>
+                    <strong>
+                      Allow parent response
+                    </strong>
+
+                    <small>
+                      Guardians may submit a response through the secure attendance notice.
+                    </small>
+                  </span>
+                </label>
+              </section>
+
+              <label className="students-risk-config-message">
+                <div>
+                  <span>
+                    DEFAULT ADVISER MESSAGE
+                  </span>
+
+                  <small>
+                    {
+                      configForm
+                        .defaultAdviserMessage
+                        .length
+                    }
+                    /2000
+                  </small>
+                </div>
+
+                <textarea
+                  rows="4"
+                  maxLength="2000"
+                  value={
+                    configForm
+                      .defaultAdviserMessage
+                  }
+                  placeholder="Optional default message for parent attendance notices..."
+                  onChange={
+                    (
+                      event,
+                    ) => {
+                      setConfigForm(
+                        (
+                          current,
+                        ) => ({
+                          ...current,
+                          defaultAdviserMessage:
+                            event
+                              .target
+                              .value,
+                        }),
+                      );
+
+                      setConfigSaveError(
+                        "",
+                      );
+                    }
+                  }
+                />
+              </label>
+
+              {configSaveError && (
+                <div
+                  className="students-risk-feedback is-error"
+                  role="alert"
+                >
+                  <span>
+                    !
+                  </span>
+
+                  <p>
+                    {
+                      configSaveError
+                    }
+                  </p>
+                </div>
+              )}
+
+              <footer className="students-risk-config-actions">
+                <div>
+                  <span>
+                    SECTION
+                  </span>
+
+                  <strong>
+                    {
+                      sectionName
+                    }
+                  </strong>
+
+                  <small>
+                    Configuration is saved once per section and can be updated later through the same backend endpoint.
+                  </small>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={
+                    configSaving
+                  }
+                >
+                  {
+                    configSaving
+                      ? "Saving..."
+                      : "Save & Start Monitoring"
+                  }
+                </button>
+              </footer>
+            </form>
           </section>
         ) : section ? (
           <>

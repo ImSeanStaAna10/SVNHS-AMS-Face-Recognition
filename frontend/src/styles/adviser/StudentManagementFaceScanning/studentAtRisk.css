@@ -5567,3 +5567,887 @@ html[data-theme="dark"]
     min-height: auto;
   }
 }
+/* =========================================================
+   39. FIRST-TIME INTERVENTION CONFIGURATION
+   ADDITIVE ONLY
+
+   Supports the first-time configuration UI added to
+   StudentsAtRisk.jsx.
+
+   Existing Students at Risk styles above are intentionally
+   preserved unchanged.
+========================================================= */
+
+.students-risk-config-panel {
+  overflow: hidden;
+}
+
+.students-risk-config-form {
+  display: grid;
+
+  gap: 18px;
+
+  padding:
+    18px
+    20px
+    20px;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(
+        --sr-surface
+      )
+        0%,
+      color-mix(
+        in srgb,
+        var(
+          --sr-surface-soft
+        )
+          38%,
+        var(
+          --sr-surface
+        )
+      )
+        100%
+    );
+}
+
+/* =========================================================
+   CONFIGURATION FIELDS
+========================================================= */
+
+.students-risk-config-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 10px;
+}
+
+.students-risk-config-grid
+  > label {
+  min-width: 0;
+
+  display: grid;
+
+  align-content: start;
+
+  gap: 7px;
+
+  padding:
+    13px
+    14px;
+
+  border:
+    1px
+    solid
+    var(
+      --sr-border-soft
+    );
+
+  border-radius:
+    11px;
+
+  background:
+    var(
+      --sr-surface
+    );
+}
+
+.students-risk-config-grid
+  > label
+  > span {
+  display: block;
+
+  color:
+    var(
+      --sr-text-muted
+    );
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.08em;
+}
+
+.students-risk-config-grid
+  > label
+  > small {
+  display: block;
+
+  color:
+    var(
+      --sr-text-muted
+    );
+
+  font-size: 9px;
+
+  line-height: 1.45;
+}
+
+.students-risk-config-grid
+  input[type="date"],
+.students-risk-config-grid
+  input[type="number"] {
+  width: 100%;
+
+  min-width: 0;
+
+  min-height: 41px;
+
+  padding:
+    0
+    10px;
+
+  border:
+    1px
+    solid
+    var(
+      --sr-border
+    );
+
+  border-radius:
+    9px;
+
+  outline: 0;
+
+  background:
+    var(
+      --sr-surface
+    );
+
+  color:
+    var(
+      --sr-text-primary
+    );
+
+  font-family:
+    inherit;
+
+  font-size: 11.5px;
+
+  font-weight: 700;
+
+  transition:
+    border-color
+      0.16s
+      ease,
+    box-shadow
+      0.16s
+      ease,
+    background
+      0.16s
+      ease;
+}
+
+.students-risk-config-grid
+  input[type="date"]:focus,
+.students-risk-config-grid
+  input[type="number"]:focus {
+  border-color:
+    var(
+      --sr-blue-800
+    );
+
+  box-shadow:
+    0 0 0 3px
+      rgba(
+        18,
+        61,
+        126,
+        0.08
+      );
+}
+
+.students-risk-config-grid
+  input::placeholder {
+  color:
+    var(
+      --sr-text-muted
+    );
+}
+
+/* =========================================================
+   CONFIGURATION OPTIONS
+========================================================= */
+
+.students-risk-config-options {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 10px;
+}
+
+.students-risk-config-options
+  > label {
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    auto
+    minmax(
+      0,
+      1fr
+    );
+
+  align-items:
+    flex-start;
+
+  gap: 10px;
+
+  padding:
+    13px
+    14px;
+
+  border:
+    1px
+    solid
+    var(
+      --sr-border-soft
+    );
+
+  border-radius:
+    11px;
+
+  background:
+    var(
+      --sr-surface
+    );
+
+  cursor: pointer;
+
+  transition:
+    border-color
+      0.16s
+      ease,
+    background
+      0.16s
+      ease,
+    box-shadow
+      0.16s
+      ease;
+}
+
+.students-risk-config-options
+  > label:hover {
+  border-color:
+    color-mix(
+      in srgb,
+      var(
+        --sr-blue-800
+      )
+        30%,
+      var(
+        --sr-border
+      )
+    );
+
+  background:
+    color-mix(
+      in srgb,
+      var(
+        --sr-icon-bg
+      )
+        24%,
+      var(
+        --sr-surface
+      )
+    );
+}
+
+.students-risk-config-options
+  input[type="checkbox"] {
+  width: 17px;
+
+  height: 17px;
+
+  margin:
+    1px
+    0
+    0;
+
+  accent-color:
+    var(
+      --sr-blue-900
+    );
+
+  cursor: pointer;
+}
+
+.students-risk-config-options
+  input[type="checkbox"]:disabled {
+  cursor:
+    not-allowed;
+
+  opacity: 0.48;
+}
+
+.students-risk-config-options
+  > label:has(
+    input:disabled
+  ) {
+  cursor:
+    not-allowed;
+
+  opacity: 0.62;
+}
+
+.students-risk-config-options
+  > label
+  > span {
+  min-width: 0;
+
+  display: grid;
+
+  gap: 3px;
+}
+
+.students-risk-config-options
+  strong {
+  color:
+    var(
+      --sr-text-primary
+    );
+
+  font-size: 11px;
+
+  font-weight: 850;
+
+  line-height: 1.35;
+}
+
+.students-risk-config-options
+  small {
+  color:
+    var(
+      --sr-text-body
+    );
+
+  font-size: 9.5px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   DEFAULT ADVISER MESSAGE
+========================================================= */
+
+.students-risk-config-message {
+  display: grid;
+
+  gap: 8px;
+
+  padding:
+    14px;
+
+  border:
+    1px
+    solid
+    var(
+      --sr-border-soft
+    );
+
+  border-radius:
+    11px;
+
+  background:
+    var(
+      --sr-surface
+    );
+}
+
+.students-risk-config-message
+  > div {
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  gap: 12px;
+}
+
+.students-risk-config-message
+  > div
+  > span {
+  color:
+    var(
+      --sr-text-muted
+    );
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.08em;
+}
+
+.students-risk-config-message
+  > div
+  > small {
+  color:
+    var(
+      --sr-text-muted
+    );
+
+  font-size: 9.5px;
+
+  font-weight: 750;
+}
+
+.students-risk-config-message
+  textarea {
+  width: 100%;
+
+  min-height: 104px;
+
+  resize: vertical;
+
+  padding:
+    11px
+    12px;
+
+  border:
+    1px
+    solid
+    var(
+      --sr-border
+    );
+
+  border-radius:
+    10px;
+
+  outline: 0;
+
+  background:
+    var(
+      --sr-surface
+    );
+
+  color:
+    var(
+      --sr-text-primary
+    );
+
+  font-family:
+    inherit;
+
+  font-size: 12px;
+
+  line-height: 1.55;
+
+  transition:
+    border-color
+      0.16s
+      ease,
+    box-shadow
+      0.16s
+      ease;
+}
+
+.students-risk-config-message
+  textarea:focus {
+  border-color:
+    var(
+      --sr-blue-800
+    );
+
+  box-shadow:
+    0 0 0 3px
+      rgba(
+        18,
+        61,
+        126,
+        0.08
+      );
+}
+
+.students-risk-config-message
+  textarea::placeholder {
+  color:
+    var(
+      --sr-text-muted
+    );
+}
+
+/* =========================================================
+   CONFIGURATION ACTIONS
+========================================================= */
+
+.students-risk-config-actions {
+  display: flex;
+
+  align-items: center;
+
+  justify-content:
+    space-between;
+
+  gap: 18px;
+
+  padding-top: 2px;
+}
+
+.students-risk-config-actions
+  > div {
+  min-width: 0;
+}
+
+.students-risk-config-actions
+  > div
+  > span {
+  display: block;
+
+  color:
+    var(
+      --sr-text-muted
+    );
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.08em;
+}
+
+.students-risk-config-actions
+  > div
+  > strong {
+  display: block;
+
+  margin-top: 4px;
+
+  overflow-wrap:
+    anywhere;
+
+  color:
+    var(
+      --sr-text-primary
+    );
+
+  font-size: 12px;
+
+  font-weight: 850;
+}
+
+.students-risk-config-actions
+  > div
+  > small {
+  display: block;
+
+  max-width: 650px;
+
+  margin-top: 3px;
+
+  color:
+    var(
+      --sr-text-body
+    );
+
+  font-size: 9.5px;
+
+  line-height: 1.5;
+}
+
+.students-risk-config-actions
+  > button {
+  min-height: 42px;
+
+  flex:
+    0
+    0
+    auto;
+
+  display:
+    inline-flex;
+
+  align-items: center;
+
+  justify-content:
+    center;
+
+  padding:
+    0
+    15px;
+
+  border:
+    1px
+    solid
+    var(
+      --sr-blue-900
+    );
+
+  border-radius:
+    9px;
+
+  background:
+    var(
+      --sr-blue-900
+    );
+
+  color: #ffffff;
+
+  font-family:
+    inherit;
+
+  font-size: 11px;
+
+  font-weight: 850;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 14px
+      rgba(
+        18,
+        61,
+        126,
+        0.12
+      );
+
+  transition:
+    transform
+      0.15s
+      ease,
+    border-color
+      0.15s
+      ease,
+    background
+      0.15s
+      ease,
+    box-shadow
+      0.15s
+      ease,
+    opacity
+      0.15s
+      ease;
+}
+
+.students-risk-config-actions
+  > button:hover:not(
+    :disabled
+  ) {
+  transform:
+    translateY(
+      -1px
+    );
+
+  background:
+    var(
+      --sr-blue-800
+    );
+
+  border-color:
+    var(
+      --sr-blue-800
+    );
+
+  box-shadow:
+    0 8px 18px
+      rgba(
+        18,
+        61,
+        126,
+        0.16
+      );
+}
+
+.students-risk-config-actions
+  > button:disabled {
+  cursor:
+    not-allowed;
+
+  opacity: 0.58;
+}
+
+/* =========================================================
+   FIRST-TIME CONFIGURATION — DARK MODE
+========================================================= */
+
+html[data-theme="dark"]
+  .students-risk-config-form,
+html[data-theme="dark"]
+  .students-risk-config-grid
+  > label,
+html[data-theme="dark"]
+  .students-risk-config-options
+  > label,
+html[data-theme="dark"]
+  .students-risk-config-message {
+  background:
+    var(
+      --sr-surface
+    );
+}
+
+html[data-theme="dark"]
+  .students-risk-config-grid
+  input[type="date"],
+html[data-theme="dark"]
+  .students-risk-config-grid
+  input[type="number"],
+html[data-theme="dark"]
+  .students-risk-config-message
+  textarea {
+  background:
+    var(
+      --sr-surface
+    );
+
+  color:
+    var(
+      --sr-text-primary
+    );
+
+  color-scheme: dark;
+}
+
+html[data-theme="dark"]
+  .students-risk-config-options
+  > label:hover {
+  background:
+    color-mix(
+      in srgb,
+      var(
+        --sr-icon-bg
+      )
+        18%,
+      var(
+        --sr-surface
+      )
+    );
+}
+
+/* =========================================================
+   FIRST-TIME CONFIGURATION — RESPONSIVE
+========================================================= */
+
+@media (
+  max-width: 1100px
+) {
+  .students-risk-config-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+  }
+
+  .students-risk-config-grid
+    > label:last-child {
+    grid-column:
+      span
+      2;
+  }
+}
+
+@media (
+  max-width: 760px
+) {
+  .students-risk-config-form {
+    padding:
+      15px;
+  }
+
+  .students-risk-config-options {
+    grid-template-columns:
+      1fr;
+  }
+
+  .students-risk-config-actions {
+    align-items:
+      stretch;
+
+    flex-direction:
+      column;
+  }
+
+  .students-risk-config-actions
+    > button {
+    width: 100%;
+  }
+}
+
+@media (
+  max-width: 560px
+) {
+  .students-risk-config-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .students-risk-config-grid
+    > label:last-child {
+    grid-column:
+      auto;
+  }
+
+  .students-risk-config-form {
+    gap: 14px;
+
+    padding:
+      14px
+      12px
+      15px;
+  }
+
+  .students-risk-config-grid,
+  .students-risk-config-options {
+    gap: 8px;
+  }
+
+  .students-risk-config-grid
+    > label,
+  .students-risk-config-options
+    > label,
+  .students-risk-config-message {
+    padding:
+      12px;
+  }
+}
+
+/* =========================================================
+   FIRST-TIME CONFIGURATION — REDUCED MOTION
+========================================================= */
+
+@media (
+  prefers-reduced-motion:
+    reduce
+) {
+  .students-risk-config-grid
+    input,
+  .students-risk-config-options
+    > label,
+  .students-risk-config-message
+    textarea,
+  .students-risk-config-actions
+    > button {
+    transition:
+      none
+      !important;
+  }
+}
