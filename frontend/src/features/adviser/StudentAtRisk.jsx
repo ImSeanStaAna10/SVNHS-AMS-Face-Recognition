@@ -2458,105 +2458,70 @@ function StudentsAtRisk() {
       preview,
     );
 
+  const riskFilterCounts = {
+    ALL: summary.total,
+    CRITICAL: summary.critical,
+    AT_RISK: summary.atRisk,
+    WARNING: summary.warning,
+    NORMAL: summary.normal,
+  };
+
   /* =======================================================
-     RENDER
+     RENDER — UI/UX REORGANIZATION ONLY
+
+     IMPORTANT:
+     - No API flow changed.
+     - No query/cache behavior changed.
+     - No intervention validation changed.
+     - Prepare -> Queue delivery flow remains intact.
   ======================================================= */
 
   return (
     <AdviserLayout
       title="Students at Risk"
       eyebrow="ATTENDANCE INTERVENTION"
-      description="Review finalized attendance patterns and coordinate parent follow-up"
+      description="Prioritize attendance concerns and coordinate parent follow-up"
     >
       <section className="students-risk-page">
-        {/* =================================================
-            HERO
-        ================================================= */}
-
         <section className="students-risk-hero">
-          <div>
-            <span>
-              ATTENDANCE INTERVENTION
-            </span>
-
-            <h2>
-              Identify attendance concerns before they become harder to recover.
-            </h2>
-
+          <div className="students-risk-hero-copy">
+            <span className="students-risk-kicker">ATTENDANCE INTERVENTION</span>
+            <h2>Focus first on students who need attendance support.</h2>
             <p>
-              Review finalized attendance records, prioritize students by risk level,
-              and prepare secure guardian communication when follow-up is needed.
+              Finalized attendance is grouped by risk level so you can review the
+              most important cases without scanning every record manually.
             </p>
           </div>
 
-          <aside>
-            <span>
-              ASSIGNED SECTION
-            </span>
-
+          <aside className="students-risk-section-card">
+            <span>ASSIGNED SECTION</span>
             <strong>
-              {
-                sectionsQuery
-                  .isLoading
-                  ? "Loading..."
-                  : sectionName
-              }
+              {sectionsQuery.isLoading ? "Loading..." : sectionName}
             </strong>
-
-            <small>
-              Signal Village National High School
-            </small>
+            <div className="students-risk-section-status">
+              <i aria-hidden="true" />
+              <span>{configReady ? "Monitoring active" : "Setup required"}</span>
+            </div>
           </aside>
         </section>
 
-        {/* =================================================
-            PAGE ERROR
-
-            Try Again stays ONLY as error recovery.
-            It is not a normal manual refresh action.
-        ================================================= */}
-
         {pageError && (
-          <div
-            className="students-risk-alert"
-            role="alert"
-          >
-            <span>
-              !
-            </span>
-
+          <div className="students-risk-alert" role="alert">
+            <span>!</span>
             <div>
-              <strong>
-                Attendance intervention unavailable
-              </strong>
-
-              <p>
-                {
-                  pageError
-                }
-              </p>
+              <strong>Attendance intervention unavailable</strong>
+              <p>{pageError}</p>
             </div>
-
             {sectionId && (
               <button
                 type="button"
-                onClick={
-                  () => {
-                    if (
-                      configQuery
-                        .error &&
-                      !configMissing
-                    ) {
-                      void configQuery
-                        .refetch();
-
-                      return;
-                    }
-
-                    void risksQuery
-                      .refetch();
+                onClick={() => {
+                  if (configQuery.error && !configMissing) {
+                    void configQuery.refetch();
+                    return;
                   }
-                }
+                  void risksQuery.refetch();
+                }}
               >
                 Try Again
               </button>
@@ -2564,56 +2529,29 @@ function StudentsAtRisk() {
           </div>
         )}
 
-        {/* =================================================
-            NO SECTION
-        ================================================= */}
-
-        {!sectionsQuery
-          .isLoading &&
-        !section ? (
+        {!sectionsQuery.isLoading && !section ? (
           <section className="students-risk-empty">
-            <span>
-              ◇
-            </span>
-
-            <h3>
-              No assigned section
-            </h3>
-
+            <span>◇</span>
+            <h3>No assigned section</h3>
             <p>
-              Attendance-risk monitoring becomes available after a section is assigned.
+              Attendance-risk monitoring becomes available after a section is
+              assigned to this adviser account.
             </p>
           </section>
-        ) : section &&
-          (
-            configMissing ||
-            configEditing
-          ) ? (
+        ) : section && (configMissing || configEditing) ? (
           <section className="students-risk-panel students-risk-config-panel">
             <header className="students-risk-panel-head">
               <div>
-                <span>
-                  {
-                    configEditing
-                      ? "RISK SETTINGS"
-                      : "FIRST-TIME SETUP"
-                  }
-                </span>
-
+                <span>{configEditing ? "RISK SETTINGS" : "FIRST-TIME SETUP"}</span>
                 <h3>
-                  {
-                    configEditing
-                      ? "Attendance Risk Settings"
-                      : "Set up Attendance Risk Monitoring"
-                  }
+                  {configEditing
+                    ? "Attendance Risk Settings"
+                    : "Set up attendance-risk monitoring"}
                 </h3>
-
                 <p>
-                  {
-                    configEditing
-                      ? "Review or update the monitoring period, absence thresholds, and parent communication options for this section."
-                      : "This section exists, but it does not have attendance intervention settings yet. Configure the monitoring period and absence thresholds once to activate Students at Risk."
-                  }
+                  {configEditing
+                    ? "Update the period, thresholds, or parent communication preferences without changing the intervention flow."
+                    : "Complete these three sections once. You can edit them later from Risk Settings."}
                 </p>
               </div>
 
@@ -2621,12 +2559,8 @@ function StudentsAtRisk() {
                 <button
                   type="button"
                   className="students-risk-review"
-                  disabled={
-                    configSaving
-                  }
-                  onClick={
-                    closeConfigEditor
-                  }
+                  disabled={configSaving}
+                  onClick={closeConfigEditor}
                 >
                   ← Back to Risk Register
                 </button>
@@ -2635,589 +2569,306 @@ function StudentsAtRisk() {
 
             <form
               className="students-risk-config-form"
-              onSubmit={
-                (
-                  event,
-                ) =>
-                  void saveInterventionConfig(
-                    event,
-                  )
-              }
+              onSubmit={(event) => void saveInterventionConfig(event)}
             >
-              <div className="students-risk-config-grid">
-                <label>
-                  <span>
-                    PERIOD START
-                  </span>
-
-                  <input
-                    type="date"
-                    required
-                    value={
-                      configForm
-                        .periodStart
-                    }
-                    onChange={
-                      (
-                        event,
-                      ) => {
-                        setConfigForm(
-                          (
-                            current,
-                          ) => ({
-                            ...current,
-                            periodStart:
-                              event
-                                .target
-                                .value,
-                          }),
-                        );
-
-                        setConfigSaveError(
-                          "",
-                        );
-                      }
-                    }
-                  />
-                </label>
-
-                <label>
-                  <span>
-                    PERIOD END
-                  </span>
-
-                  <input
-                    type="date"
-                    required
-                    value={
-                      configForm
-                        .periodEnd
-                    }
-                    onChange={
-                      (
-                        event,
-                      ) => {
-                        setConfigForm(
-                          (
-                            current,
-                          ) => ({
-                            ...current,
-                            periodEnd:
-                              event
-                                .target
-                                .value,
-                          }),
-                        );
-
-                        setConfigSaveError(
-                          "",
-                        );
-                      }
-                    }
-                  />
-                </label>
-
-                <label>
-                  <span>
-                    WARNING
-                  </span>
-
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    required
-                    placeholder="e.g. 2"
-                    value={
-                      configForm
-                        .warningAbsenceCount
-                    }
-                    onChange={
-                      (
-                        event,
-                      ) => {
-                        setConfigForm(
-                          (
-                            current,
-                          ) => ({
-                            ...current,
-                            warningAbsenceCount:
-                              event
-                                .target
-                                .value,
-                          }),
-                        );
-
-                        setConfigSaveError(
-                          "",
-                        );
-                      }
-                    }
-                  />
-
-                  <small>
-                    Absences before early intervention
-                  </small>
-                </label>
-
-                <label>
-                  <span>
-                    AT RISK
-                  </span>
-
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    required
-                    placeholder="e.g. 4"
-                    value={
-                      configForm
-                        .atRiskAbsenceCount
-                    }
-                    onChange={
-                      (
-                        event,
-                      ) => {
-                        setConfigForm(
-                          (
-                            current,
-                          ) => ({
-                            ...current,
-                            atRiskAbsenceCount:
-                              event
-                                .target
-                                .value,
-                          }),
-                        );
-
-                        setConfigSaveError(
-                          "",
-                        );
-                      }
-                    }
-                  />
-
-                  <small>
-                    Must be higher than Warning
-                  </small>
-                </label>
-
-                <label>
-                  <span>
-                    CRITICAL
-                  </span>
-
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    required
-                    placeholder="e.g. 6"
-                    value={
-                      configForm
-                        .criticalAbsenceCount
-                    }
-                    onChange={
-                      (
-                        event,
-                      ) => {
-                        setConfigForm(
-                          (
-                            current,
-                          ) => ({
-                            ...current,
-                            criticalAbsenceCount:
-                              event
-                                .target
-                                .value,
-                          }),
-                        );
-
-                        setConfigSaveError(
-                          "",
-                        );
-                      }
-                    }
-                  />
-
-                  <small>
-                    Must be higher than At Risk
-                  </small>
-                </label>
+              <div className="students-risk-setup-progress" aria-label="Setup sections">
+                <span><b>1</b> Monitoring period</span>
+                <span><b>2</b> Risk thresholds</span>
+                <span><b>3</b> Parent follow-up</span>
               </div>
 
-              <section className="students-risk-config-options">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={
-                      configForm
-                        .enabled
-                    }
-                    onChange={
-                      (
-                        event,
-                      ) =>
-                        setConfigForm(
-                          (
-                            current,
-                          ) => ({
-                            ...current,
-                            enabled:
-                              event
-                                .target
-                                .checked,
-                          }),
-                        )
-                    }
-                  />
+              <section className="students-risk-config-block">
+                <header>
+                  <span>1</span>
+                  <div>
+                    <h4>Monitoring period</h4>
+                    <p>Only finalized attendance inside this date range is evaluated.</p>
+                  </div>
+                </header>
 
-                  <span>
-                    <strong>
-                      Enable attendance-risk monitoring
-                    </strong>
+                <div className="students-risk-config-grid is-period">
+                  <label>
+                    <span>START DATE</span>
+                    <input
+                      type="date"
+                      required
+                      value={configForm.periodStart}
+                      onChange={(event) => {
+                        setConfigForm((current) => ({
+                          ...current,
+                          periodStart: event.target.value,
+                        }));
+                        setConfigSaveError("");
+                      }}
+                    />
+                  </label>
 
-                    <small>
-                      Finalized attendance inside the selected period will be evaluated.
-                    </small>
-                  </span>
-                </label>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={
-                      configForm
-                        .parentNotificationEnabled
-                    }
-                    onChange={
-                      (
-                        event,
-                      ) =>
-                        setConfigForm(
-                          (
-                            current,
-                          ) => ({
-                            ...current,
-                            parentNotificationEnabled:
-                              event
-                                .target
-                                .checked,
-                          }),
-                        )
-                    }
-                  />
-
-                  <span>
-                    <strong>
-                      Enable parent notifications
-                    </strong>
-
-                    <small>
-                      Warning, At Risk, and Critical notifications start in Manual mode.
-                    </small>
-                  </span>
-                </label>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    disabled={
-                      !configForm
-                        .parentNotificationEnabled
-                    }
-                    checked={
-                      configForm
-                        .allowParentAcknowledgement
-                    }
-                    onChange={
-                      (
-                        event,
-                      ) =>
-                        setConfigForm(
-                          (
-                            current,
-                          ) => ({
-                            ...current,
-                            allowParentAcknowledgement:
-                              event
-                                .target
-                                .checked,
-                          }),
-                        )
-                    }
-                  />
-
-                  <span>
-                    <strong>
-                      Allow parent acknowledgement
-                    </strong>
-
-                    <small>
-                      Guardians may confirm that they reviewed the secure attendance notice.
-                    </small>
-                  </span>
-                </label>
-
-                <label>
-                  <input
-                    type="checkbox"
-                    disabled={
-                      !configForm
-                        .parentNotificationEnabled
-                    }
-                    checked={
-                      configForm
-                        .allowParentResponse
-                    }
-                    onChange={
-                      (
-                        event,
-                      ) =>
-                        setConfigForm(
-                          (
-                            current,
-                          ) => ({
-                            ...current,
-                            allowParentResponse:
-                              event
-                                .target
-                                .checked,
-                          }),
-                        )
-                    }
-                  />
-
-                  <span>
-                    <strong>
-                      Allow parent response
-                    </strong>
-
-                    <small>
-                      Guardians may submit a response through the secure attendance notice.
-                    </small>
-                  </span>
-                </label>
+                  <label>
+                    <span>END DATE</span>
+                    <input
+                      type="date"
+                      required
+                      value={configForm.periodEnd}
+                      onChange={(event) => {
+                        setConfigForm((current) => ({
+                          ...current,
+                          periodEnd: event.target.value,
+                        }));
+                        setConfigSaveError("");
+                      }}
+                    />
+                  </label>
+                </div>
               </section>
 
-              <label className="students-risk-config-message">
-                <div>
-                  <span>
-                    DEFAULT ADVISER MESSAGE
-                  </span>
+              <section className="students-risk-config-block">
+                <header>
+                  <span>2</span>
+                  <div>
+                    <h4>Absence thresholds</h4>
+                    <p>Keep the order simple: Warning &lt; At Risk &lt; Critical.</p>
+                  </div>
+                </header>
 
-                  <small>
-                    {
-                      configForm
-                        .defaultAdviserMessage
-                        .length
-                    }
-                    /2000
-                  </small>
+                <div className="students-risk-config-grid is-thresholds">
+                  <label className="is-warning-field">
+                    <span>WARNING</span>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      required
+                      placeholder="e.g. 2"
+                      value={configForm.warningAbsenceCount}
+                      onChange={(event) => {
+                        setConfigForm((current) => ({
+                          ...current,
+                          warningAbsenceCount: event.target.value,
+                        }));
+                        setConfigSaveError("");
+                      }}
+                    />
+                    <small>Early monitoring</small>
+                  </label>
+
+                  <label className="is-at-risk-field">
+                    <span>AT RISK</span>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      required
+                      placeholder="e.g. 4"
+                      value={configForm.atRiskAbsenceCount}
+                      onChange={(event) => {
+                        setConfigForm((current) => ({
+                          ...current,
+                          atRiskAbsenceCount: event.target.value,
+                        }));
+                        setConfigSaveError("");
+                      }}
+                    />
+                    <small>Active follow-up</small>
+                  </label>
+
+                  <label className="is-critical-field">
+                    <span>CRITICAL</span>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      required
+                      placeholder="e.g. 6"
+                      value={configForm.criticalAbsenceCount}
+                      onChange={(event) => {
+                        setConfigForm((current) => ({
+                          ...current,
+                          criticalAbsenceCount: event.target.value,
+                        }));
+                        setConfigSaveError("");
+                      }}
+                    />
+                    <small>Highest priority</small>
+                  </label>
+                </div>
+              </section>
+
+              <section className="students-risk-config-block">
+                <header>
+                  <span>3</span>
+                  <div>
+                    <h4>Parent follow-up</h4>
+                    <p>Choose what guardians can do when a secure notice is sent.</p>
+                  </div>
+                </header>
+
+                <div className="students-risk-config-options is-primary-options">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={configForm.enabled}
+                      onChange={(event) =>
+                        setConfigForm((current) => ({
+                          ...current,
+                          enabled: event.target.checked,
+                        }))
+                      }
+                    />
+                    <span>
+                      <strong>Enable risk monitoring</strong>
+                      <small>Evaluate finalized attendance in the selected period.</small>
+                    </span>
+                  </label>
+
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={configForm.parentNotificationEnabled}
+                      onChange={(event) =>
+                        setConfigForm((current) => ({
+                          ...current,
+                          parentNotificationEnabled: event.target.checked,
+                        }))
+                      }
+                    />
+                    <span>
+                      <strong>Enable parent notifications</strong>
+                      <small>Notices remain manual by default.</small>
+                    </span>
+                  </label>
                 </div>
 
-                <textarea
-                  rows="4"
-                  maxLength="2000"
-                  value={
-                    configForm
-                      .defaultAdviserMessage
-                  }
-                  placeholder="Optional default message for parent attendance notices..."
-                  onChange={
-                    (
-                      event,
-                    ) => {
-                      setConfigForm(
-                        (
-                          current,
-                        ) => ({
-                          ...current,
-                          defaultAdviserMessage:
-                            event
-                              .target
-                              .value,
-                        }),
-                      );
+                <details className="students-risk-config-advanced">
+                  <summary>
+                    <span>Guardian interaction & default message</span>
+                    <small>Optional settings</small>
+                  </summary>
 
-                      setConfigSaveError(
-                        "",
-                      );
-                    }
-                  }
-                />
-              </label>
+                  <div>
+                    <section className="students-risk-config-options">
+                      <label>
+                        <input
+                          type="checkbox"
+                          disabled={!configForm.parentNotificationEnabled}
+                          checked={configForm.allowParentAcknowledgement}
+                          onChange={(event) =>
+                            setConfigForm((current) => ({
+                              ...current,
+                              allowParentAcknowledgement: event.target.checked,
+                            }))
+                          }
+                        />
+                        <span>
+                          <strong>Allow acknowledgement</strong>
+                          <small>Guardians can confirm they reviewed the notice.</small>
+                        </span>
+                      </label>
+
+                      <label>
+                        <input
+                          type="checkbox"
+                          disabled={!configForm.parentNotificationEnabled}
+                          checked={configForm.allowParentResponse}
+                          onChange={(event) =>
+                            setConfigForm((current) => ({
+                              ...current,
+                              allowParentResponse: event.target.checked,
+                            }))
+                          }
+                        />
+                        <span>
+                          <strong>Allow parent response</strong>
+                          <small>Guardians can submit a secure written response.</small>
+                        </span>
+                      </label>
+                    </section>
+
+                    <label className="students-risk-config-message">
+                      <div>
+                        <span>DEFAULT ADVISER MESSAGE</span>
+                        <small>{configForm.defaultAdviserMessage.length}/2000</small>
+                      </div>
+                      <textarea
+                        rows="4"
+                        maxLength="2000"
+                        value={configForm.defaultAdviserMessage}
+                        placeholder="Optional default message for parent attendance notices..."
+                        onChange={(event) => {
+                          setConfigForm((current) => ({
+                            ...current,
+                            defaultAdviserMessage: event.target.value,
+                          }));
+                          setConfigSaveError("");
+                        }}
+                      />
+                    </label>
+                  </div>
+                </details>
+              </section>
 
               {configSaveError && (
-                <div
-                  className="students-risk-feedback is-error"
-                  role="alert"
-                >
-                  <span>
-                    !
-                  </span>
-
-                  <p>
-                    {
-                      configSaveError
-                    }
-                  </p>
+                <div className="students-risk-feedback is-error" role="alert">
+                  <span>!</span>
+                  <p>{configSaveError}</p>
                 </div>
               )}
 
               <footer className="students-risk-config-actions">
                 <div>
-                  <span>
-                    SECTION
-                  </span>
-
-                  <strong>
-                    {
-                      sectionName
-                    }
-                  </strong>
-
+                  <span>SECTION</span>
+                  <strong>{sectionName}</strong>
                   <small>
-                    {
-                      configEditing
-                        ? "Saving changes updates the same section configuration and refreshes the risk register."
-                        : "Configuration is saved once per section and can be updated later through Risk Settings."
-                    }
+                    {configEditing
+                      ? "Your existing configuration will be updated for this section."
+                      : "You can change these settings later without recreating the section."}
                   </small>
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={
-                    configSaving
-                  }
-                >
-                  {
-                    configSaving
-                      ? "Saving..."
-                      : configEditing
-                        ? "Save Changes"
-                        : "Save & Start Monitoring"
-                  }
+                <button type="submit" disabled={configSaving}>
+                  {configSaving
+                    ? "Saving..."
+                    : configEditing
+                      ? "Save Changes"
+                      : "Save & Start Monitoring"}
                 </button>
               </footer>
             </form>
           </section>
         ) : section ? (
           <>
-            {/* =============================================
-                SUMMARY
-            ============================================= */}
-
-            <section
-              className="students-risk-summary"
-              aria-label="Attendance risk summary"
-            >
-              <article>
-                <span>
-                  STUDENTS
-                </span>
-
-                <strong>
-                  {
-                    loading
-                      ? "—"
-                      : summary
-                          .total
-                  }
-                </strong>
-
-                <p>
-                  Active students evaluated
-                </p>
-              </article>
-
-              <article className="is-warning">
-                <span>
-                  WARNING
-                </span>
-
-                <strong>
-                  {
-                    loading
-                      ? "—"
-                      : summary
-                          .warning
-                  }
-                </strong>
-
-                <p>
-                  Early intervention
-                </p>
-              </article>
-
-              <article className="is-at-risk">
-                <span>
-                  AT RISK
-                </span>
-
-                <strong>
-                  {
-                    loading
-                      ? "—"
-                      : summary
-                          .atRisk
-                  }
-                </strong>
-
-                <p>
-                  Active follow-up
-                </p>
-              </article>
-
-              <article className="is-critical">
-                <span>
-                  CRITICAL
-                </span>
-
-                <strong>
-                  {
-                    loading
-                      ? "—"
-                      : summary
-                          .critical
-                  }
-                </strong>
-
-                <p>
-                  Highest priority
-                </p>
-              </article>
+            <section className="students-risk-focus-strip">
+              <div>
+                <span>SECTION OVERVIEW</span>
+                <strong>{loading ? "—" : summary.total}</strong>
+                <small>students evaluated</small>
+              </div>
+              <div className="is-attention">
+                <span>NEEDS ATTENTION</span>
+                <strong>{loading ? "—" : summary.needsAttention}</strong>
+                <small>warning or higher</small>
+              </div>
+              <div className="is-critical">
+                <span>CRITICAL</span>
+                <strong>{loading ? "—" : summary.critical}</strong>
+                <small>review first</small>
+              </div>
+              <div className="is-normal">
+                <span>NORMAL</span>
+                <strong>{loading ? "—" : summary.normal}</strong>
+                <small>no action required</small>
+              </div>
             </section>
-
-            {/* =============================================
-                RISK REGISTER
-            ============================================= */}
 
             <section className="students-risk-panel">
               <header className="students-risk-panel-head">
                 <div>
-                  <span>
-                    STUDENT MONITORING
-                  </span>
-
-                  <h3>
-                    Attendance Risk Register
-                  </h3>
-
+                  <span>STUDENT MONITORING</span>
+                  <h3>Attendance Risk Register</h3>
                   <p>
-                    {
-                      loading
-                        ? "Loading finalized attendance data..."
-                        : `${summary.needsAttention} student${
-                            summary
-                              .needsAttention ===
-                            1
-                              ? ""
-                              : "s"
-                          } currently require attendance follow-up.`
-                    }
+                    {loading
+                      ? "Loading finalized attendance data..."
+                      : summary.needsAttention > 0
+                        ? `${summary.needsAttention} student${summary.needsAttention === 1 ? "" : "s"} currently need follow-up.`
+                        : "No students currently require attendance intervention."}
                   </p>
                 </div>
 
@@ -3225,152 +2876,68 @@ function StudentsAtRisk() {
                   <button
                     type="button"
                     className="students-risk-review"
-                    onClick={
-                      openConfigEditor
-                    }
+                    onClick={openConfigEditor}
                   >
                     ⚙ Risk Settings
                   </button>
                 )}
               </header>
 
-              {/* ===========================================
-                  TOOLBAR
-              =========================================== */}
-
               <div className="students-risk-toolbar">
-                <label>
-                  <span>
-                    ⌕
-                  </span>
-
+                <label className="students-risk-search">
+                  <span>⌕</span>
                   <input
                     type="search"
-                    value={
-                      search
-                    }
+                    value={search}
                     placeholder="Search student name or number..."
-                    onChange={
-                      (
-                        event,
-                      ) =>
-                        setSearch(
-                          event
-                            .target
-                            .value,
-                        )
-                    }
+                    onChange={(event) => setSearch(event.target.value)}
                   />
-
                   {search && (
                     <button
                       type="button"
                       aria-label="Clear search"
-                      onClick={
-                        () =>
-                          setSearch(
-                            "",
-                          )
-                      }
+                      onClick={() => setSearch("")}
                     >
                       ×
                     </button>
                   )}
                 </label>
 
-                <div>
-                  {
-                    RISK_FILTERS
-                      .map(
-                        ([
-                          value,
-                          label,
-                        ]) => (
-                          <button
-                            key={
-                              value
-                            }
-                            type="button"
-                            className={
-                              filter ===
-                              value
-                                ? "is-active"
-                                : ""
-                            }
-                            onClick={
-                              () =>
-                                setFilter(
-                                  value,
-                                )
-                            }
-                          >
-                            {
-                              label
-                            }
-                          </button>
-                        ),
-                      )
-                  }
+                <div className="students-risk-filter-list" aria-label="Risk filters">
+                  {RISK_FILTERS.map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      className={filter === value ? "is-active" : ""}
+                      onClick={() => setFilter(value)}
+                    >
+                      <span>{label}</span>
+                      <b>{loading ? "—" : riskFilterCounts[value]}</b>
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* ===========================================
-                  TABLE BODY
-              =========================================== */}
-
               {loading ? (
                 <div className="students-risk-loading">
-                  {
-                    Array.from(
-                      {
-                        length:
-                          6,
-                      },
-                      (
-                        _,
-                        index,
-                      ) => (
-                        <span
-                          key={
-                            index
-                          }
-                        />
-                      ),
-                    )
-                  }
+                  {Array.from({ length: 6 }, (_, index) => (
+                    <span key={index} />
+                  ))}
                 </div>
-              ) : !pageError &&
-                rows.length ===
-                  0 ? (
+              ) : !pageError && rows.length === 0 ? (
                 <div className="students-risk-empty is-panel">
-                  <span>
-                    ✓
-                  </span>
-
-                  <h3>
-                    No risk data yet
-                  </h3>
-
+                  <span>✓</span>
+                  <h3>No risk data yet</h3>
                   <p>
-                    Finalized sessions inside the configured intervention period will appear here.
+                    Finalized sessions inside the configured monitoring period will
+                    appear here automatically.
                   </p>
                 </div>
-              ) : !pageError &&
-                filteredRows
-                  .length ===
-                  0 ? (
+              ) : !pageError && filteredRows.length === 0 ? (
                 <div className="students-risk-empty is-panel">
-                  <span>
-                    ⌕
-                  </span>
-
-                  <h3>
-                    No matching students
-                  </h3>
-
-                  <p>
-                    Change the search term or risk filter to view other records.
-                  </p>
+                  <span>⌕</span>
+                  <h3>No matching students</h3>
+                  <p>Try a different search term or choose another risk filter.</p>
                 </div>
               ) : !pageError ? (
                 <>
@@ -3378,320 +2945,121 @@ function StudentsAtRisk() {
                     <table className="students-risk-table">
                       <thead>
                         <tr>
-                          <th>
-                            Student
-                          </th>
-
-                          <th>
-                            Sessions
-                          </th>
-
-                          <th>
-                            Present
-                          </th>
-
-                          <th>
-                            Late
-                          </th>
-
-                          <th>
-                            Absent
-                          </th>
-
-                          <th>
-                            Risk
-                          </th>
-
-                          <th>
-                            Parent Follow-up
-                          </th>
+                          <th>Student</th>
+                          <th>Attendance</th>
+                          <th>Risk Level</th>
+                          <th>Next Action</th>
                         </tr>
                       </thead>
-
                       <tbody>
-                        {
-                          pageRows
-                            .map(
-                              (
-                                row,
-                              ) => {
-                                const risk =
-                                  getRiskLevel(
-                                    row,
-                                  );
+                        {pageRows.map((row) => {
+                          const risk = getRiskLevel(row);
+                          const interventionId = getInterventionId(row);
+                          const interventionStatus = getInterventionStatus(row);
+                          const notificationMode = getNotificationMode(row);
+                          const canReview =
+                            !["NORMAL", "UNKNOWN"].includes(risk) &&
+                            Boolean(interventionId);
 
-                                const interventionId =
-                                  getInterventionId(
-                                    row,
-                                  );
+                          return (
+                            <tr key={row?.studentId || row?.studentNumber}>
+                              <td>
+                                <div className="students-risk-student">
+                                  <span>{initial(row?.studentName)}</span>
+                                  <div>
+                                    <strong>{row?.studentName || "Unnamed Student"}</strong>
+                                    <small>{row?.studentNumber || "No student number"}</small>
+                                  </div>
+                                </div>
+                              </td>
 
-                                const interventionStatus =
-                                  getInterventionStatus(
-                                    row,
-                                  );
+                              <td>
+                                <div className="students-risk-attendance-summary">
+                                  <div>
+                                    <span className="is-present">
+                                      <b>{count(row?.presentCount)}</b> Present
+                                    </span>
+                                    <span className="is-late">
+                                      <b>{count(row?.lateCount)}</b> Late
+                                    </span>
+                                    <span className="is-absent">
+                                      <b>{count(row?.absentCount)}</b> Absent
+                                    </span>
+                                  </div>
+                                  <small>{count(row?.sessionCount)} finalized sessions</small>
+                                </div>
+                              </td>
 
-                                const notificationMode =
-                                  getNotificationMode(
-                                    row,
-                                  );
+                              <td>
+                                <div className="students-risk-risk-cell">
+                                  <RiskBadge value={risk} />
+                                  <small>{riskDescription(risk)}</small>
+                                </div>
+                              </td>
 
-                                const canReview =
-                                  ![
-                                    "NORMAL",
-                                    "UNKNOWN",
-                                  ].includes(
-                                    risk,
-                                  ) &&
-                                  Boolean(
-                                    interventionId,
-                                  );
+                              <td>
+                                <div className="students-risk-action-cell">
+                                  {canReview ? (
+                                    <button
+                                      className="students-risk-review"
+                                      type="button"
+                                      onClick={() => void openReview(row)}
+                                    >
+                                      Review & Follow Up →
+                                    </button>
+                                  ) : (
+                                    <span className="students-risk-muted">
+                                      {risk === "NORMAL"
+                                        ? "No action required"
+                                        : "Intervention unavailable"}
+                                    </span>
+                                  )}
 
-                                return (
-                                  <tr
-                                    key={
-                                      row
-                                        ?.studentId ||
-                                      row
-                                        ?.studentNumber
-                                    }
-                                  >
-                                    <td>
-                                      <div className="students-risk-student">
-                                        <span>
-                                          {
-                                            initial(
-                                              row
-                                                ?.studentName,
-                                            )
-                                          }
-                                        </span>
-
-                                        <div>
-                                          <strong>
-                                            {
-                                              row
-                                                ?.studentName ||
-                                              "Unnamed Student"
-                                            }
-                                          </strong>
-
-                                          <small>
-                                            {
-                                              row
-                                                ?.studentNumber ||
-                                              "No student number"
-                                            }
-                                          </small>
-                                        </div>
-                                      </div>
-                                    </td>
-
-                                    <td>
-                                      {
-                                        count(
-                                          row
-                                            ?.sessionCount,
-                                        )
-                                      }
-                                    </td>
-
-                                    <td className="is-present">
-                                      {
-                                        count(
-                                          row
-                                            ?.presentCount,
-                                        )
-                                      }
-                                    </td>
-
-                                    <td className="is-late">
-                                      {
-                                        count(
-                                          row
-                                            ?.lateCount,
-                                        )
-                                      }
-                                    </td>
-
-                                    <td className="is-absent">
-                                      {
-                                        count(
-                                          row
-                                            ?.absentCount,
-                                        )
-                                      }
-                                    </td>
-
-                                    <td>
-                                      <RiskBadge
-                                        value={
-                                          risk
-                                        }
-                                      />
-
-                                      <small className="students-risk-risk-copy">
-                                        {
-                                          riskDescription(
-                                            risk,
-                                          )
-                                        }
-                                      </small>
-                                    </td>
-
-                                    <td>
-                                      {canReview ? (
-                                        <button
-                                          className="students-risk-review"
-                                          type="button"
-                                          onClick={
-                                            () =>
-                                              void openReview(
-                                                row,
-                                              )
-                                          }
-                                        >
-                                          Review Notice →
-                                        </button>
-                                      ) : (
-                                        <span className="students-risk-muted">
-                                          {
-                                            risk ===
-                                            "NORMAL"
-                                              ? "No action required"
-                                              : "Intervention unavailable"
-                                          }
-                                        </span>
-                                      )}
-
-                                      {(interventionStatus ||
-                                        notificationMode) && (
-                                        <small className="students-risk-meta">
-                                          {
-                                            [
-                                              interventionStatus &&
-                                                `Intervention: ${interventionStatus.replaceAll(
-                                                  "_",
-                                                  " ",
-                                                )}`,
-
-                                              notificationMode &&
-                                                `Mode: ${notificationMode.replaceAll(
-                                                  "_",
-                                                  " ",
-                                                )}`,
-                                            ]
-                                              .filter(
-                                                Boolean,
-                                              )
-                                              .join(
-                                                " • ",
-                                              )
-                                          }
-                                        </small>
-                                      )}
-                                    </td>
-                                  </tr>
-                                );
-                              },
-                            )
-                        }
+                                  {(interventionStatus || notificationMode) && (
+                                    <small>
+                                      {[
+                                        interventionStatus &&
+                                          interventionStatus.replaceAll("_", " "),
+                                        notificationMode &&
+                                          `${notificationMode.replaceAll("_", " ")} mode`,
+                                      ]
+                                        .filter(Boolean)
+                                        .join(" • ")}
+                                    </small>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
 
-                  {/* =======================================
-                      PAGINATION
-                  ======================================= */}
-
                   <footer className="students-risk-pagination">
                     <p>
-                      Showing{" "}
-                      <strong>
-                        {
-                          filteredRows
-                            .length
-                            ? start +
-                              1
-                            : 0
-                        }
-                      </strong>
-                      –
-                      <strong>
-                        {
-                          Math.min(
-                            start +
-                              PAGE_SIZE,
-                            filteredRows
-                              .length,
-                          )
-                        }
-                      </strong>{" "}
-                      of{" "}
-                      <strong>
-                        {
-                          filteredRows
-                            .length
-                        }
-                      </strong>
+                      Showing <strong>{filteredRows.length ? start + 1 : 0}</strong>–
+                      <strong>{Math.min(start + PAGE_SIZE, filteredRows.length)}</strong>{" "}
+                      of <strong>{filteredRows.length}</strong>
                     </p>
-
                     <div>
                       <button
                         type="button"
-                        disabled={
-                          safePage <=
-                          1
-                        }
-                        onClick={
-                          () =>
-                            setPage(
-                              (
-                                current,
-                              ) =>
-                                Math.max(
-                                  1,
-                                  current -
-                                    1,
-                                ),
-                            )
+                        disabled={safePage <= 1}
+                        onClick={() =>
+                          setPage((current) => Math.max(1, current - 1))
                         }
                       >
                         ← Previous
                       </button>
-
                       <span>
-                        Page{" "}
-                        <strong>
-                          {
-                            safePage
-                          }
-                        </strong>{" "}
-                        of{" "}
-                        <strong>
-                          {
-                            totalPages
-                          }
-                        </strong>
+                        Page <strong>{safePage}</strong> of <strong>{totalPages}</strong>
                       </span>
-
                       <button
                         type="button"
-                        disabled={
-                          safePage >=
-                          totalPages
-                        }
-                        onClick={
-                          () =>
-                            setPage(
-                              (
-                                current,
-                              ) =>
-                                Math.min(
-                                  totalPages,
-                                  current +
-                                    1,
-                                ),
-                            )
+                        disabled={safePage >= totalPages}
+                        onClick={() =>
+                          setPage((current) => Math.min(totalPages, current + 1))
                         }
                       >
                         Next →
@@ -3704,29 +3072,15 @@ function StudentsAtRisk() {
           </>
         ) : null}
 
-        {/* =================================================
-            PARENT NOTICE MODAL
-        ================================================= */}
-
         {selectedRow && (
           <div
             className="students-risk-modal-backdrop"
             role="presentation"
-            onMouseDown={
-              (
-                event,
-              ) => {
-                if (
-                  event
-                    .target ===
-                    event
-                      .currentTarget &&
-                  !modalBusy
-                ) {
-                  closeModal();
-                }
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget && !modalBusy) {
+                closeModal();
               }
-            }
+            }}
           >
             <section
               className="students-risk-modal"
@@ -3734,385 +3088,179 @@ function StudentsAtRisk() {
               aria-modal="true"
               aria-labelledby="risk-notice-title"
             >
-              {/* ===========================================
-                  MODAL HEADER
-              =========================================== */}
-
-              <header>
+              <header className="students-risk-modal-header">
                 <div>
-                  <span>
-                    SECURE PARENT COMMUNICATION
-                  </span>
-
-                  <h2 id="risk-notice-title">
-                    Attendance Intervention Review
-                  </h2>
-
-                  <p>
-                    {
-                      communications
-                        .length >
-                      0
-                        ? "Review attendance evidence, delivery status, acknowledgement, and parent responses in one place."
-                        : "Review the attendance evidence before preparing secure parent communication."
-                    }
-                  </p>
+                  <span>ATTENDANCE FOLLOW-UP</span>
+                  <h2 id="risk-notice-title">Review Parent Notice</h2>
+                  <p>Review the essentials first. Evidence and history are available below when needed.</p>
                 </div>
-
                 <button
                   type="button"
                   aria-label="Close"
-                  disabled={
-                    modalBusy
-                  }
-                  onClick={
-                    closeModal
-                  }
+                  disabled={modalBusy}
+                  onClick={closeModal}
                 >
                   ×
                 </button>
               </header>
 
-              {/* ===========================================
-                  LOADING
-              =========================================== */}
-
               {previewLoading ? (
                 <div className="students-risk-modal-loading">
                   <span />
-
-                  <strong>
-                    Loading secure notification preview...
-                  </strong>
+                  <strong>Loading attendance review...</strong>
                 </div>
               ) : previewError ? (
                 <div className="students-risk-modal-error">
-                  <span>
-                    !
-                  </span>
-
+                  <span>!</span>
                   <div>
-                    <strong>
-                      Notice cannot be prepared
-                    </strong>
-
-                    <p>
-                      {
-                        previewError
-                      }
-                    </p>
+                    <strong>Notice cannot be prepared</strong>
+                    <p>{previewError}</p>
                   </div>
                 </div>
               ) : preview ? (
                 <div className="students-risk-modal-body">
-                  {/* =======================================
-                      STUDENT / GUARDIAN
-                  ======================================= */}
-
-                  <section className="students-risk-notice-identity">
-                    <div>
-                      <span>
-                        STUDENT
+                  <section className="students-risk-review-identity">
+                    <div className="students-risk-review-student">
+                      <span className="students-risk-avatar">
+                        {initial(preview?.studentName)}
                       </span>
-
-                      <strong>
-                        {
-                          preview
-                            ?.studentName ||
-                          "Student"
-                        }
-                      </strong>
-
-                      <small>
-                        {
-                          preview
-                            ?.studentNumber ||
-                          "—"
-                        }
-                      </small>
-                    </div>
-
-                    <div>
-                      <span>
-                        PRIMARY GUARDIAN
-                      </span>
-
-                      <strong>
-                        {
-                          preview
-                            ?.guardianName ||
-                          "Guardian"
-                        }
-                      </strong>
-
-                      <small>
-                        {
-                          preview
-                            ?.guardianEmail ||
-                          "Email unavailable"
-                        }
-                      </small>
-                    </div>
-                  </section>
-
-                  {/* =======================================
-                      SUMMARY
-                  ======================================= */}
-
-                  <section className="students-risk-notice-summary">
-                    <div>
-                      <span>
-                        RISK
-                      </span>
-
-                      <RiskBadge
-                        value={
-                          getRiskLevel(
-                            preview,
-                          )
-                        }
-                      />
-                    </div>
-
-                    <div>
-                      <span>
-                        ABSENCES
-                      </span>
-
-                      <strong>
-                        {
-                          count(
-                            preview
-                              ?.currentAbsenceCount,
-                          )
-                        }
-                      </strong>
-                    </div>
-
-                    <div>
-                      <span>
-                        THRESHOLD
-                      </span>
-
-                      <strong>
-                        {
-                          count(
-                            preview
-                              ?.thresholdAbsenceCount,
-                          )
-                        }
-                      </strong>
-                    </div>
-
-                    <div>
-                      <span>
-                        PERIOD
-                      </span>
-
-                      <strong>
-                        {
-                          formatDate(
-                            preview
-                              ?.periodStart,
-                          )
-                        }{" "}
-                        –{" "}
-                        {
-                          formatDate(
-                            preview
-                              ?.periodEnd,
-                          )
-                        }
-                      </strong>
-                    </div>
-                  </section>
-
-                  {/* =======================================
-                      ATTENDANCE CHANGED WARNING
-                  ======================================= */}
-
-                  {
-                    hasAttendanceChanged(
-                      preview,
-                    ) && (
-                      <div className="students-risk-warning">
-                        <span>
-                          !
-                        </span>
-
-                        <p>
-                          <strong>
-                            Attendance changed after this intervention.
-                          </strong>{" "}
-                          Review the current finalized absence list before preparing the notice.
-                        </p>
-                      </div>
-                    )
-                  }
-
-                  {/* =======================================
-                      SUBJECT
-                  ======================================= */}
-
-                  <section className="students-risk-subject">
-                    <span>
-                      EMAIL SUBJECT
-                    </span>
-
-                    <strong>
-                      {
-                        preview
-                          ?.subject ||
-                        "Attendance Notice"
-                      }
-                    </strong>
-                  </section>
-
-                  {/* =======================================
-                      FINALIZED ABSENCES
-                  ======================================= */}
-
-                  <section className="students-risk-absences">
-                    <header>
                       <div>
-                        <span>
-                          FINALIZED RECORDS
-                        </span>
-
-                        <h3>
-                          Attendance Details
-                        </h3>
+                        <small>STUDENT</small>
+                        <strong>{preview?.studentName || "Student"}</strong>
+                        <span>{preview?.studentNumber || "—"}</span>
                       </div>
+                    </div>
 
+                    <div className="students-risk-review-guardian">
+                      <small>PRIMARY GUARDIAN</small>
+                      <strong>{preview?.guardianName || "Guardian"}</strong>
+                      <span>{preview?.guardianEmail || "Email unavailable"}</span>
+                    </div>
+
+                    <RiskBadge value={getRiskLevel(preview)} />
+                  </section>
+
+                  <section className="students-risk-review-metrics">
+                    <article>
+                      <span>CURRENT ABSENCES</span>
+                      <strong>{count(preview?.currentAbsenceCount)}</strong>
+                    </article>
+                    <article>
+                      <span>RISK THRESHOLD</span>
+                      <strong>{count(preview?.thresholdAbsenceCount)}</strong>
+                    </article>
+                    <article className="is-period">
+                      <span>MONITORING PERIOD</span>
                       <strong>
-                        {
-                          count(
-                            preview
-                              ?.currentAbsenceCount,
-                          )
-                        }{" "}
-                        absence
-                        {
-                          count(
-                            preview
-                              ?.currentAbsenceCount,
-                          ) ===
-                          1
-                            ? ""
-                            : "s"
-                        }
+                        {formatDate(preview?.periodStart)} – {formatDate(preview?.periodEnd)}
                       </strong>
+                    </article>
+                  </section>
+
+                  {hasAttendanceChanged(preview) && (
+                    <div className="students-risk-warning">
+                      <span>!</span>
+                      <p>
+                        <strong>Attendance changed after this intervention.</strong>{" "}
+                        Review the finalized absence list before preparing the notice.
+                      </p>
+                    </div>
+                  )}
+
+                  <section className="students-risk-task-card">
+                    <header>
+                      <span className="students-risk-task-number">1</span>
+                      <div>
+                        <h3>Review and personalize the notice</h3>
+                        <p>Your note is the only editable content before the snapshot is prepared.</p>
+                      </div>
                     </header>
 
-                    <div>
-                      {
-                        previewAbsences
-                          .length >
-                        0 ? (
-                          previewAbsences
-                            .map(
-                              (
-                                absence,
-                                index,
-                              ) => (
-                                <article
-                                  key={
-                                    absence
-                                      ?.attendanceRecordId ||
-                                    `${absence?.attendanceDate}-${index}`
-                                  }
-                                >
-                                  <div>
-                                    <span>
-                                      DATE
-                                    </span>
-
-                                    <strong>
-                                      {
-                                        formatDate(
-                                          absence
-                                            ?.attendanceDate,
-                                        )
-                                      }
-                                    </strong>
-                                  </div>
-
-                                  <div>
-                                    <span>
-                                      SESSION
-                                    </span>
-
-                                    <strong>
-                                      {
-                                        formatTime(
-                                          absence
-                                            ?.sessionStartedAt,
-                                        )
-                                      }{" "}
-                                      –{" "}
-                                      {
-                                        formatTime(
-                                          absence
-                                            ?.sessionEndedAt,
-                                        )
-                                      }
-                                    </strong>
-                                  </div>
-
-                                  <em>
-                                    {
-                                      upper(
-                                        absence
-                                          ?.status,
-                                      ) ||
-                                      "ABSENT"
-                                    }
-                                  </em>
-                                </article>
-                              ),
-                            )
-                        ) : (
-                          <div className="students-risk-no-absence-details">
-                            No finalized absence details are available.
-                          </div>
-                        )
-                      }
+                    <div className="students-risk-subject-row">
+                      <span>EMAIL SUBJECT</span>
+                      <strong>{preview?.subject || "Attendance Notice"}</strong>
                     </div>
+
+                    <label className="students-risk-note">
+                      <div>
+                        <span>ADVISER NOTE</span>
+                        <small>{adviserNote.length}/2000</small>
+                      </div>
+                      <textarea
+                        rows="5"
+                        maxLength="2000"
+                        value={adviserNote}
+                        disabled={Boolean(prepared)}
+                        placeholder="Add a clear and respectful note for the parent or guardian..."
+                        onChange={(event) => {
+                          setAdviserNote(event.target.value);
+                          setActionError("");
+                        }}
+                      />
+                      <small>
+                        {prepared
+                          ? "This note is frozen in the prepared notification snapshot."
+                          : "Review this message before clicking Prepare Notice."}
+                      </small>
+                    </label>
                   </section>
 
-                  {/* =======================================
-                      PARENT COMMUNICATION
-                  ======================================= */}
-
-                  <section className="students-risk-communication">
-                    <header>
+                  <details
+                    className="students-risk-disclosure"
+                    open={hasAttendanceChanged(preview)}
+                  >
+                    <summary>
                       <div>
-                        <span>
-                          PARENT COMMUNICATION
-                        </span>
-
-                        <h3>
-                          Delivery & Response Activity
-                        </h3>
-
-                        <p>
-                          Communication activity is cached and checked periodically while this review is open.
-                        </p>
+                        <span>Attendance evidence</span>
+                        <small>{count(preview?.currentAbsenceCount)} finalized absence{count(preview?.currentAbsenceCount) === 1 ? "" : "s"}</small>
                       </div>
+                      <b>View details</b>
+                    </summary>
 
+                    <div className="students-risk-absence-list">
+                      {previewAbsences.length > 0 ? (
+                        previewAbsences.map((absence, index) => (
+                          <article
+                            key={
+                              absence?.attendanceRecordId ||
+                              `${absence?.attendanceDate}-${index}`
+                            }
+                          >
+                            <div>
+                              <span>DATE</span>
+                              <strong>{formatDate(absence?.attendanceDate)}</strong>
+                            </div>
+                            <div>
+                              <span>SESSION</span>
+                              <strong>
+                                {formatTime(absence?.sessionStartedAt)} – {formatTime(absence?.sessionEndedAt)}
+                              </strong>
+                            </div>
+                            <em>{upper(absence?.status) || "ABSENT"}</em>
+                          </article>
+                        ))
+                      ) : (
+                        <div className="students-risk-no-absence-details">
+                          No finalized absence details are available.
+                        </div>
+                      )}
+                    </div>
+                  </details>
+
+                  <section className="students-risk-task-card students-risk-communication-card">
+                    <header>
+                      <span className="students-risk-task-number">2</span>
+                      <div>
+                        <h3>Parent communication status</h3>
+                        <p>See what has already happened before sending another notice.</p>
+                      </div>
                       {latestCommunication ? (
                         <span
                           className={`students-risk-communication-status is-${communicationStatusClass(
-                            latestCommunication
-                              ?.status,
+                            latestCommunication?.status,
                           )}`}
                         >
-                          {
-                            communicationStatusLabel(
-                              latestCommunication
-                                ?.status,
-                            )
-                          }
+                          {communicationStatusLabel(latestCommunication?.status)}
                         </span>
                       ) : (
                         <span className="students-risk-communication-status is-none">
@@ -4121,473 +3269,164 @@ function StudentsAtRisk() {
                       )}
                     </header>
 
-                    {
-                      communicationQuery
-                        .isLoading ? (
-                        <div className="students-risk-communication-loading">
-                          <span />
-
-                          <p>
-                            Loading parent communication activity...
-                          </p>
-                        </div>
-                      ) : communicationQuery
-                          .error ? (
-                        <div className="students-risk-communication-error">
-                          <span>
-                            !
-                          </span>
-
-                          <p>
-                            {
-                              getErrorMessage(
-                                communicationQuery
-                                  .error,
-                                "Unable to load parent communication activity.",
-                              )
-                            }
-                          </p>
-                        </div>
-                      ) : communications
-                          .length ===
-                        0 ? (
-                        <div className="students-risk-communication-empty">
-                          <span>
-                            ✉
-                          </span>
-
-                          <div>
-                            <strong>
-                              No parent notice has been sent yet
-                            </strong>
-
-                            <p>
-                              Prepare a notice below when parent follow-up is appropriate.
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="students-risk-communication-flow">
-                            <article
-                              className={
-                                latestSentCommunication
-                                  ? "is-complete"
-                                  : ""
-                              }
-                            >
-                              <span>
-                                ✓
-                              </span>
-
-                              <div>
-                                <small>
-                                  EMAIL DELIVERY
-                                </small>
-
-                                <strong>
-                                  {
-                                    latestSentCommunication
-                                      ? "Sent to guardian"
-                                      : "Not sent yet"
-                                  }
-                                </strong>
-
-                                <p>
-                                  {
-                                    latestSentCommunication
-                                      ? formatDateTime(
-                                          latestSentCommunication
-                                            ?.sentAt,
-                                        )
-                                      : "Waiting for email delivery"
-                                  }
-                                </p>
-                              </div>
-                            </article>
-
-                            <article
-                              className={
-                                latestAcknowledgement
-                                  ? "is-complete"
-                                  : ""
-                              }
-                            >
-                              <span>
-                                ✓
-                              </span>
-
-                              <div>
-                                <small>
-                                  PARENT REVIEW
-                                </small>
-
-                                <strong>
-                                  {
-                                    latestAcknowledgement
-                                      ? "Notice acknowledged"
-                                      : "Awaiting acknowledgement"
-                                  }
-                                </strong>
-
-                                <p>
-                                  {
-                                    latestAcknowledgement
-                                      ? formatDateTime(
-                                          latestAcknowledgement
-                                            ?.acknowledgedAt,
-                                        )
-                                      : "No acknowledgement received yet"
-                                  }
-                                </p>
-                              </div>
-                            </article>
-
-                            <article
-                              className={
-                                latestParentResponse
-                                  ? "is-complete is-response"
-                                  : ""
-                              }
-                            >
-                              <span>
-                                ✓
-                              </span>
-
-                              <div>
-                                <small>
-                                  PARENT RESPONSE
-                                </small>
-
-                                <strong>
-                                  {
-                                    latestParentResponse
-                                      ? "Response received"
-                                      : "No response yet"
-                                  }
-                                </strong>
-
-                                <p>
-                                  {
-                                    latestParentResponse
-                                      ? formatDateTime(
-                                          latestParentResponse
-                                            ?.respondedAt,
-                                        )
-                                      : "The parent may respond through the secure notice"
-                                  }
-                                </p>
-                              </div>
-                            </article>
-                          </div>
-
-                          {latestParentResponse && (
-                            <div className="students-risk-parent-response">
-                              <header>
-                                <div>
-                                  <span>
-                                    LATEST PARENT RESPONSE
-                                  </span>
-
-                                  <strong>
-                                    {
-                                      latestParentResponse
-                                        ?.recipientName ||
-                                      preview
-                                        ?.guardianName ||
-                                      "Parent or guardian"
-                                    }
-                                  </strong>
-                                </div>
-
-                                <small>
-                                  {
-                                    formatDateTime(
-                                      latestParentResponse
-                                        ?.respondedAt,
-                                    )
-                                  }
-                                </small>
-                              </header>
-
-                              <blockquote>
-                                {
-                                  String(
-                                    latestParentResponse
-                                      ?.parentResponse ||
-                                      "Response received.",
-                                  )
-                                }
-                              </blockquote>
-
-                              <footer>
-                                <span>
-                                  Related notice
-                                </span>
-
-                                <strong>
-                                  {
-                                    latestParentResponse
-                                      ?.subject ||
-                                    preview
-                                      ?.subject ||
-                                    "Attendance Notice"
-                                  }
-                                </strong>
-                              </footer>
-                            </div>
+                    {communicationQuery.isLoading ? (
+                      <div className="students-risk-communication-state">
+                        <span className="students-risk-mini-spinner" />
+                        <p>Loading parent communication activity...</p>
+                      </div>
+                    ) : communicationQuery.error ? (
+                      <div className="students-risk-communication-state is-error">
+                        <span>!</span>
+                        <p>
+                          {getErrorMessage(
+                            communicationQuery.error,
+                            "Unable to load parent communication activity.",
                           )}
-
-                          <details className="students-risk-communication-history">
-                            <summary>
-                              <span>
-                                Communication history
-                              </span>
-
-                              <strong>
-                                {
-                                  communications
-                                    .length
-                                }{" "}
-                                notice
-                                {
-                                  communications
-                                    .length ===
-                                  1
-                                    ? ""
-                                    : "s"
-                                }
-                              </strong>
-                            </summary>
-
+                        </p>
+                      </div>
+                    ) : communications.length === 0 ? (
+                      <div className="students-risk-communication-empty">
+                        <span>✉</span>
+                        <div>
+                          <strong>No parent notice has been sent yet</strong>
+                          <p>When ready, prepare the first notice using the action below.</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="students-risk-communication-flow">
+                          <article className={latestSentCommunication ? "is-complete" : ""}>
+                            <span>✓</span>
                             <div>
-                              {
-                                communications
-                                  .slice(
-                                    0,
-                                    8,
-                                  )
-                                  .map(
-                                    (
-                                      item,
-                                      index,
-                                    ) => (
-                                      <article
-                                        key={
-                                          item
-                                            ?.notificationId ||
-                                          `${item?.createdAt}-${index}`
-                                        }
-                                      >
-                                        <span
-                                          className={`is-${communicationStatusClass(
-                                            item
-                                              ?.status,
-                                          )}`}
-                                        />
-
-                                        <div>
-                                          <strong>
-                                            {
-                                              communicationStatusLabel(
-                                                item
-                                                  ?.status,
-                                              )
-                                            }
-                                          </strong>
-
-                                          <small>
-                                            {
-                                              item
-                                                ?.recipientEmail ||
-                                              "Guardian email unavailable"
-                                            }
-                                          </small>
-                                        </div>
-
-                                        <time>
-                                          {
-                                            formatDateTime(
-                                              item
-                                                ?.respondedAt ||
-                                                item
-                                                  ?.acknowledgedAt ||
-                                                item
-                                                  ?.sentAt ||
-                                                item
-                                                  ?.queuedAt ||
-                                                item
-                                                  ?.createdAt,
-                                            )
-                                          }
-                                        </time>
-                                      </article>
-                                    ),
-                                  )
-                              }
+                              <small>EMAIL</small>
+                              <strong>{latestSentCommunication ? "Sent" : "Pending"}</strong>
+                              <p>
+                                {latestSentCommunication
+                                  ? formatDateTime(latestSentCommunication?.sentAt)
+                                  : "Waiting for delivery"}
+                              </p>
                             </div>
-                          </details>
-                        </>
-                      )
-                    }
+                          </article>
+
+                          <article className={latestAcknowledgement ? "is-complete" : ""}>
+                            <span>✓</span>
+                            <div>
+                              <small>REVIEW</small>
+                              <strong>{latestAcknowledgement ? "Acknowledged" : "Waiting"}</strong>
+                              <p>
+                                {latestAcknowledgement
+                                  ? formatDateTime(latestAcknowledgement?.acknowledgedAt)
+                                  : "No acknowledgement yet"}
+                              </p>
+                            </div>
+                          </article>
+
+                          <article className={latestParentResponse ? "is-complete is-response" : ""}>
+                            <span>✓</span>
+                            <div>
+                              <small>RESPONSE</small>
+                              <strong>{latestParentResponse ? "Received" : "None yet"}</strong>
+                              <p>
+                                {latestParentResponse
+                                  ? formatDateTime(latestParentResponse?.respondedAt)
+                                  : "Guardian may respond securely"}
+                              </p>
+                            </div>
+                          </article>
+                        </div>
+
+                        {latestParentResponse && (
+                          <div className="students-risk-parent-response">
+                            <header>
+                              <div>
+                                <span>LATEST PARENT RESPONSE</span>
+                                <strong>
+                                  {latestParentResponse?.recipientName ||
+                                    preview?.guardianName ||
+                                    "Parent or guardian"}
+                                </strong>
+                              </div>
+                              <small>{formatDateTime(latestParentResponse?.respondedAt)}</small>
+                            </header>
+                            <blockquote>
+                              {String(latestParentResponse?.parentResponse || "Response received.")}
+                            </blockquote>
+                          </div>
+                        )}
+
+                        <details className="students-risk-history">
+                          <summary>
+                            Communication history
+                            <strong>{communications.length}</strong>
+                          </summary>
+                          <div>
+                            {communications.slice(0, 8).map((item, index) => (
+                              <article
+                                key={
+                                  item?.notificationId ||
+                                  `${item?.createdAt}-${index}`
+                                }
+                              >
+                                <span className={`is-${communicationStatusClass(item?.status)}`} />
+                                <div>
+                                  <strong>{communicationStatusLabel(item?.status)}</strong>
+                                  <small>{item?.recipientEmail || "Guardian email unavailable"}</small>
+                                </div>
+                                <time>
+                                  {formatDateTime(
+                                    item?.respondedAt ||
+                                      item?.acknowledgedAt ||
+                                      item?.sentAt ||
+                                      item?.queuedAt ||
+                                      item?.createdAt,
+                                  )}
+                                </time>
+                              </article>
+                            ))}
+                          </div>
+                        </details>
+                      </>
+                    )}
                   </section>
-
-                  {/* =======================================
-                      ADVISER NOTE
-                  ======================================= */}
-
-                  <label className="students-risk-note">
-                    <div>
-                      <span>
-                        ADVISER NOTE
-                      </span>
-
-                      <small>
-                        {
-                          adviserNote
-                            .length
-                        }
-                        /2000
-                      </small>
-                    </div>
-
-                    <textarea
-                      rows="5"
-                      maxLength="2000"
-                      value={
-                        adviserNote
-                      }
-                      disabled={
-                        Boolean(
-                          prepared,
-                        )
-                      }
-                      placeholder="Add a clear and respectful note for the parent or guardian..."
-                      onChange={
-                        (
-                          event,
-                        ) => {
-                          setAdviserNote(
-                            event
-                              .target
-                              .value,
-                          );
-
-                          setActionError(
-                            "",
-                          );
-                        }
-                      }
-                    />
-
-                    <small>
-                      Once prepared, this note is frozen into the notification snapshot.
-                    </small>
-                  </label>
-
-                  {/* =======================================
-                      PREPARED
-                  ======================================= */}
 
                   {prepared && (
                     <div className="students-risk-prepared">
-                      <span>
-                        ✓
-                      </span>
-
+                      <span>✓</span>
                       <div>
-                        <strong>
-                          Notification snapshot prepared
-                        </strong>
-
-                        <p>
-                          Recipient, student, risk, note, and absence details are now frozen.
-                        </p>
+                        <strong>Notification snapshot prepared</strong>
+                        <p>Recipient, risk, note, and attendance evidence are now frozen.</p>
                       </div>
-
-                      <em>
-                        {
-                          upper(
-                            prepared
-                              ?.status,
-                          ) ||
-                          "PENDING"
-                        }
-                      </em>
+                      <em>{upper(prepared?.status) || "PENDING"}</em>
                     </div>
                   )}
-
-                  {/* =======================================
-                      ACTION ERROR
-                  ======================================= */}
 
                   {actionError && (
-                    <div
-                      className="students-risk-feedback is-error"
-                      role="alert"
-                    >
-                      <span>
-                        !
-                      </span>
-
-                      <p>
-                        {
-                          actionError
-                        }
-                      </p>
+                    <div className="students-risk-feedback is-error" role="alert">
+                      <span>!</span>
+                      <p>{actionError}</p>
                     </div>
                   )}
 
-                  {/* =======================================
-                      ACTION SUCCESS
-                  ======================================= */}
-
                   {actionSuccess && (
-                    <div
-                      className="students-risk-feedback is-success"
-                      role="status"
-                    >
-                      <span>
-                        ✓
-                      </span>
-
-                      <p>
-                        {
-                          actionSuccess
-                        }
-                      </p>
+                    <div className="students-risk-feedback is-success" role="status">
+                      <span>✓</span>
+                      <p>{actionSuccess}</p>
                     </div>
                   )}
                 </div>
               ) : null}
 
-              {/* ===========================================
-                  MODAL ACTIONS
-              =========================================== */}
-
               <footer className="students-risk-modal-actions">
-                <div>
-                  <span>
-                    DELIVERY FLOW
-                  </span>
-
+                <div className="students-risk-delivery-step">
+                  <span>DELIVERY FLOW</span>
                   <strong>
-                    {
-                      queued
-                        ? "Queued for delivery"
-                        : prepared
-                          ? "Prepared → Queue Email"
-                          : communicationInProgress
-                            ? communicationStatus ===
-                              "QUEUED"
-                              ? "Notice queued — delivery pending"
-                              : "Prepared notice already exists"
-                            : latestParentResponse
-                              ? "Parent response received"
-                              : latestCommunication
-                                ? "Follow-up available"
-                                : "Preview → Prepare"
-                    }
+                    {queued
+                      ? "3 of 3 · Queued for delivery"
+                      : prepared
+                        ? "2 of 3 · Snapshot prepared"
+                        : communicationInProgress
+                          ? "Existing notice in progress"
+                          : "1 of 3 · Review notice"}
                   </strong>
                 </div>
 
@@ -4595,67 +3434,39 @@ function StudentsAtRisk() {
                   <button
                     type="button"
                     className="is-secondary"
-                    disabled={
-                      modalBusy
-                    }
-                    onClick={
-                      closeModal
-                    }
+                    disabled={modalBusy}
+                    onClick={closeModal}
                   >
-                    {
-                      queued
-                        ? "Done"
-                        : "Close"
-                    }
+                    {queued ? "Done" : "Close"}
                   </button>
 
-                  {!previewError &&
-                    preview &&
-                    !prepared && (
-                      <button
-                        type="button"
-                        className="is-primary"
-                        disabled={
-                          modalBusy ||
-                          communicationInProgress
-                        }
-                        onClick={
-                          () =>
-                            void prepareNotice()
-                        }
-                      >
-                        {
-                          preparing
-                            ? "Preparing..."
-                            : communicationInProgress
-                              ? "Notice Already In Progress"
-                              : latestCommunication
-                                ? "Prepare Follow-up Notice"
-                                : "Prepare Notice"
-                        }
-                      </button>
-                    )}
+                  {!previewError && preview && !prepared && (
+                    <button
+                      type="button"
+                      className="is-primary"
+                      disabled={modalBusy || communicationInProgress}
+                      onClick={() => void prepareNotice()}
+                    >
+                      {preparing
+                        ? "Preparing..."
+                        : communicationInProgress
+                          ? "Notice Already In Progress"
+                          : latestCommunication
+                            ? "Prepare Follow-up Notice"
+                            : "Prepare Notice"}
+                    </button>
+                  )}
 
-                  {prepared &&
-                    !queued && (
-                      <button
-                        type="button"
-                        className="is-primary"
-                        disabled={
-                          modalBusy
-                        }
-                        onClick={
-                          () =>
-                            void queueNotice()
-                        }
-                      >
-                        {
-                          queueing
-                            ? "Queueing..."
-                            : "Queue Parent Email"
-                        }
-                      </button>
-                    )}
+                  {prepared && !queued && (
+                    <button
+                      type="button"
+                      className="is-primary"
+                      disabled={modalBusy}
+                      onClick={() => void queueNotice()}
+                    >
+                      {queueing ? "Queueing..." : "Queue Parent Email"}
+                    </button>
+                  )}
                 </div>
               </footer>
             </section>

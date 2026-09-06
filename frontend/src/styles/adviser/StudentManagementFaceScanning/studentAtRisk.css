@@ -1,20 +1,16 @@
 /* =========================================================
    SVNHS — STUDENTS AT RISK
-   STUDENT MANAGEMENT VISUAL LANGUAGE
-   FULL CONSOLIDATED REPLACEMENT
+   UI/UX REORGANIZATION ONLY
 
-   GOALS
-   - Match Student Management spacing, typography, cards, tables,
-     modal hierarchy, buttons, dark mode, and responsive behavior.
-   - Keep ALL existing StudentsAtRisk.jsx behavior intact.
-   - Keep automatic risk refresh and parent communication refresh.
-   - No manual refresh control is introduced.
-   - No API, query, notification, parent-response, or intervention
-     logic is changed by this stylesheet.
+   IMPORTANT
+   - No API / query / cache behavior is represented here.
+   - No dark-mode toggle or global theme logic is changed.
+   - Uses existing project color variables when available.
+   - Designed to reduce visual overload and keep actions obvious.
 ========================================================= */
 
 /* =========================================================
-   01. PAGE / SHARED READABILITY
+   01. PAGE TOKENS / BASE
 ========================================================= */
 
 .students-risk-page,
@@ -31,5551 +27,801 @@
 }
 
 .students-risk-page {
-  --sr-blue-900: var(--c-blue-900, #123d7e);
-  --sr-blue-800: var(--c-blue-800, #174f88);
-  --sr-red-600: var(--c-red-600, #dc2626);
+  --sr-primary: var(--c-blue-900, #123d7e);
+  --sr-primary-2: var(--c-blue-800, #174f88);
+  --sr-text: var(--c-text-primary, #172033);
+  --sr-text-2: var(--c-text-secondary, #334155);
+  --sr-body: var(--c-text-body, #64748b);
+  --sr-muted: var(--c-text-muted, #8493a5);
+  --sr-border: var(--c-border, #d7e0ea);
+  --sr-border-soft: var(--c-border-soft, #e6ebf1);
+  --sr-surface: var(--c-surface, #ffffff);
+  --sr-surface-soft: var(--c-surface-soft, #f8fafc);
+  --sr-brand-soft: var(--c-icon-bg, #edf5ff);
+  --sr-brand-border: var(--c-brand-border, #c9dff5);
 
-  --sr-text-primary: var(
-    --c-text-primary,
-    #172033
-  );
+  --sr-success-bg: var(--c-success-bg, #ecfdf3);
+  --sr-success-border: var(--c-success-border, #bbf7d0);
+  --sr-success-text: var(--c-success-text, #15803d);
 
-  --sr-text-secondary: var(
-    --c-text-secondary,
-    #334155
-  );
-
-  --sr-text-body: var(
-    --c-text-body,
-    #64748b
-  );
-
-  --sr-text-muted: var(
-    --c-text-muted,
-    #8493a5
-  );
-
-  --sr-border: var(
-    --c-border,
-    #d7e0ea
-  );
-
-  --sr-border-soft: var(
-    --c-border-soft,
-    #e6ebf1
-  );
-
-  --sr-surface: var(
-    --c-surface,
-    #ffffff
-  );
-
-  --sr-surface-soft: var(
-    --c-surface-soft,
-    #f8fafc
-  );
-
-  --sr-icon-bg: var(
-    --c-icon-bg,
-    #edf5ff
-  );
-
-  --sr-brand-border: var(
-    --c-brand-border,
-    #c9dff5
-  );
-
-  --sr-success-bg: var(
-    --c-success-bg,
-    #ecfdf3
-  );
-
-  --sr-success-border: var(
-    --c-success-border,
-    #bbf7d0
-  );
-
-  --sr-success-text: var(
-    --c-success-text,
-    #15803d
-  );
-
-  --sr-error-bg: var(
-    --c-error-bg,
-    #fff1f2
-  );
-
-  --sr-error-border: var(
-    --c-error-border,
-    #fecaca
-  );
-
-  --sr-error-text: var(
-    --c-error-text,
-    #b91c1c
-  );
+  --sr-error-bg: var(--c-error-bg, #fff1f2);
+  --sr-error-border: var(--c-error-border, #fecaca);
+  --sr-error-text: var(--c-error-text, #b91c1c);
 
   width: 100%;
   min-width: 0;
-
   display: grid;
-
-  gap: 18px;
-
+  gap: 16px;
   padding-bottom: 36px;
-
-  color: var(
-    --sr-text-primary
-  );
+  color: var(--sr-text);
 }
 
-.students-risk-page
-  button:focus-visible,
-.students-risk-page
-  input:focus-visible,
-.students-risk-page
-  textarea:focus-visible,
-.students-risk-modal-backdrop
-  button:focus-visible,
-.students-risk-modal-backdrop
-  textarea:focus-visible {
-  outline: 3px solid
-    rgba(
-      37,
-      99,
-      235,
-      0.16
-    );
+.students-risk-page * {
+  box-sizing: border-box;
+}
 
+.students-risk-page button,
+.students-risk-page input,
+.students-risk-page textarea,
+.students-risk-page summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.students-risk-page button:focus-visible,
+.students-risk-page input:focus-visible,
+.students-risk-page textarea:focus-visible,
+.students-risk-page summary:focus-visible,
+.students-risk-modal-backdrop button:focus-visible,
+.students-risk-modal-backdrop textarea:focus-visible,
+.students-risk-modal-backdrop summary:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.16);
   outline-offset: 2px;
 }
 
 /* =========================================================
-   02. TOP OVERVIEW
-   STUDENT MANAGEMENT REFERENCE
+   02. HERO — SMALLER, MORE TASK FOCUSED
 ========================================================= */
 
 .students-risk-hero {
   position: relative;
-
   display: grid;
-
-  grid-template-columns:
-    minmax(
-      0,
-      1.45fr
-    )
-    minmax(
-      280px,
-      0.55fr
-    );
-
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 0.38fr);
   align-items: center;
-
-  gap: 28px;
-
+  gap: 22px;
   overflow: hidden;
-
-  padding:
-    23px
-    25px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    14px;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  box-shadow:
-    0 1px 2px
-      rgba(
-        15,
-        23,
-        42,
-        0.025
-      ),
-    0 12px 32px
-      rgba(
-        15,
-        23,
-        42,
-        0.045
-      );
+  padding: 21px 22px 21px 26px;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 16px;
+  background: var(--sr-surface);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
 }
 
 .students-risk-hero::before {
   content: "";
-
   position: absolute;
-
-  inset:
-    0
-    auto
-    0
-    0;
-
+  inset: 0 auto 0 0;
   width: 4px;
-
-  background:
-    linear-gradient(
-      180deg,
-      var(
-        --sr-blue-900
-      ),
-      var(
-        --sr-red-600
-      )
-    );
+  background: var(--sr-primary);
 }
 
-.students-risk-hero
-  > div {
+.students-risk-hero-copy {
   min-width: 0;
-
-  padding-left: 7px;
 }
 
-.students-risk-hero
-  > div
-  > span,
-.students-risk-hero
-  aside
-  > span {
+.students-risk-kicker,
+.students-risk-section-card > span,
+.students-risk-panel-head > div > span {
   display: block;
-
-  color:
-    var(
-      --sr-blue-800
-    );
-
+  color: var(--sr-primary-2);
   font-size: 10px;
-
   font-weight: 900;
-
-  letter-spacing:
-    0.11em;
+  letter-spacing: 0.11em;
 }
 
 .students-risk-hero h2 {
   max-width: 760px;
-
-  margin:
-    6px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size:
-    clamp(
-      23px,
-      2.15vw,
-      28px
-    );
-
+  margin: 6px 0 0;
+  color: var(--sr-text);
+  font-size: clamp(22px, 2vw, 28px);
   font-weight: 850;
-
   line-height: 1.18;
-
-  letter-spacing:
-    -0.4px;
+  letter-spacing: -0.45px;
 }
 
 .students-risk-hero p {
   max-width: 760px;
-
-  margin:
-    7px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-body
-    );
-
-  font-size: 12px;
-
+  margin: 8px 0 0;
+  color: var(--sr-body);
+  font-size: 13px;
   line-height: 1.55;
 }
 
-.students-risk-hero aside {
+.students-risk-section-card {
   min-width: 0;
-
-  display: grid;
-
-  align-content: center;
-
-  padding:
-    14px
-    16px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    11px;
-
-  background:
-    var(
-      --sr-surface-soft
-    );
+  padding: 14px 15px;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 12px;
+  background: var(--sr-surface-soft);
 }
 
-.students-risk-hero
-  aside
-  strong {
+.students-risk-section-card > strong {
   display: block;
-
   margin-top: 6px;
-
   overflow: hidden;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 20px;
-
-  font-weight: 880;
-
-  line-height: 1.2;
-
-  text-overflow:
-    ellipsis;
-
-  white-space:
-    nowrap;
+  color: var(--sr-text);
+  font-size: 18px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.students-risk-hero
-  aside
-  small {
-  display: block;
+.students-risk-section-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 9px;
+  color: var(--sr-body);
+  font-size: 11px;
+  font-weight: 700;
+}
 
-  margin-top: 5px;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 10px;
-
-  line-height: 1.4;
+.students-risk-section-status i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.11);
 }
 
 /* =========================================================
-   03. PAGE ERROR
+   03. ERROR / EMPTY STATES
 ========================================================= */
 
 .students-risk-alert {
   display: grid;
-
-  grid-template-columns:
-    auto
-    minmax(
-      0,
-      1fr
-    )
-    auto;
-
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-
   gap: 12px;
-
-  padding:
-    14px
-    15px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-error-border
-    );
-
-  border-radius:
-    11px;
-
-  background:
-    var(
-      --sr-error-bg
-    );
-
-  color:
-    var(
-      --sr-error-text
-    );
+  padding: 13px 14px;
+  border: 1px solid var(--sr-error-border);
+  border-radius: 12px;
+  background: var(--sr-error-bg);
+  color: var(--sr-error-text);
 }
 
-.students-risk-alert
-  > span {
+.students-risk-alert > span,
+.students-risk-feedback > span {
   width: 28px;
-
   height: 28px;
-
   display: grid;
-
   place-items: center;
-
+  flex: 0 0 28px;
   border-radius: 50%;
-
-  background:
-    currentColor;
-
-  color: #ffffff;
-
   font-size: 12px;
-
   font-weight: 900;
 }
 
-.students-risk-alert
-  > div {
-  min-width: 0;
+.students-risk-alert > span {
+  background: currentColor;
+  color: #ffffff;
 }
 
-.students-risk-alert
-  strong {
+.students-risk-alert strong {
   display: block;
-
   font-size: 13px;
-
   font-weight: 850;
 }
 
-.students-risk-alert
-  p {
-  margin:
-    4px
-    0
-    0;
-
+.students-risk-alert p {
+  margin: 3px 0 0;
   color: inherit;
-
   font-size: 11px;
-
-  line-height: 1.5;
-
-  opacity: 0.9;
+  line-height: 1.45;
 }
 
-.students-risk-alert
-  button {
+.students-risk-alert button {
   min-height: 36px;
-
-  padding:
-    0
-    11px;
-
-  border:
-    1px
-    solid
-    currentColor;
-
+  padding: 0 12px;
+  border: 1px solid currentColor;
   border-radius: 8px;
-
-  background:
-    transparent;
-
+  background: transparent;
   color: inherit;
-
-  font-family:
-    inherit;
-
-  font-size: 10px;
-
+  font-size: 11px;
   font-weight: 850;
-
   cursor: pointer;
 }
 
-/* =========================================================
-   04. SUMMARY CARDS
-========================================================= */
-
-.students-risk-summary {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      4,
-      minmax(
-        0,
-        1fr
-      )
-    );
-
-  gap: 8px;
-}
-
-.students-risk-summary
-  article {
-  position: relative;
-
-  min-width: 0;
-
-  min-height: 104px;
-
+.students-risk-empty {
+  min-height: 280px;
   display: flex;
-
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
-
-  padding:
-    13px
-    14px;
-
-  overflow: hidden;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    11px;
-
-  background:
-    var(
-      --sr-surface-soft
-    );
+  padding: 32px;
+  border: 1px dashed var(--sr-border);
+  border-radius: 14px;
+  background: var(--sr-surface-soft);
+  text-align: center;
 }
 
-.students-risk-summary
-  article::before {
-  content: "";
-
-  position: absolute;
-
-  inset:
-    0
-    0
-    auto
-    0;
-
-  height: 3px;
-
-  background:
-    var(
-      --sr-blue-900
-    );
+.students-risk-empty.is-panel {
+  min-height: 250px;
+  border: 0;
+  border-radius: 0;
 }
 
-.students-risk-summary
-  article
-  > span {
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 9px;
-
-  font-weight: 900;
-
-  letter-spacing:
-    0.06em;
+.students-risk-empty > span {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--sr-brand-border);
+  border-radius: 14px;
+  background: var(--sr-brand-soft);
+  color: var(--sr-primary-2);
+  font-size: 21px;
 }
 
-.students-risk-summary
-  article
-  strong {
-  display: block;
-
-  margin-top: auto;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 23px;
-
-  font-weight: 900;
-
-  line-height: 1;
+.students-risk-empty h3 {
+  margin: 12px 0 0;
+  font-size: 17px;
+  font-weight: 850;
 }
 
-.students-risk-summary
-  article
-  p {
-  margin:
-    7px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 10px;
-
-  line-height: 1.4;
-}
-
-.students-risk-summary
-  .is-warning::before {
-  background:
-    #eab308;
-}
-
-.students-risk-summary
-  .is-warning
-  strong {
-  color:
-    #a16207;
-}
-
-.students-risk-summary
-  .is-at-risk::before {
-  background:
-    #f97316;
-}
-
-.students-risk-summary
-  .is-at-risk
-  strong {
-  color:
-    #c2410c;
-}
-
-.students-risk-summary
-  .is-critical::before {
-  background:
-    #ef4444;
-}
-
-.students-risk-summary
-  .is-critical
-  strong {
-  color:
-    #b91c1c;
+.students-risk-empty p {
+  max-width: 470px;
+  margin: 7px auto 0;
+  color: var(--sr-body);
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 /* =========================================================
-   05. RISK REGISTER PANEL
+   04. SHARED PANEL / HEADER
 ========================================================= */
 
 .students-risk-panel {
   min-width: 0;
-
   overflow: hidden;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    14px;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  box-shadow:
-    0 1px 2px
-      rgba(
-        15,
-        23,
-        42,
-        0.025
-      ),
-    0 12px 32px
-      rgba(
-        15,
-        23,
-        42,
-        0.045
-      );
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 16px;
+  background: var(--sr-surface);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.045);
 }
 
 .students-risk-panel-head {
-  min-height: 82px;
-
+  min-height: 80px;
   display: flex;
-
   align-items: center;
-
-  justify-content:
-    space-between;
-
+  justify-content: space-between;
   gap: 20px;
-
-  padding:
-    17px
-    19px
-    17px
-    21px;
-
-  border-bottom:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
+  padding: 16px 18px 16px 20px;
+  border-bottom: 1px solid var(--sr-border-soft);
 }
 
-.students-risk-panel-head
-  > div:first-child {
+.students-risk-panel-head > div {
   min-width: 0;
 }
 
-.students-risk-panel-head
-  > div:first-child
-  > span {
-  display: block;
-
-  margin-bottom: 5px;
-
-  color:
-    var(
-      --sr-blue-800
-    );
-
-  font-size: 10px;
-
-  font-weight: 900;
-
-  letter-spacing:
-    0.11em;
-}
-
-.students-risk-panel-head
-  h3 {
-  margin: 0;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
+.students-risk-panel-head h3 {
+  margin: 4px 0 0;
+  color: var(--sr-text);
   font-size: 20px;
-
   font-weight: 850;
 }
 
-.students-risk-panel-head
-  p {
-  margin:
-    5px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-body
-    );
-
+.students-risk-panel-head p {
+  margin: 5px 0 0;
+  color: var(--sr-body);
   font-size: 12px;
-
-  line-height: 1.45;
-}
-
-/* =========================================================
-   06. AUTO SYNC
-   NO MANUAL REFRESH
-========================================================= */
-
-.students-risk-live-sync {
-  min-height: 38px;
-
-  flex:
-    0
-    0
-    auto;
-
-  display:
-    inline-flex;
-
-  align-items: center;
-
-  gap: 9px;
-
-  padding:
-    0
-    12px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-success-border
-    );
-
-  border-radius:
-    999px;
-
-  background:
-    var(
-      --sr-success-bg
-    );
-
-  color:
-    var(
-      --sr-success-text
-    );
-
-  white-space:
-    nowrap;
-}
-
-.students-risk-live-sync
-  > i {
-  width: 7px;
-
-  height: 7px;
-
-  flex:
-    0
-    0
-    7px;
-
-  border-radius:
-    50%;
-
-  background:
-    #16a34a;
-
-  box-shadow:
-    0 0 0 4px
-      rgba(
-        22,
-        163,
-        74,
-        0.1
-      );
-}
-
-.students-risk-live-sync
-  > div {
-  display: grid;
-
-  gap: 1px;
-}
-
-.students-risk-live-sync
-  strong {
-  color: inherit;
-
-  font-size: 10px;
-
-  font-weight: 900;
-}
-
-.students-risk-live-sync
-  small {
-  color: inherit;
-
-  font-size: 8.5px;
-
-  line-height: 1.3;
-
-  opacity: 0.82;
-}
-
-.students-risk-live-sync.is-syncing {
-  border-color:
-    #bfdbfe;
-
-  background:
-    #eff6ff;
-
-  color:
-    #1d4ed8;
-}
-
-.students-risk-live-sync.is-syncing
-  > i {
-  background:
-    #2563eb;
-
-  box-shadow:
-    0 0 0 4px
-      rgba(
-        37,
-        99,
-        235,
-        0.11
-      );
-
-  animation:
-    sr-live-pulse
-    1s
-    ease-in-out
-    infinite;
-}
-
-/* =========================================================
-   07. TOOLBAR
-========================================================= */
-
-.students-risk-toolbar {
-  position: relative;
-
-  z-index: 5;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 14px;
-
-  padding:
-    11px
-    14px;
-
-  border-bottom:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  background:
-    color-mix(
-      in srgb,
-      var(
-        --sr-surface-soft
-      )
-        70%,
-      var(
-        --sr-surface
-      )
-    );
-}
-
-.students-risk-toolbar
-  > label {
-  width:
-    min(
-      100%,
-      560px
-    );
-
-  min-height: 42px;
-
-  display: grid;
-
-  grid-template-columns:
-    auto
-    minmax(
-      0,
-      1fr
-    )
-    auto;
-
-  align-items: center;
-
-  gap: 9px;
-
-  padding:
-    0
-    11px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border
-    );
-
-  border-radius: 9px;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  transition:
-    border-color
-      0.16s
-      ease,
-    box-shadow
-      0.16s
-      ease;
-}
-
-.students-risk-toolbar
-  > label:focus-within {
-  border-color:
-    var(
-      --sr-blue-800
-    );
-
-  box-shadow:
-    0 0 0 3px
-      rgba(
-        18,
-        61,
-        126,
-        0.08
-      );
-}
-
-.students-risk-toolbar
-  > label
-  > span {
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 17px;
-}
-
-.students-risk-toolbar
-  input {
-  width: 100%;
-
-  min-width: 0;
-
-  padding: 0;
-
-  border: 0;
-
-  outline: 0;
-
-  background:
-    transparent;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-family:
-    inherit;
-
-  font-size: 12px;
-}
-
-.students-risk-toolbar
-  input::placeholder {
-  color:
-    var(
-      --sr-text-muted
-    );
-}
-
-.students-risk-toolbar
-  label
-  button {
-  width: 28px;
-
-  height: 28px;
-
-  display: grid;
-
-  place-items: center;
-
-  padding: 0;
-
-  border: 0;
-
-  border-radius: 7px;
-
-  background:
-    transparent;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 17px;
-
-  cursor: pointer;
-}
-
-.students-risk-toolbar
-  label
-  button:hover {
-  background:
-    var(
-      --sr-surface-soft
-    );
-
-  color:
-    var(
-      --sr-text-primary
-    );
-}
-
-.students-risk-toolbar
-  > div {
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    flex-end;
-
-  gap: 6px;
-
-  overflow-x: auto;
-
-  scrollbar-width:
-    none;
-}
-
-.students-risk-toolbar
-  > div::-webkit-scrollbar {
-  display: none;
-}
-
-.students-risk-toolbar
-  > div
-  button {
-  min-height: 36px;
-
-  flex:
-    0
-    0
-    auto;
-
-  padding:
-    0
-    11px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border
-    );
-
-  border-radius: 9px;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-secondary
-    );
-
-  font-family:
-    inherit;
-
-  font-size: 10px;
-
-  font-weight: 820;
-
-  cursor: pointer;
-
-  transition:
-    transform
-      0.15s
-      ease,
-    border-color
-      0.15s
-      ease,
-    background
-      0.15s
-      ease,
-    color
-      0.15s
-      ease;
-}
-
-.students-risk-toolbar
-  > div
-  button:hover,
-.students-risk-toolbar
-  > div
-  button.is-active {
-  transform:
-    translateY(
-      -1px
-    );
-
-  border-color:
-    color-mix(
-      in srgb,
-      var(
-        --sr-blue-800
-      )
-        45%,
-      var(
-        --sr-border
-      )
-    );
-
-  background:
-    var(
-      --sr-icon-bg
-    );
-
-  color:
-    var(
-      --sr-blue-800
-    );
-}
-
-/* =========================================================
-   08. TABLE
-========================================================= */
-
-.students-risk-table-wrap {
-  width: 100%;
-
-  overflow-x: auto;
-
-  scrollbar-width:
-    thin;
-}
-
-.students-risk-table {
-  width: 100%;
-
-  min-width:
-    1000px;
-
-  border-collapse:
-    collapse;
-
-  table-layout:
-    fixed;
-}
-
-.students-risk-table
-  thead {
-  background:
-    var(
-      --sr-surface-soft
-    );
-}
-
-.students-risk-table
-  th {
-  padding:
-    12px
-    14px;
-
-  border-bottom:
-    1px
-    solid
-    var(
-      --sr-border
-    );
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 10px;
-
-  font-weight: 900;
-
-  letter-spacing:
-    0.06em;
-
-  text-align: left;
-
-  white-space: nowrap;
-}
-
-.students-risk-table
-  th:nth-child(1) {
-  width: 24%;
-}
-
-.students-risk-table
-  th:nth-child(2),
-.students-risk-table
-  th:nth-child(3),
-.students-risk-table
-  th:nth-child(4),
-.students-risk-table
-  th:nth-child(5) {
-  width: 8%;
-
-  text-align:
-    center;
-}
-
-.students-risk-table
-  th:nth-child(6) {
-  width: 20%;
-}
-
-.students-risk-table
-  th:nth-child(7) {
-  width: 24%;
-}
-
-.students-risk-table
-  td {
-  padding: 14px;
-
-  border-bottom:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  color:
-    var(
-      --sr-text-secondary
-    );
-
-  font-size: 12px;
-
-  vertical-align:
-    middle;
-}
-
-.students-risk-table
-  tbody
-  tr {
-  transition:
-    background
-      0.15s
-      ease;
-}
-
-.students-risk-table
-  tbody
-  tr:hover {
-  background:
-    var(
-      --sr-surface-soft
-    );
-}
-
-.students-risk-table
-  tbody
-  tr:last-child
-  td {
-  border-bottom: 0;
-}
-
-.students-risk-table
-  td:nth-child(2),
-.students-risk-table
-  td:nth-child(3),
-.students-risk-table
-  td:nth-child(4),
-.students-risk-table
-  td:nth-child(5) {
-  text-align: center;
-
-  color:
-    var(
-      --sr-text-secondary
-    );
-
-  font-size: 13px;
-
-  font-weight: 900;
-}
-
-.students-risk-table
-  td.is-present {
-  color:
-    #15803d;
-}
-
-.students-risk-table
-  td.is-late {
-  color:
-    #a16207;
-}
-
-.students-risk-table
-  td.is-absent {
-  color:
-    #b91c1c;
-}
-
-/* =========================================================
-   09. STUDENT CELL
-========================================================= */
-
-.students-risk-student {
-  min-width: 0;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-}
-
-.students-risk-student
-  > span {
-  width: 38px;
-
-  height: 38px;
-
-  flex:
-    0
-    0
-    38px;
-
-  display: grid;
-
-  place-items: center;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-brand-border
-    );
-
-  border-radius:
-    10px;
-
-  background:
-    var(
-      --sr-icon-bg
-    );
-
-  color:
-    var(
-      --sr-blue-800
-    );
-
-  font-size: 14px;
-
-  font-weight: 900;
-}
-
-.students-risk-student
-  > div {
-  min-width: 0;
-}
-
-.students-risk-student
-  strong {
-  display: block;
-
-  overflow: hidden;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 13px;
-
-  font-weight: 820;
-
-  text-overflow:
-    ellipsis;
-
-  white-space:
-    nowrap;
-}
-
-.students-risk-student
-  small {
-  display: block;
-
-  margin-top: 3px;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 10px;
-}
-
-/* =========================================================
-   10. RISK BADGES
-========================================================= */
-
-.students-risk-badge {
-  width: 75px;
-  height: 29px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0 10px;
-
-  border: 1px solid;
-  border-radius: 999px;
-
-  font-size: 20px;
-  font-weight: 900;
-  line-height: 3;
-
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-
-  white-space: nowrap;
-}
-
-.students-risk-badge.is-normal {
-  border-color:
-    #bbf7d0;
-
-  background:
-    #ecfdf3;
-
-  color:
-    #15803d;
-}
-
-.students-risk-badge.is-warning {
-  border-color:
-    #fde68a;
-
-  background:
-    #fffbeb;
-
-  color:
-    #a16207;
-}
-
-.students-risk-badge.is-at-risk {
-  border-color:
-    #fed7aa;
-
-  background:
-    #fff7ed;
-
-  color:
-    #c2410c;
-}
-
-.students-risk-badge.is-critical {
-  border-color:
-    #fecdd3;
-
-  background:
-    #fff1f2;
-
-  color:
-    #b91c1c;
-}
-
-.students-risk-badge.is-unknown {
-  border-color:
-    var(
-      --sr-border
-    );
-
-  background:
-    var(
-      --sr-surface-soft
-    );
-
-  color:
-    var(
-      --sr-text-muted
-    );
-}
-
-.students-risk-risk-copy,
-.students-risk-meta {
-  display: block;
-
-  margin-top: 6px;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 9.5px;
-
   line-height: 1.45;
 }
 
 .students-risk-review {
-  min-height: 37px;
-
-  padding:
-    0
-    12px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-brand-border
-    );
-
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 13px;
+  border: 1px solid var(--sr-brand-border);
   border-radius: 9px;
-
-  background:
-    var(
-      --sr-icon-bg
-    );
-
-  color:
-    var(
-      --sr-blue-800
-    );
-
-  font-family:
-    inherit;
-
-  font-size: 10.5px;
-
+  background: var(--sr-brand-soft);
+  color: var(--sr-primary-2);
+  font-size: 11px;
   font-weight: 850;
-
   white-space: nowrap;
-
   cursor: pointer;
-
-  transition:
-    transform
-      0.15s
-      ease,
-    border-color
-      0.15s
-      ease,
-    box-shadow
-      0.15s
-      ease;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.students-risk-review:hover {
-  transform:
-    translateY(
-      -1px
-    );
+.students-risk-review:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--sr-primary-2);
+  box-shadow: 0 5px 14px rgba(7, 27, 66, 0.07);
+}
 
-  border-color:
-    var(
-      --sr-blue-800
-    );
+.students-risk-review:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
 
-  box-shadow:
-    0 5px 14px
-      rgba(
-        7,
-        27,
-        66,
-        0.06
-      );
+/* =========================================================
+   05. FOCUS STRIP — ESSENTIAL COUNTS ONLY
+========================================================= */
+
+.students-risk-focus-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.students-risk-focus-strip > div {
+  position: relative;
+  min-width: 0;
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 13px 14px;
+  overflow: hidden;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 12px;
+  background: var(--sr-surface);
+}
+
+.students-risk-focus-strip > div::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--sr-primary);
+}
+
+.students-risk-focus-strip > div.is-attention::before {
+  background: #f59e0b;
+}
+
+.students-risk-focus-strip > div.is-critical::before {
+  background: #ef4444;
+}
+
+.students-risk-focus-strip > div.is-normal::before {
+  background: #22c55e;
+}
+
+.students-risk-focus-strip span {
+  color: var(--sr-muted);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.students-risk-focus-strip strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--sr-text);
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.students-risk-focus-strip small {
+  display: block;
+  margin-top: 6px;
+  color: var(--sr-muted);
+  font-size: 10px;
+}
+
+.students-risk-focus-strip .is-critical strong {
+  color: #b91c1c;
+}
+
+/* =========================================================
+   06. TOOLBAR — SEARCH + FILTER COUNTS
+========================================================= */
+
+.students-risk-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border-bottom: 1px solid var(--sr-border-soft);
+  background: var(--sr-surface-soft);
+}
+
+.students-risk-search {
+  width: min(100%, 460px);
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 0 11px;
+  border: 1px solid var(--sr-border);
+  border-radius: 10px;
+  background: var(--sr-surface);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.students-risk-search:focus-within {
+  border-color: var(--sr-primary-2);
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.08);
+}
+
+.students-risk-search > span {
+  color: var(--sr-muted);
+  font-size: 17px;
+}
+
+.students-risk-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--sr-text);
+  font-size: 12px;
+}
+
+.students-risk-search input::placeholder {
+  color: var(--sr-muted);
+}
+
+.students-risk-search button {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--sr-muted);
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.students-risk-filter-list {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.students-risk-filter-list::-webkit-scrollbar {
+  display: none;
+}
+
+.students-risk-filter-list button {
+  min-height: 36px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 1px solid var(--sr-border);
+  border-radius: 9px;
+  background: var(--sr-surface);
+  color: var(--sr-text-2);
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.students-risk-filter-list button b {
+  min-width: 20px;
+  min-height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--sr-surface-soft);
+  color: var(--sr-muted);
+  font-size: 9px;
+}
+
+.students-risk-filter-list button:hover,
+.students-risk-filter-list button.is-active {
+  border-color: var(--sr-brand-border);
+  background: var(--sr-brand-soft);
+  color: var(--sr-primary-2);
+}
+
+.students-risk-filter-list button.is-active b {
+  background: var(--sr-surface);
+  color: var(--sr-primary-2);
+}
+
+/* =========================================================
+   07. TABLE — 4 COLUMNS, LESS SCANNING
+========================================================= */
+
+.students-risk-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.students-risk-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.students-risk-table thead {
+  background: var(--sr-surface-soft);
+}
+
+.students-risk-table th {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--sr-border);
+  color: var(--sr-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.students-risk-table th:nth-child(1) { width: 26%; }
+.students-risk-table th:nth-child(2) { width: 27%; }
+.students-risk-table th:nth-child(3) { width: 24%; }
+.students-risk-table th:nth-child(4) { width: 23%; }
+
+.students-risk-table td {
+  padding: 14px;
+  border-bottom: 1px solid var(--sr-border-soft);
+  color: var(--sr-text-2);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.students-risk-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.students-risk-table tbody tr:hover {
+  background: var(--sr-surface-soft);
+}
+
+.students-risk-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.students-risk-student {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.students-risk-student > span,
+.students-risk-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--sr-brand-border);
+  border-radius: 11px;
+  background: var(--sr-brand-soft);
+  color: var(--sr-primary-2);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.students-risk-student > div {
+  min-width: 0;
+}
+
+.students-risk-student strong {
+  display: block;
+  overflow: hidden;
+  color: var(--sr-text);
+  font-size: 13px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.students-risk-student small {
+  display: block;
+  margin-top: 3px;
+  color: var(--sr-muted);
+  font-size: 10px;
+}
+
+.students-risk-attendance-summary {
+  display: grid;
+  gap: 7px;
+}
+
+.students-risk-attendance-summary > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.students-risk-attendance-summary > div > span {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 8px;
+  background: var(--sr-surface-soft);
+  color: var(--sr-body);
+  font-size: 9.5px;
+  font-weight: 750;
+}
+
+.students-risk-attendance-summary b {
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.students-risk-attendance-summary .is-present b { color: #15803d; }
+.students-risk-attendance-summary .is-late b { color: #a16207; }
+.students-risk-attendance-summary .is-absent b { color: #b91c1c; }
+
+.students-risk-attendance-summary > small {
+  color: var(--sr-muted);
+  font-size: 9.5px;
+}
+
+.students-risk-risk-cell,
+.students-risk-action-cell {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+
+.students-risk-risk-cell small,
+.students-risk-action-cell small {
+  color: var(--sr-muted);
+  font-size: 9.5px;
+  line-height: 1.42;
+}
+
+.students-risk-badge {
+  min-width: 78px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.students-risk-badge.is-normal {
+  border-color: #bbf7d0;
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.students-risk-badge.is-warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #a16207;
+}
+
+.students-risk-badge.is-at-risk {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.students-risk-badge.is-critical {
+  border-color: #fecdd3;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+.students-risk-badge.is-unknown {
+  border-color: var(--sr-border);
+  background: var(--sr-surface-soft);
+  color: var(--sr-muted);
 }
 
 .students-risk-muted {
-  color:
-    var(
-      --sr-text-muted
-    );
-
+  color: var(--sr-muted);
   font-size: 10px;
-
   font-weight: 750;
 }
 
 /* =========================================================
-   11. LOADING
+   08. LOADING / PAGINATION
 ========================================================= */
 
 .students-risk-loading {
   display: grid;
-
   gap: 1px;
-
-  background:
-    var(
-      --sr-border-soft
-    );
+  background: var(--sr-border-soft);
 }
 
-.students-risk-loading
-  > span {
-  height: 66px;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(
-        --sr-surface
-      ),
-      var(
-        --sr-surface-soft
-      ),
-      var(
-        --sr-surface
-      )
-    );
-
-  background-size:
-    220%
-    100%;
-
-  animation:
-    sr-shimmer
-    1.25s
-    linear
-    infinite;
+.students-risk-loading > span {
+  height: 68px;
+  background: linear-gradient(90deg, var(--sr-surface), var(--sr-surface-soft), var(--sr-surface));
+  background-size: 220% 100%;
+  animation: sr-shimmer 1.2s linear infinite;
 }
-
-/* =========================================================
-   12. EMPTY STATES
-========================================================= */
-
-.students-risk-empty {
-  min-height: 310px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    center;
-
-  flex-direction:
-    column;
-
-  padding: 35px;
-
-  border:
-    1px
-    dashed
-    var(
-      --sr-border
-    );
-
-  border-radius:
-    14px;
-
-  background:
-    var(
-      --sr-surface-soft
-    );
-
-  text-align:
-    center;
-}
-
-.students-risk-empty.is-panel {
-  border: 0;
-
-  border-radius: 0;
-}
-
-.students-risk-empty
-  > span {
-  width: 56px;
-
-  height: 56px;
-
-  display: grid;
-
-  place-items: center;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-brand-border
-    );
-
-  border-radius:
-    14px;
-
-  background:
-    var(
-      --sr-icon-bg
-    );
-
-  color:
-    var(
-      --sr-blue-800
-    );
-
-  font-size: 22px;
-}
-
-.students-risk-empty
-  h3 {
-  margin:
-    12px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 17px;
-
-  font-weight: 850;
-}
-
-.students-risk-empty
-  p {
-  max-width: 440px;
-
-  margin:
-    7px
-    auto
-    0;
-
-  color:
-    var(
-      --sr-text-body
-    );
-
-  font-size: 12px;
-
-  line-height: 1.55;
-}
-
-/* =========================================================
-   13. PAGINATION
-========================================================= */
 
 .students-risk-pagination {
-  min-height: 64px;
-
+  min-height: 62px;
   display: flex;
-
   align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 16px;
-
-  padding:
-    13px
-    16px;
-
-  border-top:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  background:
-    var(
-      --sr-surface
-    );
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--sr-border-soft);
+  background: var(--sr-surface);
 }
 
-.students-risk-pagination
-  p,
-.students-risk-pagination
-  span {
+.students-risk-pagination p,
+.students-risk-pagination span {
   margin: 0;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
+  color: var(--sr-muted);
   font-size: 11px;
-
-  line-height: 1.4;
 }
 
-.students-risk-pagination
-  strong {
-  color:
-    var(
-      --sr-text-secondary
-    );
-
-  font-size: 12px;
-
+.students-risk-pagination strong {
+  color: var(--sr-text-2);
   font-weight: 900;
 }
 
-.students-risk-pagination
-  > div {
+.students-risk-pagination > div {
   display: flex;
-
   align-items: center;
-
   gap: 8px;
 }
 
-.students-risk-pagination
-  button {
+.students-risk-pagination button {
   min-width: 88px;
-
   height: 36px;
-
-  display:
-    inline-flex;
-
+  display: inline-flex;
   align-items: center;
-
-  justify-content:
-    center;
-
-  padding:
-    0
-    10px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border
-    );
-
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid var(--sr-border);
   border-radius: 8px;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-secondary
-    );
-
-  font-family:
-    inherit;
-
+  background: var(--sr-surface);
+  color: var(--sr-text-2);
   font-size: 10.5px;
-
   font-weight: 820;
-
   cursor: pointer;
-
-  transition:
-    border-color
-      0.15s
-      ease,
-    background
-      0.15s
-      ease,
-    color
-      0.15s
-      ease;
 }
 
-.students-risk-pagination
-  button:hover:not(
-    :disabled
-  ) {
-  border-color:
-    #93b9ef;
-
-  background:
-    #eff6ff;
-
-  color:
-    #1d4ed8;
+.students-risk-pagination button:hover:not(:disabled) {
+  border-color: var(--sr-brand-border);
+  background: var(--sr-brand-soft);
+  color: var(--sr-primary-2);
 }
 
-.students-risk-pagination
-  button:disabled {
-  cursor:
-    not-allowed;
-
+.students-risk-pagination button:disabled {
+  cursor: not-allowed;
   opacity: 0.4;
 }
 
 /* =========================================================
-   14. MODAL BACKDROP
-========================================================= */
-
-.students-risk-modal-backdrop {
-  position: fixed;
-
-  inset: 0;
-
-  z-index: 2100;
-
-  display: grid;
-
-  place-items: center;
-
-  padding: 16px;
-
-  overflow: hidden;
-
-  background:
-    rgba(
-      8,
-      18,
-      34,
-      0.54
-    );
-
-  backdrop-filter:
-    blur(
-      5px
-    );
-}
-
-/* =========================================================
-   15. MODAL SHELL
-========================================================= */
-
-.students-risk-modal {
-  width:
-    min(
-      980px,
-      calc(
-        100vw -
-          32px
-      )
-    );
-
-  max-height:
-    calc(
-      100dvh -
-        32px
-    );
-
-  display: grid;
-
-  grid-template-rows:
-    auto
-    minmax(
-      0,
-      1fr
-    )
-    auto;
-
-  overflow: hidden;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    18px;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  box-shadow:
-    0 30px 80px
-      rgba(
-        2,
-        8,
-        23,
-        0.26
-      ),
-    0 8px 24px
-      rgba(
-        2,
-        8,
-        23,
-        0.1
-      );
-}
-
-/* =========================================================
-   16. MODAL HEADER
-========================================================= */
-
-.students-risk-modal
-  > header {
-  position: relative;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 18px;
-
-  padding:
-    18px
-    20px;
-
-  border-bottom:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(
-        in srgb,
-        var(
-          --sr-icon-bg
-        )
-          60%,
-        var(
-          --sr-surface
-        )
-      ),
-      var(
-        --sr-surface
-      )
-        58%
-    );
-}
-
-.students-risk-modal
-  > header
-  > div {
-  min-width: 0;
-}
-
-.students-risk-modal
-  > header
-  span {
-  display: block;
-
-  margin-bottom: 4px;
-
-  color:
-    var(
-      --sr-blue-800
-    );
-
-  font-size: 10px;
-
-  font-weight: 900;
-
-  letter-spacing:
-    0.11em;
-}
-
-.students-risk-modal
-  > header
-  h2 {
-  margin: 0;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 21px;
-
-  font-weight: 850;
-
-  line-height: 1.18;
-
-  letter-spacing:
-    -0.3px;
-}
-
-.students-risk-modal
-  > header
-  p {
-  max-width: 720px;
-
-  margin:
-    5px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-body
-    );
-
-  font-size: 12px;
-
-  line-height: 1.5;
-}
-
-.students-risk-modal
-  > header
-  > button {
-  width: 36px;
-
-  height: 36px;
-
-  flex:
-    0
-    0
-    36px;
-
-  display: grid;
-
-  place-items: center;
-
-  padding: 0;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius: 10px;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-family:
-    inherit;
-
-  font-size: 21px;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  transition:
-    transform
-      0.16s
-      ease,
-    border-color
-      0.16s
-      ease,
-    background
-      0.16s
-      ease,
-    color
-      0.16s
-      ease;
-}
-
-.students-risk-modal
-  > header
-  > button:hover:not(
-    :disabled
-  ) {
-  transform:
-    translateY(
-      -1px
-    );
-
-  border-color:
-    var(
-      --sr-border
-    );
-
-  background:
-    var(
-      --sr-surface-soft
-    );
-
-  color:
-    var(
-      --sr-text-primary
-    );
-}
-
-.students-risk-modal
-  > header
-  > button:disabled {
-  cursor:
-    not-allowed;
-
-  opacity: 0.5;
-}
-
-/* =========================================================
-   17. MODAL LOADING / ERROR
-========================================================= */
-
-.students-risk-modal-loading,
-.students-risk-modal-error {
-  min-height: 340px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    center;
-
-  gap: 12px;
-
-  padding: 32px;
-}
-
-.students-risk-modal-loading {
-  flex-direction:
-    column;
-
-  color:
-    var(
-      --sr-text-secondary
-    );
-
-  text-align:
-    center;
-}
-
-.students-risk-modal-loading
-  > span {
-  width: 34px;
-
-  height: 34px;
-
-  border:
-    3px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-top-color:
-    var(
-      --sr-blue-800
-    );
-
-  border-radius:
-    50%;
-
-  animation:
-    sr-spin
-    0.75s
-    linear
-    infinite;
-}
-
-.students-risk-modal-loading
-  strong,
-.students-risk-modal-error
-  strong {
-  font-size: 13px;
-
-  font-weight: 850;
-}
-
-.students-risk-modal-error {
-  color:
-    var(
-      --sr-error-text
-    );
-}
-
-.students-risk-modal-error
-  > span {
-  width: 38px;
-
-  height: 38px;
-
-  flex:
-    0
-    0
-    38px;
-
-  display: grid;
-
-  place-items: center;
-
-  border-radius: 50%;
-
-  background:
-    var(
-      --sr-error-bg
-    );
-
-  font-weight: 900;
-}
-
-.students-risk-modal-error
-  p {
-  max-width: 500px;
-
-  margin:
-    4px
-    0
-    0;
-
-  font-size: 11px;
-
-  line-height: 1.5;
-}
-
-/* =========================================================
-   18. MODAL BODY
-========================================================= */
-
-.students-risk-modal-body {
-  min-height: 0;
-
-  display: grid;
-
-  align-content:
-    start;
-
-  gap: 14px;
-
-  overflow-y: auto;
-
-  overscroll-behavior:
-    contain;
-
-  padding:
-    18px
-    20px
-    22px;
-
-  background:
-    linear-gradient(
-      180deg,
-      var(
-        --sr-surface
-      )
-        0%,
-      color-mix(
-        in srgb,
-        var(
-          --sr-surface-soft
-        )
-          44%,
-        var(
-          --sr-surface
-        )
-      )
-        100%
-    );
-
-  scrollbar-width:
-    thin;
-}
-
-/* =========================================================
-   19. STUDENT + GUARDIAN
-========================================================= */
-
-.students-risk-notice-identity {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      2,
-      minmax(
-        0,
-        1fr
-      )
-    );
-
-  gap: 10px;
-}
-
-.students-risk-notice-identity
-  > div,
-.students-risk-subject {
-  min-width: 0;
-
-  padding:
-    13px
-    14px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    11px;
-
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-.students-risk-notice-identity
-  span,
-.students-risk-notice-summary
-  > div
-  > span,
-.students-risk-subject
-  > span,
-.students-risk-absences
-  header
-  span,
-.students-risk-absences
-  article
-  span,
-.students-risk-note
-  > div
-  > span,
-.students-risk-modal-actions
-  > div:first-child
-  > span {
-  display: block;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 9px;
-
-  font-weight: 900;
-
-  letter-spacing:
-    0.08em;
-}
-
-.students-risk-notice-identity
-  strong,
-.students-risk-subject
-  strong {
-  display: block;
-
-  margin-top: 4px;
-
-  overflow-wrap:
-    anywhere;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 12px;
-
-  font-weight: 850;
-}
-
-.students-risk-notice-identity
-  small {
-  display: block;
-
-  margin-top: 3px;
-
-  overflow-wrap:
-    anywhere;
-
-  color:
-    var(
-      --sr-text-body
-    );
-
-  font-size: 10px;
-}
-
-/* =========================================================
-   20. NOTICE SUMMARY
-========================================================= */
-
-.students-risk-notice-summary {
-  display: grid;
-
-  grid-template-columns:
-    0.85fr
-    0.75fr
-    0.75fr
-    1.45fr;
-
-  overflow: hidden;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    11px;
-
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-.students-risk-notice-summary
-  > div {
-  min-width: 0;
-
-  padding:
-    12px
-    13px;
-}
-
-.students-risk-notice-summary
-  > div
-  + div {
-  border-left:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-}
-
-.students-risk-notice-summary
-  strong {
-  display: block;
-
-  margin-top: 5px;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 11px;
-
-  font-weight: 900;
-}
-
-.students-risk-notice-summary
-  .students-risk-badge {
-  margin-top: 5px;
-}
-
-/* =========================================================
-   21. ATTENDANCE CHANGED WARNING
-========================================================= */
-
-.students-risk-warning {
-  display: grid;
-
-  grid-template-columns:
-    auto
-    minmax(
-      0,
-      1fr
-    );
-
-  align-items:
-    flex-start;
-
-  gap: 10px;
-
-  padding:
-    11px
-    12px;
-
-  border:
-    1px
-    solid
-    #f2d28f;
-
-  border-radius:
-    10px;
-
-  background:
-    color-mix(
-      in srgb,
-      #fff7ed
-        55%,
-      var(
-        --sr-surface
-      )
-    );
-
-  color:
-    #92400e;
-}
-
-.students-risk-warning
-  > span {
-  width: 26px;
-
-  height: 26px;
-
-  display: grid;
-
-  place-items: center;
-
-  border-radius: 50%;
-
-  background:
-    #fef3c7;
-
-  font-size: 10px;
-
-  font-weight: 900;
-}
-
-.students-risk-warning
-  p {
-  margin:
-    1px
-    0
-    0;
-
-  font-size: 10.5px;
-
-  line-height: 1.5;
-}
-
-/* =========================================================
-   22. EMAIL SUBJECT
-========================================================= */
-
-.students-risk-subject {
-  border-color:
-    var(
-      --sr-brand-border
-    );
-
-  background:
-    var(
-      --sr-icon-bg
-    );
-}
-
-.students-risk-subject
-  strong {
-  font-size: 11.5px;
-}
-
-/* =========================================================
-   23. ATTENDANCE DETAILS
-========================================================= */
-
-.students-risk-absences {
-  overflow: hidden;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    12px;
-
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-.students-risk-absences
-  > header {
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 12px;
-
-  padding:
-    12px
-    14px;
-
-  border-bottom:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  background:
-    var(
-      --sr-surface-soft
-    );
-}
-
-.students-risk-absences
-  h3 {
-  margin:
-    4px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 14px;
-
-  font-weight: 850;
-}
-
-.students-risk-absences
-  > header
-  > strong {
-  min-height: 28px;
-
-  display:
-    inline-flex;
-
-  align-items: center;
-
-  padding:
-    0
-    9px;
-
-  border:
-    1px
-    solid
-    #fecdd3;
-
-  border-radius:
-    999px;
-
-  background:
-    #fff1f2;
-
-  color:
-    #b91c1c;
-
-  font-size: 9px;
-
-  font-weight: 900;
-
-  white-space:
-    nowrap;
-}
-
-.students-risk-absences
-  article {
-  display: grid;
-
-  grid-template-columns:
-    1fr
-    1.25fr
-    auto;
-
-  align-items: center;
-
-  gap: 12px;
-
-  padding:
-    11px
-    14px;
-}
-
-.students-risk-absences
-  article
-  + article {
-  border-top:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-}
-
-.students-risk-absences
-  article
-  strong {
-  display: block;
-
-  margin-top: 3px;
-
-  color:
-    var(
-      --sr-text-secondary
-    );
-
-  font-size: 10.5px;
-
-  font-weight: 820;
-}
-
-.students-risk-absences
-  article
-  em {
-  min-height: 27px;
-
-  display:
-    inline-flex;
-
-  align-items: center;
-
-  justify-content:
-    center;
-
-  padding:
-    0
-    9px;
-
-  border:
-    1px
-    solid
-    #fecdd3;
-
-  border-radius:
-    999px;
-
-  background:
-    #fff1f2;
-
-  color:
-    #b91c1c;
-
-  font-size: 8.5px;
-
-  font-style: normal;
-
-  font-weight: 900;
-}
-
-.students-risk-no-absence-details {
-  padding: 16px;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 10.5px;
-
-  line-height: 1.5;
-}
-
-/* =========================================================
-   24. PARENT COMMUNICATION
-========================================================= */
-
-.students-risk-communication {
-  overflow: hidden;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    12px;
-
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-.students-risk-communication
-  > header {
-  display: flex;
-
-  align-items:
-    flex-start;
-
-  justify-content:
-    space-between;
-
-  gap: 14px;
-
-  padding:
-    13px
-    14px;
-
-  border-bottom:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  background:
-    var(
-      --sr-surface-soft
-    );
-}
-
-.students-risk-communication
-  > header
-  > div {
-  min-width: 0;
-}
-
-.students-risk-communication
-  > header
-  span:first-child {
-  display: block;
-
-  color:
-    var(
-      --sr-blue-800
-    );
-
-  font-size: 9px;
-
-  font-weight: 900;
-
-  letter-spacing:
-    0.09em;
-}
-
-.students-risk-communication
-  > header
-  h3 {
-  margin:
-    4px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 14px;
-
-  font-weight: 850;
-}
-
-.students-risk-communication
-  > header
-  p {
-  margin:
-    4px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-body
-    );
-
-  font-size: 10px;
-
-  line-height: 1.45;
-}
-
-/* =========================================================
-   25. COMMUNICATION STATUS
-========================================================= */
-
-.students-risk-communication-status {
-  min-height: 29px;
-
-  flex:
-    0
-    0
-    auto;
-
-  display:
-    inline-flex;
-
-  align-items: center;
-
-  justify-content:
-    center;
-
-  padding:
-    0
-    10px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border
-    );
-
-  border-radius:
-    999px;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size:
-    8.5px
-    !important;
-
-  font-weight:
-    900
-    !important;
-
-  letter-spacing:
-    0.04em
-    !important;
-
-  text-transform:
-    uppercase;
-
-  white-space:
-    nowrap;
-}
-
-.students-risk-communication-status.is-pending {
-  border-color:
-    #cbd5e1;
-
-  background:
-    #f8fafc;
-
-  color:
-    #475569;
-}
-
-.students-risk-communication-status.is-queued {
-  border-color:
-    #bfdbfe;
-
-  background:
-    #eff6ff;
-
-  color:
-    #1d4ed8;
-}
-
-.students-risk-communication-status.is-sent {
-  border-color:
-    #bbf7d0;
-
-  background:
-    #ecfdf3;
-
-  color:
-    #15803d;
-}
-
-.students-risk-communication-status.is-failed {
-  border-color:
-    #fecaca;
-
-  background:
-    #fff1f2;
-
-  color:
-    #b91c1c;
-}
-
-.students-risk-communication-status.is-acknowledged {
-  border-color:
-    #c7d2fe;
-
-  background:
-    #eef2ff;
-
-  color:
-    #4338ca;
-}
-
-.students-risk-communication-status.is-responded {
-  border-color:
-    #a7f3d0;
-
-  background:
-    #ecfdf5;
-
-  color:
-    #047857;
-}
-
-/* =========================================================
-   26. COMMUNICATION EMPTY / LOADING / ERROR
-========================================================= */
-
-.students-risk-communication-loading,
-.students-risk-communication-error,
-.students-risk-communication-empty {
-  min-height: 84px;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 11px;
-
-  padding: 14px;
-}
-
-.students-risk-communication-loading {
-  color:
-    var(
-      --sr-text-body
-    );
-}
-
-.students-risk-communication-loading
-  > span {
-  width: 23px;
-
-  height: 23px;
-
-  flex:
-    0
-    0
-    23px;
-
-  border:
-    2px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-top-color:
-    var(
-      --sr-blue-800
-    );
-
-  border-radius:
-    50%;
-
-  animation:
-    sr-spin
-    0.75s
-    linear
-    infinite;
-}
-
-.students-risk-communication-loading
-  p,
-.students-risk-communication-error
-  p,
-.students-risk-communication-empty
-  p {
-  margin: 0;
-
-  font-size: 10.5px;
-
-  line-height: 1.5;
-}
-
-.students-risk-communication-error {
-  background:
-    var(
-      --sr-error-bg
-    );
-
-  color:
-    var(
-      --sr-error-text
-    );
-}
-
-.students-risk-communication-error
-  > span {
-  width: 27px;
-
-  height: 27px;
-
-  flex:
-    0
-    0
-    27px;
-
-  display: grid;
-
-  place-items: center;
-
-  border-radius: 50%;
-
-  background:
-    #fee2e2;
-
-  font-weight: 900;
-}
-
-.students-risk-communication-empty
-  > span {
-  width: 34px;
-
-  height: 34px;
-
-  flex:
-    0
-    0
-    34px;
-
-  display: grid;
-
-  place-items: center;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-brand-border
-    );
-
-  border-radius: 9px;
-
-  background:
-    var(
-      --sr-icon-bg
-    );
-
-  color:
-    var(
-      --sr-blue-800
-    );
-
-  font-size: 15px;
-}
-
-.students-risk-communication-empty
-  strong {
-  display: block;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 11px;
-
-  font-weight: 850;
-}
-
-.students-risk-communication-empty
-  p {
-  margin-top: 3px;
-
-  color:
-    var(
-      --sr-text-body
-    );
-}
-
-/* =========================================================
-   27. DELIVERY / RESPONSE FLOW
-========================================================= */
-
-.students-risk-communication-flow {
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      3,
-      minmax(
-        0,
-        1fr
-      )
-    );
-
-  gap: 1px;
-
-  background:
-    var(
-      --sr-border-soft
-    );
-}
-
-.students-risk-communication-flow
-  article {
-  min-width: 0;
-
-  display: flex;
-
-  align-items:
-    flex-start;
-
-  gap: 9px;
-
-  padding:
-    13px
-    12px;
-
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-.students-risk-communication-flow
-  article
-  > span {
-  width: 27px;
-
-  height: 27px;
-
-  flex:
-    0
-    0
-    27px;
-
-  display: grid;
-
-  place-items: center;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border
-    );
-
-  border-radius:
-    50%;
-
-  background:
-    var(
-      --sr-surface-soft
-    );
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 9px;
-
-  font-weight: 900;
-}
-
-.students-risk-communication-flow
-  article.is-complete
-  > span {
-  border-color:
-    #bbf7d0;
-
-  background:
-    #dcfce7;
-
-  color:
-    #15803d;
-}
-
-.students-risk-communication-flow
-  article.is-response
-  > span {
-  border-color:
-    #a7f3d0;
-
-  background:
-    #d1fae5;
-
-  color:
-    #047857;
-}
-
-.students-risk-communication-flow
-  article
-  > div {
-  min-width: 0;
-}
-
-.students-risk-communication-flow
-  small,
-.students-risk-communication-flow
-  strong,
-.students-risk-communication-flow
-  p {
-  display: block;
-}
-
-.students-risk-communication-flow
-  small {
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 8px;
-
-  font-weight: 900;
-
-  letter-spacing:
-    0.07em;
-}
-
-.students-risk-communication-flow
-  strong {
-  margin-top: 3px;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 10.5px;
-
-  font-weight: 850;
-}
-
-.students-risk-communication-flow
-  p {
-  margin:
-    3px
-    0
-    0;
-
-  color:
-    var(
-      --sr-text-body
-    );
-
-  font-size: 9px;
-
-  line-height: 1.4;
-}
-
-/* =========================================================
-   28. LATEST PARENT RESPONSE
-========================================================= */
-
-.students-risk-parent-response {
-  margin: 12px;
-
-  overflow: hidden;
-
-  border:
-    1px
-    solid
-    #b7ead1;
-
-  border-radius:
-    11px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #f0fdf7,
-      #f8fffb
-    );
-
-  box-shadow:
-    0 8px 20px
-      rgba(
-        5,
-        100,
-        70,
-        0.05
-      );
-}
-
-.students-risk-parent-response
-  > header {
-  display: flex;
-
-  align-items:
-    flex-start;
-
-  justify-content:
-    space-between;
-
-  gap: 12px;
-
-  padding:
-    12px
-    13px
-    9px;
-}
-
-.students-risk-parent-response
-  > header
-  span,
-.students-risk-parent-response
-  > footer
-  span {
-  display: block;
-
-  color:
-    #3d7c68;
-
-  font-size: 8px;
-
-  font-weight: 900;
-
-  letter-spacing:
-    0.08em;
-}
-
-.students-risk-parent-response
-  > header
-  strong {
-  display: block;
-
-  margin-top: 4px;
-
-  color:
-    #14532d;
-
-  font-size: 11.5px;
-
-  font-weight: 850;
-}
-
-.students-risk-parent-response
-  > header
-  small {
-  color:
-    #568575;
-
-  font-size: 9px;
-
-  white-space:
-    nowrap;
-}
-
-.students-risk-parent-response
-  blockquote {
-  margin:
-    0
-    13px
-    11px;
-
-  padding:
-    12px
-    13px;
-
-  border:
-    1px
-    solid
-    #ccefe0;
-
-  border-left:
-    3px
-    solid
-    #10b981;
-
-  border-radius: 8px;
-
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      0.84
-    );
-
-  color:
-    #173f34;
-
-  font-size: 12px;
-
-  font-weight: 650;
-
-  line-height: 1.65;
-
-  white-space:
-    pre-wrap;
-
-  overflow-wrap:
-    anywhere;
-}
-
-.students-risk-parent-response
-  > footer {
-  padding:
-    9px
-    13px
-    11px;
-
-  border-top:
-    1px
-    solid
-    #d8f1e6;
-}
-
-.students-risk-parent-response
-  > footer
-  strong {
-  display: block;
-
-  margin-top: 3px;
-
-  overflow-wrap:
-    anywhere;
-
-  color:
-    #315f51;
-
-  font-size: 9.5px;
-
-  font-weight: 800;
-}
-
-/* =========================================================
-   29. COMMUNICATION HISTORY
-========================================================= */
-
-.students-risk-communication-history {
-  border-top:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-}
-
-.students-risk-communication-history
-  > summary {
-  min-height: 43px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 12px;
-
-  padding:
-    0
-    14px;
-
-  background:
-    var(
-      --sr-surface-soft
-    );
-
-  color:
-    var(
-      --sr-text-body
-    );
-
-  cursor: pointer;
-
-  list-style: none;
-
-  user-select: none;
-}
-
-.students-risk-communication-history
-  > summary::-webkit-details-marker {
-  display: none;
-}
-
-.students-risk-communication-history
-  > summary
-  span {
-  font-size: 10px;
-
-  font-weight: 850;
-}
-
-.students-risk-communication-history
-  > summary
-  strong {
-  color:
-    var(
-      --sr-text-secondary
-    );
-
-  font-size: 9px;
-
-  font-weight: 900;
-}
-
-.students-risk-communication-history
-  > div {
-  padding:
-    0
-    13px
-    10px;
-
-  background:
-    var(
-      --sr-surface-soft
-    );
-}
-
-.students-risk-communication-history
-  article {
-  display: grid;
-
-  grid-template-columns:
-    9px
-    minmax(
-      0,
-      1fr
-    )
-    auto;
-
-  align-items: center;
-
-  gap: 9px;
-
-  padding:
-    9px
-    0;
-}
-
-.students-risk-communication-history
-  article
-  + article {
-  border-top:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-}
-
-.students-risk-communication-history
-  article
-  > span {
-  width: 8px;
-
-  height: 8px;
-
-  border-radius: 50%;
-
-  background:
-    #94a3b8;
-}
-
-.students-risk-communication-history
-  article
-  > span.is-queued {
-  background:
-    #3b82f6;
-}
-
-.students-risk-communication-history
-  article
-  > span.is-sent {
-  background:
-    #22c55e;
-}
-
-.students-risk-communication-history
-  article
-  > span.is-failed {
-  background:
-    #ef4444;
-}
-
-.students-risk-communication-history
-  article
-  > span.is-acknowledged {
-  background:
-    #6366f1;
-}
-
-.students-risk-communication-history
-  article
-  > span.is-responded {
-  background:
-    #10b981;
-}
-
-.students-risk-communication-history
-  article
-  > div {
-  min-width: 0;
-}
-
-.students-risk-communication-history
-  article
-  strong,
-.students-risk-communication-history
-  article
-  small {
-  display: block;
-}
-
-.students-risk-communication-history
-  article
-  strong {
-  color:
-    var(
-      --sr-text-secondary
-    );
-
-  font-size: 9.5px;
-
-  font-weight: 850;
-}
-
-.students-risk-communication-history
-  article
-  small {
-  margin-top: 2px;
-
-  overflow: hidden;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 8.5px;
-
-  text-overflow:
-    ellipsis;
-
-  white-space:
-    nowrap;
-}
-
-.students-risk-communication-history
-  time {
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 8.5px;
-
-  white-space:
-    nowrap;
-}
-
-/* =========================================================
-   30. ADVISER NOTE
-========================================================= */
-
-.students-risk-note {
-  display: grid;
-
-  gap: 8px;
-
-  padding: 14px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    12px;
-
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-.students-risk-note
-  > div {
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 10px;
-}
-
-.students-risk-note
-  > div
-  small,
-.students-risk-note
-  > small {
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 9.5px;
-
-  line-height: 1.4;
-}
-
-.students-risk-note
-  textarea {
-  width: 100%;
-
-  min-height: 112px;
-
-  resize: vertical;
-
-  padding:
-    11px
-    12px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border
-    );
-
-  border-radius:
-    10px;
-
-  outline: 0;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-family:
-    inherit;
-
-  font-size: 12px;
-
-  line-height: 1.55;
-
-  transition:
-    border-color
-      0.16s
-      ease,
-    box-shadow
-      0.16s
-      ease;
-}
-
-.students-risk-note
-  textarea:focus {
-  border-color:
-    var(
-      --sr-blue-800
-    );
-
-  box-shadow:
-    0 0 0 3px
-      rgba(
-        18,
-        61,
-        126,
-        0.08
-      );
-}
-
-.students-risk-note
-  textarea:disabled {
-  resize: none;
-
-  background:
-    var(
-      --sr-surface-soft
-    );
-
-  color:
-    var(
-      --sr-text-body
-    );
-}
-
-/* =========================================================
-   31. PREPARED SNAPSHOT / FEEDBACK
-========================================================= */
-
-.students-risk-prepared,
-.students-risk-feedback {
-  display: flex;
-
-  align-items: center;
-
-  gap: 10px;
-
-  padding:
-    11px
-    12px;
-
-  border:
-    1px
-    solid;
-
-  border-radius:
-    10px;
-}
-
-.students-risk-prepared {
-  display: grid;
-
-  grid-template-columns:
-    28px
-    minmax(
-      0,
-      1fr
-    )
-    auto;
-
-  border-color:
-    var(
-      --sr-success-border
-    );
-
-  background:
-    var(
-      --sr-success-bg
-    );
-
-  color:
-    var(
-      --sr-success-text
-    );
-}
-
-.students-risk-prepared
-  > span,
-.students-risk-feedback
-  > span {
-  width: 26px;
-
-  height: 26px;
-
-  display: grid;
-
-  place-items: center;
-
-  border-radius:
-    50%;
-
-  font-size: 10px;
-
-  font-weight: 900;
-}
-
-.students-risk-prepared
-  > span {
-  background:
-    #dcfce7;
-}
-
-.students-risk-prepared
-  strong {
-  display: block;
-
-  font-size: 11px;
-
-  font-weight: 850;
-}
-
-.students-risk-prepared
-  p {
-  margin:
-    3px
-    0
-    0;
-
-  font-size: 9.5px;
-
-  line-height: 1.45;
-}
-
-.students-risk-prepared
-  em {
-  font-size: 9px;
-
-  font-style: normal;
-
-  font-weight: 900;
-}
-
-.students-risk-feedback
-  p {
-  margin: 0;
-
-  font-size: 10px;
-
-  line-height: 1.45;
-}
-
-.students-risk-feedback.is-error {
-  border-color:
-    var(
-      --sr-error-border
-    );
-
-  background:
-    var(
-      --sr-error-bg
-    );
-
-  color:
-    var(
-      --sr-error-text
-    );
-}
-
-.students-risk-feedback.is-error
-  > span {
-  background:
-    #fee2e2;
-}
-
-.students-risk-feedback.is-success {
-  border-color:
-    var(
-      --sr-success-border
-    );
-
-  background:
-    var(
-      --sr-success-bg
-    );
-
-  color:
-    var(
-      --sr-success-text
-    );
-}
-
-.students-risk-feedback.is-success
-  > span {
-  background:
-    #dcfce7;
-}
-
-/* =========================================================
-   32. MODAL FOOTER
-========================================================= */
-
-.students-risk-modal-actions {
-  min-height: 68px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 16px;
-
-  padding:
-    11px
-    18px;
-
-  border-top:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-.students-risk-modal-actions
-  > div:first-child {
-  min-width: 0;
-}
-
-.students-risk-modal-actions
-  > div:first-child
-  strong {
-  display: block;
-
-  margin-top: 3px;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 11px;
-
-  font-weight: 850;
-}
-
-.students-risk-modal-actions
-  > div:last-child {
-  display: flex;
-
-  align-items: center;
-
-  justify-content:
-    flex-end;
-
-  gap: 8px;
-
-  flex-wrap: wrap;
-}
-
-.students-risk-modal-actions
-  button {
-  min-height: 40px;
-
-  padding:
-    0
-    13px;
-
-  border:
-    1px
-    solid;
-
-  border-radius: 9px;
-
-  font-family:
-    inherit;
-
-  font-size: 11px;
-
-  font-weight: 850;
-
-  cursor: pointer;
-
-  transition:
-    transform
-      0.15s
-      ease,
-    border-color
-      0.15s
-      ease,
-    background
-      0.15s
-      ease,
-    box-shadow
-      0.15s
-      ease;
-}
-
-.students-risk-modal-actions
-  button:hover:not(
-    :disabled
-  ) {
-  transform:
-    translateY(
-      -1px
-    );
-}
-
-.students-risk-modal-actions
-  button:disabled {
-  cursor:
-    not-allowed;
-
-  opacity: 0.55;
-}
-
-.students-risk-modal-actions
-  .is-secondary {
-  border-color:
-    var(
-      --sr-border
-    );
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-secondary
-    );
-}
-
-.students-risk-modal-actions
-  .is-secondary:hover:not(
-    :disabled
-  ) {
-  background:
-    var(
-      --sr-surface-soft
-    );
-}
-
-.students-risk-modal-actions
-  .is-primary {
-  border-color:
-    var(
-      --sr-blue-900
-    );
-
-  background:
-    var(
-      --sr-blue-900
-    );
-
-  color: #ffffff;
-
-  box-shadow:
-    0 6px 14px
-      rgba(
-        18,
-        61,
-        126,
-        0.12
-      );
-}
-
-/* =========================================================
-   33. SCROLLBARS
-========================================================= */
-
-.students-risk-table-wrap::-webkit-scrollbar,
-.students-risk-modal-body::-webkit-scrollbar {
-  width: 8px;
-
-  height: 8px;
-}
-
-.students-risk-table-wrap::-webkit-scrollbar-track,
-.students-risk-modal-body::-webkit-scrollbar-track {
-  background:
-    var(
-      --sr-surface-soft
-    );
-}
-
-.students-risk-table-wrap::-webkit-scrollbar-thumb,
-.students-risk-modal-body::-webkit-scrollbar-thumb {
-  border:
-    2px
-    solid
-    var(
-      --sr-surface-soft
-    );
-
-  border-radius:
-    999px;
-
-  background:
-    var(
-      --sr-border
-    );
-}
-
-/* =========================================================
-   34. DARK MODE
-========================================================= */
-
-html[data-theme="dark"]
-  .students-risk-hero,
-html[data-theme="dark"]
-  .students-risk-panel,
-html[data-theme="dark"]
-  .students-risk-modal,
-html[data-theme="dark"]
-  .students-risk-notice-identity
-  > div,
-html[data-theme="dark"]
-  .students-risk-notice-summary,
-html[data-theme="dark"]
-  .students-risk-absences,
-html[data-theme="dark"]
-  .students-risk-communication,
-html[data-theme="dark"]
-  .students-risk-note {
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-html[data-theme="dark"]
-  .students-risk-hero
-  aside,
-html[data-theme="dark"]
-  .students-risk-toolbar,
-html[data-theme="dark"]
-  .students-risk-table
-  thead,
-html[data-theme="dark"]
-  .students-risk-absences
-  > header,
-html[data-theme="dark"]
-  .students-risk-communication
-  > header,
-html[data-theme="dark"]
-  .students-risk-communication-history
-  > summary,
-html[data-theme="dark"]
-  .students-risk-communication-history
-  > div {
-  background:
-    var(
-      --sr-surface-soft
-    );
-}
-
-html[data-theme="dark"]
-  .students-risk-modal-backdrop {
-  background:
-    rgba(
-      0,
-      0,
-      0,
-      0.68
-    );
-}
-
-html[data-theme="dark"]
-  .students-risk-modal
-  > header {
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(
-        in srgb,
-        var(
-          --sr-icon-bg
-        )
-          38%,
-        var(
-          --sr-surface
-        )
-      ),
-      var(
-        --sr-surface
-      )
-        60%
-    );
-}
-
-html[data-theme="dark"]
-  .students-risk-toolbar
-  > label,
-html[data-theme="dark"]
-  .students-risk-toolbar
-  > div
-  button,
-html[data-theme="dark"]
-  .students-risk-pagination
-  button,
-html[data-theme="dark"]
-  .students-risk-modal
-  > header
-  > button,
-html[data-theme="dark"]
-  .students-risk-note
-  textarea {
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-primary
-    );
-}
-
-html[data-theme="dark"]
-  .students-risk-live-sync {
-  border-color:
-    #31506e;
-
-  background:
-    #11243a;
-
-  color:
-    #a9bfd5;
-}
-
-html[data-theme="dark"]
-  .students-risk-live-sync.is-syncing {
-  border-color:
-    #315679;
-
-  background:
-    #132a43;
-
-  color:
-    #a7d2ff;
-}
-
-html[data-theme="dark"]
-  .students-risk-subject {
-  border-color:
-    #315272;
-
-  background:
-    #17304b;
-}
-
-html[data-theme="dark"]
-  .students-risk-warning {
-  border-color:
-    rgba(
-      245,
-      158,
-      11,
-      0.36
-    );
-
-  background:
-    rgba(
-      120,
-      53,
-      15,
-      0.22
-    );
-
-  color:
-    #f6c76f;
-}
-
-html[data-theme="dark"]
-  .students-risk-communication-flow {
-  background:
-    var(
-      --sr-border-soft
-    );
-}
-
-html[data-theme="dark"]
-  .students-risk-communication-flow
-  article {
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-html[data-theme="dark"]
-  .students-risk-parent-response {
-  border-color:
-    #246651;
-
-  background:
-    linear-gradient(
-      145deg,
-      #103329,
-      #0f2823
-    );
-
-  box-shadow: none;
-}
-
-html[data-theme="dark"]
-  .students-risk-parent-response
-  > header
-  strong {
-  color:
-    #baf2d8;
-}
-
-html[data-theme="dark"]
-  .students-risk-parent-response
-  > header
-  span,
-html[data-theme="dark"]
-  .students-risk-parent-response
-  > footer
-  span,
-html[data-theme="dark"]
-  .students-risk-parent-response
-  > header
-  small {
-  color:
-    #7ec7aa;
-}
-
-html[data-theme="dark"]
-  .students-risk-parent-response
-  blockquote {
-  border-color:
-    #28644f;
-
-  border-left-color:
-    #34d399;
-
-  background:
-    #102c25;
-
-  color:
-    #d6f6e9;
-}
-
-html[data-theme="dark"]
-  .students-risk-parent-response
-  > footer {
-  border-color:
-    #225443;
-}
-
-html[data-theme="dark"]
-  .students-risk-parent-response
-  > footer
-  strong {
-  color:
-    #a8d7c5;
-}
-
-html[data-theme="dark"]
-  .students-risk-communication-error {
-  background:
-    rgba(
-      127,
-      29,
-      29,
-      0.18
-    );
-}
-
-/* =========================================================
-   35. TABLET / LAPTOP
-========================================================= */
-
-@media (
-  max-width: 1100px
-) {
-  .students-risk-hero {
-    grid-template-columns:
-      minmax(
-        0,
-        1fr
-      )
-      minmax(
-        240px,
-        0.55fr
-      );
-
-    gap: 20px;
-  }
-
-  .students-risk-summary {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(
-          0,
-          1fr
-        )
-      );
-  }
-}
-
-@media (
-  max-width: 900px
-) {
-  .students-risk-panel-head {
-    align-items:
-      flex-start;
-  }
-
-  .students-risk-toolbar {
-    align-items:
-      stretch;
-
-    flex-direction:
-      column;
-  }
-
-  .students-risk-toolbar
-    > label {
-    width: 100%;
-  }
-
-  .students-risk-toolbar
-    > div {
-    width: 100%;
-
-    justify-content:
-      flex-start;
-  }
-
-  .students-risk-table {
-    min-width:
-      920px;
-  }
-
-  .students-risk-communication-flow {
-    grid-template-columns:
-      1fr;
-  }
-}
-
-/* =========================================================
-   36. MOBILE
-========================================================= */
-
-@media (
-  max-width: 650px
-) {
-  .students-risk-page {
-    gap: 14px;
-  }
-
-  .students-risk-hero {
-    grid-template-columns:
-      1fr;
-
-    gap: 15px;
-
-    padding:
-      18px
-      15px
-      17px
-      19px;
-  }
-
-  .students-risk-hero
-    > div {
-    padding-left:
-      3px;
-  }
-
-  .students-risk-hero
-    h2 {
-    font-size:
-      22px;
-  }
-
-  .students-risk-hero
-    aside
-    strong {
-    white-space:
-      normal;
-  }
-
-  .students-risk-summary {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(
-          0,
-          1fr
-        )
-      );
-
-    gap: 8px;
-  }
-
-  .students-risk-summary
-    article {
-    min-height:
-      96px;
-
-    padding:
-      12px
-      11px;
-  }
-
-  .students-risk-summary
-    article
-    strong {
-    font-size:
-      20px;
-  }
-
-  .students-risk-panel-head {
-    min-height: 0;
-
-    align-items:
-      stretch;
-
-    flex-direction:
-      column;
-
-    gap: 13px;
-
-    padding:
-      16px;
-  }
-
-  .students-risk-live-sync {
-    width: 100%;
-
-    justify-content:
-      center;
-  }
-
-  .students-risk-toolbar {
-    padding: 12px;
-  }
-
-  .students-risk-toolbar
-    > div {
-    padding-bottom:
-      2px;
-  }
-
-  .students-risk-table {
-    min-width:
-      860px;
-  }
-
-  .students-risk-pagination {
-    align-items:
-      stretch;
-
-    flex-direction:
-      column;
-
-    padding: 12px;
-  }
-
-  .students-risk-pagination
-    > div {
-    width: 100%;
-
-    justify-content:
-      space-between;
-  }
-
-  .students-risk-pagination
-    button {
-    flex: 1;
-  }
-
-  .students-risk-modal-backdrop {
-    padding: 8px;
-  }
-
-  .students-risk-modal {
-    width:
-      calc(
-        100vw -
-          16px
-      );
-
-    max-height:
-      calc(
-        100dvh -
-          16px
-      );
-
-    border-radius:
-      14px;
-  }
-
-  .students-risk-modal
-    > header {
-    padding: 16px;
-  }
-
-  .students-risk-modal-body {
-    padding: 14px;
-  }
-
-  .students-risk-notice-identity {
-    grid-template-columns:
-      1fr;
-  }
-
-  .students-risk-notice-summary {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(
-          0,
-          1fr
-        )
-      );
-  }
-
-  .students-risk-notice-summary
-    > div
-    + div {
-    border-left:
-      0;
-  }
-
-  .students-risk-notice-summary
-    > div:nth-child(
-      even
-    ) {
-    border-left:
-      1px
-      solid
-      var(
-        --sr-border-soft
-      );
-  }
-
-  .students-risk-notice-summary
-    > div:nth-child(
-      n + 3
-    ) {
-    border-top:
-      1px
-      solid
-      var(
-        --sr-border-soft
-      );
-  }
-
-  .students-risk-communication
-    > header {
-    align-items:
-      stretch;
-
-    flex-direction:
-      column;
-  }
-
-  .students-risk-communication-status {
-    width:
-      fit-content;
-  }
-
-  .students-risk-parent-response
-    > header {
-    flex-direction:
-      column;
-  }
-
-  .students-risk-parent-response
-    > header
-    small {
-    white-space:
-      normal;
-  }
-
-  .students-risk-communication-history
-    article {
-    grid-template-columns:
-      9px
-      minmax(
-        0,
-        1fr
-      );
-  }
-
-  .students-risk-communication-history
-    time {
-    grid-column: 2;
-
-    white-space:
-      normal;
-  }
-
-  .students-risk-absences
-    article {
-    grid-template-columns:
-      1fr;
-
-    gap: 8px;
-  }
-
-  .students-risk-absences
-    article
-    em {
-    width:
-      fit-content;
-  }
-
-  .students-risk-prepared {
-    grid-template-columns:
-      26px
-      minmax(
-        0,
-        1fr
-      );
-  }
-
-  .students-risk-prepared
-    em {
-    grid-column: 2;
-  }
-
-  .students-risk-modal-actions {
-    align-items:
-      stretch;
-
-    flex-direction:
-      column;
-
-    padding:
-      11px
-      13px;
-  }
-
-  .students-risk-modal-actions
-    > div:last-child {
-    width: 100%;
-  }
-
-  .students-risk-modal-actions
-    button {
-    flex: 1;
-  }
-}
-
-@media (
-  max-width: 430px
-) {
-  .students-risk-summary {
-    grid-template-columns:
-      1fr
-      1fr;
-  }
-
-  .students-risk-notice-summary {
-    grid-template-columns:
-      1fr;
-  }
-
-  .students-risk-notice-summary
-    > div:nth-child(
-      even
-    ) {
-    border-left:
-      0;
-  }
-
-  .students-risk-notice-summary
-    > div
-    + div,
-  .students-risk-notice-summary
-    > div:nth-child(
-      n + 3
-    ) {
-    border-top:
-      1px
-      solid
-      var(
-        --sr-border-soft
-      );
-  }
-}
-
-/* =========================================================
-   37. ANIMATIONS
-========================================================= */
-
-@keyframes sr-spin {
-  to {
-    transform:
-      rotate(
-        360deg
-      );
-  }
-}
-
-@keyframes sr-shimmer {
-  from {
-    background-position:
-      100%
-      0;
-  }
-
-  to {
-    background-position:
-      -100%
-      0;
-  }
-}
-
-@keyframes sr-live-pulse {
-  0%,
-  100% {
-    opacity: 1;
-
-    transform:
-      scale(
-        1
-      );
-  }
-
-  50% {
-    opacity: 0.55;
-
-    transform:
-      scale(
-        0.82
-      );
-  }
-}
-
-/* =========================================================
-   38. REDUCED MOTION
-========================================================= */
-
-@media (
-  prefers-reduced-motion:
-    reduce
-) {
-  .students-risk-loading
-    > span,
-  .students-risk-modal-loading
-    > span,
-  .students-risk-communication-loading
-    > span,
-  .students-risk-live-sync.is-syncing
-    > i {
-    animation:
-      none
-      !important;
-  }
-
-  .students-risk-table
-    tbody
-    tr,
-  .students-risk-review,
-  .students-risk-modal-actions
-    button {
-    transition:
-      none
-      !important;
-  }
-}
-
-/* =========================================================
-   STUDENTS AT RISK MODAL
-   FIX COLLAPSED / COMPRESSED CONTENT
-
-   Problem:
-   The modal body used CSS Grid inside a constrained height.
-   Sections with overflow:hidden could shrink until only
-   their headers remained visible.
-
-   Fix:
-   - Modal becomes flex-column
-   - Header/footer stay fixed
-   - Body becomes the ONLY scrolling area
-   - Content sections retain their natural height
-========================================================= */
-
-.students-risk-modal {
-  display: flex !important;
-  flex-direction: column !important;
-
-  width: min(
-    980px,
-    calc(100vw - 32px)
-  ) !important;
-
-  max-height: calc(
-    100dvh - 32px
-  ) !important;
-
-  overflow: hidden !important;
-}
-
-/* =========================================================
-   MODAL HEADER
-========================================================= */
-
-.students-risk-modal > header {
-  flex: 0 0 auto !important;
-}
-
-/* =========================================================
-   SCROLLABLE CONTENT AREA
-========================================================= */
-
-.students-risk-modal-body {
-  flex: 1 1 auto !important;
-
-  min-height: 0 !important;
-
-  display: flex !important;
-  flex-direction: column !important;
-
-  gap: 14px !important;
-
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-
-  overscroll-behavior: contain;
-
-  padding:
-    18px
-    20px
-    22px !important;
-}
-
-/*
- * CRITICAL:
- *
- * Never allow any modal section to collapse vertically.
- */
-.students-risk-modal-body > * {
-  flex: 0 0 auto !important;
-
-  min-height: max-content;
-}
-
-/* =========================================================
-   STUDENT + GUARDIAN
-========================================================= */
-
-.students-risk-notice-identity {
-  flex: 0 0 auto !important;
-
-  min-height: 88px;
-}
-
-/* =========================================================
-   RISK SUMMARY
-========================================================= */
-
-.students-risk-notice-summary {
-  flex: 0 0 auto !important;
-
-  min-height: 67px !important;
-
-  overflow: visible !important;
-}
-
-.students-risk-notice-summary > div {
-  min-height: 65px;
-
-  display: flex;
-  flex-direction: column;
-
-  justify-content: center;
-}
-
-/* Make sure values never disappear */
-.students-risk-notice-summary strong,
-.students-risk-notice-summary .students-risk-badge {
-  flex: 0 0 auto;
-
-  visibility: visible !important;
-
-  opacity: 1 !important;
-}
-
-/* =========================================================
-   SUBJECT
-========================================================= */
-
-.students-risk-subject {
-  flex: 0 0 auto !important;
-
-  min-height: 65px;
-
-  display: flex;
-  flex-direction: column;
-
-  justify-content: center;
-}
-
-/* =========================================================
-   ATTENDANCE DETAILS
-========================================================= */
-
-.students-risk-absences {
-  flex: 0 0 auto !important;
-
-  height: auto !important;
-
-  min-height: auto !important;
-
-  overflow: visible !important;
-}
-
-/*
- * Keep the rounded clipping only visually.
- * Internal data must remain visible.
- */
-.students-risk-absences > header {
-  flex: 0 0 auto !important;
-}
-
-.students-risk-absences > div {
-  display: block !important;
-
-  height: auto !important;
-
-  min-height: 0 !important;
-
-  overflow: visible !important;
-}
-
-.students-risk-absences article {
-  min-height: 52px;
-}
-
-/* =========================================================
-   PARENT COMMUNICATION
-========================================================= */
-
-.students-risk-communication {
-  flex: 0 0 auto !important;
-
-  height: auto !important;
-
-  min-height: auto !important;
-
-  overflow: visible !important;
-}
-
-.students-risk-communication > header {
-  flex: 0 0 auto !important;
-
-  min-height: 72px;
-}
-
-/*
- * Never allow communication content to be clipped.
- */
-.students-risk-communication-loading,
-.students-risk-communication-error,
-.students-risk-communication-empty,
-.students-risk-communication-flow,
-.students-risk-parent-response,
-.students-risk-communication-history {
-  flex: 0 0 auto !important;
-
-  height: auto !important;
-
-  visibility: visible !important;
-
-  opacity: 1 !important;
-}
-
-/* =========================================================
-   DELIVERY PROGRESS
-========================================================= */
-
-.students-risk-communication-flow {
-  min-height: 88px;
-}
-
-/* =========================================================
-   PARENT RESPONSE
-========================================================= */
-
-.students-risk-parent-response {
-  min-height: max-content;
-}
-
-/* =========================================================
-   COMMUNICATION HISTORY
-========================================================= */
-
-.students-risk-communication-history {
-  min-height: 43px;
-}
-
-/* =========================================================
-   ADVISER NOTE
-========================================================= */
-
-.students-risk-note {
-  flex: 0 0 auto !important;
-
-  height: auto !important;
-
-  min-height: auto !important;
-}
-
-.students-risk-note textarea {
-  min-height: 112px !important;
-
-  max-height: 220px;
-
-  resize: vertical;
-}
-
-/* =========================================================
-   PREPARED / ERROR / SUCCESS
-========================================================= */
-
-.students-risk-prepared,
-.students-risk-feedback {
-  flex: 0 0 auto !important;
-}
-
-/* =========================================================
-   MODAL FOOTER
-========================================================= */
-
-.students-risk-modal-actions {
-  flex: 0 0 auto !important;
-
-  position: relative;
-
-  z-index: 5;
-
-  background:
-    var(
-      --sr-surface,
-      #ffffff
-    );
-}
-
-/* =========================================================
-   SAFER INTERNAL ROUNDING
-
-   Since the parent containers can no longer use
-   overflow:hidden for layout, clip individual edges instead.
-========================================================= */
-
-.students-risk-absences > header,
-.students-risk-communication > header {
-  border-radius:
-    11px
-    11px
-    0
-    0;
-}
-
-.students-risk-absences > div:last-child,
-.students-risk-communication-history:last-child,
-.students-risk-communication-empty:last-child,
-.students-risk-communication-error:last-child,
-.students-risk-communication-loading:last-child {
-  border-radius:
-    0
-    0
-    11px
-    11px;
-}
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 650px) {
-  .students-risk-modal {
-    width: calc(
-      100vw - 16px
-    ) !important;
-
-    max-height: calc(
-      100dvh - 16px
-    ) !important;
-  }
-
-  .students-risk-modal-body {
-    padding: 14px !important;
-
-    gap: 12px !important;
-  }
-
-  .students-risk-notice-summary {
-    min-height: auto !important;
-  }
-
-  .students-risk-notice-summary > div {
-    min-height: 58px;
-  }
-
-  .students-risk-communication > header {
-    min-height: auto;
-  }
-}
-/* =========================================================
-   39. FIRST-TIME INTERVENTION CONFIGURATION
-   ADDITIVE ONLY
-
-   Supports the first-time configuration UI added to
-   StudentsAtRisk.jsx.
-
-   Existing Students at Risk styles above are intentionally
-   preserved unchanged.
+   09. CONFIGURATION — 3 CLEAR SECTIONS
 ========================================================= */
 
 .students-risk-config-panel {
@@ -5584,870 +830,1563 @@ html[data-theme="dark"]
 
 .students-risk-config-form {
   display: grid;
-
-  gap: 18px;
-
-  padding:
-    18px
-    20px
-    20px;
-
-  background:
-    linear-gradient(
-      180deg,
-      var(
-        --sr-surface
-      )
-        0%,
-      color-mix(
-        in srgb,
-        var(
-          --sr-surface-soft
-        )
-          38%,
-        var(
-          --sr-surface
-        )
-      )
-        100%
-    );
+  gap: 14px;
+  padding: 16px 18px 18px;
+  background: var(--sr-surface-soft);
 }
 
-/* =========================================================
-   CONFIGURATION FIELDS
-========================================================= */
-
-.students-risk-config-grid {
+.students-risk-setup-progress {
   display: grid;
-
-  grid-template-columns:
-    repeat(
-      5,
-      minmax(
-        0,
-        1fr
-      )
-    );
-
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.students-risk-config-grid
-  > label {
-  min-width: 0;
+.students-risk-setup-progress > span {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 9px;
+  background: var(--sr-surface);
+  color: var(--sr-body);
+  font-size: 10px;
+  font-weight: 800;
+}
 
+.students-risk-setup-progress b {
+  width: 21px;
+  height: 21px;
   display: grid;
-
-  align-content: start;
-
-  gap: 7px;
-
-  padding:
-    13px
-    14px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    11px;
-
-  background:
-    var(
-      --sr-surface
-    );
-}
-
-.students-risk-config-grid
-  > label
-  > span {
-  display: block;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
+  place-items: center;
+  flex: 0 0 21px;
+  border-radius: 50%;
+  background: var(--sr-brand-soft);
+  color: var(--sr-primary-2);
   font-size: 9px;
-
   font-weight: 900;
-
-  letter-spacing:
-    0.08em;
 }
 
-.students-risk-config-grid
-  > label
-  > small {
-  display: block;
+.students-risk-config-block {
+  overflow: hidden;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 12px;
+  background: var(--sr-surface);
+}
 
-  color:
-    var(
-      --sr-text-muted
-    );
+.students-risk-config-block > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--sr-border-soft);
+}
 
-  font-size: 9px;
+.students-risk-config-block > header > span,
+.students-risk-task-number {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  border-radius: 9px;
+  background: var(--sr-brand-soft);
+  color: var(--sr-primary-2);
+  font-size: 11px;
+  font-weight: 900;
+}
 
+.students-risk-config-block h4,
+.students-risk-task-card h3 {
+  margin: 0;
+  color: var(--sr-text);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.students-risk-config-block header p,
+.students-risk-task-card header p {
+  margin: 3px 0 0;
+  color: var(--sr-body);
+  font-size: 10px;
   line-height: 1.45;
 }
 
-.students-risk-config-grid
-  input[type="date"],
-.students-risk-config-grid
-  input[type="number"] {
-  width: 100%;
+.students-risk-config-grid {
+  display: grid;
+  gap: 10px;
+  padding: 13px 14px 14px;
+}
 
+.students-risk-config-grid.is-period {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.students-risk-config-grid.is-thresholds {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.students-risk-config-grid > label {
   min-width: 0;
+  display: grid;
+  gap: 7px;
+  padding: 11px 12px;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 10px;
+  background: var(--sr-surface-soft);
+}
 
-  min-height: 41px;
+.students-risk-config-grid label > span,
+.students-risk-config-message > div > span,
+.students-risk-note > div > span,
+.students-risk-subject-row > span {
+  color: var(--sr-muted);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
 
-  padding:
-    0
-    10px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border
-    );
-
-  border-radius:
-    9px;
-
+.students-risk-config-grid input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--sr-border);
+  border-radius: 9px;
   outline: 0;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-family:
-    inherit;
-
-  font-size: 11.5px;
-
+  background: var(--sr-surface);
+  color: var(--sr-text);
+  font-size: 12px;
   font-weight: 700;
-
-  transition:
-    border-color
-      0.16s
-      ease,
-    box-shadow
-      0.16s
-      ease,
-    background
-      0.16s
-      ease;
 }
 
-.students-risk-config-grid
-  input[type="date"]:focus,
-.students-risk-config-grid
-  input[type="number"]:focus {
-  border-color:
-    var(
-      --sr-blue-800
-    );
-
-  box-shadow:
-    0 0 0 3px
-      rgba(
-        18,
-        61,
-        126,
-        0.08
-      );
+.students-risk-config-grid input:focus,
+.students-risk-config-message textarea:focus,
+.students-risk-note textarea:focus {
+  border-color: var(--sr-primary-2);
+  box-shadow: 0 0 0 3px rgba(18, 61, 126, 0.08);
 }
 
-.students-risk-config-grid
-  input::placeholder {
-  color:
-    var(
-      --sr-text-muted
-    );
+.students-risk-config-grid small {
+  color: var(--sr-muted);
+  font-size: 9.5px;
 }
 
-/* =========================================================
-   CONFIGURATION OPTIONS
-========================================================= */
+.students-risk-config-grid .is-warning-field {
+  border-top: 3px solid #facc15;
+}
+
+.students-risk-config-grid .is-at-risk-field {
+  border-top: 3px solid #fb923c;
+}
+
+.students-risk-config-grid .is-critical-field {
+  border-top: 3px solid #ef4444;
+}
 
 .students-risk-config-options {
   display: grid;
-
-  grid-template-columns:
-    repeat(
-      2,
-      minmax(
-        0,
-        1fr
-      )
-    );
-
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
 }
 
-.students-risk-config-options
-  > label {
+.students-risk-config-options.is-primary-options {
+  padding: 13px 14px 14px;
+}
+
+.students-risk-config-options > label {
   min-width: 0;
-
   display: grid;
-
-  grid-template-columns:
-    auto
-    minmax(
-      0,
-      1fr
-    );
-
-  align-items:
-    flex-start;
-
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
   gap: 10px;
-
-  padding:
-    13px
-    14px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    11px;
-
-  background:
-    var(
-      --sr-surface
-    );
-
+  padding: 11px 12px;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 10px;
+  background: var(--sr-surface-soft);
   cursor: pointer;
-
-  transition:
-    border-color
-      0.16s
-      ease,
-    background
-      0.16s
-      ease,
-    box-shadow
-      0.16s
-      ease;
 }
 
-.students-risk-config-options
-  > label:hover {
-  border-color:
-    color-mix(
-      in srgb,
-      var(
-        --sr-blue-800
-      )
-        30%,
-      var(
-        --sr-border
-      )
-    );
-
-  background:
-    color-mix(
-      in srgb,
-      var(
-        --sr-icon-bg
-      )
-        24%,
-      var(
-        --sr-surface
-      )
-    );
-}
-
-.students-risk-config-options
-  input[type="checkbox"] {
+.students-risk-config-options input[type="checkbox"] {
   width: 17px;
-
   height: 17px;
-
-  margin:
-    1px
-    0
-    0;
-
-  accent-color:
-    var(
-      --sr-blue-900
-    );
-
-  cursor: pointer;
+  margin: 1px 0 0;
+  accent-color: var(--sr-primary);
 }
 
-.students-risk-config-options
-  input[type="checkbox"]:disabled {
-  cursor:
-    not-allowed;
-
-  opacity: 0.48;
-}
-
-.students-risk-config-options
-  > label:has(
-    input:disabled
-  ) {
-  cursor:
-    not-allowed;
-
-  opacity: 0.62;
-}
-
-.students-risk-config-options
-  > label
-  > span {
-  min-width: 0;
-
+.students-risk-config-options > label > span {
   display: grid;
-
   gap: 3px;
 }
 
-.students-risk-config-options
-  strong {
-  color:
-    var(
-      --sr-text-primary
-    );
-
+.students-risk-config-options strong {
+  color: var(--sr-text);
   font-size: 11px;
-
   font-weight: 850;
-
-  line-height: 1.35;
 }
 
-.students-risk-config-options
-  small {
-  color:
-    var(
-      --sr-text-body
-    );
-
+.students-risk-config-options small {
+  color: var(--sr-body);
   font-size: 9.5px;
-
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
-/* =========================================================
-   DEFAULT ADVISER MESSAGE
-========================================================= */
+.students-risk-config-options > label:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.students-risk-config-advanced {
+  margin: 0 14px 14px;
+  overflow: hidden;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 10px;
+  background: var(--sr-surface-soft);
+}
+
+.students-risk-config-advanced > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 12px;
+  color: var(--sr-text-2);
+  cursor: pointer;
+  list-style: none;
+}
+
+.students-risk-config-advanced > summary::-webkit-details-marker,
+.students-risk-disclosure > summary::-webkit-details-marker,
+.students-risk-history > summary::-webkit-details-marker {
+  display: none;
+}
+
+.students-risk-config-advanced > summary span {
+  font-size: 10.5px;
+  font-weight: 850;
+}
+
+.students-risk-config-advanced > summary small {
+  color: var(--sr-muted);
+  font-size: 9px;
+}
+
+.students-risk-config-advanced[open] > summary {
+  border-bottom: 1px solid var(--sr-border-soft);
+}
+
+.students-risk-config-advanced > div {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
 
 .students-risk-config-message {
   display: grid;
-
   gap: 8px;
-
-  padding:
-    14px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border-soft
-    );
-
-  border-radius:
-    11px;
-
-  background:
-    var(
-      --sr-surface
-    );
+  padding: 11px 12px;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 10px;
+  background: var(--sr-surface);
 }
 
-.students-risk-config-message
-  > div {
+.students-risk-config-message > div,
+.students-risk-note > div {
   display: flex;
-
   align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 12px;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.students-risk-config-message
-  > div
-  > span {
-  color:
-    var(
-      --sr-text-muted
-    );
-
-  font-size: 9px;
-
-  font-weight: 900;
-
-  letter-spacing:
-    0.08em;
-}
-
-.students-risk-config-message
-  > div
-  > small {
-  color:
-    var(
-      --sr-text-muted
-    );
-
+.students-risk-config-message > div > small,
+.students-risk-note > div > small,
+.students-risk-note > small {
+  color: var(--sr-muted);
   font-size: 9.5px;
-
-  font-weight: 750;
 }
 
-.students-risk-config-message
-  textarea {
+.students-risk-config-message textarea,
+.students-risk-note textarea {
   width: 100%;
-
   min-height: 104px;
-
   resize: vertical;
-
-  padding:
-    11px
-    12px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-border
-    );
-
-  border-radius:
-    10px;
-
+  padding: 10px 11px;
+  border: 1px solid var(--sr-border);
+  border-radius: 9px;
   outline: 0;
-
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-family:
-    inherit;
-
+  background: var(--sr-surface);
+  color: var(--sr-text);
   font-size: 12px;
-
   line-height: 1.55;
-
-  transition:
-    border-color
-      0.16s
-      ease,
-    box-shadow
-      0.16s
-      ease;
 }
-
-.students-risk-config-message
-  textarea:focus {
-  border-color:
-    var(
-      --sr-blue-800
-    );
-
-  box-shadow:
-    0 0 0 3px
-      rgba(
-        18,
-        61,
-        126,
-        0.08
-      );
-}
-
-.students-risk-config-message
-  textarea::placeholder {
-  color:
-    var(
-      --sr-text-muted
-    );
-}
-
-/* =========================================================
-   CONFIGURATION ACTIONS
-========================================================= */
 
 .students-risk-config-actions {
   display: flex;
-
   align-items: center;
-
-  justify-content:
-    space-between;
-
-  gap: 18px;
-
-  padding-top: 2px;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 2px 2px 0;
 }
 
-.students-risk-config-actions
-  > div {
+.students-risk-config-actions > div {
   min-width: 0;
 }
 
-.students-risk-config-actions
-  > div
-  > span {
-  display: block;
-
-  color:
-    var(
-      --sr-text-muted
-    );
-
+.students-risk-config-actions > div > span {
+  color: var(--sr-muted);
   font-size: 9px;
-
   font-weight: 900;
-
-  letter-spacing:
-    0.08em;
+  letter-spacing: 0.08em;
 }
 
-.students-risk-config-actions
-  > div
-  > strong {
+.students-risk-config-actions > div > strong {
   display: block;
-
-  margin-top: 4px;
-
-  overflow-wrap:
-    anywhere;
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  font-size: 12px;
-
-  font-weight: 850;
-}
-
-.students-risk-config-actions
-  > div
-  > small {
-  display: block;
-
-  max-width: 650px;
-
   margin-top: 3px;
-
-  color:
-    var(
-      --sr-text-body
-    );
-
-  font-size: 9.5px;
-
-  line-height: 1.5;
-}
-
-.students-risk-config-actions
-  > button {
-  min-height: 42px;
-
-  flex:
-    0
-    0
-    auto;
-
-  display:
-    inline-flex;
-
-  align-items: center;
-
-  justify-content:
-    center;
-
-  padding:
-    0
-    15px;
-
-  border:
-    1px
-    solid
-    var(
-      --sr-blue-900
-    );
-
-  border-radius:
-    9px;
-
-  background:
-    var(
-      --sr-blue-900
-    );
-
-  color: #ffffff;
-
-  font-family:
-    inherit;
-
-  font-size: 11px;
-
+  color: var(--sr-text);
+  font-size: 12px;
   font-weight: 850;
+}
 
+.students-risk-config-actions > div > small {
+  display: block;
+  margin-top: 3px;
+  color: var(--sr-body);
+  font-size: 9.5px;
+}
+
+.students-risk-config-actions > button,
+.students-risk-modal-actions .is-primary {
+  min-height: 41px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border: 1px solid var(--sr-primary);
+  border-radius: 9px;
+  background: var(--sr-primary);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 850;
   cursor: pointer;
-
-  box-shadow:
-    0 6px 14px
-      rgba(
-        18,
-        61,
-        126,
-        0.12
-      );
-
-  transition:
-    transform
-      0.15s
-      ease,
-    border-color
-      0.15s
-      ease,
-    background
-      0.15s
-      ease,
-    box-shadow
-      0.15s
-      ease,
-    opacity
-      0.15s
-      ease;
+  box-shadow: 0 6px 14px rgba(18, 61, 126, 0.12);
 }
 
-.students-risk-config-actions
-  > button:hover:not(
-    :disabled
-  ) {
-  transform:
-    translateY(
-      -1px
-    );
-
-  background:
-    var(
-      --sr-blue-800
-    );
-
-  border-color:
-    var(
-      --sr-blue-800
-    );
-
-  box-shadow:
-    0 8px 18px
-      rgba(
-        18,
-        61,
-        126,
-        0.16
-      );
+.students-risk-config-actions > button:hover:not(:disabled),
+.students-risk-modal-actions .is-primary:hover:not(:disabled) {
+  background: var(--sr-primary-2);
+  border-color: var(--sr-primary-2);
 }
 
-.students-risk-config-actions
-  > button:disabled {
-  cursor:
-    not-allowed;
-
+.students-risk-config-actions > button:disabled {
+  cursor: not-allowed;
   opacity: 0.58;
 }
 
 /* =========================================================
-   FIRST-TIME CONFIGURATION — DARK MODE
+   10. MODAL SHELL
 ========================================================= */
 
-html[data-theme="dark"]
-  .students-risk-config-form,
-html[data-theme="dark"]
-  .students-risk-config-grid
-  > label,
-html[data-theme="dark"]
-  .students-risk-config-options
-  > label,
-html[data-theme="dark"]
-  .students-risk-config-message {
-  background:
-    var(
-      --sr-surface
-    );
+.students-risk-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  overflow: hidden;
+  background: rgba(8, 18, 34, 0.56);
+  backdrop-filter: blur(5px);
 }
 
-html[data-theme="dark"]
-  .students-risk-config-grid
-  input[type="date"],
-html[data-theme="dark"]
-  .students-risk-config-grid
-  input[type="number"],
-html[data-theme="dark"]
-  .students-risk-config-message
-  textarea {
-  background:
-    var(
-      --sr-surface
-    );
-
-  color:
-    var(
-      --sr-text-primary
-    );
-
-  color-scheme: dark;
+.students-risk-modal {
+  width: min(900px, calc(100vw - 28px));
+  max-height: calc(100dvh - 28px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 18px;
+  background: var(--sr-surface);
+  box-shadow: 0 30px 80px rgba(2, 8, 23, 0.28), 0 8px 24px rgba(2, 8, 23, 0.11);
 }
 
-html[data-theme="dark"]
-  .students-risk-config-options
-  > label:hover {
-  background:
-    color-mix(
-      in srgb,
-      var(
-        --sr-icon-bg
-      )
-        18%,
-      var(
-        --sr-surface
-      )
-    );
+.students-risk-modal-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 17px 19px;
+  border-bottom: 1px solid var(--sr-border-soft);
+  background: var(--sr-surface);
+}
+
+.students-risk-modal-header > div {
+  min-width: 0;
+}
+
+.students-risk-modal-header > div > span {
+  display: block;
+  color: var(--sr-primary-2);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+.students-risk-modal-header h2 {
+  margin: 4px 0 0;
+  color: var(--sr-text);
+  font-size: 21px;
+  font-weight: 850;
+  letter-spacing: -0.3px;
+}
+
+.students-risk-modal-header p {
+  margin: 4px 0 0;
+  color: var(--sr-body);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.students-risk-modal-header > button {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 10px;
+  background: var(--sr-surface-soft);
+  color: var(--sr-muted);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.students-risk-modal-header > button:hover:not(:disabled) {
+  color: var(--sr-text);
+  border-color: var(--sr-border);
+}
+
+.students-risk-modal-header > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.students-risk-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 15px 17px 18px;
+  background: var(--sr-surface-soft);
+  scrollbar-width: thin;
+}
+
+.students-risk-modal-body > * {
+  flex: 0 0 auto;
+}
+
+.students-risk-modal-loading,
+.students-risk-modal-error {
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 30px;
+}
+
+.students-risk-modal-loading {
+  flex-direction: column;
+  color: var(--sr-text-2);
+  text-align: center;
+}
+
+.students-risk-modal-loading > span,
+.students-risk-mini-spinner {
+  border: 3px solid var(--sr-border-soft);
+  border-top-color: var(--sr-primary-2);
+  border-radius: 50%;
+  animation: sr-spin 0.75s linear infinite;
+}
+
+.students-risk-modal-loading > span {
+  width: 34px;
+  height: 34px;
+}
+
+.students-risk-modal-loading strong,
+.students-risk-modal-error strong {
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.students-risk-modal-error {
+  color: var(--sr-error-text);
+}
+
+.students-risk-modal-error > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  border-radius: 50%;
+  background: var(--sr-error-bg);
+  font-weight: 900;
+}
+
+.students-risk-modal-error p {
+  max-width: 500px;
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 /* =========================================================
-   FIRST-TIME CONFIGURATION — RESPONSIVE
+   11. MODAL — ESSENTIAL REVIEW FIRST
 ========================================================= */
 
-@media (
-  max-width: 1100px
-) {
-  .students-risk-config-grid {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(
-          0,
-          1fr
-        )
-      );
+.students-risk-review-identity {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 13px;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 12px;
+  background: var(--sr-surface);
+}
+
+.students-risk-review-student {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.students-risk-review-student > div,
+.students-risk-review-guardian {
+  min-width: 0;
+}
+
+.students-risk-review-student small,
+.students-risk-review-guardian small,
+.students-risk-review-metrics span {
+  display: block;
+  color: var(--sr-muted);
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.students-risk-review-student strong,
+.students-risk-review-guardian strong {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--sr-text);
+  font-size: 12px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.students-risk-review-student > div > span,
+.students-risk-review-guardian > span {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--sr-body);
+  font-size: 9.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.students-risk-review-metrics {
+  display: grid;
+  grid-template-columns: 0.8fr 0.8fr 1.4fr;
+  overflow: hidden;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 12px;
+  background: var(--sr-surface);
+}
+
+.students-risk-review-metrics article {
+  min-width: 0;
+  padding: 11px 12px;
+}
+
+.students-risk-review-metrics article + article {
+  border-left: 1px solid var(--sr-border-soft);
+}
+
+.students-risk-review-metrics strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--sr-text);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.students-risk-review-metrics .is-period strong {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.students-risk-warning {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 11px;
+  border: 1px solid #f2d28f;
+  border-radius: 10px;
+  background: #fffaf0;
+  color: #92400e;
+}
+
+.students-risk-warning > span {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fef3c7;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.students-risk-warning p {
+  margin: 1px 0 0;
+  font-size: 10.5px;
+  line-height: 1.48;
+}
+
+/* =========================================================
+   12. TASK CARDS / ADVISER NOTE
+========================================================= */
+
+.students-risk-task-card {
+  overflow: hidden;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 12px;
+  background: var(--sr-surface);
+}
+
+.students-risk-task-card > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 13px;
+  border-bottom: 1px solid var(--sr-border-soft);
+}
+
+.students-risk-task-card > header > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.students-risk-subject-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--sr-border-soft);
+  background: var(--sr-surface-soft);
+}
+
+.students-risk-subject-row strong {
+  min-width: 0;
+  color: var(--sr-text-2);
+  font-size: 11px;
+  font-weight: 820;
+  overflow-wrap: anywhere;
+}
+
+.students-risk-note {
+  display: grid;
+  gap: 8px;
+  padding: 12px 13px 13px;
+}
+
+.students-risk-note textarea {
+  min-height: 108px;
+}
+
+.students-risk-note textarea:disabled {
+  resize: none;
+  background: var(--sr-surface-soft);
+  color: var(--sr-body);
+}
+
+/* =========================================================
+   13. ATTENDANCE EVIDENCE — COLLAPSIBLE
+========================================================= */
+
+.students-risk-disclosure {
+  overflow: hidden;
+  border: 1px solid var(--sr-border-soft);
+  border-radius: 12px;
+  background: var(--sr-surface);
+}
+
+.students-risk-disclosure > summary {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 13px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.students-risk-disclosure > summary > div {
+  display: grid;
+  gap: 2px;
+}
+
+.students-risk-disclosure > summary span {
+  color: var(--sr-text);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.students-risk-disclosure > summary small {
+  color: var(--sr-muted);
+  font-size: 9px;
+}
+
+.students-risk-disclosure > summary b {
+  color: var(--sr-primary-2);
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.students-risk-disclosure[open] > summary {
+  border-bottom: 1px solid var(--sr-border-soft);
+  background: var(--sr-surface-soft);
+}
+
+.students-risk-absence-list article {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 13px;
+}
+
+.students-risk-absence-list article + article {
+  border-top: 1px solid var(--sr-border-soft);
+}
+
+.students-risk-absence-list article span {
+  display: block;
+  color: var(--sr-muted);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+}
+
+.students-risk-absence-list article strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--sr-text-2);
+  font-size: 10.5px;
+  font-weight: 820;
+}
+
+.students-risk-absence-list article em {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border: 1px solid #fecdd3;
+  border-radius: 999px;
+  background: #fff1f2;
+  color: #b91c1c;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.students-risk-no-absence-details {
+  padding: 14px;
+  color: var(--sr-muted);
+  font-size: 10.5px;
+}
+
+/* =========================================================
+   14. COMMUNICATION STATUS / FLOW
+========================================================= */
+
+.students-risk-communication-card > header {
+  align-items: center;
+}
+
+.students-risk-communication-status {
+  min-height: 28px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 9px;
+  border: 1px solid var(--sr-border);
+  border-radius: 999px;
+  background: var(--sr-surface-soft);
+  color: var(--sr-muted);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.students-risk-communication-status.is-pending { color: #475569; }
+.students-risk-communication-status.is-queued { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; }
+.students-risk-communication-status.is-sent { border-color: #bbf7d0; background: #ecfdf3; color: #15803d; }
+.students-risk-communication-status.is-failed { border-color: #fecaca; background: #fff1f2; color: #b91c1c; }
+.students-risk-communication-status.is-acknowledged { border-color: #c7d2fe; background: #eef2ff; color: #4338ca; }
+.students-risk-communication-status.is-responded { border-color: #a7f3d0; background: #ecfdf5; color: #047857; }
+
+.students-risk-communication-state,
+.students-risk-communication-empty {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 13px;
+}
+
+.students-risk-communication-state p,
+.students-risk-communication-empty p {
+  margin: 0;
+  color: var(--sr-body);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.students-risk-communication-state.is-error {
+  background: var(--sr-error-bg);
+  color: var(--sr-error-text);
+}
+
+.students-risk-communication-state.is-error p {
+  color: inherit;
+}
+
+.students-risk-mini-spinner {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border-width: 2px;
+}
+
+.students-risk-communication-empty > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  border: 1px solid var(--sr-brand-border);
+  border-radius: 9px;
+  background: var(--sr-brand-soft);
+  color: var(--sr-primary-2);
+  font-size: 15px;
+}
+
+.students-risk-communication-empty strong {
+  display: block;
+  color: var(--sr-text);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.students-risk-communication-empty p {
+  margin-top: 3px;
+}
+
+.students-risk-communication-flow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--sr-border-soft);
+}
+
+.students-risk-communication-flow article {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 11px 10px;
+  background: var(--sr-surface);
+}
+
+.students-risk-communication-flow article > span {
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--sr-border);
+  border-radius: 50%;
+  background: var(--sr-surface-soft);
+  color: var(--sr-muted);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.students-risk-communication-flow article.is-complete > span {
+  border-color: #bbf7d0;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.students-risk-communication-flow article.is-response > span {
+  border-color: #a7f3d0;
+  background: #d1fae5;
+  color: #047857;
+}
+
+.students-risk-communication-flow article > div {
+  min-width: 0;
+}
+
+.students-risk-communication-flow small,
+.students-risk-communication-flow strong,
+.students-risk-communication-flow p {
+  display: block;
+}
+
+.students-risk-communication-flow small {
+  color: var(--sr-muted);
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+}
+
+.students-risk-communication-flow strong {
+  margin-top: 2px;
+  color: var(--sr-text);
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.students-risk-communication-flow p {
+  margin: 2px 0 0;
+  color: var(--sr-body);
+  font-size: 8.5px;
+  line-height: 1.35;
+}
+
+/* =========================================================
+   15. PARENT RESPONSE + HISTORY
+========================================================= */
+
+.students-risk-parent-response {
+  margin: 10px 11px;
+  overflow: hidden;
+  border: 1px solid #b7ead1;
+  border-radius: 10px;
+  background: #f3fcf7;
+}
+
+.students-risk-parent-response > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 11px 8px;
+}
+
+.students-risk-parent-response > header span {
+  display: block;
+  color: #3d7c68;
+  font-size: 7.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.students-risk-parent-response > header strong {
+  display: block;
+  margin-top: 3px;
+  color: #14532d;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.students-risk-parent-response > header small {
+  color: #568575;
+  font-size: 8.5px;
+}
+
+.students-risk-parent-response blockquote {
+  margin: 0 11px 10px;
+  padding: 10px 11px;
+  border: 1px solid #ccefe0;
+  border-left: 3px solid #10b981;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #173f34;
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.students-risk-history {
+  border-top: 1px solid var(--sr-border-soft);
+}
+
+.students-risk-history > summary {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 12px;
+  background: var(--sr-surface-soft);
+  color: var(--sr-text-2);
+  font-size: 10px;
+  font-weight: 820;
+  cursor: pointer;
+  list-style: none;
+}
+
+.students-risk-history > summary strong {
+  min-width: 22px;
+  min-height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--sr-surface);
+  color: var(--sr-muted);
+  font-size: 8.5px;
+}
+
+.students-risk-history > div {
+  padding: 0 12px 8px;
+  background: var(--sr-surface-soft);
+}
+
+.students-risk-history article {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.students-risk-history article + article {
+  border-top: 1px solid var(--sr-border-soft);
+}
+
+.students-risk-history article > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.students-risk-history article > span.is-queued { background: #3b82f6; }
+.students-risk-history article > span.is-sent { background: #22c55e; }
+.students-risk-history article > span.is-failed { background: #ef4444; }
+.students-risk-history article > span.is-acknowledged { background: #6366f1; }
+.students-risk-history article > span.is-responded { background: #10b981; }
+
+.students-risk-history article > div {
+  min-width: 0;
+}
+
+.students-risk-history article strong,
+.students-risk-history article small {
+  display: block;
+}
+
+.students-risk-history article strong {
+  color: var(--sr-text-2);
+  font-size: 9.5px;
+  font-weight: 850;
+}
+
+.students-risk-history article small {
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--sr-muted);
+  font-size: 8.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.students-risk-history time {
+  color: var(--sr-muted);
+  font-size: 8.5px;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   16. PREPARED / FEEDBACK
+========================================================= */
+
+.students-risk-prepared,
+.students-risk-feedback {
+  border: 1px solid;
+  border-radius: 10px;
+}
+
+.students-risk-prepared {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 11px;
+  border-color: var(--sr-success-border);
+  background: var(--sr-success-bg);
+  color: var(--sr-success-text);
+}
+
+.students-risk-prepared > span {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #dcfce7;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.students-risk-prepared strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.students-risk-prepared p {
+  margin: 2px 0 0;
+  font-size: 9.5px;
+  line-height: 1.4;
+}
+
+.students-risk-prepared em {
+  font-size: 8.5px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.students-risk-feedback {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 11px;
+}
+
+.students-risk-feedback p {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.students-risk-feedback.is-error {
+  border-color: var(--sr-error-border);
+  background: var(--sr-error-bg);
+  color: var(--sr-error-text);
+}
+
+.students-risk-feedback.is-error > span {
+  background: #fee2e2;
+}
+
+.students-risk-feedback.is-success {
+  border-color: var(--sr-success-border);
+  background: var(--sr-success-bg);
+  color: var(--sr-success-text);
+}
+
+.students-risk-feedback.is-success > span {
+  background: #dcfce7;
+}
+
+/* =========================================================
+   17. MODAL ACTIONS — STICKY, ONE PRIMARY ACTION
+========================================================= */
+
+.students-risk-modal-actions {
+  flex: 0 0 auto;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--sr-border-soft);
+  background: var(--sr-surface);
+}
+
+.students-risk-delivery-step {
+  min-width: 0;
+}
+
+.students-risk-delivery-step > span {
+  display: block;
+  color: var(--sr-muted);
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.students-risk-delivery-step strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--sr-text);
+  font-size: 10.5px;
+  font-weight: 850;
+}
+
+.students-risk-modal-actions > div:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.students-risk-modal-actions button {
+  min-height: 40px;
+  padding: 0 13px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.students-risk-modal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.students-risk-modal-actions .is-secondary {
+  border: 1px solid var(--sr-border);
+  background: var(--sr-surface);
+  color: var(--sr-text-2);
+}
+
+.students-risk-modal-actions .is-secondary:hover:not(:disabled) {
+  background: var(--sr-surface-soft);
+}
+
+/* =========================================================
+   18. SCROLLBARS
+========================================================= */
+
+.students-risk-table-wrap::-webkit-scrollbar,
+.students-risk-modal-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.students-risk-table-wrap::-webkit-scrollbar-track,
+.students-risk-modal-body::-webkit-scrollbar-track {
+  background: var(--sr-surface-soft);
+}
+
+.students-risk-table-wrap::-webkit-scrollbar-thumb,
+.students-risk-modal-body::-webkit-scrollbar-thumb {
+  border: 2px solid var(--sr-surface-soft);
+  border-radius: 999px;
+  background: var(--sr-border);
+}
+
+/* =========================================================
+   19. RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+  .students-risk-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 0.42fr);
   }
 
-  .students-risk-config-grid
-    > label:last-child {
-    grid-column:
-      span
-      2;
+  .students-risk-focus-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .students-risk-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .students-risk-search {
+    width: 100%;
+  }
+
+  .students-risk-filter-list {
+    justify-content: flex-start;
   }
 }
 
-@media (
-  max-width: 760px
-) {
-  .students-risk-config-form {
-    padding:
-      15px;
+@media (max-width: 780px) {
+  .students-risk-panel-head {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .students-risk-panel-head .students-risk-review {
+    width: fit-content;
+  }
+
+  .students-risk-config-grid.is-thresholds {
+    grid-template-columns: 1fr;
   }
 
   .students-risk-config-options {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
+  }
+
+  .students-risk-review-identity {
+    grid-template-columns: 1fr auto;
+  }
+
+  .students-risk-review-guardian {
+    grid-column: 1 / -1;
+    padding-top: 9px;
+    border-top: 1px solid var(--sr-border-soft);
+  }
+
+  .students-risk-communication-flow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .students-risk-page {
+    gap: 13px;
+  }
+
+  .students-risk-hero {
+    grid-template-columns: 1fr;
+    gap: 13px;
+    padding: 17px 14px 16px 19px;
+  }
+
+  .students-risk-hero h2 {
+    font-size: 21px;
+  }
+
+  .students-risk-section-card > strong {
+    white-space: normal;
+  }
+
+  .students-risk-focus-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .students-risk-focus-strip > div {
+    min-height: 84px;
+    padding: 11px 12px;
+  }
+
+  .students-risk-focus-strip strong {
+    font-size: 21px;
+  }
+
+  .students-risk-toolbar {
+    padding: 11px;
+  }
+
+  .students-risk-table {
+    min-width: 820px;
+  }
+
+  .students-risk-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .students-risk-pagination > div {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .students-risk-pagination button {
+    flex: 1;
+  }
+
+  .students-risk-setup-progress {
+    grid-template-columns: 1fr;
+  }
+
+  .students-risk-config-grid.is-period {
+    grid-template-columns: 1fr;
   }
 
   .students-risk-config-actions {
-    align-items:
-      stretch;
-
-    flex-direction:
-      column;
+    align-items: stretch;
+    flex-direction: column;
   }
 
-  .students-risk-config-actions
-    > button {
+  .students-risk-config-actions > button {
     width: 100%;
+  }
+
+  .students-risk-modal-backdrop {
+    padding: 7px;
+  }
+
+  .students-risk-modal {
+    width: calc(100vw - 14px);
+    max-height: calc(100dvh - 14px);
+    border-radius: 14px;
+  }
+
+  .students-risk-modal-header {
+    padding: 14px;
+  }
+
+  .students-risk-modal-header p {
+    display: none;
+  }
+
+  .students-risk-modal-body {
+    padding: 12px;
+  }
+
+  .students-risk-review-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .students-risk-review-metrics article + article {
+    border-left: 0;
+  }
+
+  .students-risk-review-metrics article:nth-child(2) {
+    border-left: 1px solid var(--sr-border-soft);
+  }
+
+  .students-risk-review-metrics .is-period {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--sr-border-soft);
+  }
+
+  .students-risk-subject-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .students-risk-absence-list article {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .students-risk-absence-list article em {
+    width: fit-content;
+  }
+
+  .students-risk-communication-card > header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .students-risk-parent-response > header {
+    flex-direction: column;
+  }
+
+  .students-risk-history article {
+    grid-template-columns: 8px minmax(0, 1fr);
+  }
+
+  .students-risk-history time {
+    grid-column: 2;
+    white-space: normal;
+  }
+
+  .students-risk-prepared {
+    grid-template-columns: 26px minmax(0, 1fr);
+  }
+
+  .students-risk-prepared em {
+    grid-column: 2;
+  }
+
+  .students-risk-modal-actions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 9px;
+    padding: 10px 12px;
+  }
+
+  .students-risk-modal-actions > div:last-child {
+    width: 100%;
+  }
+
+  .students-risk-modal-actions button {
+    flex: 1;
   }
 }
 
-@media (
-  max-width: 560px
-) {
-  .students-risk-config-grid {
-    grid-template-columns:
-      1fr;
+@media (max-width: 430px) {
+  .students-risk-focus-strip {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .students-risk-config-grid
-    > label:last-child {
-    grid-column:
-      auto;
+  .students-risk-review-identity {
+    grid-template-columns: 1fr;
   }
 
-  .students-risk-config-form {
-    gap: 14px;
-
-    padding:
-      14px
-      12px
-      15px;
+  .students-risk-review-identity > .students-risk-badge {
+    justify-self: start;
   }
 
-  .students-risk-config-grid,
-  .students-risk-config-options {
-    gap: 8px;
+  .students-risk-review-guardian {
+    grid-column: auto;
   }
 
-  .students-risk-config-grid
-    > label,
-  .students-risk-config-options
-    > label,
-  .students-risk-config-message {
-    padding:
-      12px;
+  .students-risk-review-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .students-risk-review-metrics article:nth-child(2) {
+    border-left: 0;
+    border-top: 1px solid var(--sr-border-soft);
+  }
+
+  .students-risk-review-metrics .is-period {
+    grid-column: auto;
   }
 }
 
 /* =========================================================
-   FIRST-TIME CONFIGURATION — REDUCED MOTION
+   20. ANIMATION / REDUCED MOTION
 ========================================================= */
 
-@media (
-  prefers-reduced-motion:
-    reduce
-) {
-  .students-risk-config-grid
-    input,
-  .students-risk-config-options
-    > label,
-  .students-risk-config-message
-    textarea,
-  .students-risk-config-actions
-    > button {
-    transition:
-      none
-      !important;
+@keyframes sr-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sr-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .students-risk-loading > span,
+  .students-risk-modal-loading > span,
+  .students-risk-mini-spinner {
+    animation: none !important;
+  }
+
+  .students-risk-table tbody tr,
+  .students-risk-review {
+    transition: none !important;
   }
 }

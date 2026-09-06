@@ -3435,3 +3435,555 @@ html[data-theme="dark"] .attendance-history-card-stats div + div {
     border-top-color: #334155 !important;
   }
 }
+
+
+/* =========================================================
+   SVNHS ATTENDANCE HISTORY
+   DARK MODE VISUAL FIX
+   ---------------------------------------------------------
+   Append this block at the VERY END of attendanceHistory.css
+
+   Fixes:
+   - Light/gray panels leaking into dark mode
+   - Hardcoded light gradients inside session cards
+   - Weak contrast on date/time/rate/action areas
+   - Inconsistent dark borders and semantic tiles
+   - Keeps all existing JSX and attendance logic untouched
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-page {
+  color: var(--c-text-secondary);
+}
+
+/* =========================================================
+   MAIN PANELS
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-filter-panel,
+html[data-theme="dark"] .attendance-history-records {
+  border-color: var(--c-border);
+  background: var(--c-surface);
+  box-shadow: var(--c-panel-shadow);
+}
+
+html[data-theme="dark"] .attendance-history-filter-head,
+html[data-theme="dark"] .attendance-history-records-head {
+  border-bottom-color: var(--c-border);
+
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-surface-soft) 54%, var(--c-surface)),
+    var(--c-surface) 74%
+  );
+}
+
+html[data-theme="dark"]
+  .attendance-history-filter-head
+  > div:first-child
+  > span,
+html[data-theme="dark"]
+  .attendance-history-records-head
+  > div
+  > span {
+  color: #7db7f1;
+}
+
+html[data-theme="dark"] .attendance-history-record-count {
+  border-color: rgba(96, 165, 250, 0.22);
+  background: rgba(59, 130, 246, 0.1);
+  color: #a7d3ff;
+}
+
+/* =========================================================
+   FILTERS
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-presets button {
+  border-color: var(--c-border);
+  background: var(--c-surface-soft);
+  color: var(--c-text-secondary);
+}
+
+html[data-theme="dark"] .attendance-history-presets button:hover {
+  border-color: rgba(96, 165, 250, 0.3);
+  background: rgba(59, 130, 246, 0.08);
+  color: #eaf4ff;
+}
+
+html[data-theme="dark"] .attendance-history-presets button.is-active {
+  border-color: rgba(96, 165, 250, 0.42);
+  background: rgba(59, 130, 246, 0.16);
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"]
+  .attendance-history-filter-controls
+  input[type="date"],
+html[data-theme="dark"] .attendance-history-search {
+  border-color: var(--c-border);
+  background: var(--c-input-bg);
+  color: var(--c-input-text);
+}
+
+html[data-theme="dark"]
+  .attendance-history-filter-controls
+  input[type="date"] {
+  color-scheme: dark;
+}
+
+html[data-theme="dark"]
+  .attendance-history-filter-controls
+  input[type="date"]:hover,
+html[data-theme="dark"] .attendance-history-search:hover {
+  border-color: rgba(96, 165, 250, 0.28);
+}
+
+html[data-theme="dark"] .attendance-history-apply-button {
+  border-color: #2f6fb5;
+
+  background: linear-gradient(
+    135deg,
+    #245b9e,
+    #3277be
+  );
+
+  box-shadow: 0 7px 18px rgba(10, 67, 132, 0.2);
+}
+
+html[data-theme="dark"] .attendance-history-apply-button:hover {
+  filter: brightness(1.06);
+}
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-summary article {
+  background: var(--c-surface);
+  box-shadow: var(--c-card-shadow);
+}
+
+/* Completed */
+html[data-theme="dark"] .attendance-history-summary article:nth-child(1) {
+  border-color: rgba(96, 165, 250, 0.22);
+  background: linear-gradient(
+    180deg,
+    rgba(59, 130, 246, 0.12),
+    var(--c-surface) 76%
+  );
+}
+
+/* Present */
+html[data-theme="dark"] .attendance-history-summary article:nth-child(2) {
+  border-color: rgba(74, 222, 128, 0.2);
+  background: linear-gradient(
+    180deg,
+    rgba(34, 197, 94, 0.1),
+    var(--c-surface) 76%
+  );
+}
+
+/* Late */
+html[data-theme="dark"] .attendance-history-summary article:nth-child(3) {
+  border-color: rgba(251, 191, 36, 0.22);
+  background: linear-gradient(
+    180deg,
+    rgba(245, 158, 11, 0.1),
+    var(--c-surface) 76%
+  );
+}
+
+/* Absent */
+html[data-theme="dark"] .attendance-history-summary article:nth-child(4) {
+  border-color: rgba(248, 113, 113, 0.2);
+  background: linear-gradient(
+    180deg,
+    rgba(220, 38, 38, 0.1),
+    var(--c-surface) 76%
+  );
+}
+
+/* Rate */
+html[data-theme="dark"] .attendance-history-summary article:nth-child(5) {
+  border-color: rgba(167, 139, 250, 0.2);
+  background: linear-gradient(
+    180deg,
+    rgba(124, 58, 237, 0.1),
+    var(--c-surface) 76%
+  );
+}
+
+/* =========================================================
+   HISTORY SESSION CARD
+   This is the main screenshot issue.
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-card,
+html[data-theme="dark"] .attendance-history-card:nth-child(even) {
+  border-color: var(--c-border);
+
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--c-surface-soft) 32%, var(--c-surface)) 0%,
+    var(--c-surface) 44%,
+    var(--c-surface) 100%
+  );
+}
+
+html[data-theme="dark"] .attendance-history-card:hover {
+  border-color: rgba(96, 165, 250, 0.24);
+
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.07),
+    var(--c-surface) 44%,
+    var(--c-surface) 100%
+  );
+}
+
+/* =========================================================
+   DATE COLUMN
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-date-block {
+  border-color: rgba(96, 165, 250, 0.2);
+
+  background: linear-gradient(
+    180deg,
+    rgba(30, 64, 175, 0.18),
+    rgba(11, 30, 52, 0.7)
+  );
+}
+
+html[data-theme="dark"] .attendance-history-date-block span {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"] .attendance-history-date-block strong {
+  color: #f4f7fb;
+}
+
+html[data-theme="dark"] .attendance-history-date-block small {
+  color: #8fa0b5;
+}
+
+/* =========================================================
+   SESSION MAIN INFO
+   Removes the accidental light gradient shown in screenshot.
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-card-main {
+  border-color: var(--c-border);
+
+  background: linear-gradient(
+    90deg,
+    rgba(59, 130, 246, 0.055),
+    transparent 72%
+  );
+}
+
+html[data-theme="dark"] .attendance-history-card-title > div > span {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"] .attendance-history-card-title h3 {
+  color: var(--c-text-primary);
+}
+
+html[data-theme="dark"] .attendance-history-card-title p {
+  color: var(--c-text-body);
+}
+
+html[data-theme="dark"] .attendance-history-ended-badge {
+  border-color: var(--c-border);
+  background: rgba(148, 163, 184, 0.07);
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .attendance-history-ended-badge i {
+  background: #748399;
+}
+
+/* =========================================================
+   START / END / DURATION
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-session-times div {
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .attendance-history-session-times div:nth-child(1) {
+  border-color: rgba(96, 165, 250, 0.26);
+  background: rgba(59, 130, 246, 0.11);
+}
+
+html[data-theme="dark"]
+  .attendance-history-session-times
+  div:nth-child(1)
+  span {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"] .attendance-history-session-times div:nth-child(2) {
+  border-color: rgba(167, 139, 250, 0.24);
+  background: rgba(124, 58, 237, 0.11);
+}
+
+html[data-theme="dark"]
+  .attendance-history-session-times
+  div:nth-child(2)
+  span {
+  color: #a78bfa;
+}
+
+html[data-theme="dark"] .attendance-history-session-times div:nth-child(3) {
+  border-color: rgba(148, 163, 184, 0.17);
+  background: rgba(148, 163, 184, 0.07);
+}
+
+html[data-theme="dark"]
+  .attendance-history-session-times
+  div:nth-child(3)
+  span {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .attendance-history-session-times strong {
+  color: #e7eef7;
+}
+
+/* =========================================================
+   STUDENT / PRESENT / LATE / ABSENT BLOCK
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-card-stats {
+  border-color: var(--c-border);
+  background: #0d1a2b;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div {
+  background: transparent !important;
+}
+
+html[data-theme="dark"] .attendance-history-card-stats div + div {
+  border-left-color: var(--c-border) !important;
+}
+
+html[data-theme="dark"]
+  .attendance-history-card-stats
+  div:nth-child(1)
+  span {
+  color: #60a5fa !important;
+}
+
+html[data-theme="dark"]
+  .attendance-history-card-stats
+  div:nth-child(1)
+  strong {
+  color: #93c5fd;
+}
+
+html[data-theme="dark"]
+  .attendance-history-card-stats
+  div:nth-child(2)
+  span {
+  color: #4ade80 !important;
+}
+
+html[data-theme="dark"]
+  .attendance-history-card-stats
+  div:nth-child(2)
+  strong,
+html[data-theme="dark"] .attendance-history-card-stats strong.is-success {
+  color: #86efac;
+}
+
+html[data-theme="dark"]
+  .attendance-history-card-stats
+  div:nth-child(3)
+  span {
+  color: #fbbf24 !important;
+}
+
+html[data-theme="dark"]
+  .attendance-history-card-stats
+  div:nth-child(3)
+  strong,
+html[data-theme="dark"] .attendance-history-card-stats strong.is-late {
+  color: #fde68a;
+}
+
+html[data-theme="dark"]
+  .attendance-history-card-stats
+  div:nth-child(4)
+  span {
+  color: #fb7185 !important;
+}
+
+html[data-theme="dark"]
+  .attendance-history-card-stats
+  div:nth-child(4)
+  strong,
+html[data-theme="dark"] .attendance-history-card-stats strong.is-danger {
+  color: #fda4af;
+}
+
+/* =========================================================
+   ATTENDANCE RATE
+   Removes the large gray/light-looking block in screenshot.
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-rate {
+  border-color: var(--c-border);
+
+  background: linear-gradient(
+    180deg,
+    rgba(148, 163, 184, 0.055),
+    transparent 88%
+  );
+}
+
+html[data-theme="dark"] .attendance-history-rate-head span {
+  color: #8090a4;
+}
+
+html[data-theme="dark"] .attendance-history-rate-head strong {
+  color: #e7eef7;
+}
+
+html[data-theme="dark"] .attendance-history-rate-head strong.is-excellent {
+  color: #86efac;
+}
+
+html[data-theme="dark"] .attendance-history-rate-head strong.is-good {
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .attendance-history-rate-head strong.is-attention {
+  color: #fda4af;
+}
+
+html[data-theme="dark"] .attendance-history-rate-track {
+  background: rgba(148, 163, 184, 0.09);
+}
+
+html[data-theme="dark"] .attendance-history-rate-track span.is-excellent {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+html[data-theme="dark"] .attendance-history-rate-track span.is-good {
+  background: linear-gradient(90deg, #2563eb, #60a5fa);
+}
+
+html[data-theme="dark"] .attendance-history-rate-track span.is-attention {
+  background: linear-gradient(90deg, #dc2626, #fb7185);
+}
+
+html[data-theme="dark"] .attendance-history-rate small {
+  color: #93a2b5;
+}
+
+/* =========================================================
+   VIEW RECORD ROW
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-card-action {
+  border-color: var(--c-border);
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(59, 130, 246, 0.025)
+  );
+}
+
+html[data-theme="dark"] .attendance-history-card-action button {
+  border-color: #2f6fb5;
+
+  background: linear-gradient(
+    135deg,
+    #205493,
+    #2d6fb5
+  );
+
+  color: #ffffff;
+
+  box-shadow: 0 6px 16px rgba(8, 53, 108, 0.2);
+}
+
+html[data-theme="dark"]
+  .attendance-history-card-action
+  button:hover:not(:disabled) {
+  background: linear-gradient(
+    135deg,
+    #2866aa,
+    #3982ca
+  );
+
+  box-shadow: 0 9px 21px rgba(8, 53, 108, 0.28);
+}
+
+html[data-theme="dark"] .attendance-history-card-action small {
+  color: #8291a5;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+html[data-theme="dark"] .attendance-history-pagination {
+  border-top-color: var(--c-border);
+
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--c-surface-soft) 56%, var(--c-surface)),
+    var(--c-surface)
+  );
+}
+
+html[data-theme="dark"] .attendance-history-pagination-actions button {
+  border-color: var(--c-border);
+  background: var(--c-surface-soft);
+  color: var(--c-text-secondary);
+}
+
+html[data-theme="dark"]
+  .attendance-history-pagination-actions
+  button:hover:not(:disabled) {
+  border-color: rgba(96, 165, 250, 0.3);
+  background: rgba(59, 130, 246, 0.1);
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"]
+  .attendance-history-pagination-actions
+  button:disabled {
+  background: rgba(148, 163, 184, 0.035);
+  color: #58677a;
+  opacity: 0.55;
+}
+
+/* =========================================================
+   MOBILE BORDER FIX
+========================================================= */
+
+@media (max-width: 620px) {
+  html[data-theme="dark"]
+    .attendance-history-card-stats
+    div:nth-child(3),
+  html[data-theme="dark"]
+    .attendance-history-card-stats
+    div:nth-child(4) {
+    border-top-color: var(--c-border) !important;
+  }
+}
+
+@media (max-width: 390px) {
+  html[data-theme="dark"]
+    .attendance-history-card-stats
+    div
+    + div {
+    border-top-color: var(--c-border) !important;
+  }
+}
+

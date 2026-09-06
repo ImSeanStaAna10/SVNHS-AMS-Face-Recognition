@@ -138,25 +138,20 @@
   /* Shadows */
   --c-sidebar-shadow: none;
 
-  --c-header-shadow:
-    0 2px 10px rgba(7, 27, 66, 0.025);
+  --c-header-shadow: 0 2px 10px rgba(7, 27, 66, 0.025);
 
-  --c-card-shadow:
-    0 5px 17px rgba(7, 27, 66, 0.04);
+  --c-card-shadow: 0 5px 17px rgba(7, 27, 66, 0.04);
 
-  --c-card-hover-shadow:
-    0 10px 24px rgba(7, 27, 66, 0.08);
+  --c-card-hover-shadow: 0 10px 24px rgba(7, 27, 66, 0.08);
 
-  --c-panel-shadow:
-    0 5px 18px rgba(7, 27, 66, 0.04);
+  --c-panel-shadow: 0 5px 18px rgba(7, 27, 66, 0.04);
 
   /* Modal */
   --c-modal-backdrop: rgba(7, 27, 66, 0.62);
   --c-modal-bg: #ffffff;
 
   --c-modal-shadow:
-    0 30px 80px rgba(7, 27, 66, 0.3),
-    0 8px 25px rgba(7, 27, 66, 0.12);
+    0 30px 80px rgba(7, 27, 66, 0.3), 0 8px 25px rgba(7, 27, 66, 0.12);
 
   /* Theme toggle */
   --c-toggle-track-bg: #f5f7fb;
@@ -170,219 +165,238 @@
 
   --c-toggle-thumb-x: 0px;
 
-  --c-toggle-shadow:
-    0 2px 7px rgba(7, 27, 66, 0.18);
+  --c-toggle-shadow: 0 2px 7px rgba(7, 27, 66, 0.18);
 }
-
 /* =========================================================
    DARK MODE
+   Midnight Navy + Slate + Burgundy Accent
 ========================================================= */
 
 html[data-theme="dark"] {
   color-scheme: dark;
 
-  /* Page */
-  --c-page-start: #091a35;
-  --c-page-end: #22121d;
+  /* =======================================================
+     PAGE
+  ======================================================= */
 
-  /* Surfaces */
-  --c-sidebar-start: #0b2344;
-  --c-sidebar-end: #191521;
+  --c-page-start: #08111f;
+  --c-page-end: #0b1424;
 
-  --c-header-start: #0d294f;
-  --c-header-mid: #132540;
-  --c-header-end: #28141e;
+  /* =======================================================
+     SURFACES
+  ======================================================= */
 
-  --c-surface: #132c4b;
-  --c-surface-soft: #17263b;
+  --c-sidebar-start: #0b1728;
+  --c-sidebar-end: #0a1422;
 
-  --c-table-head: #102641;
-  --c-input-bg: #101f36;
+  --c-header-start: rgba(12, 25, 43, 0.97);
+  --c-header-mid: rgba(12, 25, 43, 0.97);
+  --c-header-end: rgba(12, 25, 43, 0.97);
 
-  --c-logo-bg: rgba(255, 255, 255, 0.97);
+  --c-surface: #101d2f;
+  --c-surface-soft: #142337;
 
-  /* Typography */
-  --c-text-primary: #f5f8fd;
-  --c-text-secondary: #d9e3ef;
-  --c-text-body: #b5c1d1;
-  --c-text-muted: #8795a8;
+  --c-table-head: #0d1a2b;
 
-  /* Borders */
-  --c-border: rgba(106, 163, 222, 0.18);
-  --c-border-soft: rgba(197, 31, 45, 0.1);
+  --c-input-bg: #0d1b2d;
 
-  --c-brand-border: rgba(197, 31, 45, 0.2);
+  --c-logo-bg: #ffffff;
 
-  /* Navigation */
-  --c-nav-text: #a9b9cc;
+  /* =======================================================
+     TYPOGRAPHY
+  ======================================================= */
 
-  --c-nav-hover-bg: linear-gradient(
-    90deg,
-    rgba(47, 111, 181, 0.13),
-    rgba(197, 31, 45, 0.07)
-  );
+  --c-text-primary: #f4f7fb;
 
-  --c-nav-hover-text: #ffffff;
+  --c-text-secondary: #d5deea;
 
-  --c-nav-active-start: rgba(44, 105, 177, 0.3);
-  --c-nav-active-end: rgba(197, 31, 45, 0.15);
+  --c-text-body: #a9b6c7;
+
+  --c-text-muted: #748399;
+
+  /* =======================================================
+     BORDERS
+  ======================================================= */
+
+  --c-border: rgba(148, 163, 184, 0.18);
+
+  --c-border-soft: rgba(148, 163, 184, 0.1);
+
+  --c-brand-border: rgba(96, 165, 250, 0.2);
+
+  /* =======================================================
+     NAVIGATION
+  ======================================================= */
+
+  --c-nav-text: #96a7bb;
+
+  --c-nav-hover-bg: rgba(96, 165, 250, 0.08);
+
+  --c-nav-hover-text: #eaf4ff;
+
+  --c-nav-active-start: rgba(59, 130, 246, 0.18);
+
+  --c-nav-active-end: rgba(59, 130, 246, 0.08);
 
   --c-nav-active-text: #ffffff;
 
-  --c-nav-soon-bg: rgba(255, 255, 255, 0.06);
-  --c-nav-soon-text: #8291a5;
+  --c-nav-soon-bg: rgba(255, 255, 255, 0.04);
 
-  /* Icons */
-  --c-icon-bg: linear-gradient(
-    135deg,
-    rgba(74, 143, 214, 0.17),
-    rgba(197, 31, 45, 0.1)
-  );
+  --c-nav-soon-text: #68778b;
+
+  /* =======================================================
+     ICONS / BADGES
+  ======================================================= */
+
+  --c-icon-bg: rgba(59, 130, 246, 0.11);
 
   --c-icon-text: #8ec5ff;
 
-  --c-role-bg: rgba(61, 128, 201, 0.16);
-  --c-role-text: #9dccff;
+  --c-role-bg: rgba(59, 130, 246, 0.12);
 
-  /* Secondary button */
-  --c-secondary-bg: linear-gradient(
-    135deg,
-    rgba(66, 130, 199, 0.08),
-    rgba(197, 31, 45, 0.06)
-  );
+  --c-role-text: #a7d3ff;
 
-  --c-secondary-text: #cedbeb;
+  /* =======================================================
+     SECONDARY BUTTON
+  ======================================================= */
 
-  --c-secondary-border:
-    rgba(116, 169, 224, 0.18);
+  --c-secondary-bg: #142337;
 
-  --c-secondary-hover-bg: linear-gradient(
-    135deg,
-    rgba(61, 133, 208, 0.15),
-    rgba(197, 31, 45, 0.1)
-  );
+  --c-secondary-text: #c9d6e5;
+
+  --c-secondary-border: rgba(148, 163, 184, 0.18);
+
+  --c-secondary-hover-bg: rgba(59, 130, 246, 0.1);
 
   --c-secondary-hover-text: #ffffff;
 
-  --c-secondary-hover-border:
-    rgba(197, 31, 45, 0.3);
+  --c-secondary-hover-border: rgba(96, 165, 250, 0.32);
 
-  /* Inputs */
-  --c-input-text: #f5f8fd;
-  --c-input-placeholder: #78899d;
+  /* =======================================================
+     INPUTS
+  ======================================================= */
 
-  --c-input-hover-border:
-    rgba(116, 169, 224, 0.3);
+  --c-input-text: #eef4fb;
 
-  --c-focus-color: #5d9fe3;
-  --c-focus-ring: rgba(197, 31, 45, 0.12);
+  --c-input-placeholder: #68788e;
 
-  /* Table */
-  --c-table-text: #b9c6d6;
-  --c-table-title: #edf4fc;
-  --c-table-muted: #8090a4;
+  --c-input-hover-border: rgba(96, 165, 250, 0.28);
 
-  --c-table-hover: linear-gradient(
-    90deg,
-    rgba(63, 130, 202, 0.05),
-    rgba(197, 31, 45, 0.035)
-  );
+  --c-focus-color: #60a5fa;
 
-  /* Status */
-  --c-success-bg: rgba(44, 143, 82, 0.18);
-  --c-success-text: #82dda3;
-  --c-success-dot: #5bc581;
+  --c-focus-ring: rgba(96, 165, 250, 0.14);
 
-  --c-success-border:
-    rgba(71, 183, 110, 0.24);
+  /* =======================================================
+     TABLE
+  ======================================================= */
 
-  --c-inactive-bg: rgba(255, 255, 255, 0.06);
-  --c-inactive-text: #9cabbb;
-  --c-inactive-dot: #8391a3;
+  --c-table-text: #aab8c9;
 
-  --c-error-bg: rgba(197, 31, 45, 0.14);
-  --c-error-text: #ff949d;
-  --c-error-border: rgba(225, 60, 73, 0.3);
+  --c-table-title: #eaf1f8;
 
-  /* Hero */
-  --c-hero-bg: #071b42;
+  --c-table-muted: #718197;
 
-  --c-hero-border:
-    rgba(197, 31, 45, 0.18);
+  --c-table-hover: rgba(96, 165, 250, 0.045);
+
+  /* =======================================================
+     SUCCESS / INACTIVE / ERROR
+  ======================================================= */
+
+  --c-success-bg: rgba(34, 197, 94, 0.11);
+
+  --c-success-text: #86efac;
+
+  --c-success-dot: #4ade80;
+
+  --c-success-border: rgba(74, 222, 128, 0.18);
+
+  --c-inactive-bg: rgba(148, 163, 184, 0.08);
+
+  --c-inactive-text: #94a3b8;
+
+  --c-inactive-dot: #64748b;
+
+  --c-error-bg: rgba(220, 38, 38, 0.1);
+
+  --c-error-text: #fca5a5;
+
+  --c-error-border: rgba(248, 113, 113, 0.2);
+
+  /* =======================================================
+     HERO
+  ======================================================= */
+
+  --c-hero-bg: #07172d;
+
+  --c-hero-border: rgba(96, 165, 250, 0.14);
 
   --c-hero-overlay: linear-gradient(
     90deg,
-    rgba(7, 27, 66, 0.97) 0%,
-    rgba(18, 61, 126, 0.88) 48%,
-    rgba(126, 21, 34, 0.62) 100%
+    rgba(7, 23, 45, 0.98) 0%,
+    rgba(12, 43, 79, 0.92) 55%,
+    rgba(91, 29, 42, 0.72) 100%
   );
 
-  --c-hero-pattern:
-    rgba(197, 31, 45, 0.09);
+  --c-hero-pattern: rgba(255, 255, 255, 0.035);
 
-  --c-hero-seal-bg:
-    rgba(255, 255, 255, 0.1);
+  --c-hero-seal-bg: rgba(255, 255, 255, 0.08);
 
-  --c-hero-seal-border:
-    rgba(255, 255, 255, 0.2);
+  --c-hero-seal-border: rgba(255, 255, 255, 0.16);
 
-  /* Feature welcome */
+  /* =======================================================
+     FEATURE / WELCOME
+  ======================================================= */
+
   --c-welcome-bg: linear-gradient(
     120deg,
-    #071b42 0%,
-    #123d7e 45%,
-    #6c1b2b 78%,
-    #a91522 100%
+    #07172d 0%,
+    #0e315c 52%,
+    #4f2230 82%,
+    #7b1e2d 100%
   );
 
-  /* Shadows */
-  --c-sidebar-shadow:
-    5px 0 22px rgba(0, 0, 0, 0.12);
+  /* =======================================================
+     SHADOWS
+  ======================================================= */
 
-  --c-header-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.16);
+  --c-sidebar-shadow: 6px 0 24px rgba(0, 0, 0, 0.18);
 
-  --c-card-shadow:
-    0 7px 20px rgba(0, 0, 0, 0.14);
+  --c-header-shadow: 0 4px 18px rgba(0, 0, 0, 0.16);
 
-  --c-card-hover-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.22);
+  --c-card-shadow: 0 7px 22px rgba(0, 0, 0, 0.16);
 
-  --c-panel-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.16);
+  --c-card-hover-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
 
-  /* Modal */
-  --c-modal-backdrop:
-    rgba(4, 11, 25, 0.8);
+  --c-panel-shadow: 0 8px 25px rgba(0, 0, 0, 0.16);
 
-  --c-modal-bg: #132c4b;
+  /* =======================================================
+     MODAL
+  ======================================================= */
+
+  --c-modal-backdrop: rgba(2, 8, 18, 0.82);
+
+  --c-modal-bg: #101d2f;
 
   --c-modal-shadow:
-    0 32px 85px rgba(0, 0, 0, 0.48);
+    0 34px 90px rgba(0, 0, 0, 0.5), 0 10px 28px rgba(0, 0, 0, 0.22);
 
-  /* Theme toggle */
-  --c-toggle-track-bg: linear-gradient(
-    90deg,
-    #123d7e,
-    #5b1b2a
-  );
+  /* =======================================================
+     THEME TOGGLE
+  ======================================================= */
 
-  --c-toggle-track-border:
-    rgba(197, 31, 45, 0.22);
+  --c-toggle-track-bg: #0b1a2d;
 
-  --c-toggle-sun: #8192a6;
+  --c-toggle-track-border: rgba(148, 163, 184, 0.2);
+
+  --c-toggle-sun: #748399;
+
   --c-toggle-moon: #f7c945;
 
-  --c-toggle-thumb-bg: linear-gradient(
-    135deg,
-    #377fc4,
-    #c51f2d
-  );
+  --c-toggle-thumb-bg: #1c3555;
 
-  --c-toggle-thumb-text: #ffffff;
+  --c-toggle-thumb-text: #f7c945;
 
   --c-toggle-thumb-x: 32px;
 
-  --c-toggle-shadow:
-    0 4px 12px rgba(197, 31, 45, 0.22);
+  --c-toggle-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
 }

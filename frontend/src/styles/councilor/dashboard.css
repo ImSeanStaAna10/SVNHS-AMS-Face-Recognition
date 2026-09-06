@@ -2741,3 +2741,368 @@ html[data-theme="dark"] .dashboard-adviser-role {
     animation: none !important;
   }
 }
+
+/* =========================================================
+   COUNCILOR DASHBOARD — DARK MODE REFINEMENT V3
+   ---------------------------------------------------------
+   Purpose:
+   - Remove light-mode semantic washes from dark mode
+   - Use the shared midnight/slate design tokens
+   - Keep semantic colors subtle and complementary
+   - Improve contrast for links, icons and progress bars
+   - Presentation only; no layout or dashboard logic changes
+========================================================= */
+
+html[data-theme="dark"] .dashboard-page {
+  color: var(--c-text-body);
+}
+
+/* =========================================================
+   HERO — KEEP BRAND CHARACTER, REDUCE BLUE GLOW
+========================================================= */
+
+html[data-theme="dark"] .councilor-hero {
+  border-color: rgba(96, 165, 250, 0.13);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 10px 30px rgba(0, 0, 0, 0.22),
+    0 24px 60px rgba(0, 0, 0, 0.24);
+}
+
+html[data-theme="dark"] .councilor-hero-overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(4, 15, 31, 0.985) 0%,
+    rgba(8, 31, 61, 0.95) 36%,
+    rgba(14, 48, 84, 0.8) 66%,
+    rgba(62, 32, 49, 0.48) 100%
+  );
+}
+
+html[data-theme="dark"] .councilor-hero::before {
+  background:
+    radial-gradient(
+      circle at 76% 20%,
+      rgba(96, 165, 250, 0.13),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 20% 110%,
+      rgba(59, 130, 246, 0.12),
+      transparent 40%
+    );
+}
+
+html[data-theme="dark"] .councilor-hero-seal {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.105),
+    rgba(255, 255, 255, 0.025)
+  );
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 0 0 7px rgba(255, 255, 255, 0.025);
+}
+
+/* =========================================================
+   KPI CARDS — DARK SEMANTIC TINTS
+========================================================= */
+
+html[data-theme="dark"] .dashboard-kpi-card {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--c-surface-soft) 48%, var(--c-surface)) 0%,
+    var(--c-surface) 54%,
+    color-mix(in srgb, #000000 8%, var(--c-surface)) 100%
+  );
+  border-color: var(--c-border);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.16),
+    0 9px 26px rgba(0, 0, 0, 0.14);
+}
+
+html[data-theme="dark"] .dashboard-kpi-card::after {
+  border-color: rgba(96, 165, 250, 0.035);
+}
+
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(1) {
+  border-color: rgba(96, 165, 250, 0.2);
+  background: linear-gradient(
+    155deg,
+    rgba(59, 130, 246, 0.08) 0%,
+    var(--c-surface) 42%,
+    var(--c-surface) 100%
+  );
+}
+
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(2) {
+  border-color: rgba(74, 222, 128, 0.16);
+  background: linear-gradient(
+    155deg,
+    rgba(34, 197, 94, 0.065) 0%,
+    var(--c-surface) 42%,
+    var(--c-surface) 100%
+  );
+}
+
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(3) {
+  border-color: rgba(167, 139, 250, 0.17);
+  background: linear-gradient(
+    155deg,
+    rgba(139, 92, 246, 0.065) 0%,
+    var(--c-surface) 42%,
+    var(--c-surface) 100%
+  );
+}
+
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(4) {
+  border-color: rgba(251, 191, 36, 0.17);
+  background: linear-gradient(
+    155deg,
+    rgba(245, 158, 11, 0.06) 0%,
+    var(--c-surface) 42%,
+    var(--c-surface) 100%
+  );
+}
+
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(1) .dashboard-kpi-icon {
+  background: rgba(59, 130, 246, 0.13);
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(2) .dashboard-kpi-icon {
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+}
+
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(3) .dashboard-kpi-icon {
+  background: rgba(139, 92, 246, 0.13);
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"] .dashboard-kpi-grid .dashboard-kpi-card:nth-child(4) .dashboard-kpi-icon {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fcd34d;
+}
+
+html[data-theme="dark"] .dashboard-kpi-tag {
+  color: #718197;
+}
+
+/* =========================================================
+   MAIN PANELS
+========================================================= */
+
+html[data-theme="dark"] .dashboard-panel {
+  border-color: var(--c-border);
+  background: var(--c-surface);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.14),
+    0 10px 28px rgba(0, 0, 0, 0.15);
+}
+
+html[data-theme="dark"] .dashboard-panel-header {
+  border-bottom-color: var(--c-border-soft);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--c-surface-soft) 76%, var(--c-surface)) 0%,
+    var(--c-surface) 78%
+  );
+}
+
+/* Fix the light semantic header washes visible in dark mode. */
+html[data-theme="dark"]
+  .dashboard-operational-grid
+  .dashboard-panel:first-child
+  .dashboard-panel-header {
+  background: linear-gradient(
+    90deg,
+    rgba(59, 130, 246, 0.09) 0%,
+    color-mix(in srgb, var(--c-surface-soft) 46%, var(--c-surface)) 42%,
+    var(--c-surface) 100%
+  );
+}
+
+html[data-theme="dark"]
+  .dashboard-operational-grid
+  .dashboard-panel:last-child
+  .dashboard-panel-header {
+  background: linear-gradient(
+    90deg,
+    rgba(139, 92, 246, 0.085) 0%,
+    color-mix(in srgb, var(--c-surface-soft) 46%, var(--c-surface)) 42%,
+    var(--c-surface) 100%
+  );
+}
+
+html[data-theme="dark"]
+  .dashboard-operational-grid
+  .dashboard-panel:first-child
+  .dashboard-panel-header
+  > div
+  > span {
+  color: #7db5ff;
+}
+
+html[data-theme="dark"]
+  .dashboard-operational-grid
+  .dashboard-panel:last-child
+  .dashboard-panel-header
+  > div
+  > span {
+  color: #bca7ff;
+}
+
+html[data-theme="dark"] .dashboard-panel-header h2 {
+  color: var(--c-text-primary);
+}
+
+html[data-theme="dark"] .dashboard-panel-header p {
+  color: var(--c-text-muted);
+}
+
+html[data-theme="dark"] .dashboard-panel-link,
+html[data-theme="dark"] .dashboard-adviser-footer button,
+html[data-theme="dark"] .dashboard-panel-empty button {
+  color: #7db5ff;
+}
+
+/* =========================================================
+   ATTENDANCE SNAPSHOT
+========================================================= */
+
+html[data-theme="dark"] .dashboard-attendance-session-box {
+  border-color: var(--c-border);
+  background: color-mix(in srgb, var(--c-surface-soft) 72%, var(--c-surface));
+}
+
+html[data-theme="dark"] .dashboard-main-progress,
+html[data-theme="dark"] .dashboard-readiness-progress {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+html[data-theme="dark"] .dashboard-main-progress > div {
+  background: linear-gradient(90deg, #2563eb, #60a5fa);
+  box-shadow: 0 0 12px rgba(96, 165, 250, 0.14);
+}
+
+html[data-theme="dark"] .dashboard-readiness-progress > div {
+  background: linear-gradient(90deg, #2563eb, #4f9cf7);
+}
+
+html[data-theme="dark"] .dashboard-attendance-metric {
+  background: color-mix(in srgb, var(--c-surface-soft) 70%, var(--c-surface));
+  border-color: var(--c-border-soft);
+}
+
+html[data-theme="dark"] .dashboard-attendance-present {
+  border-color: rgba(74, 222, 128, 0.16);
+  background: rgba(34, 197, 94, 0.065);
+}
+
+html[data-theme="dark"] .dashboard-attendance-late {
+  border-color: rgba(251, 191, 36, 0.17);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+html[data-theme="dark"] .dashboard-attendance-absent {
+  border-color: rgba(248, 113, 113, 0.17);
+  background: rgba(220, 38, 38, 0.065);
+}
+
+/* =========================================================
+   READINESS / QUICK ACTIONS
+========================================================= */
+
+html[data-theme="dark"] .dashboard-quick-actions {
+  border-top-color: var(--c-border-soft);
+}
+
+html[data-theme="dark"] .dashboard-quick-actions button {
+  border-bottom-color: var(--c-border-soft);
+}
+
+html[data-theme="dark"] .dashboard-quick-actions button:hover {
+  background: rgba(96, 165, 250, 0.045);
+}
+
+html[data-theme="dark"]
+  .dashboard-quick-actions
+  button:nth-child(1)
+  > span:first-child {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+}
+
+html[data-theme="dark"]
+  .dashboard-quick-actions
+  button:nth-child(2)
+  > span:first-child {
+  background: rgba(139, 92, 246, 0.12);
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"]
+  .dashboard-quick-actions
+  button:nth-child(3)
+  > span:first-child {
+  background: rgba(34, 197, 94, 0.11);
+  color: #86efac;
+}
+
+/* =========================================================
+   ADVISER LIST / EMPTY STATE
+========================================================= */
+
+html[data-theme="dark"] .dashboard-adviser-row {
+  border-bottom-color: var(--c-border-soft);
+}
+
+html[data-theme="dark"] .dashboard-adviser-row:hover {
+  background: rgba(96, 165, 250, 0.035);
+}
+
+html[data-theme="dark"] .dashboard-adviser-avatar {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .dashboard-adviser-role {
+  background: rgba(139, 92, 246, 0.11);
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"] .dashboard-adviser-footer {
+  border-top-color: var(--c-border-soft);
+  background: color-mix(in srgb, var(--c-surface-soft) 62%, var(--c-surface));
+}
+
+html[data-theme="dark"] .dashboard-panel-empty > span {
+  background: rgba(59, 130, 246, 0.1);
+  color: #93c5fd;
+}
+
+html[data-theme="dark"] .dashboard-panel-empty button {
+  border-color: var(--c-border);
+  background: var(--c-surface-soft);
+}
+
+/* =========================================================
+   DARK HOVER POLISH
+========================================================= */
+
+@media (hover: hover) {
+  html[data-theme="dark"] .dashboard-kpi-card:hover {
+    border-color: rgba(96, 165, 250, 0.24);
+    box-shadow:
+      0 2px 5px rgba(0, 0, 0, 0.16),
+      0 15px 36px rgba(0, 0, 0, 0.2);
+  }
+
+  html[data-theme="dark"] .dashboard-panel-link:hover,
+  html[data-theme="dark"] .dashboard-adviser-footer button:hover {
+    color: #a7d3ff;
+  }
+}
