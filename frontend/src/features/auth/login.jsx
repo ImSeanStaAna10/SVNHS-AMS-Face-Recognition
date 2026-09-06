@@ -1,11 +1,6 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
-import {
-  useNavigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import authService from "../../services/authService";
 
@@ -30,16 +25,10 @@ const INITIAL_FORM = {
    PASSWORD VISIBILITY ICON
 ========================================================= */
 
-function PasswordVisibilityIcon({
-  visible,
-}) {
+function PasswordVisibilityIcon({ visible }) {
   if (visible) {
     return (
-      <svg
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-        focusable="false"
-      >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path
           d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
           fill="none"
@@ -62,11 +51,7 @@ function PasswordVisibilityIcon({
   }
 
   return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       <path
         d="M3 3l18 18"
         fill="none"
@@ -109,106 +94,61 @@ function PasswordVisibilityIcon({
 ========================================================= */
 
 function Login() {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
   /* =======================================================
      STATE
   ======================================================= */
 
-  const [
-    formData,
-    setFormData,
-  ] = useState(
-    INITIAL_FORM,
-  );
+  const [formData, setFormData] = useState(INITIAL_FORM);
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] = useState("");
 
-  const [
-    showPassword,
-    setShowPassword,
-  ] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [
-    showForgotPasswordModal,
-    setShowForgotPasswordModal,
-  ] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
 
   /* =======================================================
      FORGOT PASSWORD MODAL EFFECTS
   ======================================================= */
 
   useEffect(() => {
-    if (
-      !showForgotPasswordModal
-    ) {
+    if (!showForgotPasswordModal) {
       return undefined;
     }
 
-    const previousOverflow =
-      document.body.style.overflow;
+    const previousOverflow = document.body.style.overflow;
 
-    document.body.style.overflow =
-      "hidden";
+    document.body.style.overflow = "hidden";
 
-    const handleKeyDown = (
-      event,
-    ) => {
-      if (
-        event.key ===
-        "Escape"
-      ) {
-        setShowForgotPasswordModal(
-          false,
-        );
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setShowForgotPasswordModal(false);
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
+      document.body.style.overflow = previousOverflow;
 
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    showForgotPasswordModal,
-  ]);
+  }, [showForgotPasswordModal]);
 
   /* =======================================================
      FORM CHANGE
   ======================================================= */
 
-  const handleChange = (
-    event,
-  ) => {
-    const {
-      name,
-      value,
-    } = event.target;
+  const handleChange = (event) => {
+    const { name, value } = event.target;
 
-    setFormData(
-      (current) => ({
-        ...current,
-        [name]: value,
-      }),
-    );
+    setFormData((current) => ({
+      ...current,
+      [name]: value,
+    }));
 
     if (error) {
       setError("");
@@ -219,142 +159,111 @@ function Login() {
      PASSWORD VISIBILITY
   ======================================================= */
 
-  const togglePasswordVisibility =
-    () => {
-      setShowPassword(
-        (current) =>
-          !current,
-      );
-    };
+  const togglePasswordVisibility = () => {
+    setShowPassword((current) => !current);
+  };
 
   /* =======================================================
      FORGOT PASSWORD MODAL
   ======================================================= */
 
-  const openForgotPasswordModal =
-    () => {
-      setShowForgotPasswordModal(
-        true,
-      );
-    };
+  const openForgotPasswordModal = () => {
+    setShowForgotPasswordModal(true);
+  };
 
-  const closeForgotPasswordModal =
-    () => {
-      setShowForgotPasswordModal(
-        false,
-      );
-    };
+  const closeForgotPasswordModal = () => {
+    setShowForgotPasswordModal(false);
+  };
 
   /* =======================================================
      LOGIN
   ======================================================= */
 
-  const handleSubmit =
-    async (event) => {
-      event.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-      const email =
-        formData.email.trim();
+    const email = formData.email.trim();
 
-      const password =
-        formData.password;
+    const password = formData.password;
 
-      if (
-        !email ||
-        !password
-      ) {
+    if (!email || !password) {
+      setError("Please enter your email address and password.");
+
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      setError("");
+
+      const data = await authService.login({
+        email,
+        password,
+      });
+
+      const user = authService.saveSession(data);
+
+      /* ===============================================
+           ROLE-BASED REDIRECT
+        ================================================ */
+
+      switch (user.role) {
+        case "SUPERADMIN":
+          navigate("/superadmin/dashboard", {
+            replace: true,
+          });
+
+          break;
+
+        case "COUNCILOR":
+          navigate("/councilor/dashboard", {
+            replace: true,
+          });
+
+          break;
+
+        case "ADVISER":
+          navigate("/adviser/dashboard", {
+            replace: true,
+          });
+
+          break;
+
+        default:
+          authService.logout();
+
+          setError(
+            "Your account role is not authorized to access this system.",
+          );
+
+          break;
+      }
+    } catch (err) {
+      if (!err.response) {
         setError(
-          "Please enter your email address and password.",
+          "Unable to connect to the server. Please check if the backend is running.",
         );
 
         return;
       }
 
-      try {
-        setLoading(true);
-
-        setError("");
-
-        const data =
-          await authService.login({
-            email,
-            password,
-          });
-
-        const user =
-          authService.saveSession(
-            data,
-          );
-
-        /* ===============================================
-           ROLE-BASED REDIRECT
-        ================================================ */
-
-        switch (user.role) {
-          case "SUPERADMIN":
-            navigate(
-              "/superadmin/dashboard",
-              {
-                replace: true,
-              },
-            );
-
-            break;
-
-          case "COUNCILOR":
-            navigate(
-              "/councilor/dashboard",
-              {
-                replace: true,
-              },
-            );
-
-            break;
-
-          case "ADVISER":
-            navigate(
-              "/adviser/dashboard",
-              {
-                replace: true,
-              },
-            );
-
-            break;
-
-          default:
-            authService.logout();
-
-            setError(
-              "Your account role is not authorized to access this system.",
-            );
-
-            break;
-        }
-      } catch (err) {
-        if (!err.response) {
-          setError(
-            "Unable to connect to the server. Please check if the backend is running.",
-          );
-
-          return;
-        }
-
-        setError(
-          err.response?.data?.message ||
-            err.response?.data?.error ||
-            "Invalid email address or password.",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+      setError(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Invalid email address or password.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* =======================================================
      RENDER
   ======================================================= */
 
   return (
-    <main className="auth-page">
+    <main className="auth-page auth-light-theme">
       {/* =================================================
           BACKGROUND
       ================================================== */}
@@ -366,28 +275,19 @@ function Login() {
         aria-hidden="true"
       />
 
-      <div
-        className="auth-background-overlay"
-        aria-hidden="true"
-      />
+      <div className="auth-background-overlay" aria-hidden="true" />
 
       {/* =================================================
           DECORATIVE WAVES
       ================================================== */}
 
-      <div
-        className="auth-decoration auth-decoration-left"
-        aria-hidden="true"
-      >
+      <div className="auth-decoration auth-decoration-left" aria-hidden="true">
         <span className="auth-wave auth-wave-red" />
 
         <span className="auth-wave auth-wave-blue" />
       </div>
 
-      <div
-        className="auth-decoration auth-decoration-right"
-        aria-hidden="true"
-      >
+      <div className="auth-decoration auth-decoration-right" aria-hidden="true">
         <span className="auth-wave auth-wave-red" />
 
         <span className="auth-wave auth-wave-blue" />
@@ -404,25 +304,14 @@ function Login() {
 
         <section className="auth-brand">
           <div className="auth-institutional">
-            <p className="auth-republic">
-              REPUBLIC OF THE PHILIPPINES
-            </p>
+            <p className="auth-republic">REPUBLIC OF THE PHILIPPINES</p>
 
             <div className="auth-logos">
-              <img
-                src={depedLogo}
-                alt="Department of Education"
-              />
+              <img src={depedLogo} alt="Department of Education" />
 
-              <img
-                src={bagongPilipinasLogo}
-                alt="Bagong Pilipinas"
-              />
+              <img src={bagongPilipinasLogo} alt="Bagong Pilipinas" />
 
-              <img
-                src={schoolDivisionLogo}
-                alt="Schools Division"
-              />
+              <img src={schoolDivisionLogo} alt="Schools Division" />
 
               <img
                 src={shsLogo}
@@ -433,31 +322,22 @@ function Login() {
           </div>
 
           <div className="auth-school-title">
-            <span className="auth-location">
-              TAGUIG CITY
-            </span>
+            <span className="auth-location">TAGUIG CITY</span>
 
             <h1>
-              <span>
-                SIGNAL VILLAGE
-              </span>
-
+              <span>SIGNAL VILLAGE</span>
               NATIONAL HIGH SCHOOL
             </h1>
 
             <div className="auth-title-divider">
               <span />
 
-              <strong>
-                SVNHS
-              </strong>
+              <strong>SVNHS</strong>
 
               <span />
             </div>
 
-            <p>
-              ATTENDANCE MANAGEMENT SYSTEM
-            </p>
+            <p>ATTENDANCE MANAGEMENT SYSTEM</p>
           </div>
         </section>
 
@@ -474,18 +354,13 @@ function Login() {
             ============================================ */}
 
             <header className="auth-login-header">
-              <span className="auth-welcome">
-                WELCOME BACK!
-              </span>
+              <span className="auth-welcome">WELCOME BACK!</span>
 
-              <h2>
-                Sign in to your account
-              </h2>
+              <h2>Sign in to your account</h2>
 
               <p>
-                Enter your school account
-                credentials to continue
-                to the attendance system.
+                Enter your school account credentials to continue to the
+                attendance system.
               </p>
             </header>
 
@@ -493,27 +368,16 @@ function Login() {
                 LOGIN FORM
             ============================================ */}
 
-            <form
-              className="auth-form"
-              onSubmit={
-                handleSubmit
-              }
-              noValidate
-            >
+            <form className="auth-form" onSubmit={handleSubmit} noValidate>
               {/* =========================================
                   EMAIL
               ========================================== */}
 
               <div className="auth-field">
-                <label htmlFor="email">
-                  Email Address
-                </label>
+                <label htmlFor="email">Email Address</label>
 
                 <div className="auth-input-wrapper">
-                  <span
-                    className="auth-input-icon"
-                    aria-hidden="true"
-                  >
+                  <span className="auth-input-icon" aria-hidden="true">
                     @
                   </span>
 
@@ -522,16 +386,10 @@ function Login() {
                     name="email"
                     type="email"
                     placeholder="Enter your school email"
-                    value={
-                      formData.email
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.email}
+                    onChange={handleChange}
                     autoComplete="email"
-                    disabled={
-                      loading
-                    }
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -541,67 +399,36 @@ function Login() {
               ========================================== */}
 
               <div className="auth-field">
-                <label htmlFor="password">
-                  Password
-                </label>
+                <label htmlFor="password">Password</label>
 
                 <div className="auth-input-wrapper auth-password-input-wrapper">
-                  <span
-                    className="auth-input-icon"
-                    aria-hidden="true"
-                  >
+                  <span className="auth-input-icon" aria-hidden="true">
                     •
                   </span>
 
                   <input
                     id="password"
                     name="password"
-                    type={
-                      showPassword
-                        ? "text"
-                        : "password"
-                    }
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    value={
-                      formData.password
-                    }
-                    onChange={
-                      handleChange
-                    }
+                    value={formData.password}
+                    onChange={handleChange}
                     autoComplete="current-password"
-                    disabled={
-                      loading
-                    }
+                    disabled={loading}
                   />
 
                   <button
                     type="button"
                     className="auth-password-toggle"
-                    onClick={
-                      togglePasswordVisibility
-                    }
-                    disabled={
-                      loading
-                    }
+                    onClick={togglePasswordVisibility}
+                    disabled={loading}
                     aria-label={
-                      showPassword
-                        ? "Hide password"
-                        : "Show password"
+                      showPassword ? "Hide password" : "Show password"
                     }
-                    aria-pressed={
-                      showPassword
-                    }
-                    title={
-                      showPassword
-                        ? "Hide password"
-                        : "Show password"
-                    }
+                    aria-pressed={showPassword}
+                    title={showPassword ? "Hide password" : "Show password"}
                   >
-                    <PasswordVisibilityIcon
-                      visible={
-                        showPassword
-                      }
-                    />
+                    <PasswordVisibilityIcon visible={showPassword} />
                   </button>
                 </div>
 
@@ -612,9 +439,7 @@ function Login() {
                 <button
                   type="button"
                   className="auth-forgot-password"
-                  onClick={
-                    openForgotPasswordModal
-                  }
+                  onClick={openForgotPasswordModal}
                   aria-haspopup="dialog"
                 >
                   Forgot your password?
@@ -626,19 +451,10 @@ function Login() {
               ========================================== */}
 
               {error && (
-                <div
-                  className="auth-error"
-                  role="alert"
-                >
-                  <span
-                    aria-hidden="true"
-                  >
-                    !
-                  </span>
+                <div className="auth-error" role="alert">
+                  <span aria-hidden="true">!</span>
 
-                  <p>
-                    {error}
-                  </p>
+                  <p>{error}</p>
                 </div>
               )}
 
@@ -646,23 +462,12 @@ function Login() {
                   LOGIN BUTTON
               ========================================== */}
 
-              <button
-                type="submit"
-                className="auth-submit"
-                disabled={
-                  loading
-                }
-              >
+              <button type="submit" className="auth-submit" disabled={loading}>
                 {loading && (
-                  <span
-                    className="auth-spinner"
-                    aria-hidden="true"
-                  />
+                  <span className="auth-spinner" aria-hidden="true" />
                 )}
 
-                {loading
-                  ? "Signing In..."
-                  : "Login"}
+                {loading ? "Signing In..." : "Login"}
               </button>
             </form>
 
@@ -671,16 +476,11 @@ function Login() {
             ============================================ */}
 
             <footer className="auth-login-footer">
-              <span>
-                SVNHS
-              </span>
+              <span>SVNHS</span>
 
               <span className="auth-footer-divider" />
 
-              <span>
-                Attendance Management
-                System
-              </span>
+              <span>Attendance Management System</span>
             </footer>
           </div>
         </section>
@@ -691,18 +491,11 @@ function Login() {
       ================================================== */}
 
       <div className="auth-bottom-label">
-        <span>
-          Department of Education
-        </span>
+        <span>Department of Education</span>
 
-        <strong>
-          •
-        </strong>
+        <strong>•</strong>
 
-        <span>
-          Schools Division of Taguig
-          City and Pateros
-        </span>
+        <span>Schools Division of Taguig City and Pateros</span>
       </div>
 
       {/* =================================================
@@ -712,13 +505,8 @@ function Login() {
       {showForgotPasswordModal && (
         <div
           className="auth-modal-backdrop"
-          onMouseDown={(
-            event,
-          ) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
               closeForgotPasswordModal();
             }
           }}
@@ -736,29 +524,20 @@ function Login() {
 
             <header className="auth-recovery-modal-header">
               <div className="auth-recovery-header-copy">
-                <span>
-                  ACCOUNT RECOVERY
-                </span>
+                <span>ACCOUNT RECOVERY</span>
 
-                <h2 id="auth-recovery-title">
-                  Forgot your password?
-                </h2>
+                <h2 id="auth-recovery-title">Forgot your password?</h2>
 
                 <p id="auth-recovery-description">
-                  Password recovery
-                  follows the system
-                  administration hierarchy.
-                  Find your account role
-                  below.
+                  Password recovery follows the system administration hierarchy.
+                  Find your account role below.
                 </p>
               </div>
 
               <button
                 type="button"
                 className="auth-modal-close"
-                onClick={
-                  closeForgotPasswordModal
-                }
+                onClick={closeForgotPasswordModal}
                 aria-label="Close password recovery modal"
               >
                 ×
@@ -770,21 +549,14 @@ function Login() {
             ============================================ */}
 
             <div className="auth-recovery-intro">
-              <span
-                className="auth-recovery-intro-icon"
-                aria-hidden="true"
-              >
+              <span className="auth-recovery-intro-icon" aria-hidden="true">
                 i
               </span>
 
               <p>
-                Passwords cannot be
-                recovered or viewed.
-                An authorized administrator
-                must reset the password
-                and provide the account
-                holder with a new
-                credential.
+                Passwords cannot be recovered or viewed. An authorized
+                administrator must reset the password and provide the account
+                holder with a new credential.
               </p>
             </div>
 
@@ -797,33 +569,20 @@ function Login() {
               aria-label="Account recovery hierarchy"
             >
               <div>
-                <span>
-                  ADVISER
-                </span>
+                <span>ADVISER</span>
 
-                <strong>
-                  →
-                </strong>
+                <strong>→</strong>
 
-                <span>
-                  COUNCILOR
-                </span>
+                <span>COUNCILOR</span>
 
-                <strong>
-                  →
-                </strong>
+                <strong>→</strong>
 
-                <span>
-                  SUPER ADMIN
-                </span>
+                <span>SUPER ADMIN</span>
               </div>
 
               <p>
-                Recovery requests are
-                handled by the authorized
-                role directly above the
-                account whenever
-                applicable.
+                Recovery requests are handled by the authorized role directly
+                above the account whenever applicable.
               </p>
             </div>
 
@@ -837,33 +596,19 @@ function Login() {
               ========================================== */}
 
               <article className="auth-recovery-card auth-recovery-adviser">
-                <div
-                  className="auth-recovery-role-icon"
-                  aria-hidden="true"
-                >
+                <div className="auth-recovery-role-icon" aria-hidden="true">
                   A
                 </div>
 
                 <div className="auth-recovery-role-copy">
-                  <span>
-                    ADVISER ACCOUNT
-                  </span>
+                  <span>ADVISER ACCOUNT</span>
 
-                  <h3>
-                    Contact your
-                    Department Councilor
-                  </h3>
+                  <h3>Contact your Department Councilor</h3>
 
                   <p>
-                    If you forgot your
-                    Adviser password,
-                    contact the Councilor
-                    responsible for your
-                    department. The
-                    Councilor can securely
-                    reset your password
-                    and provide a new
-                    temporary credential.
+                    If you forgot your Adviser password, contact the Councilor
+                    responsible for your department. The Councilor can securely
+                    reset your password and provide a new temporary credential.
                   </p>
                 </div>
               </article>
@@ -873,54 +618,29 @@ function Login() {
               ========================================== */}
 
               <article className="auth-recovery-card auth-recovery-councilor">
-                <div
-                  className="auth-recovery-role-icon"
-                  aria-hidden="true"
-                >
+                <div className="auth-recovery-role-icon" aria-hidden="true">
                   C
                 </div>
 
                 <div className="auth-recovery-role-copy">
-                  <span>
-                    COUNCILOR ACCOUNT
-                  </span>
+                  <span>COUNCILOR ACCOUNT</span>
 
-                  <h3>
-                    Contact the Super
-                    Administrator
-                  </h3>
+                  <h3>Contact the Super Administrator</h3>
 
                   <p>
-                    If you forgot your
-                    Councilor password,
-                    contact the system's
-                    Super Administrator.
-                    The Super Administrator
-                    can reset your
-                    Councilor account
-                    password through the
-                    Councilor Management
-                    page and provide a
-                    new temporary
-                    credential.
+                    If you forgot your Councilor password, contact the system's
+                    Super Administrator. The Super Administrator can reset your
+                    Councilor account password through the Councilor Management
+                    page and provide a new temporary credential.
                   </p>
 
                   <div className="auth-recovery-role-note">
-                    <span
-                      aria-hidden="true"
-                    >
-                      ✓
-                    </span>
+                    <span aria-hidden="true">✓</span>
 
                     <p>
-                      A password reset
-                      does not automatically
-                      activate an inactive
-                      Councilor account.
-                      Account status is
-                      managed separately
-                      by the Super
-                      Administrator.
+                      A password reset does not automatically activate an
+                      inactive Councilor account. Account status is managed
+                      separately by the Super Administrator.
                     </p>
                   </div>
                 </div>
@@ -931,34 +651,20 @@ function Login() {
               ========================================== */}
 
               <article className="auth-recovery-card auth-recovery-superadmin">
-                <div
-                  className="auth-recovery-role-icon"
-                  aria-hidden="true"
-                >
+                <div className="auth-recovery-role-icon" aria-hidden="true">
                   S
                 </div>
 
                 <div className="auth-recovery-role-copy">
-                  <span>
-                    SUPER ADMIN ACCOUNT
-                  </span>
+                  <span>SUPER ADMIN ACCOUNT</span>
 
-                  <h3>
-                    Contact the authorized
-                    technical administrator
-                  </h3>
+                  <h3>Contact the authorized technical administrator</h3>
 
                   <p>
-                    The Super Administrator
-                    is the highest
-                    administrative role
-                    inside the attendance
-                    system. If this account
-                    password is forgotten,
-                    recovery must be
-                    handled through the
-                    authorized technical
-                    administration process.
+                    The Super Administrator is the highest administrative role
+                    inside the attendance system. If this account password is
+                    forgotten, recovery must be handled through the authorized
+                    technical administration process.
                   </p>
                 </div>
               </article>
@@ -969,25 +675,17 @@ function Login() {
             ============================================ */}
 
             <div className="auth-recovery-security-note">
-              <div
-                className="auth-recovery-security-icon"
-                aria-hidden="true"
-              >
+              <div className="auth-recovery-security-icon" aria-hidden="true">
                 !
               </div>
 
               <div>
-                <strong>
-                  Security Reminder
-                </strong>
+                <strong>Security Reminder</strong>
 
                 <p>
-                  Never send or disclose
-                  your current password.
-                  Administrators should
-                  reset credentials,
-                  not request the user's
-                  existing password.
+                  Never send or disclose your current password. Administrators
+                  should reset credentials, not request the user's existing
+                  password.
                 </p>
               </div>
             </div>
@@ -997,24 +695,14 @@ function Login() {
             ============================================ */}
 
             <div className="auth-recovery-status-note">
-              <span
-                aria-hidden="true"
-              >
-                i
-              </span>
+              <span aria-hidden="true">i</span>
 
               <div>
-                <strong>
-                  Unable to sign in after
-                  a password reset?
-                </strong>
+                <strong>Unable to sign in after a password reset?</strong>
 
                 <p>
-                  Your account may be
-                  inactive. Contact the
-                  authorized administrator
-                  for your role to verify
-                  the account status.
+                  Your account may be inactive. Contact the authorized
+                  administrator for your role to verify the account status.
                 </p>
               </div>
             </div>
@@ -1027,9 +715,7 @@ function Login() {
               <button
                 type="button"
                 className="auth-recovery-button"
-                onClick={
-                  closeForgotPasswordModal
-                }
+                onClick={closeForgotPasswordModal}
               >
                 Back to Login
               </button>
