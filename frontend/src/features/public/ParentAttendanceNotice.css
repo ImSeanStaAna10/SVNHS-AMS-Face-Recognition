@@ -1465,118 +1465,267 @@
 }
 
 /* =========================================================
-   27. DARK MODE
+   27. PUBLIC NOTICE LIGHT-THEME ISOLATION
+   ---------------------------------------------------------
+   This public guardian page intentionally stays LIGHT
+   regardless of the saved Adviser/Councilor dashboard theme.
+
+   IMPORTANT:
+   - Does NOT change the user's saved theme.
+   - Does NOT affect any other page.
+   - Prevents global html[data-theme="dark"] typography,
+     surfaces, inputs, borders, and status tokens from leaking
+     into this public notice.
 ========================================================= */
 
-html[data-theme="dark"] .parent-notice-page {
-  --pn-blue-950: #071b33;
+.parent-notice-light-theme {
+  color-scheme: light;
 
-  --pn-blue-900: #173b65;
+  /* Global token isolation for this subtree only */
+  --c-blue-900: #123d7e;
+  --c-blue-800: #174f88;
+  --c-red-600: #dc2626;
 
-  --pn-blue-800: #4d89c8;
+  --c-text-primary: #172033;
+  --c-text-secondary: #334155;
+  --c-text-body: #64748b;
+  --c-text-muted: #8493a5;
 
-  --pn-red-600: #ef4444;
+  --c-border: #d7e0ea;
+  --c-border-soft: #e6ebf1;
+  --c-brand-border: #c9dff5;
 
-  --pn-text-primary: #e8eef6;
+  --c-surface: #ffffff;
+  --c-surface-soft: #f8fafc;
+  --c-icon-bg: #edf5ff;
 
-  --pn-text-secondary: #d2dce9;
+  --c-success-bg: #ecfdf3;
+  --c-success-border: #bbf7d0;
+  --c-success-text: #15803d;
 
-  --pn-text-body: #9fb0c4;
+  --c-error-bg: #fff1f2;
+  --c-error-border: #fecaca;
+  --c-error-text: #b91c1c;
 
-  --pn-text-muted: #778da6;
-
-  --pn-border: #32475e;
-
-  --pn-border-soft: #26394d;
-
-  --pn-surface: #101d2a;
-
-  --pn-surface-soft: #132434;
-
-  --pn-icon-bg: #17304b;
-
-  --pn-brand-border: #315272;
-
-  --pn-success-bg: rgba(20, 83, 45, 0.23);
-
-  --pn-success-border: rgba(74, 222, 128, 0.25);
-
-  --pn-success-text: #86efac;
-
-  --pn-error-bg: rgba(127, 29, 29, 0.22);
-
-  --pn-error-border: rgba(248, 113, 113, 0.26);
-
-  --pn-error-text: #fca5a5;
+  --c-input-text: #172033;
+  --c-input-placeholder: #94a3b8;
 
   background:
+    radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.08), transparent 31%),
     radial-gradient(
-      circle at 12% 0%,
-      rgba(59, 130, 246, 0.09),
-      transparent 30%
+      circle at 88% 12%,
+      rgba(220, 38, 38, 0.035),
+      transparent 25%
     ),
-    linear-gradient(180deg, #091521 0%, #0b1723 48%, #09131d 100%);
+    linear-gradient(180deg, #eef5fc 0%, #f8fafc 42%, #f3f6f9 100%);
+
+  color: #172033;
 }
 
-html[data-theme="dark"] .parent-notice-shell {
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+/*
+ * Global dark-mode selectors may have higher specificity than
+ * component selectors. These scoped rules keep this page light
+ * without changing the application theme itself.
+ */
+html[data-theme="dark"] .parent-notice-light-theme {
+  color-scheme: light;
+
+  --c-blue-900: #123d7e;
+  --c-blue-800: #174f88;
+  --c-red-600: #dc2626;
+
+  --c-text-primary: #172033;
+  --c-text-secondary: #334155;
+  --c-text-body: #64748b;
+  --c-text-muted: #8493a5;
+
+  --c-border: #d7e0ea;
+  --c-border-soft: #e6ebf1;
+  --c-brand-border: #c9dff5;
+
+  --c-surface: #ffffff;
+  --c-surface-soft: #f8fafc;
+  --c-icon-bg: #edf5ff;
+
+  --c-success-bg: #ecfdf3;
+  --c-success-border: #bbf7d0;
+  --c-success-text: #15803d;
+
+  --c-error-bg: #fff1f2;
+  --c-error-border: #fecaca;
+  --c-error-text: #b91c1c;
+
+  --c-input-text: #172033;
+  --c-input-placeholder: #94a3b8;
+
+  background:
+    radial-gradient(circle at 12% 0%, rgba(37, 99, 235, 0.08), transparent 31%),
+    radial-gradient(
+      circle at 88% 12%,
+      rgba(220, 38, 38, 0.035),
+      transparent 25%
+    ),
+    linear-gradient(180deg, #eef5fc 0%, #f8fafc 42%, #f3f6f9 100%);
+
+  color: #172033;
 }
 
-html[data-theme="dark"] .parent-notice-header {
-  background: linear-gradient(135deg, #071b33, #123152);
+/* Dark typography protection */
+html[data-theme="dark"] .parent-notice-light-theme h1,
+html[data-theme="dark"] .parent-notice-light-theme h2,
+html[data-theme="dark"] .parent-notice-light-theme h3,
+html[data-theme="dark"] .parent-notice-light-theme h4,
+html[data-theme="dark"] .parent-notice-light-theme h5,
+html[data-theme="dark"] .parent-notice-light-theme h6 {
+  color: #172033;
 }
 
-html[data-theme="dark"] .parent-notice-risk--normal {
-  border-color: rgba(74, 222, 128, 0.28);
-
-  background: rgba(20, 83, 45, 0.25);
-
-  color: #86efac;
+html[data-theme="dark"] .parent-notice-light-theme p {
+  color: #64748b;
 }
 
-html[data-theme="dark"] .parent-notice-risk--warning {
-  border-color: rgba(250, 204, 21, 0.28);
-
-  background: rgba(113, 63, 18, 0.25);
-
-  color: #fde68a;
+/*
+ * Re-apply component-specific paragraph colors that intentionally
+ * differ from the generic public-page body color.
+ */
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-heading p {
+  color: var(--pn-text-body);
 }
 
-html[data-theme="dark"] .parent-notice-risk--at-risk {
-  border-color: rgba(251, 146, 60, 0.3);
-
-  background: rgba(124, 45, 18, 0.25);
-
-  color: #fdba74;
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-student-card
+  p,
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-action-copy p,
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-security-note
+  p {
+  color: var(--pn-text-body);
 }
 
-html[data-theme="dark"] .parent-notice-risk--critical,
-html[data-theme="dark"] .parent-notice-absence-badge {
-  border-color: rgba(248, 113, 113, 0.27);
-
-  background: rgba(127, 29, 29, 0.22);
-
-  color: #fca5a5;
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-adviser-note
+  p {
+  color: var(--pn-text-secondary);
 }
 
-html[data-theme="dark"] .parent-notice-adviser-note {
-  border-color: #315272;
-
-  background: linear-gradient(135deg, #142b42, #122538);
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-submitted-response
+  p {
+  color: #245445;
 }
 
-html[data-theme="dark"] .parent-notice-submitted-response {
-  border-color: #246651;
+/* Form protection */
+html[data-theme="dark"] .parent-notice-light-theme textarea {
+  color-scheme: light;
 
-  background: linear-gradient(145deg, #103329, #0f2823);
+  background: #ffffff;
+
+  color: #172033;
+
+  caret-color: #123d7e;
 }
 
-html[data-theme="dark"] .parent-notice-submitted-response p {
-  color: #d6f6e9;
+html[data-theme="dark"] .parent-notice-light-theme textarea::placeholder {
+  color: #8493a5;
 }
 
-html[data-theme="dark"] .parent-notice-submitted-response small {
-  color: #7ec7aa;
+/* Browser autofill / UA form protection */
+.parent-notice-light-theme textarea {
+  color-scheme: light;
+}
+
+/* Ensure the main white document surface stays white. */
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-shell {
+  background: #ffffff;
+
+  color: #172033;
+
+  box-shadow:
+    0 2px 5px rgba(15, 23, 42, 0.035),
+    0 24px 70px rgba(15, 23, 42, 0.1);
+}
+
+/* Header remains SVNHS blue in every application theme. */
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-header {
+  background: linear-gradient(135deg, #092d5f 0%, #123d7e 56%, #174f88 100%);
+
+  color: #ffffff;
+}
+
+/* Header text must stay white despite global dark/light heading rules. */
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-header * {
+  color: inherit;
+}
+
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-school {
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-system-name {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-secure {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Restore intended status colors under global dark selectors. */
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-risk--normal {
+  border-color: #bbf7d0;
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-risk--warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #a16207;
+}
+
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-risk--at-risk {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-risk--critical,
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-absence-badge {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+html[data-theme="dark"] .parent-notice-light-theme .parent-notice-adviser-note {
+  border-color: #c9dff5;
+
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 100%);
+}
+
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-submitted-response {
+  border-color: #b7ead1;
+
+  background: linear-gradient(145deg, #f0fdf7, #f8fffb);
+}
+
+html[data-theme="dark"]
+  .parent-notice-light-theme
+  .parent-notice-submitted-response
+  small {
+  color: #5c8174;
 }
 
 /* =========================================================

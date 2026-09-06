@@ -8515,3 +8515,66 @@ html[data-theme="dark"]
     transition: none;
   }
 }
+@media (max-width: 650px) {
+  .adviser-attendance-hero {
+    min-height: 0;
+    height: auto;
+
+    gap: 18px;
+
+    padding: 20px 16px;
+  }
+
+  .adviser-attendance-hero-side {
+    width: 100%;
+
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 9px;
+  }
+
+  .adviser-attendance-adviser {
+    width: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    flex: 0 0 auto;
+
+    padding: 12px 13px;
+  }
+
+  .adviser-attendance-adviser strong {
+    white-space: normal;
+
+    overflow-wrap: anywhere;
+  }
+
+  .adviser-attendance-session-badge {
+    width: fit-content;
+
+    align-self: flex-start;
+
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 430px) {
+  .adviser-attendance-hero {
+    gap: 15px;
+
+    padding: 18px 14px;
+
+    border-radius: 14px;
+  }
+
+  .adviser-attendance-hero-side {
+    gap: 8px;
+  }
+
+  .adviser-attendance-adviser {
+    padding: 11px 12px;
+  }
+}

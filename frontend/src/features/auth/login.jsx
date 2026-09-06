@@ -484,6 +484,41 @@ function Login() {
             </footer>
           </div>
         </section>
+
+        {/* ===============================================
+            MOBILE-ONLY FOOTER
+        ================================================ */}
+
+        <footer className="auth-mobile-footer" aria-label="SVNHS system information">
+          <div className="auth-mobile-footer-brand">
+            <span className="auth-mobile-footer-logo">
+              <img
+                src={shsLogo}
+                alt=""
+                aria-hidden="true"
+              />
+            </span>
+
+            <div>
+              <strong>SVNHS</strong>
+              <span>Attendance Management System</span>
+            </div>
+          </div>
+
+          <div className="auth-mobile-footer-divider-line" />
+
+          <p>
+            Department of Education
+            <span aria-hidden="true">•</span>
+            Schools Division of Taguig City and Pateros
+          </p>
+
+          <small>
+            Secure school access
+            <span aria-hidden="true">•</span>
+            © 2026 Signal Village National High School
+          </small>
+        </footer>
       </div>
 
       {/* =================================================

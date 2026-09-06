@@ -490,7 +490,7 @@ function ParentAttendanceNotice() {
 
   if (loading) {
     return (
-      <main className="parent-notice-page">
+      <main className="parent-notice-page parent-notice-light-theme">
         <div className="parent-notice-shell parent-notice-shell--state">
           <div
             className="parent-notice-spinner"
@@ -520,7 +520,7 @@ function ParentAttendanceNotice() {
     !notice
   ) {
     return (
-      <main className="parent-notice-page">
+      <main className="parent-notice-page parent-notice-light-theme">
         <div className="parent-notice-shell parent-notice-shell--state">
           <div className="parent-notice-state-mark">
             !
@@ -558,7 +558,7 @@ function ParentAttendanceNotice() {
   ======================================================= */
 
   return (
-    <main className="parent-notice-page">
+    <main className="parent-notice-page parent-notice-light-theme">
       <div className="parent-notice-shell">
         {/* ===============================================
             HEADER
