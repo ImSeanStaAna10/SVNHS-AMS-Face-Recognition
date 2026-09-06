@@ -1,12 +1,6 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
-import {
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import ThemeToggle from "../common/themeToggle";
 
@@ -80,41 +74,27 @@ const NAVIGATION_ITEMS = [
    HELPERS
 ========================================================= */
 
-const getErrorMessage = (
-  error,
-  fallbackMessage,
-) =>
+const getErrorMessage = (error, fallbackMessage) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   fallbackMessage;
 
-const isNavigationActive = (
-  pathname,
-  item,
-) => {
+const isNavigationActive = (pathname, item) => {
   if (item.exact) {
     return pathname === item.path;
   }
 
-  return pathname.startsWith(
-    item.path,
-  );
+  return pathname.startsWith(item.path);
 };
 
 /* =========================================================
    PASSWORD VISIBILITY ICON
 ========================================================= */
 
-function PasswordVisibilityIcon({
-  visible,
-}) {
+function PasswordVisibilityIcon({ visible }) {
   if (visible) {
     return (
-      <svg
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-        focusable="false"
-      >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path
           d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
           fill="none"
@@ -137,11 +117,7 @@ function PasswordVisibilityIcon({
   }
 
   return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       <path
         d="M3 3l18 18"
         fill="none"
@@ -189,79 +165,45 @@ function SuperadminLayout({
   eyebrow = "SUPERADMIN PORTAL",
   description = "System Administration",
 }) {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
-  const location =
-    useLocation();
+  const location = useLocation();
 
-  const user =
-    authService.getUser();
+  const user = authService.getUser();
 
   /* =======================================================
      MOBILE SIDEBAR STATE
   ======================================================= */
 
-  const [
-    mobileSidebarOpen,
-    setMobileSidebarOpen,
-  ] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   /* =======================================================
      PASSWORD STATE
   ======================================================= */
 
-  const [
-    showPasswordModal,
-    setShowPasswordModal,
-  ] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
-  const [
-    passwordForm,
-    setPasswordForm,
-  ] = useState(
-    INITIAL_PASSWORD_FORM,
-  );
+  const [passwordForm, setPasswordForm] = useState(INITIAL_PASSWORD_FORM);
 
-  const [
-    passwordVisibility,
-    setPasswordVisibility,
-  ] = useState(
+  const [passwordVisibility, setPasswordVisibility] = useState(
     INITIAL_PASSWORD_VISIBILITY,
   );
 
-  const [
-    passwordError,
-    setPasswordError,
-  ] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
-  const [
-    passwordSuccess,
-    setPasswordSuccess,
-  ] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
 
-  const [
-    changingPassword,
-    setChangingPassword,
-  ] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   /* =======================================================
      USER
   ======================================================= */
 
-  const userName =
-    user?.name?.trim() ||
-    "Super Administrator";
+  const userName = user?.name?.trim() || "Super Administrator";
 
-  const userEmail =
-    user?.email ||
-    "Superadmin account";
+  const userEmail = user?.email || "Superadmin account";
 
-  const userInitial =
-    userName
-      .charAt(0)
-      .toUpperCase() ||
-    "S";
+  const userInitial = userName.charAt(0).toUpperCase() || "S";
 
   /* =======================================================
      MOBILE SIDEBAR CONTROLS
@@ -280,29 +222,18 @@ function SuperadminLayout({
   ======================================================= */
 
   useEffect(() => {
-    const mediaQuery =
-      window.matchMedia(
-        "(max-width: 720px)",
-      );
+    const mediaQuery = window.matchMedia("(max-width: 720px)");
 
-    const handleViewportChange = (
-      event,
-    ) => {
+    const handleViewportChange = (event) => {
       if (!event.matches) {
         setMobileSidebarOpen(false);
       }
     };
 
-    mediaQuery.addEventListener(
-      "change",
-      handleViewportChange,
-    );
+    mediaQuery.addEventListener("change", handleViewportChange);
 
     return () => {
-      mediaQuery.removeEventListener(
-        "change",
-        handleViewportChange,
-      );
+      mediaQuery.removeEventListener("change", handleViewportChange);
     };
   }, []);
 
@@ -310,9 +241,7 @@ function SuperadminLayout({
      NAVIGATION
   ======================================================= */
 
-  const handleNavigate = (
-    path,
-  ) => {
+  const handleNavigate = (path) => {
     closeMobileSidebar();
 
     navigate(path);
@@ -321,37 +250,25 @@ function SuperadminLayout({
   /* =======================================================
      LOGOUT
   ======================================================= */
-
   const handleLogout = () => {
     closeMobileSidebar();
 
     authService.logout();
 
-    navigate(
-      "/login",
-      {
-        replace: true,
-      },
-    );
+    window.location.replace("/login");
   };
-
   /* =======================================================
      RESET PASSWORD MODAL STATE
   ======================================================= */
 
-  const resetPasswordModalState =
-    () => {
-      setPasswordForm(
-        INITIAL_PASSWORD_FORM,
-      );
+  const resetPasswordModalState = () => {
+    setPasswordForm(INITIAL_PASSWORD_FORM);
 
-      setPasswordVisibility(
-        INITIAL_PASSWORD_VISIBILITY,
-      );
+    setPasswordVisibility(INITIAL_PASSWORD_VISIBILITY);
 
-      setPasswordError("");
-      setPasswordSuccess("");
-    };
+    setPasswordError("");
+    setPasswordSuccess("");
+  };
 
   /* =======================================================
      PASSWORD MODAL CONTROLS
@@ -380,47 +297,30 @@ function SuperadminLayout({
   ======================================================= */
 
   useEffect(() => {
-    if (
-      !mobileSidebarOpen &&
-      !showPasswordModal
-    ) {
+    if (!mobileSidebarOpen && !showPasswordModal) {
       return undefined;
     }
 
-    const previousOverflow =
-      document.body.style.overflow;
+    const previousOverflow = document.body.style.overflow;
 
-    document.body.style.overflow =
-      "hidden";
+    document.body.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
+      document.body.style.overflow = previousOverflow;
     };
-  }, [
-    mobileSidebarOpen,
-    showPasswordModal,
-  ]);
+  }, [mobileSidebarOpen, showPasswordModal]);
 
   /* =======================================================
      ESCAPE KEY
   ======================================================= */
 
   useEffect(() => {
-    if (
-      !mobileSidebarOpen &&
-      !showPasswordModal
-    ) {
+    if (!mobileSidebarOpen && !showPasswordModal) {
       return undefined;
     }
 
-    const handleKeyDown = (
-      event,
-    ) => {
-      if (
-        event.key !==
-        "Escape"
-      ) {
+    const handleKeyDown = (event) => {
+      if (event.key !== "Escape") {
         return;
       }
 
@@ -429,9 +329,7 @@ function SuperadminLayout({
           return;
         }
 
-        setShowPasswordModal(
-          false,
-        );
+        setShowPasswordModal(false);
 
         resetPasswordModalState();
 
@@ -439,47 +337,28 @@ function SuperadminLayout({
       }
 
       if (mobileSidebarOpen) {
-        setMobileSidebarOpen(
-          false,
-        );
+        setMobileSidebarOpen(false);
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    mobileSidebarOpen,
-    showPasswordModal,
-    changingPassword,
-  ]);
+  }, [mobileSidebarOpen, showPasswordModal, changingPassword]);
 
   /* =======================================================
      PASSWORD FORM CHANGE
   ======================================================= */
 
-  const handlePasswordFormChange = (
-    event,
-  ) => {
-    const {
-      name,
-      value,
-    } = event.target;
+  const handlePasswordFormChange = (event) => {
+    const { name, value } = event.target;
 
-    setPasswordForm(
-      (current) => ({
-        ...current,
-        [name]: value,
-      }),
-    );
+    setPasswordForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
 
     if (passwordError) {
       setPasswordError("");
@@ -494,17 +373,12 @@ function SuperadminLayout({
      PASSWORD VISIBILITY
   ======================================================= */
 
-  const togglePasswordVisibility = (
-    fieldName,
-  ) => {
-    setPasswordVisibility(
-      (current) => ({
-        ...current,
+  const togglePasswordVisibility = (fieldName) => {
+    setPasswordVisibility((current) => ({
+      ...current,
 
-        [fieldName]:
-          !current[fieldName],
-      }),
-    );
+      [fieldName]: !current[fieldName],
+    }));
   };
 
   /* =======================================================
@@ -512,58 +386,37 @@ function SuperadminLayout({
   ======================================================= */
 
   const validatePasswordForm = () => {
-    const {
-      currentPassword,
-      newPassword,
-      confirmPassword,
-    } = passwordForm;
+    const { currentPassword, newPassword, confirmPassword } = passwordForm;
 
-    if (
-      !currentPassword ||
-      !newPassword ||
-      !confirmPassword
-    ) {
+    if (!currentPassword || !newPassword || !confirmPassword) {
       return {
         valid: false,
 
-        message:
-          "Please complete all password fields.",
+        message: "Please complete all password fields.",
       };
     }
 
-    if (
-      newPassword.length <
-      8
-    ) {
+    if (newPassword.length < 8) {
       return {
         valid: false,
 
-        message:
-          "New password must be at least 8 characters.",
+        message: "New password must be at least 8 characters.",
       };
     }
 
-    if (
-      newPassword ===
-      currentPassword
-    ) {
+    if (newPassword === currentPassword) {
       return {
         valid: false,
 
-        message:
-          "New password must be different from your current password.",
+        message: "New password must be different from your current password.",
       };
     }
 
-    if (
-      newPassword !==
-      confirmPassword
-    ) {
+    if (newPassword !== confirmPassword) {
       return {
         valid: false,
 
-        message:
-          "New password and confirmation do not match.",
+        message: "New password and confirmation do not match.",
       };
     }
 
@@ -581,62 +434,38 @@ function SuperadminLayout({
      CHANGE PASSWORD
   ======================================================= */
 
-  const handleChangePassword =
-    async (event) => {
-      event.preventDefault();
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
 
-      const validation =
-        validatePasswordForm();
+    const validation = validatePasswordForm();
 
-      if (!validation.valid) {
-        setPasswordError(
-          validation.message,
-        );
+    if (!validation.valid) {
+      setPasswordError(validation.message);
 
-        return;
-      }
+      return;
+    }
 
-      try {
-        setChangingPassword(
-          true,
-        );
+    try {
+      setChangingPassword(true);
 
-        setPasswordError("");
-        setPasswordSuccess("");
+      setPasswordError("");
+      setPasswordSuccess("");
 
-        await accountService.changePassword(
-          validation.data,
-        );
+      await accountService.changePassword(validation.data);
 
-        setPasswordForm(
-          INITIAL_PASSWORD_FORM,
-        );
+      setPasswordForm(INITIAL_PASSWORD_FORM);
 
-        setPasswordVisibility(
-          INITIAL_PASSWORD_VISIBILITY,
-        );
+      setPasswordVisibility(INITIAL_PASSWORD_VISIBILITY);
 
-        setPasswordSuccess(
-          "Your password has been changed successfully.",
-        );
-      } catch (error) {
-        console.error(
-          "Unable to change Superadmin password:",
-          error,
-        );
+      setPasswordSuccess("Your password has been changed successfully.");
+    } catch (error) {
+      console.error("Unable to change Superadmin password:", error);
 
-        setPasswordError(
-          getErrorMessage(
-            error,
-            "Unable to change password.",
-          ),
-        );
-      } finally {
-        setChangingPassword(
-          false,
-        );
-      }
-    };
+      setPasswordError(getErrorMessage(error, "Unable to change password."));
+    } finally {
+      setChangingPassword(false);
+    }
+  };
 
   /* =======================================================
      RENDER
@@ -651,9 +480,7 @@ function SuperadminLayout({
       <aside
         id="superadmin-mobile-sidebar"
         className={`councilor-sidebar ${
-          mobileSidebarOpen
-            ? "is-mobile-open"
-            : ""
+          mobileSidebarOpen ? "is-mobile-open" : ""
         }`}
       >
         {/* ===============================================
@@ -663,37 +490,24 @@ function SuperadminLayout({
         <div className="councilor-brand">
           <div className="councilor-brand-logo">
             <img
-              src={
-                seniorHighSchoolLogo
-              }
+              src={seniorHighSchoolLogo}
               alt="Signal Village National High School"
             />
           </div>
 
           <div className="councilor-brand-copy">
-            <strong>
-              SVNHS
-            </strong>
+            <strong>SVNHS</strong>
 
-            <span>
-              Attendance Management
-              System
-            </span>
+            <span>Attendance Management System</span>
           </div>
 
           <button
             type="button"
             className="councilor-mobile-sidebar-close"
-            onClick={
-              closeMobileSidebar
-            }
+            onClick={closeMobileSidebar}
             aria-label="Close navigation menu"
           >
-            <span
-              aria-hidden="true"
-            >
-              ×
-            </span>
+            <span aria-hidden="true">×</span>
           </button>
         </div>
 
@@ -701,58 +515,28 @@ function SuperadminLayout({
             NAVIGATION
         ================================================ */}
 
-        <span className="councilor-nav-label">
-          ADMINISTRATION
-        </span>
+        <span className="councilor-nav-label">ADMINISTRATION</span>
 
-        <nav
-          className="councilor-nav"
-          aria-label="Superadmin navigation"
-        >
-          {NAVIGATION_ITEMS.map(
-            (item) => {
-              const active =
-                isNavigationActive(
-                  location.pathname,
-                  item,
-                );
+        <nav className="councilor-nav" aria-label="Superadmin navigation">
+          {NAVIGATION_ITEMS.map((item) => {
+            const active = isNavigationActive(location.pathname, item);
 
-              return (
-                <button
-                  key={
-                    item.path
-                  }
-                  type="button"
-                  className={`councilor-nav-item ${
-                    active
-                      ? "active"
-                      : ""
-                  }`}
-                  aria-current={
-                    active
-                      ? "page"
-                      : undefined
-                  }
-                  onClick={() =>
-                    handleNavigate(
-                      item.path,
-                    )
-                  }
-                >
-                  <span
-                    className="councilor-nav-icon"
-                    aria-hidden="true"
-                  >
-                    {item.icon}
-                  </span>
+            return (
+              <button
+                key={item.path}
+                type="button"
+                className={`councilor-nav-item ${active ? "active" : ""}`}
+                aria-current={active ? "page" : undefined}
+                onClick={() => handleNavigate(item.path)}
+              >
+                <span className="councilor-nav-icon" aria-hidden="true">
+                  {item.icon}
+                </span>
 
-                  <span>
-                    {item.label}
-                  </span>
-                </button>
-              );
-            },
-          )}
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
 
           {/* =============================================
               CHANGE PASSWORD
@@ -761,9 +545,7 @@ function SuperadminLayout({
           <button
             type="button"
             className="councilor-nav-item councilor-password-nav-item"
-            onClick={
-              openPasswordModal
-            }
+            onClick={openPasswordModal}
             aria-haspopup="dialog"
           >
             <span
@@ -773,9 +555,7 @@ function SuperadminLayout({
               ⚿
             </span>
 
-            <span>
-              Change Password
-            </span>
+            <span>Change Password</span>
           </button>
         </nav>
 
@@ -785,32 +565,19 @@ function SuperadminLayout({
 
         <div className="councilor-sidebar-footer">
           <div className="councilor-sidebar-school">
-            <span>
-              SYSTEM ADMINISTRATION
-            </span>
+            <span>SYSTEM ADMINISTRATION</span>
 
-            <strong>
-              Signal Village National
-              High School
-            </strong>
+            <strong>Signal Village National High School</strong>
           </div>
 
           <button
             type="button"
             className="councilor-logout"
-            onClick={
-              handleLogout
-            }
+            onClick={handleLogout}
           >
-            <span
-              aria-hidden="true"
-            >
-              ↪
-            </span>
+            <span aria-hidden="true">↪</span>
 
-            <span>
-              Logout
-            </span>
+            <span>Logout</span>
           </button>
         </div>
       </aside>
@@ -823,9 +590,7 @@ function SuperadminLayout({
         <div
           className="councilor-mobile-backdrop"
           role="presentation"
-          onMouseDown={
-            closeMobileSidebar
-          }
+          onMouseDown={closeMobileSidebar}
         />
       )}
 
@@ -843,38 +608,22 @@ function SuperadminLayout({
             <button
               type="button"
               className="councilor-mobile-menu-button"
-              onClick={
-                openMobileSidebar
-              }
+              onClick={openMobileSidebar}
               aria-label="Open navigation menu"
-              aria-expanded={
-                mobileSidebarOpen
-              }
+              aria-expanded={mobileSidebarOpen}
               aria-controls="superadmin-mobile-sidebar"
             >
-              <span
-                aria-hidden="true"
-              />
-              <span
-                aria-hidden="true"
-              />
-              <span
-                aria-hidden="true"
-              />
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
             </button>
 
             <div className="councilor-topbar-copy">
-              <span className="councilor-eyebrow">
-                {eyebrow}
-              </span>
+              <span className="councilor-eyebrow">{eyebrow}</span>
 
-              <h1>
-                {title}
-              </h1>
+              <h1>{title}</h1>
 
-              <p>
-                {description}
-              </p>
+              <p>{description}</p>
             </div>
           </div>
 
@@ -887,30 +636,17 @@ function SuperadminLayout({
               className="councilor-topbar-logos"
               aria-label="Institutional logos"
             >
-              {INSTITUTIONAL_LOGOS.map(
-                (logo) => (
-                  <img
-                    key={
-                      logo.alt
-                    }
-                    src={
-                      logo.src
-                    }
-                    alt={
-                      logo.alt
-                    }
-                    title={
-                      logo.alt
-                    }
-                  />
-                ),
-              )}
+              {INSTITUTIONAL_LOGOS.map((logo) => (
+                <img
+                  key={logo.alt}
+                  src={logo.src}
+                  alt={logo.alt}
+                  title={logo.alt}
+                />
+              ))}
             </div>
 
-            <div
-              className="councilor-topbar-divider"
-              aria-hidden="true"
-            />
+            <div className="councilor-topbar-divider" aria-hidden="true" />
 
             {/* ===========================================
                 THEME
@@ -918,28 +654,19 @@ function SuperadminLayout({
 
             <ThemeToggle />
 
-            <div
-              className="councilor-topbar-divider"
-              aria-hidden="true"
-            />
+            <div className="councilor-topbar-divider" aria-hidden="true" />
 
             {/* ===========================================
                 USER
             ============================================ */}
 
             <div className="councilor-user">
-              <div className="councilor-avatar">
-                {userInitial}
-              </div>
+              <div className="councilor-avatar">{userInitial}</div>
 
               <div className="councilor-user-copy">
-                <strong>
-                  {userName}
-                </strong>
+                <strong>{userName}</strong>
 
-                <span>
-                  Super Administrator
-                </span>
+                <span>Super Administrator</span>
               </div>
             </div>
           </div>
@@ -949,9 +676,7 @@ function SuperadminLayout({
             PAGE CONTENT
         ================================================ */}
 
-        <main className="councilor-content">
-          {children}
-        </main>
+        <main className="councilor-content">{children}</main>
       </section>
 
       {/* =================================================
@@ -962,10 +687,7 @@ function SuperadminLayout({
         <div
           className="councilor-modal-backdrop"
           onMouseDown={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
+            if (event.target === event.currentTarget) {
               closePasswordModal();
             }
           }}
@@ -982,18 +704,12 @@ function SuperadminLayout({
 
             <div className="councilor-modal-header">
               <div>
-                <span>
-                  ACCOUNT SECURITY
-                </span>
+                <span>ACCOUNT SECURITY</span>
 
-                <h2 id="superadmin-change-password-title">
-                  Change Password
-                </h2>
+                <h2 id="superadmin-change-password-title">Change Password</h2>
 
                 <p>
-                  Update the password
-                  used to access your
-                  Super Administrator
+                  Update the password used to access your Super Administrator
                   account.
                 </p>
               </div>
@@ -1001,12 +717,8 @@ function SuperadminLayout({
               <button
                 type="button"
                 className="councilor-modal-close"
-                onClick={
-                  closePasswordModal
-                }
-                disabled={
-                  changingPassword
-                }
+                onClick={closePasswordModal}
+                disabled={changingPassword}
                 aria-label="Close modal"
               >
                 ×
@@ -1019,9 +731,7 @@ function SuperadminLayout({
 
             <form
               className="councilor-modal-form councilor-password-form"
-              onSubmit={
-                handleChangePassword
-              }
+              onSubmit={handleChangePassword}
               noValidate
             >
               {/* =========================================
@@ -1029,22 +739,14 @@ function SuperadminLayout({
               ========================================== */}
 
               <div className="councilor-password-account">
-                <div className="councilor-password-avatar">
-                  {userInitial}
-                </div>
+                <div className="councilor-password-avatar">{userInitial}</div>
 
                 <div className="councilor-password-account-copy">
-                  <span>
-                    SIGNED IN AS
-                  </span>
+                  <span>SIGNED IN AS</span>
 
-                  <strong>
-                    {userName}
-                  </strong>
+                  <strong>{userName}</strong>
 
-                  <small>
-                    {userEmail}
-                  </small>
+                  <small>{userEmail}</small>
                 </div>
               </div>
 
@@ -1061,19 +763,11 @@ function SuperadminLayout({
                 </span>
 
                 <div>
-                  <strong>
-                    Administrative
-                    account security
-                  </strong>
+                  <strong>Administrative account security</strong>
 
                   <p>
-                    This account has
-                    system-level
-                    administrative
-                    privileges. Use a
-                    secure password and
-                    keep the credentials
-                    private.
+                    This account has system-level administrative privileges. Use
+                    a secure password and keep the credentials private.
                   </p>
                 </div>
               </div>
@@ -1092,48 +786,30 @@ function SuperadminLayout({
                     id="superadmin-current-password"
                     name="currentPassword"
                     type={
-                      passwordVisibility.currentPassword
-                        ? "text"
-                        : "password"
+                      passwordVisibility.currentPassword ? "text" : "password"
                     }
                     placeholder="Enter current password"
-                    value={
-                      passwordForm.currentPassword
-                    }
-                    onChange={
-                      handlePasswordFormChange
-                    }
+                    value={passwordForm.currentPassword}
+                    onChange={handlePasswordFormChange}
                     autoComplete="current-password"
-                    disabled={
-                      changingPassword
-                    }
+                    disabled={changingPassword}
                     autoFocus
                   />
 
                   <button
                     type="button"
                     className="councilor-password-toggle"
-                    onClick={() =>
-                      togglePasswordVisibility(
-                        "currentPassword",
-                      )
-                    }
-                    disabled={
-                      changingPassword
-                    }
+                    onClick={() => togglePasswordVisibility("currentPassword")}
+                    disabled={changingPassword}
                     aria-label={
                       passwordVisibility.currentPassword
                         ? "Hide current password"
                         : "Show current password"
                     }
-                    aria-pressed={
-                      passwordVisibility.currentPassword
-                    }
+                    aria-pressed={passwordVisibility.currentPassword}
                   >
                     <PasswordVisibilityIcon
-                      visible={
-                        passwordVisibility.currentPassword
-                      }
+                      visible={passwordVisibility.currentPassword}
                     />
                   </button>
                 </div>
@@ -1144,63 +820,40 @@ function SuperadminLayout({
               ========================================== */}
 
               <div className="councilor-modal-field">
-                <label htmlFor="superadmin-new-password">
-                  New Password
-                </label>
+                <label htmlFor="superadmin-new-password">New Password</label>
 
                 <div className="councilor-password-input">
                   <input
                     id="superadmin-new-password"
                     name="newPassword"
-                    type={
-                      passwordVisibility.newPassword
-                        ? "text"
-                        : "password"
-                    }
+                    type={passwordVisibility.newPassword ? "text" : "password"}
                     placeholder="Enter new password"
-                    value={
-                      passwordForm.newPassword
-                    }
-                    onChange={
-                      handlePasswordFormChange
-                    }
+                    value={passwordForm.newPassword}
+                    onChange={handlePasswordFormChange}
                     autoComplete="new-password"
-                    disabled={
-                      changingPassword
-                    }
+                    disabled={changingPassword}
                   />
 
                   <button
                     type="button"
                     className="councilor-password-toggle"
-                    onClick={() =>
-                      togglePasswordVisibility(
-                        "newPassword",
-                      )
-                    }
-                    disabled={
-                      changingPassword
-                    }
+                    onClick={() => togglePasswordVisibility("newPassword")}
+                    disabled={changingPassword}
                     aria-label={
                       passwordVisibility.newPassword
                         ? "Hide new password"
                         : "Show new password"
                     }
-                    aria-pressed={
-                      passwordVisibility.newPassword
-                    }
+                    aria-pressed={passwordVisibility.newPassword}
                   >
                     <PasswordVisibilityIcon
-                      visible={
-                        passwordVisibility.newPassword
-                      }
+                      visible={passwordVisibility.newPassword}
                     />
                   </button>
                 </div>
 
                 <span className="councilor-field-hint">
-                  Use at least 8
-                  characters.
+                  Use at least 8 characters.
                 </span>
               </div>
 
@@ -1218,47 +871,29 @@ function SuperadminLayout({
                     id="superadmin-confirm-password"
                     name="confirmPassword"
                     type={
-                      passwordVisibility.confirmPassword
-                        ? "text"
-                        : "password"
+                      passwordVisibility.confirmPassword ? "text" : "password"
                     }
                     placeholder="Re-enter new password"
-                    value={
-                      passwordForm.confirmPassword
-                    }
-                    onChange={
-                      handlePasswordFormChange
-                    }
+                    value={passwordForm.confirmPassword}
+                    onChange={handlePasswordFormChange}
                     autoComplete="new-password"
-                    disabled={
-                      changingPassword
-                    }
+                    disabled={changingPassword}
                   />
 
                   <button
                     type="button"
                     className="councilor-password-toggle"
-                    onClick={() =>
-                      togglePasswordVisibility(
-                        "confirmPassword",
-                      )
-                    }
-                    disabled={
-                      changingPassword
-                    }
+                    onClick={() => togglePasswordVisibility("confirmPassword")}
+                    disabled={changingPassword}
                     aria-label={
                       passwordVisibility.confirmPassword
                         ? "Hide confirmed password"
                         : "Show confirmed password"
                     }
-                    aria-pressed={
-                      passwordVisibility.confirmPassword
-                    }
+                    aria-pressed={passwordVisibility.confirmPassword}
                   >
                     <PasswordVisibilityIcon
-                      visible={
-                        passwordVisibility.confirmPassword
-                      }
+                      visible={passwordVisibility.confirmPassword}
                     />
                   </button>
                 </div>
@@ -1269,19 +904,10 @@ function SuperadminLayout({
               ========================================== */}
 
               {passwordError && (
-                <div
-                  className="councilor-modal-error"
-                  role="alert"
-                >
-                  <span
-                    aria-hidden="true"
-                  >
-                    !
-                  </span>
+                <div className="councilor-modal-error" role="alert">
+                  <span aria-hidden="true">!</span>
 
-                  <p>
-                    {passwordError}
-                  </p>
+                  <p>{passwordError}</p>
                 </div>
               )}
 
@@ -1295,20 +921,12 @@ function SuperadminLayout({
                   role="status"
                   aria-live="polite"
                 >
-                  <span
-                    aria-hidden="true"
-                  >
-                    ✓
-                  </span>
+                  <span aria-hidden="true">✓</span>
 
                   <div>
-                    <strong>
-                      Password updated
-                    </strong>
+                    <strong>Password updated</strong>
 
-                    <p>
-                      {passwordSuccess}
-                    </p>
+                    <p>{passwordSuccess}</p>
                   </div>
                 </div>
               )}
@@ -1321,25 +939,17 @@ function SuperadminLayout({
                 <button
                   type="button"
                   className="councilor-secondary-button"
-                  onClick={
-                    closePasswordModal
-                  }
-                  disabled={
-                    changingPassword
-                  }
+                  onClick={closePasswordModal}
+                  disabled={changingPassword}
                 >
-                  {passwordSuccess
-                    ? "Done"
-                    : "Cancel"}
+                  {passwordSuccess ? "Done" : "Cancel"}
                 </button>
 
                 {!passwordSuccess && (
                   <button
                     type="submit"
                     className="councilor-primary-button"
-                    disabled={
-                      changingPassword
-                    }
+                    disabled={changingPassword}
                   >
                     {changingPassword && (
                       <span
@@ -1348,9 +958,7 @@ function SuperadminLayout({
                       />
                     )}
 
-                    {changingPassword
-                      ? "Changing..."
-                      : "Change Password"}
+                    {changingPassword ? "Changing..." : "Change Password"}
                   </button>
                 )}
               </div>

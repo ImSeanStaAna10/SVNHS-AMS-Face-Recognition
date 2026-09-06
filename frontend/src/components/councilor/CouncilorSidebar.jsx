@@ -1,7 +1,4 @@
-import {
-  NavLink,
-  useNavigate,
-} from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import shsLogo from "../../assets/shs-logo.svg";
 
@@ -11,24 +8,13 @@ import authService from "../../services/authService";
    COMPONENT
 ========================================================= */
 
-function CouncilorSidebar({
-  onChangePassword,
-  isOpen = false,
-  onClose,
-}) {
-  const navigate =
-    useNavigate();
-
+function CouncilorSidebar({ onChangePassword, isOpen = false, onClose }) {
   /* =======================================================
      NAV LINK CLASS
   ======================================================= */
 
-  const getNavClassName = ({
-    isActive,
-  }) =>
-    `councilor-nav-item ${
-      isActive ? "active" : ""
-    }`;
+  const getNavClassName = ({ isActive }) =>
+    `councilor-nav-item ${isActive ? "active" : ""}`;
 
   /* =======================================================
      CLOSE MOBILE SIDEBAR
@@ -59,11 +45,26 @@ function CouncilorSidebar({
   const handleLogout = () => {
     handleClose();
 
+    /*
+     * Remove the current authentication session.
+     *
+     * authService.logout() removes:
+     * - token
+     * - user
+     *
+     * from localStorage.
+     */
     authService.logout();
 
-    navigate("/login", {
-      replace: true,
-    });
+    /*
+     * Use a real browser navigation instead of React Router
+     * navigation when logging out.
+     *
+     * This fully reloads the application and clears any
+     * in-memory React state/cache belonging to the previous
+     * Councilor account.
+     */
+    window.location.replace("/login");
   };
 
   /* =======================================================
@@ -73,32 +74,21 @@ function CouncilorSidebar({
   return (
     <aside
       id="councilor-mobile-sidebar"
-      className={`councilor-sidebar ${
-        isOpen
-          ? "is-mobile-open"
-          : ""
-      }`}
+      className={`councilor-sidebar ${isOpen ? "is-mobile-open" : ""}`}
     >
-      {/* ===============================================
+      {/* =================================================
           BRAND
-      ================================================ */}
+      ================================================== */}
 
       <div className="councilor-brand">
         <div className="councilor-brand-logo">
-          <img
-            src={shsLogo}
-            alt="Signal Village National High School"
-          />
+          <img src={shsLogo} alt="Signal Village National High School" />
         </div>
 
         <div className="councilor-brand-copy">
-          <strong>
-            SVNHS
-          </strong>
+          <strong>SVNHS</strong>
 
-          <span>
-            Attendance Management System
-          </span>
+          <span>Attendance Management System</span>
         </div>
 
         {/* =============================================
@@ -111,50 +101,32 @@ function CouncilorSidebar({
           onClick={handleClose}
           aria-label="Close navigation menu"
         >
-          <span
-            aria-hidden="true"
-          >
-            ×
-          </span>
+          <span aria-hidden="true">×</span>
         </button>
       </div>
 
-      {/* ===============================================
+      {/* =================================================
           NAVIGATION
-      ================================================ */}
+      ================================================== */}
 
-      <span className="councilor-nav-label">
-        MAIN MENU
-      </span>
+      <span className="councilor-nav-label">MAIN MENU</span>
 
-      <nav
-        className="councilor-nav"
-        aria-label="Councilor navigation"
-      >
+      <nav className="councilor-nav" aria-label="Councilor navigation">
         {/* =============================================
             DASHBOARD
         ============================================== */}
 
         <NavLink
           to="/councilor/dashboard"
-          className={
-            getNavClassName
-          }
-          onClick={
-            handleClose
-          }
+          className={getNavClassName}
+          onClick={handleClose}
           end
         >
-          <span
-            className="councilor-nav-icon"
-            aria-hidden="true"
-          >
+          <span className="councilor-nav-icon" aria-hidden="true">
             ▦
           </span>
 
-          <span>
-            Dashboard
-          </span>
+          <span>Dashboard</span>
         </NavLink>
 
         {/* =============================================
@@ -163,24 +135,15 @@ function CouncilorSidebar({
 
         <NavLink
           to="/councilor/advisers"
-          className={
-            getNavClassName
-          }
-          onClick={
-            handleClose
-          }
+          className={getNavClassName}
+          onClick={handleClose}
           end
         >
-          <span
-            className="councilor-nav-icon"
-            aria-hidden="true"
-          >
+          <span className="councilor-nav-icon" aria-hidden="true">
             ♙
           </span>
 
-          <span>
-            Advisers
-          </span>
+          <span>Advisers</span>
         </NavLink>
 
         {/* =============================================
@@ -189,24 +152,15 @@ function CouncilorSidebar({
 
         <NavLink
           to="/councilor/sections"
-          className={
-            getNavClassName
-          }
-          onClick={
-            handleClose
-          }
+          className={getNavClassName}
+          onClick={handleClose}
           end
         >
-          <span
-            className="councilor-nav-icon"
-            aria-hidden="true"
-          >
+          <span className="councilor-nav-icon" aria-hidden="true">
             ▤
           </span>
 
-          <span>
-            Sections
-          </span>
+          <span>Sections</span>
         </NavLink>
 
         {/* =============================================
@@ -215,24 +169,15 @@ function CouncilorSidebar({
 
         <NavLink
           to="/councilor/attendance"
-          className={
-            getNavClassName
-          }
-          onClick={
-            handleClose
-          }
+          className={getNavClassName}
+          onClick={handleClose}
           end
         >
-          <span
-            className="councilor-nav-icon"
-            aria-hidden="true"
-          >
+          <span className="councilor-nav-icon" aria-hidden="true">
             ◷
           </span>
 
-          <span>
-            Attendance
-          </span>
+          <span>Attendance</span>
         </NavLink>
 
         {/* =============================================
@@ -241,24 +186,15 @@ function CouncilorSidebar({
 
         <NavLink
           to="/councilor/attendance-records"
-          className={
-            getNavClassName
-          }
-          onClick={
-            handleClose
-          }
+          className={getNavClassName}
+          onClick={handleClose}
           end
         >
-          <span
-            className="councilor-nav-icon"
-            aria-hidden="true"
-          >
+          <span className="councilor-nav-icon" aria-hidden="true">
             ▥
           </span>
 
-          <span>
-            Attendance Records
-          </span>
+          <span>Attendance Records</span>
         </NavLink>
 
         {/* =============================================
@@ -268,9 +204,7 @@ function CouncilorSidebar({
         <button
           type="button"
           className="councilor-nav-item councilor-password-nav-item"
-          onClick={
-            handleChangePassword
-          }
+          onClick={handleChangePassword}
           aria-haspopup="dialog"
         >
           <span
@@ -280,44 +214,29 @@ function CouncilorSidebar({
             ⚿
           </span>
 
-          <span>
-            Change Password
-          </span>
+          <span>Change Password</span>
         </button>
       </nav>
 
-      {/* ===============================================
+      {/* =================================================
           SIDEBAR FOOTER
-      ================================================ */}
+      ================================================== */}
 
       <div className="councilor-sidebar-footer">
         <div className="councilor-sidebar-school">
-          <span>
-            SCHOOL SYSTEM
-          </span>
+          <span>SCHOOL SYSTEM</span>
 
-          <strong>
-            Signal Village National
-            High School
-          </strong>
+          <strong>Signal Village National High School</strong>
         </div>
 
         <button
           type="button"
           className="councilor-logout"
-          onClick={
-            handleLogout
-          }
+          onClick={handleLogout}
         >
-          <span
-            aria-hidden="true"
-          >
-            ↪
-          </span>
+          <span aria-hidden="true">↪</span>
 
-          <span>
-            Logout
-          </span>
+          <span>Logout</span>
         </button>
       </div>
     </aside>

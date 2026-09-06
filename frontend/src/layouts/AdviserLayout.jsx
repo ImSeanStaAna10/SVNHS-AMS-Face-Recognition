@@ -1,12 +1,6 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
-import {
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import AdviserTopbar from "../components/topbar/adviserTopbar";
 
@@ -18,8 +12,8 @@ import seniorHighSchoolLogo from "../assets/shs-logo.svg";
 /*
  * Shared portal shell styles.
  */
-import "../styles/councilor.css";
 import "../styles/adviser/account.css";
+import "../styles/councilor.css";
 
 /*
  * Student transfer styles currently own
@@ -92,37 +86,23 @@ const NAVIGATION_ITEMS = [
    HELPERS
 ========================================================= */
 
-const isNavigationActive = (
-  pathname,
-  item,
-) => {
+const isNavigationActive = (pathname, item) => {
   if (item.exact) {
     return pathname === item.path;
   }
 
-  return pathname.startsWith(
-    item.path,
-  );
+  return pathname.startsWith(item.path);
 };
 
-const getErrorMessage = (
-  error,
-  fallbackMessage,
-) =>
+const getErrorMessage = (error, fallbackMessage) =>
   error?.response?.data?.message ||
   error?.response?.data?.error ||
   fallbackMessage;
 
-const normalizePendingTransferCount = (
-  value,
-) => {
-  const parsed =
-    Number(value);
+const normalizePendingTransferCount = (value) => {
+  const parsed = Number(value);
 
-  if (
-    !Number.isFinite(parsed) ||
-    parsed < 0
-  ) {
+  if (!Number.isFinite(parsed) || parsed < 0) {
     return 0;
   }
 
@@ -133,16 +113,10 @@ const normalizePendingTransferCount = (
    PASSWORD VISIBILITY ICON
 ========================================================= */
 
-function PasswordVisibilityIcon({
-  visible,
-}) {
+function PasswordVisibilityIcon({ visible }) {
   if (visible) {
     return (
-      <svg
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-        focusable="false"
-      >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path
           d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
           fill="none"
@@ -165,11 +139,7 @@ function PasswordVisibilityIcon({
   }
 
   return (
-    <svg
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-      focusable="false"
-    >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
       <path
         d="M3 3l18 18"
         fill="none"
@@ -217,23 +187,17 @@ function AdviserLayout({
   eyebrow = "ADVISER PORTAL",
   description = "Attendance Management System",
 }) {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
-  const location =
-    useLocation();
+  const location = useLocation();
 
-  const user =
-    authService.getUser();
+  const user = authService.getUser();
 
   /* =======================================================
      MOBILE SIDEBAR STATE
   ======================================================= */
 
-  const [
-    mobileSidebarOpen,
-    setMobileSidebarOpen,
-  ] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   /* =======================================================
      TRANSFER BADGE STATE
@@ -253,66 +217,35 @@ function AdviserLayout({
      synchronized using the same source.
   ======================================================= */
 
-  const [
-    incomingTransferCount,
-    setIncomingTransferCount,
-  ] = useState(0);
+  const [incomingTransferCount, setIncomingTransferCount] = useState(0);
 
   /* =======================================================
      CHANGE PASSWORD STATE
   ======================================================= */
 
-  const [
-    showPasswordModal,
-    setShowPasswordModal,
-  ] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
-  const [
-    passwordForm,
-    setPasswordForm,
-  ] = useState(
-    INITIAL_PASSWORD_FORM,
-  );
+  const [passwordForm, setPasswordForm] = useState(INITIAL_PASSWORD_FORM);
 
-  const [
-    passwordVisibility,
-    setPasswordVisibility,
-  ] = useState(
+  const [passwordVisibility, setPasswordVisibility] = useState(
     INITIAL_PASSWORD_VISIBILITY,
   );
 
-  const [
-    passwordError,
-    setPasswordError,
-  ] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
-  const [
-    passwordSuccess,
-    setPasswordSuccess,
-  ] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
 
-  const [
-    changingPassword,
-    setChangingPassword,
-  ] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   /* =======================================================
      USER
   ======================================================= */
 
-  const userName =
-    user?.name?.trim() ||
-    "Adviser";
+  const userName = user?.name?.trim() || "Adviser";
 
-  const userInitial =
-    userName
-      .charAt(0)
-      .toUpperCase() ||
-    "A";
+  const userInitial = userName.charAt(0).toUpperCase() || "A";
 
-  const userEmail =
-    user?.email ||
-    "Adviser account";
+  const userEmail = user?.email || "Adviser account";
 
   /* =======================================================
      NOTIFICATION COUNT CALLBACK
@@ -323,85 +256,53 @@ function AdviserLayout({
      The sidebar uses the same count for the Transfers badge.
   ======================================================= */
 
-  const handleNotificationCountChange =
-    (count) => {
-      setIncomingTransferCount(
-        normalizePendingTransferCount(
-          count,
-        ),
-      );
-    };
+  const handleNotificationCountChange = (count) => {
+    setIncomingTransferCount(normalizePendingTransferCount(count));
+  };
 
   /* =======================================================
      MOBILE SIDEBAR CONTROLS
   ======================================================= */
 
-  const openMobileSidebar =
-    () => {
-      setMobileSidebarOpen(
-        true,
-      );
-    };
+  const openMobileSidebar = () => {
+    setMobileSidebarOpen(true);
+  };
 
-  const closeMobileSidebar =
-    () => {
-      setMobileSidebarOpen(
-        false,
-      );
-    };
+  const closeMobileSidebar = () => {
+    setMobileSidebarOpen(false);
+  };
 
   /* =======================================================
      CLOSE SIDEBAR WHEN RETURNING TO DESKTOP
   ======================================================= */
 
   useEffect(() => {
-    const mediaQuery =
-      window.matchMedia(
-        "(max-width: 720px)",
-      );
+    const mediaQuery = window.matchMedia("(max-width: 720px)");
 
-    const handleViewportChange =
-      (event) => {
-        if (
-          !event.matches
-        ) {
-          setMobileSidebarOpen(
-            false,
-          );
-        }
-      };
+    const handleViewportChange = (event) => {
+      if (!event.matches) {
+        setMobileSidebarOpen(false);
+      }
+    };
 
     /*
      * Modern browsers.
      */
-    if (
-      typeof mediaQuery.addEventListener ===
-      "function"
-    ) {
-      mediaQuery.addEventListener(
-        "change",
-        handleViewportChange,
-      );
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleViewportChange);
 
       return () => {
-        mediaQuery.removeEventListener(
-          "change",
-          handleViewportChange,
-        );
+        mediaQuery.removeEventListener("change", handleViewportChange);
       };
     }
 
     /*
      * Compatibility fallback.
      */
-    mediaQuery.addListener?.(
-      handleViewportChange,
-    );
+    mediaQuery.addListener?.(handleViewportChange);
 
     return () => {
-      mediaQuery.removeListener?.(
-        handleViewportChange,
-      );
+      mediaQuery.removeListener?.(handleViewportChange);
     };
   }, []);
 
@@ -410,401 +311,246 @@ function AdviserLayout({
   ======================================================= */
 
   useEffect(() => {
-    if (
-      !mobileSidebarOpen
-    ) {
+    if (!mobileSidebarOpen) {
       return undefined;
     }
 
-    const previousOverflow =
-      document.body.style
-        .overflow;
+    const previousOverflow = document.body.style.overflow;
 
-    document.body.style.overflow =
-      "hidden";
+    document.body.style.overflow = "hidden";
 
-    const handleKeyDown =
-      (event) => {
-        if (
-          event.key ===
-          "Escape"
-        ) {
-          setMobileSidebarOpen(
-            false,
-          );
-        }
-      };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setMobileSidebarOpen(false);
+      }
+    };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
+      document.body.style.overflow = previousOverflow;
 
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    mobileSidebarOpen,
-  ]);
+  }, [mobileSidebarOpen]);
 
   /* =======================================================
      PASSWORD MODAL SIDE EFFECTS
   ======================================================= */
 
   useEffect(() => {
-    if (
-      !showPasswordModal
-    ) {
+    if (!showPasswordModal) {
       return undefined;
     }
 
-    const previousOverflow =
-      document.body.style
-        .overflow;
+    const previousOverflow = document.body.style.overflow;
 
-    document.body.style.overflow =
-      "hidden";
+    document.body.style.overflow = "hidden";
 
-    const handleKeyDown =
-      (event) => {
-        if (
-          event.key ===
-            "Escape" &&
-          !changingPassword
-        ) {
-          setShowPasswordModal(
-            false,
-          );
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape" && !changingPassword) {
+        setShowPasswordModal(false);
 
-          setPasswordForm(
-            INITIAL_PASSWORD_FORM,
-          );
+        setPasswordForm(INITIAL_PASSWORD_FORM);
 
-          setPasswordVisibility(
-            INITIAL_PASSWORD_VISIBILITY,
-          );
+        setPasswordVisibility(INITIAL_PASSWORD_VISIBILITY);
 
-          setPasswordError(
-            "",
-          );
+        setPasswordError("");
 
-          setPasswordSuccess(
-            "",
-          );
-        }
-      };
+        setPasswordSuccess("");
+      }
+    };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown,
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow =
-        previousOverflow;
+      document.body.style.overflow = previousOverflow;
 
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown,
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    showPasswordModal,
-    changingPassword,
-  ]);
+  }, [showPasswordModal, changingPassword]);
 
   /* =======================================================
      NAVIGATION
   ======================================================= */
 
-  const handleNavigate = (
-    path,
-  ) => {
+  const handleNavigate = (path) => {
     closeMobileSidebar();
 
-    navigate(
-      path,
-    );
+    navigate(path);
   };
 
   /* =======================================================
-     LOGOUT
-  ======================================================= */
+   LOGOUT
+======================================================= */
 
-  const handleLogout =
-    () => {
-      closeMobileSidebar();
+  const handleLogout = () => {
+    closeMobileSidebar();
 
-      authService.logout();
+    authService.logout();
 
-      navigate(
-        "/login",
-        {
-          replace: true,
-        },
-      );
-    };
-
+    window.location.replace("/login");
+  };
   /* =======================================================
      RESET PASSWORD MODAL STATE
   ======================================================= */
 
-  const resetPasswordModalState =
-    () => {
-      setPasswordForm(
-        INITIAL_PASSWORD_FORM,
-      );
+  const resetPasswordModalState = () => {
+    setPasswordForm(INITIAL_PASSWORD_FORM);
 
-      setPasswordVisibility(
-        INITIAL_PASSWORD_VISIBILITY,
-      );
+    setPasswordVisibility(INITIAL_PASSWORD_VISIBILITY);
 
-      setPasswordError(
-        "",
-      );
+    setPasswordError("");
 
-      setPasswordSuccess(
-        "",
-      );
-    };
+    setPasswordSuccess("");
+  };
 
   /* =======================================================
      PASSWORD MODAL CONTROLS
   ======================================================= */
 
-  const openPasswordModal =
-    () => {
-      /*
-       * Close mobile sidebar before opening
-       * the account security modal.
-       */
-      closeMobileSidebar();
+  const openPasswordModal = () => {
+    /*
+     * Close mobile sidebar before opening
+     * the account security modal.
+     */
+    closeMobileSidebar();
 
-      resetPasswordModalState();
+    resetPasswordModalState();
 
-      setShowPasswordModal(
-        true,
-      );
-    };
+    setShowPasswordModal(true);
+  };
 
-  const closePasswordModal =
-    () => {
-      if (
-        changingPassword
-      ) {
-        return;
-      }
+  const closePasswordModal = () => {
+    if (changingPassword) {
+      return;
+    }
 
-      setShowPasswordModal(
-        false,
-      );
+    setShowPasswordModal(false);
 
-      resetPasswordModalState();
-    };
+    resetPasswordModalState();
+  };
 
   /* =======================================================
      PASSWORD FORM
   ======================================================= */
 
-  const handlePasswordFormChange =
-    (event) => {
-      const {
-        name,
-        value,
-      } =
-        event.target;
+  const handlePasswordFormChange = (event) => {
+    const { name, value } = event.target;
 
-      setPasswordForm(
-        (current) => ({
-          ...current,
+    setPasswordForm((current) => ({
+      ...current,
 
-          [name]:
-            value,
-        }),
-      );
+      [name]: value,
+    }));
 
-      if (
-        passwordError
-      ) {
-        setPasswordError(
-          "",
-        );
-      }
+    if (passwordError) {
+      setPasswordError("");
+    }
 
-      if (
-        passwordSuccess
-      ) {
-        setPasswordSuccess(
-          "",
-        );
-      }
-    };
+    if (passwordSuccess) {
+      setPasswordSuccess("");
+    }
+  };
 
   /* =======================================================
      PASSWORD VISIBILITY
   ======================================================= */
 
-  const togglePasswordVisibility =
-    (fieldName) => {
-      setPasswordVisibility(
-        (current) => ({
-          ...current,
+  const togglePasswordVisibility = (fieldName) => {
+    setPasswordVisibility((current) => ({
+      ...current,
 
-          [fieldName]:
-            !current[
-              fieldName
-            ],
-        }),
-      );
-    };
+      [fieldName]: !current[fieldName],
+    }));
+  };
 
   /* =======================================================
      PASSWORD VALIDATION
   ======================================================= */
 
-  const validatePasswordForm =
-    () => {
-      const {
+  const validatePasswordForm = () => {
+    const { currentPassword, newPassword, confirmPassword } = passwordForm;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return {
+        valid: false,
+
+        message: "Please complete all password fields.",
+      };
+    }
+
+    if (newPassword.length < 8) {
+      return {
+        valid: false,
+
+        message: "New password must be at least 8 characters.",
+      };
+    }
+
+    if (newPassword === currentPassword) {
+      return {
+        valid: false,
+
+        message: "New password must be different from your current password.",
+      };
+    }
+
+    if (newPassword !== confirmPassword) {
+      return {
+        valid: false,
+
+        message: "New password and confirmation do not match.",
+      };
+    }
+
+    return {
+      valid: true,
+
+      data: {
         currentPassword,
         newPassword,
-        confirmPassword,
-      } =
-        passwordForm;
-
-      if (
-        !currentPassword ||
-        !newPassword ||
-        !confirmPassword
-      ) {
-        return {
-          valid: false,
-
-          message:
-            "Please complete all password fields.",
-        };
-      }
-
-      if (
-        newPassword.length <
-        8
-      ) {
-        return {
-          valid: false,
-
-          message:
-            "New password must be at least 8 characters.",
-        };
-      }
-
-      if (
-        newPassword ===
-        currentPassword
-      ) {
-        return {
-          valid: false,
-
-          message:
-            "New password must be different from your current password.",
-        };
-      }
-
-      if (
-        newPassword !==
-        confirmPassword
-      ) {
-        return {
-          valid: false,
-
-          message:
-            "New password and confirmation do not match.",
-        };
-      }
-
-      return {
-        valid: true,
-
-        data: {
-          currentPassword,
-          newPassword,
-        },
-      };
+      },
     };
+  };
 
   /* =======================================================
      CHANGE PASSWORD
   ======================================================= */
 
-  const handleChangePassword =
-    async (event) => {
-      event.preventDefault();
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
 
-      const validation =
-        validatePasswordForm();
+    const validation = validatePasswordForm();
 
-      if (
-        !validation.valid
-      ) {
-        setPasswordError(
-          validation.message,
-        );
+    if (!validation.valid) {
+      setPasswordError(validation.message);
 
-        return;
-      }
+      return;
+    }
 
-      try {
-        setChangingPassword(
-          true,
-        );
+    try {
+      setChangingPassword(true);
 
-        setPasswordError(
-          "",
-        );
+      setPasswordError("");
 
-        setPasswordSuccess(
-          "",
-        );
+      setPasswordSuccess("");
 
-        await accountService.changePassword(
-          validation.data,
-        );
+      await accountService.changePassword(validation.data);
 
-        setPasswordForm(
-          INITIAL_PASSWORD_FORM,
-        );
+      setPasswordForm(INITIAL_PASSWORD_FORM);
 
-        setPasswordVisibility(
-          INITIAL_PASSWORD_VISIBILITY,
-        );
+      setPasswordVisibility(INITIAL_PASSWORD_VISIBILITY);
 
-        setPasswordSuccess(
-          "Password changed successfully.",
-        );
-      } catch (
-        error
-      ) {
-        console.error(
-          "Unable to change password:",
-          error,
-        );
+      setPasswordSuccess("Password changed successfully.");
+    } catch (error) {
+      console.error("Unable to change password:", error);
 
-        setPasswordError(
-          getErrorMessage(
-            error,
-            "Unable to change password.",
-          ),
-        );
-      } finally {
-        setChangingPassword(
-          false,
-        );
-      }
-    };
+      setPasswordError(getErrorMessage(error, "Unable to change password."));
+    } finally {
+      setChangingPassword(false);
+    }
+  };
 
   /* =======================================================
      RENDER
@@ -819,9 +565,7 @@ function AdviserLayout({
       <aside
         id="adviser-mobile-sidebar"
         className={`councilor-sidebar adviser-sidebar ${
-          mobileSidebarOpen
-            ? "is-mobile-open"
-            : ""
+          mobileSidebarOpen ? "is-mobile-open" : ""
         }`}
       >
         {/* =================================================
@@ -831,22 +575,15 @@ function AdviserLayout({
         <div className="councilor-brand">
           <div className="councilor-brand-logo">
             <img
-              src={
-                seniorHighSchoolLogo
-              }
+              src={seniorHighSchoolLogo}
               alt="Signal Village National High School"
             />
           </div>
 
           <div className="councilor-brand-copy">
-            <strong>
-              SVNHS
-            </strong>
+            <strong>SVNHS</strong>
 
-            <span>
-              Attendance Management
-              System
-            </span>
+            <span>Attendance Management System</span>
           </div>
 
           {/* ===============================================
@@ -856,16 +593,10 @@ function AdviserLayout({
           <button
             type="button"
             className="adviser-mobile-sidebar-close"
-            onClick={
-              closeMobileSidebar
-            }
+            onClick={closeMobileSidebar}
             aria-label="Close navigation menu"
           >
-            <span
-              aria-hidden="true"
-            >
-              ×
-            </span>
+            <span aria-hidden="true">×</span>
           </button>
         </div>
 
@@ -873,90 +604,47 @@ function AdviserLayout({
             NAVIGATION
         ================================================== */}
 
-        <span className="councilor-nav-label">
-          MAIN MENU
-        </span>
+        <span className="councilor-nav-label">MAIN MENU</span>
 
-        <nav
-          className="councilor-nav"
-          aria-label="Adviser navigation"
-        >
-          {NAVIGATION_ITEMS.map(
-            (item) => {
-              const active =
-                isNavigationActive(
-                  location.pathname,
-                  item,
-                );
+        <nav className="councilor-nav" aria-label="Adviser navigation">
+          {NAVIGATION_ITEMS.map((item) => {
+            const active = isNavigationActive(location.pathname, item);
 
-              return (
-                <button
-                  key={
-                    item.path
-                  }
-                  type="button"
-                  className={`councilor-nav-item ${
-                    active
-                      ? "active"
-                      : ""
-                  }`}
-                  aria-current={
-                    active
-                      ? "page"
-                      : undefined
-                  }
-                  onClick={() =>
-                    handleNavigate(
-                      item.path,
-                    )
-                  }
-                >
-                  <span
-                    className="councilor-nav-icon"
-                    aria-hidden="true"
-                  >
-                    {
-                      item.icon
-                    }
-                  </span>
+            return (
+              <button
+                key={item.path}
+                type="button"
+                className={`councilor-nav-item ${active ? "active" : ""}`}
+                aria-current={active ? "page" : undefined}
+                onClick={() => handleNavigate(item.path)}
+              >
+                <span className="councilor-nav-icon" aria-hidden="true">
+                  {item.icon}
+                </span>
 
-                  {item.transferBadge ? (
-                    <span className="adviser-nav-transfer-label">
-                      <span>
-                        {
-                          item.label
-                        }
+                {item.transferBadge ? (
+                  <span className="adviser-nav-transfer-label">
+                    <span>{item.label}</span>
+
+                    {incomingTransferCount > 0 && (
+                      <span
+                        className="adviser-nav-transfer-badge"
+                        aria-label={`${incomingTransferCount} pending incoming transfer request${
+                          incomingTransferCount === 1 ? "" : "s"
+                        }`}
+                      >
+                        {incomingTransferCount > 99
+                          ? "99+"
+                          : incomingTransferCount}
                       </span>
-
-                      {incomingTransferCount >
-                        0 && (
-                        <span
-                          className="adviser-nav-transfer-badge"
-                          aria-label={`${incomingTransferCount} pending incoming transfer request${
-                            incomingTransferCount ===
-                            1
-                              ? ""
-                              : "s"
-                          }`}
-                        >
-                          {incomingTransferCount >
-                          99
-                            ? "99+"
-                            : incomingTransferCount}
-                        </span>
-                      )}
-                    </span>
-                  ) : (
-                    <span>
-                      {
-                        item.label
-                      }
-                    </span>
-                  )}
-                </button>
-              );
-            },
-          )}
+                    )}
+                  </span>
+                ) : (
+                  <span>{item.label}</span>
+                )}
+              </button>
+            );
+          })}
 
           {/* ===============================================
               CHANGE PASSWORD
@@ -965,9 +653,7 @@ function AdviserLayout({
           <button
             type="button"
             className="councilor-nav-item adviser-password-nav-item"
-            onClick={
-              openPasswordModal
-            }
+            onClick={openPasswordModal}
             aria-haspopup="dialog"
           >
             <span
@@ -977,9 +663,7 @@ function AdviserLayout({
               ⚿
             </span>
 
-            <span>
-              Change Password
-            </span>
+            <span>Change Password</span>
           </button>
         </nav>
 
@@ -989,32 +673,19 @@ function AdviserLayout({
 
         <div className="councilor-sidebar-footer">
           <div className="councilor-sidebar-school">
-            <span>
-              SCHOOL SYSTEM
-            </span>
+            <span>SCHOOL SYSTEM</span>
 
-            <strong>
-              Signal Village National
-              High School
-            </strong>
+            <strong>Signal Village National High School</strong>
           </div>
 
           <button
             type="button"
             className="councilor-logout"
-            onClick={
-              handleLogout
-            }
+            onClick={handleLogout}
           >
-            <span
-              aria-hidden="true"
-            >
-              ↪
-            </span>
+            <span aria-hidden="true">↪</span>
 
-            <span>
-              Logout
-            </span>
+            <span>Logout</span>
           </button>
         </div>
       </aside>
@@ -1027,9 +698,7 @@ function AdviserLayout({
         <div
           className="adviser-mobile-sidebar-backdrop"
           role="presentation"
-          onMouseDown={
-            closeMobileSidebar
-          }
+          onMouseDown={closeMobileSidebar}
         />
       )}
 
@@ -1055,33 +724,19 @@ function AdviserLayout({
         ================================================== */}
 
         <AdviserTopbar
-          title={
-            title
-          }
-          eyebrow={
-            eyebrow
-          }
-          description={
-            description
-          }
-          onMenuOpen={
-            openMobileSidebar
-          }
-          menuOpen={
-            mobileSidebarOpen
-          }
-          onNotificationCountChange={
-            handleNotificationCountChange
-          }
+          title={title}
+          eyebrow={eyebrow}
+          description={description}
+          onMenuOpen={openMobileSidebar}
+          menuOpen={mobileSidebarOpen}
+          onNotificationCountChange={handleNotificationCountChange}
         />
 
         {/* =================================================
             CONTENT
         ================================================== */}
 
-        <div className="councilor-content adviser-content">
-          {children}
-        </div>
+        <div className="councilor-content adviser-content">{children}</div>
       </section>
 
       {/* ===================================================
@@ -1091,13 +746,8 @@ function AdviserLayout({
       {showPasswordModal && (
         <div
           className="councilor-modal-backdrop"
-          onMouseDown={(
-            event,
-          ) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
               closePasswordModal();
             }
           }}
@@ -1114,31 +764,21 @@ function AdviserLayout({
 
             <div className="councilor-modal-header">
               <div>
-                <span>
-                  ACCOUNT SECURITY
-                </span>
+                <span>ACCOUNT SECURITY</span>
 
-                <h2 id="change-password-title">
-                  Change Password
-                </h2>
+                <h2 id="change-password-title">Change Password</h2>
 
                 <p>
-                  Keep your Adviser
-                  account secure by
-                  regularly updating
-                  your password.
+                  Keep your Adviser account secure by regularly updating your
+                  password.
                 </p>
               </div>
 
               <button
                 type="button"
                 className="councilor-modal-close"
-                onClick={
-                  closePasswordModal
-                }
-                disabled={
-                  changingPassword
-                }
+                onClick={closePasswordModal}
+                disabled={changingPassword}
                 aria-label="Close modal"
               >
                 ×
@@ -1151,9 +791,7 @@ function AdviserLayout({
 
             <form
               className="councilor-modal-form adviser-password-form"
-              onSubmit={
-                handleChangePassword
-              }
+              onSubmit={handleChangePassword}
               noValidate
             >
               {/* ===============================================
@@ -1161,28 +799,14 @@ function AdviserLayout({
               =============================================== */}
 
               <div className="adviser-password-account">
-                <div className="adviser-password-avatar">
-                  {
-                    userInitial
-                  }
-                </div>
+                <div className="adviser-password-avatar">{userInitial}</div>
 
                 <div className="adviser-password-account-copy">
-                  <span>
-                    SIGNED IN AS
-                  </span>
+                  <span>SIGNED IN AS</span>
 
-                  <strong>
-                    {
-                      userName
-                    }
-                  </strong>
+                  <strong>{userName}</strong>
 
-                  <small>
-                    {
-                      userEmail
-                    }
-                  </small>
+                  <small>{userEmail}</small>
                 </div>
               </div>
 
@@ -1191,28 +815,17 @@ function AdviserLayout({
               =============================================== */}
 
               <div className="adviser-password-help">
-                <span
-                  className="adviser-password-help-icon"
-                  aria-hidden="true"
-                >
+                <span className="adviser-password-help-icon" aria-hidden="true">
                   i
                 </span>
 
                 <div>
-                  <strong>
-                    Forgot your current
-                    password?
-                  </strong>
+                  <strong>Forgot your current password?</strong>
 
                   <p>
-                    Contact your
-                    Councilor to request
-                    a password reset.
-                    The Councilor can
-                    provide you with a
-                    temporary password
-                    that you can change
-                    after signing in.
+                    Contact your Councilor to request a password reset. The
+                    Councilor can provide you with a temporary password that you
+                    can change after signing in.
                   </p>
                 </div>
               </div>
@@ -1222,52 +835,34 @@ function AdviserLayout({
               =============================================== */}
 
               <div className="councilor-modal-field">
-                <label htmlFor="current-password">
-                  Current Password
-                </label>
+                <label htmlFor="current-password">Current Password</label>
 
                 <div className="adviser-password-input">
                   <input
                     id="current-password"
                     name="currentPassword"
                     type={
-                      passwordVisibility.currentPassword
-                        ? "text"
-                        : "password"
+                      passwordVisibility.currentPassword ? "text" : "password"
                     }
                     placeholder="Enter current password"
-                    value={
-                      passwordForm.currentPassword
-                    }
-                    onChange={
-                      handlePasswordFormChange
-                    }
+                    value={passwordForm.currentPassword}
+                    onChange={handlePasswordFormChange}
                     autoComplete="current-password"
-                    disabled={
-                      changingPassword
-                    }
+                    disabled={changingPassword}
                     autoFocus
                   />
 
                   <button
                     type="button"
                     className="adviser-password-toggle"
-                    onClick={() =>
-                      togglePasswordVisibility(
-                        "currentPassword",
-                      )
-                    }
-                    disabled={
-                      changingPassword
-                    }
+                    onClick={() => togglePasswordVisibility("currentPassword")}
+                    disabled={changingPassword}
                     aria-label={
                       passwordVisibility.currentPassword
                         ? "Hide current password"
                         : "Show current password"
                     }
-                    aria-pressed={
-                      passwordVisibility.currentPassword
-                    }
+                    aria-pressed={passwordVisibility.currentPassword}
                     title={
                       passwordVisibility.currentPassword
                         ? "Hide password"
@@ -1275,9 +870,7 @@ function AdviserLayout({
                     }
                   >
                     <PasswordVisibilityIcon
-                      visible={
-                        passwordVisibility.currentPassword
-                      }
+                      visible={passwordVisibility.currentPassword}
                     />
                   </button>
                 </div>
@@ -1288,51 +881,31 @@ function AdviserLayout({
               =============================================== */}
 
               <div className="councilor-modal-field">
-                <label htmlFor="new-password">
-                  New Password
-                </label>
+                <label htmlFor="new-password">New Password</label>
 
                 <div className="adviser-password-input">
                   <input
                     id="new-password"
                     name="newPassword"
-                    type={
-                      passwordVisibility.newPassword
-                        ? "text"
-                        : "password"
-                    }
+                    type={passwordVisibility.newPassword ? "text" : "password"}
                     placeholder="Enter new password"
-                    value={
-                      passwordForm.newPassword
-                    }
-                    onChange={
-                      handlePasswordFormChange
-                    }
+                    value={passwordForm.newPassword}
+                    onChange={handlePasswordFormChange}
                     autoComplete="new-password"
-                    disabled={
-                      changingPassword
-                    }
+                    disabled={changingPassword}
                   />
 
                   <button
                     type="button"
                     className="adviser-password-toggle"
-                    onClick={() =>
-                      togglePasswordVisibility(
-                        "newPassword",
-                      )
-                    }
-                    disabled={
-                      changingPassword
-                    }
+                    onClick={() => togglePasswordVisibility("newPassword")}
+                    disabled={changingPassword}
                     aria-label={
                       passwordVisibility.newPassword
                         ? "Hide new password"
                         : "Show new password"
                     }
-                    aria-pressed={
-                      passwordVisibility.newPassword
-                    }
+                    aria-pressed={passwordVisibility.newPassword}
                     title={
                       passwordVisibility.newPassword
                         ? "Hide password"
@@ -1340,16 +913,13 @@ function AdviserLayout({
                     }
                   >
                     <PasswordVisibilityIcon
-                      visible={
-                        passwordVisibility.newPassword
-                      }
+                      visible={passwordVisibility.newPassword}
                     />
                   </button>
                 </div>
 
                 <span className="councilor-field-hint">
-                  Use at least 8
-                  characters.
+                  Use at least 8 characters.
                 </span>
               </div>
 
@@ -1367,42 +937,26 @@ function AdviserLayout({
                     id="confirm-new-password"
                     name="confirmPassword"
                     type={
-                      passwordVisibility.confirmPassword
-                        ? "text"
-                        : "password"
+                      passwordVisibility.confirmPassword ? "text" : "password"
                     }
                     placeholder="Re-enter new password"
-                    value={
-                      passwordForm.confirmPassword
-                    }
-                    onChange={
-                      handlePasswordFormChange
-                    }
+                    value={passwordForm.confirmPassword}
+                    onChange={handlePasswordFormChange}
                     autoComplete="new-password"
-                    disabled={
-                      changingPassword
-                    }
+                    disabled={changingPassword}
                   />
 
                   <button
                     type="button"
                     className="adviser-password-toggle"
-                    onClick={() =>
-                      togglePasswordVisibility(
-                        "confirmPassword",
-                      )
-                    }
-                    disabled={
-                      changingPassword
-                    }
+                    onClick={() => togglePasswordVisibility("confirmPassword")}
+                    disabled={changingPassword}
                     aria-label={
                       passwordVisibility.confirmPassword
                         ? "Hide confirmed password"
                         : "Show confirmed password"
                     }
-                    aria-pressed={
-                      passwordVisibility.confirmPassword
-                    }
+                    aria-pressed={passwordVisibility.confirmPassword}
                     title={
                       passwordVisibility.confirmPassword
                         ? "Hide password"
@@ -1410,9 +964,7 @@ function AdviserLayout({
                     }
                   >
                     <PasswordVisibilityIcon
-                      visible={
-                        passwordVisibility.confirmPassword
-                      }
+                      visible={passwordVisibility.confirmPassword}
                     />
                   </button>
                 </div>
@@ -1423,21 +975,10 @@ function AdviserLayout({
               =============================================== */}
 
               {passwordError && (
-                <div
-                  className="councilor-modal-error"
-                  role="alert"
-                >
-                  <span
-                    aria-hidden="true"
-                  >
-                    !
-                  </span>
+                <div className="councilor-modal-error" role="alert">
+                  <span aria-hidden="true">!</span>
 
-                  <p>
-                    {
-                      passwordError
-                    }
-                  </p>
+                  <p>{passwordError}</p>
                 </div>
               )}
 
@@ -1451,22 +992,12 @@ function AdviserLayout({
                   role="status"
                   aria-live="polite"
                 >
-                  <span
-                    aria-hidden="true"
-                  >
-                    ✓
-                  </span>
+                  <span aria-hidden="true">✓</span>
 
                   <div>
-                    <strong>
-                      Password updated
-                    </strong>
+                    <strong>Password updated</strong>
 
-                    <p>
-                      Your password has
-                      been changed
-                      successfully.
-                    </p>
+                    <p>Your password has been changed successfully.</p>
                   </div>
                 </div>
               )}
@@ -1479,25 +1010,17 @@ function AdviserLayout({
                 <button
                   type="button"
                   className="councilor-secondary-button"
-                  onClick={
-                    closePasswordModal
-                  }
-                  disabled={
-                    changingPassword
-                  }
+                  onClick={closePasswordModal}
+                  disabled={changingPassword}
                 >
-                  {passwordSuccess
-                    ? "Done"
-                    : "Cancel"}
+                  {passwordSuccess ? "Done" : "Cancel"}
                 </button>
 
                 {!passwordSuccess && (
                   <button
                     type="submit"
                     className="councilor-primary-button"
-                    disabled={
-                      changingPassword
-                    }
+                    disabled={changingPassword}
                   >
                     {changingPassword && (
                       <span
@@ -1506,9 +1029,7 @@ function AdviserLayout({
                       />
                     )}
 
-                    {changingPassword
-                      ? "Changing..."
-                      : "Change Password"}
+                    {changingPassword ? "Changing..." : "Change Password"}
                   </button>
                 )}
               </div>
