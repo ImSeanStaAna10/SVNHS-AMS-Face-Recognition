@@ -2874,3 +2874,917 @@ html[data-theme="dark"] .attendance-history-detail-student > span {
     grid-column: 1 / -1;
   }
 }
+
+
+/* =========================================================
+   ATTENDANCE HISTORY DETAIL
+   MOBILE DOCUMENT EXPERIENCE V4
+   ---------------------------------------------------------
+   MOBILE ONLY — desktop remains untouched.
+
+   Fixes:
+   - Section / health grid overflow
+   - Narrow clipped section title
+   - Oversized fixed desktop columns on phones
+   - Export action crowding
+   - Summary density
+   - Filters / register usability
+   - Footer / signatures spacing
+========================================================= */
+
+@media (max-width: 700px) {
+  /* =======================================================
+     PAGE
+  ======================================================= */
+
+  .adviser-attendance-record-page.attendance-detail-page {
+    width: 100%;
+
+    max-width: none;
+
+    margin: 0;
+
+    padding:
+      12px
+      10px
+      30px;
+
+    overflow-x: hidden;
+  }
+
+  /* =======================================================
+     TOOLBAR
+  ======================================================= */
+
+  .adviser-attendance-record-page .attendance-record-toolbar {
+    width: 100%;
+
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-bottom: 12px;
+  }
+
+  .adviser-attendance-record-page .attendance-detail-back {
+    width: fit-content;
+
+    min-height: 40px;
+
+    justify-content: flex-start;
+
+    padding:
+      0
+      10px;
+
+    border-color: transparent;
+
+    background: transparent;
+
+    box-shadow: none;
+  }
+
+  .adviser-attendance-record-page .attendance-record-actions {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .adviser-attendance-record-page .attendance-export-button {
+    width: 100%;
+
+    min-width: 0;
+    min-height: 48px;
+
+    gap: 8px;
+
+    padding:
+      7px
+      9px;
+
+    border-radius: 11px;
+  }
+
+  .adviser-attendance-record-page .attendance-export-icon {
+    width: 31px;
+    height: 31px;
+
+    flex-basis: 31px;
+
+    border-radius: 8px;
+  }
+
+  .adviser-attendance-record-page .attendance-export-button strong {
+    font-size: 0.68rem;
+
+    line-height: 1.25;
+  }
+
+  .adviser-attendance-record-page .attendance-export-button small {
+    display: none;
+  }
+
+  /* =======================================================
+     OFFICIAL HEADER
+  ======================================================= */
+
+  .adviser-attendance-record-page .attendance-record-header {
+    min-height: 0;
+
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 15px;
+
+    padding:
+      18px
+      15px
+      17px;
+
+    border-top-width: 4px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-brand {
+    width: 100%;
+
+    align-items: center;
+
+    gap: 11px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-logos {
+    gap: 5px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-logos img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-school {
+    min-width: 0;
+
+    flex: 1;
+  }
+
+  .adviser-attendance-record-page .attendance-record-school span {
+    font-size: 0.47rem;
+
+    letter-spacing: 0.1em;
+  }
+
+  .adviser-attendance-record-page .attendance-record-school strong {
+    margin-top: 3px;
+
+    font-size: 0.8rem;
+
+    line-height: 1.2;
+  }
+
+  .adviser-attendance-record-page .attendance-record-school small {
+    margin-top: 3px;
+
+    font-size: 0.55rem;
+
+    line-height: 1.35;
+  }
+
+  .adviser-attendance-record-page .attendance-record-document {
+    width: 100%;
+
+    padding:
+      12px
+      0
+      0;
+
+    border-top:
+      1px solid
+      var(--record-border);
+
+    border-left: 0;
+
+    text-align: left;
+  }
+
+  .adviser-attendance-record-page .attendance-record-document span {
+    font-size: 0.5rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-document strong {
+    margin-top: 4px;
+
+    font-size: 0.88rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-document small {
+    max-width: none;
+
+    margin-top: 3px;
+
+    font-size: 0.56rem;
+  }
+
+  /* =======================================================
+     SECTION IDENTITY
+     MAIN SCREENSHOT FIX
+  ======================================================= */
+
+  .adviser-attendance-record-page .attendance-record-identity {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: minmax(0, 1fr) !important;
+
+    overflow: hidden;
+
+    border-top: 0;
+  }
+
+  .adviser-attendance-record-page .attendance-record-section-block {
+    width: 100%;
+
+    min-width: 0;
+
+    padding:
+      18px
+      16px
+      16px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-section-block > span {
+    font-size: 0.52rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-section-block h1 {
+    max-width: 100%;
+
+    margin-top: 6px;
+
+    overflow-wrap: anywhere;
+
+    word-break: normal;
+
+    font-size:
+      clamp(
+        1.3rem,
+        7vw,
+        1.7rem
+      );
+
+    line-height: 1.12;
+  }
+
+  .adviser-attendance-record-page .attendance-record-section-meta {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 9px;
+
+    margin-top: 15px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-section-meta > span {
+    width: 100%;
+
+    min-width: 0 !important;
+
+    gap: 3px;
+
+    padding:
+      9px
+      10px;
+
+    border:
+      1px solid
+      var(--record-border);
+
+    border-radius: 9px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-section-meta strong {
+    max-width: 100%;
+
+    overflow-wrap: anywhere;
+
+    font-size: 0.7rem;
+  }
+
+  /* =======================================================
+     ATTENDANCE HEALTH
+  ======================================================= */
+
+  .adviser-attendance-record-page .attendance-record-health {
+    width: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+
+    grid-template-areas:
+      "label rate"
+      "copy  rate";
+
+    align-items: center;
+
+    gap:
+      5px
+      14px;
+
+    padding:
+      14px
+      16px;
+
+    border-top:
+      1px solid
+      var(--record-border);
+
+    border-left: 0 !important;
+  }
+
+  .adviser-attendance-record-page .attendance-record-health > span {
+    grid-area: label;
+
+    align-self: end;
+
+    font-size: 0.5rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-health > strong {
+    grid-area: rate;
+
+    margin: 0;
+
+    font-size: 1.55rem;
+
+    text-align: right;
+  }
+
+  .adviser-attendance-record-page .attendance-record-health > div {
+    grid-area: copy;
+
+    min-width: 0;
+
+    margin: 0;
+  }
+
+  .adviser-attendance-record-page .attendance-record-health b {
+    font-size: 0.68rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-health small {
+    max-width: 220px;
+
+    margin-top: 2px;
+
+    font-size: 0.55rem;
+
+    line-height: 1.4;
+  }
+
+  /* =======================================================
+     SESSION SUMMARY
+  ======================================================= */
+
+  .adviser-attendance-record-page .attendance-record-summary {
+    width: 100%;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+
+    margin:
+      10px
+      0;
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat {
+    min-width: 0;
+    min-height: 72px;
+
+    gap: 8px;
+
+    padding:
+      11px
+      10px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat-icon {
+    width: 30px;
+    height: 30px;
+
+    flex-basis: 30px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat span {
+    font-size: 0.47rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat strong {
+    margin-top: 3px;
+
+    font-size: 0.96rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat small {
+    max-width: 100%;
+
+    font-size: 0.52rem;
+  }
+
+  /* =======================================================
+     RECORD SHEET
+  ======================================================= */
+
+  .adviser-attendance-record-page .attendance-record-sheet {
+    width: 100%;
+
+    overflow: hidden;
+
+    border-radius: 12px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-sheet-header {
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 13px;
+
+    padding:
+      17px
+      14px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-kicker {
+    font-size: 0.5rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-sheet-header h2 {
+    margin-top: 4px;
+
+    font-size: 1rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-sheet-header p {
+    margin-top: 4px;
+
+    font-size: 0.62rem;
+
+    line-height: 1.5;
+  }
+
+  .adviser-attendance-record-page .attendance-record-sheet-meta {
+    width: 100%;
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    border-radius: 9px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-sheet-meta > div {
+    min-width: 0;
+
+    padding:
+      8px
+      5px;
+  }
+
+  .adviser-attendance-record-page
+    .attendance-record-sheet-meta
+    > div
+    + div {
+    border-top: 0;
+
+    border-left:
+      1px solid
+      var(--record-border);
+  }
+
+  .adviser-attendance-record-page .attendance-record-sheet-meta span {
+    font-size: 0.44rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-sheet-meta strong {
+    margin-top: 3px;
+
+    overflow-wrap: anywhere;
+
+    font-size: 0.57rem;
+
+    line-height: 1.25;
+  }
+
+  /* =======================================================
+     FILTERS
+  ======================================================= */
+
+  .adviser-attendance-record-page .adviser-attendance-record-filters {
+    width: 100%;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    gap: 8px;
+
+    padding:
+      11px
+      10px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-search,
+  .adviser-attendance-record-page .attendance-record-filter,
+  .adviser-attendance-record-page .attendance-record-filter-context {
+    width: 100%;
+
+    min-width: 0;
+
+    grid-column: auto !important;
+  }
+
+  .adviser-attendance-record-page .attendance-record-search {
+    min-height: 50px;
+  }
+
+  .adviser-attendance-record-page .adviser-attendance-status-filter {
+    padding:
+      7px
+      9px;
+  }
+
+  .adviser-attendance-record-page
+    .adviser-attendance-status-filter
+    select {
+    min-height: 40px;
+
+    font-size: 0.72rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-filter-context strong {
+    white-space: normal;
+
+    overflow-wrap: anywhere;
+  }
+
+  .adviser-attendance-record-page .attendance-record-filter-context small {
+    white-space: normal;
+  }
+
+  /* =======================================================
+     TABLE
+  ======================================================= */
+
+  .adviser-attendance-record-page .attendance-record-table-wrap {
+    width: 100%;
+
+    max-height: none;
+
+    overflow-x: auto;
+    overflow-y: visible;
+
+    overscroll-behavior-x: contain;
+
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-gutter: auto;
+  }
+
+  .adviser-attendance-record-page .adviser-attendance-record-table {
+    width: max-content;
+
+    min-width: 720px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-table thead th {
+    padding:
+      10px
+      9px;
+
+    font-size: 0.54rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-table tbody td {
+    padding:
+      10px
+      9px;
+
+    font-size: 0.66rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-col-no {
+    width: 48px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-col-number {
+    width: 120px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-col-student {
+    min-width: 220px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-student {
+    gap: 8px;
+  }
+
+  .adviser-attendance-record-page
+    .attendance-record-student
+    > div:first-child {
+    width: 30px;
+    height: 30px;
+
+    flex-basis: 30px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-student strong {
+    font-size: 0.68rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-student span {
+    font-size: 0.54rem;
+  }
+
+  .adviser-attendance-record-page .attendance-session-status-pill {
+    min-height: 27px;
+
+    padding:
+      0
+      8px;
+
+    font-size: 0.56rem;
+  }
+
+  .adviser-attendance-record-page .adviser-attendance-record-time {
+    font-size: 0.62rem;
+  }
+
+  /* =======================================================
+     NOTE / FOOTER
+  ======================================================= */
+
+  .adviser-attendance-record-page .attendance-record-note {
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 9px;
+
+    padding:
+      11px
+      12px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-note > div {
+    gap: 7px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-note p {
+    font-size: 0.58rem;
+
+    line-height: 1.5;
+  }
+
+  .adviser-attendance-record-page .attendance-record-note > span {
+    max-width: 100%;
+
+    overflow-wrap: anywhere;
+
+    font-size: 0.52rem;
+
+    white-space: normal;
+  }
+
+  .adviser-attendance-record-page .attendance-record-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding:
+      11px
+      12px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-pagination p {
+    font-size: 0.6rem;
+  }
+
+  .adviser-attendance-record-page
+    .adviser-attendance-session-footer-meta {
+    width: 100%;
+
+    text-align: left;
+  }
+
+  /* =======================================================
+     SIGNATURES
+  ======================================================= */
+
+  .adviser-attendance-record-page
+    + .adviser-attendance-record-signatures,
+  .adviser-attendance-record-signatures {
+    width: 100%;
+
+    grid-template-columns: 1fr;
+
+    gap: 26px;
+
+    margin:
+      22px
+      auto
+      0;
+
+    padding:
+      0
+      12px;
+  }
+
+  .adviser-attendance-record-signatures > div > span {
+    height: 22px;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 430px) {
+  .adviser-attendance-record-page.attendance-detail-page {
+    padding:
+      10px
+      8px
+      26px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .adviser-attendance-record-page .attendance-export-button {
+    min-height: 45px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-header {
+    padding:
+      16px
+      13px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-logos img {
+    width: 31px;
+    height: 31px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-school strong {
+    font-size: 0.74rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-section-block {
+    padding:
+      16px
+      13px
+      14px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-section-block h1 {
+    font-size:
+      clamp(
+        1.2rem,
+        7.2vw,
+        1.5rem
+      );
+  }
+
+  .adviser-attendance-record-page .attendance-record-health {
+    padding:
+      13px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-health > strong {
+    font-size: 1.38rem;
+  }
+
+  .adviser-attendance-record-page .attendance-record-summary {
+    gap: 7px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat {
+    min-height: 68px;
+
+    padding:
+      10px
+      8px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat-icon {
+    width: 28px;
+    height: 28px;
+
+    flex-basis: 28px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat small {
+    white-space: normal;
+
+    line-height: 1.25;
+  }
+
+  .adviser-attendance-record-page .attendance-record-sheet-header {
+    padding:
+      15px
+      12px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-sheet-meta > div {
+    padding:
+      7px
+      4px;
+  }
+
+  .adviser-attendance-record-page .adviser-attendance-record-filters {
+    padding:
+      10px
+      8px;
+  }
+}
+
+/* =========================================================
+   MOBILE LANDSCAPE
+========================================================= */
+
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
+  .adviser-attendance-record-page .attendance-record-identity {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(190px, 0.65fr) !important;
+  }
+
+  .adviser-attendance-record-page .attendance-record-health {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    border-top: 0;
+
+    border-left:
+      1px solid
+      var(--record-border) !important;
+  }
+
+  .adviser-attendance-record-page .attendance-record-health > strong {
+    margin-top: 6px;
+
+    text-align: left;
+  }
+
+  .adviser-attendance-record-page .attendance-record-health > div {
+    margin-top: 8px;
+  }
+
+  .adviser-attendance-record-page .attendance-record-summary {
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+  }
+
+  .adviser-attendance-record-page .attendance-record-stat:last-child {
+    grid-column: auto;
+  }
+}
+
+/* =========================================================
+   PRINT SAFETY
+   Mobile screen overrides must never affect generated print.
+========================================================= */
+
+@media print {
+  .adviser-attendance-record-page.attendance-detail-page,
+  .adviser-attendance-record-page .attendance-record-identity,
+  .adviser-attendance-record-page .attendance-record-health,
+  .adviser-attendance-record-page .attendance-record-summary,
+  .adviser-attendance-record-page .attendance-record-sheet,
+  .adviser-attendance-record-page .attendance-record-table-wrap,
+  .adviser-attendance-record-page .adviser-attendance-record-table {
+    width: auto;
+    max-width: none;
+  }
+}

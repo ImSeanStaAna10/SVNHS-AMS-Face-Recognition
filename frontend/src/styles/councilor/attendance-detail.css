@@ -3533,3 +3533,1043 @@ html[data-theme="dark"]
     animation: none !important;
   }
 }
+
+
+/* =========================================================
+   COUNCILOR DAILY ATTENDANCE DETAIL
+   MOBILE UI / UX V3
+   ---------------------------------------------------------
+   MOBILE ONLY — desktop remains untouched.
+
+   Goals:
+   - Native-feeling mobile document layout
+   - Prevent section / health overflow
+   - Better export actions
+   - Compact 2-column summary
+   - Cleaner mobile filters
+   - Safe horizontal table scrolling
+   - Better note / pagination readability
+========================================================= */
+
+@media (max-width: 700px) {
+  /* =======================================================
+     PAGE
+  ======================================================= */
+
+  .attendance-detail-page {
+    width: 100%;
+    max-width: none;
+
+    margin: 0;
+
+    padding:
+      12px
+      10px
+      30px;
+
+    overflow-x: hidden;
+  }
+
+  /* =======================================================
+     TOOLBAR
+  ======================================================= */
+
+  .attendance-record-toolbar {
+    width: 100%;
+
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-bottom: 12px;
+  }
+
+  .attendance-detail-back {
+    width: fit-content;
+
+    min-height: 40px;
+
+    justify-content: flex-start;
+
+    padding:
+      0
+      10px;
+
+    border-color: transparent;
+
+    background: transparent;
+
+    box-shadow: none;
+  }
+
+  .attendance-detail-back:hover {
+    transform: none;
+
+    background: transparent;
+
+    box-shadow: none;
+  }
+
+  .attendance-record-actions {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .attendance-export-button {
+    width: 100%;
+
+    min-width: 0;
+    min-height: 48px;
+
+    gap: 8px;
+
+    padding:
+      7px
+      9px;
+
+    border-radius: 11px;
+  }
+
+  .attendance-export-icon {
+    width: 31px;
+    height: 31px;
+
+    flex-basis: 31px;
+
+    border-radius: 8px;
+  }
+
+  .attendance-export-button strong {
+    font-size: 0.69rem;
+
+    line-height: 1.25;
+  }
+
+  .attendance-export-button small {
+    display: none;
+  }
+
+  /* =======================================================
+     EXPORT ERROR
+  ======================================================= */
+
+  .attendance-export-error {
+    gap: 9px;
+
+    margin-bottom: 12px;
+
+    padding:
+      11px
+      12px;
+
+    border-radius: 10px;
+  }
+
+  .attendance-export-error > span {
+    width: 23px;
+    height: 23px;
+
+    flex-basis: 23px;
+  }
+
+  .attendance-export-error strong {
+    font-size: 0.72rem;
+  }
+
+  .attendance-export-error p {
+    font-size: 0.66rem;
+  }
+
+  /* =======================================================
+     OFFICIAL RECORD HEADER
+  ======================================================= */
+
+  .attendance-record-header {
+    min-height: 0;
+
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 14px;
+
+    padding:
+      17px
+      15px
+      16px;
+
+    border-top-width: 4px;
+  }
+
+  .attendance-record-brand {
+    width: 100%;
+
+    align-items: center;
+
+    gap: 10px;
+  }
+
+  .attendance-record-logos {
+    gap: 5px;
+  }
+
+  .attendance-record-logos img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .attendance-record-school {
+    min-width: 0;
+
+    flex: 1;
+  }
+
+  .attendance-record-school span {
+    font-size: 0.46rem;
+
+    letter-spacing: 0.1em;
+  }
+
+  .attendance-record-school strong {
+    margin-top: 3px;
+
+    font-size: 0.81rem;
+
+    line-height: 1.2;
+  }
+
+  .attendance-record-school small {
+    margin-top: 3px;
+
+    font-size: 0.55rem;
+
+    line-height: 1.35;
+  }
+
+  .attendance-record-document {
+    width: 100%;
+
+    padding:
+      11px
+      0
+      0;
+
+    border-top:
+      1px solid
+      var(--record-border);
+
+    border-left: 0;
+
+    text-align: left;
+  }
+
+  .attendance-record-document span {
+    font-size: 0.49rem;
+  }
+
+  .attendance-record-document strong {
+    margin-top: 4px;
+
+    font-size: 0.88rem;
+  }
+
+  .attendance-record-document small {
+    max-width: none;
+
+    margin-top: 3px;
+
+    font-size: 0.56rem;
+  }
+
+  /* =======================================================
+     SECTION + HEALTH
+     Main mobile layout fix
+  ======================================================= */
+
+  .attendance-record-identity {
+    width: 100%;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    overflow: hidden;
+  }
+
+  .attendance-record-section-block {
+    width: 100%;
+
+    min-width: 0;
+
+    padding:
+      17px
+      15px
+      15px;
+  }
+
+  .attendance-record-section-block > span {
+    font-size: 0.51rem;
+  }
+
+  .attendance-record-section-block h1 {
+    max-width: 100%;
+
+    margin-top: 6px;
+
+    overflow-wrap: anywhere;
+
+    font-size:
+      clamp(
+        1.3rem,
+        7vw,
+        1.72rem
+      );
+
+    line-height: 1.12;
+  }
+
+  .attendance-record-section-meta {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    gap: 8px;
+
+    margin-top: 14px;
+  }
+
+  .attendance-record-section-meta > span {
+    width: 100%;
+
+    min-width: 0;
+
+    gap: 3px;
+
+    padding:
+      8px
+      9px;
+
+    border:
+      1px solid
+      var(--record-border);
+
+    border-radius: 9px;
+  }
+
+  .attendance-record-section-meta strong {
+    max-width: 100%;
+
+    overflow-wrap: anywhere;
+
+    font-size: 0.69rem;
+  }
+
+  .attendance-record-health {
+    width: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+
+    grid-template-areas:
+      "label rate"
+      "copy rate";
+
+    align-items: center;
+
+    gap:
+      4px
+      13px;
+
+    padding:
+      13px
+      15px;
+
+    border-top:
+      1px solid
+      var(--record-border);
+
+    border-left: 0;
+  }
+
+  .attendance-record-health > span {
+    grid-area: label;
+
+    align-self: end;
+
+    font-size: 0.49rem;
+  }
+
+  .attendance-record-health > strong {
+    grid-area: rate;
+
+    margin: 0;
+
+    font-size: 1.5rem;
+
+    text-align: right;
+  }
+
+  .attendance-record-health > div {
+    grid-area: copy;
+
+    min-width: 0;
+
+    margin: 0;
+  }
+
+  .attendance-record-health b {
+    font-size: 0.68rem;
+  }
+
+  .attendance-record-health small {
+    max-width: 230px;
+
+    margin-top: 2px;
+
+    font-size: 0.54rem;
+
+    line-height: 1.4;
+  }
+
+  /* =======================================================
+     SUMMARY
+  ======================================================= */
+
+  .attendance-record-summary {
+    width: 100%;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+
+    margin:
+      10px
+      0;
+  }
+
+  .attendance-record-stat {
+    min-width: 0;
+    min-height: 72px;
+
+    gap: 8px;
+
+    padding:
+      10px
+      9px;
+
+    border-radius: 9px;
+  }
+
+  .attendance-record-stat:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .attendance-record-stat-icon {
+    width: 30px;
+    height: 30px;
+
+    flex-basis: 30px;
+
+    border-radius: 8px;
+  }
+
+  .attendance-record-stat span {
+    font-size: 0.47rem;
+  }
+
+  .attendance-record-stat strong {
+    margin-top: 3px;
+
+    font-size: 0.96rem;
+  }
+
+  .attendance-record-stat small {
+    max-width: 100%;
+
+    overflow: visible;
+
+    font-size: 0.51rem;
+
+    line-height: 1.25;
+
+    text-overflow: clip;
+
+    white-space: normal;
+  }
+
+  /* =======================================================
+     RECORD SHEET
+  ======================================================= */
+
+  .attendance-record-sheet {
+    width: 100%;
+
+    overflow: hidden;
+
+    border-radius: 12px;
+  }
+
+  .attendance-record-sheet-header {
+    width: 100%;
+
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 12px;
+
+    padding:
+      16px
+      13px;
+  }
+
+  .attendance-record-kicker {
+    font-size: 0.49rem;
+  }
+
+  .attendance-record-sheet-header h2 {
+    margin-top: 4px;
+
+    font-size: 1rem;
+  }
+
+  .attendance-record-sheet-header p {
+    max-width: none;
+
+    margin-top: 4px;
+
+    font-size: 0.61rem;
+
+    line-height: 1.5;
+  }
+
+  /* =======================================================
+     SHEET META
+  ======================================================= */
+
+  .attendance-record-sheet-meta {
+    width: 100%;
+
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    border-radius: 9px;
+  }
+
+  .attendance-record-sheet-meta > div {
+    min-width: 0;
+
+    padding:
+      8px
+      5px;
+  }
+
+  .attendance-record-sheet-meta > div + div {
+    border-top: 0;
+
+    border-left:
+      1px solid
+      var(--record-border);
+  }
+
+  .attendance-record-sheet-meta span {
+    font-size: 0.43rem;
+  }
+
+  .attendance-record-sheet-meta strong {
+    margin-top: 3px;
+
+    overflow-wrap: anywhere;
+
+    font-size: 0.56rem;
+
+    line-height: 1.25;
+  }
+
+  /* =======================================================
+     FILTERS
+  ======================================================= */
+
+  .attendance-record-filters,
+  .attendance-record-filters-daily {
+    width: 100%;
+
+    grid-template-columns:
+      minmax(0, 1fr) !important;
+
+    gap: 8px;
+
+    padding:
+      10px
+      9px;
+  }
+
+  .attendance-record-search,
+  .attendance-record-filter,
+  .attendance-record-today-button,
+  .attendance-record-filter-context {
+    width: 100%;
+
+    min-width: 0;
+    min-height: 48px;
+
+    grid-column: auto !important;
+  }
+
+  .attendance-record-search {
+    padding-inline: 10px;
+  }
+
+  .attendance-record-search input {
+    min-width: 0;
+
+    font-size: 0.75rem;
+  }
+
+  .attendance-record-filter {
+    padding:
+      6px
+      10px;
+  }
+
+  .attendance-record-filter input {
+    height: 31px;
+
+    font-size: 0.72rem;
+  }
+
+  .attendance-record-today-button {
+    padding:
+      7px
+      10px;
+  }
+
+  .attendance-record-filter-context {
+    padding:
+      8px
+      10px;
+  }
+
+  .attendance-record-filter-context strong,
+  .attendance-record-filter-context small {
+    overflow: visible;
+
+    text-overflow: clip;
+
+    white-space: normal;
+  }
+
+  /* =======================================================
+     TABLE
+  ======================================================= */
+
+  .attendance-record-table-wrap {
+    width: 100%;
+
+    max-height: none;
+
+    overflow-x: auto;
+    overflow-y: visible;
+
+    overscroll-behavior-x: contain;
+
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-gutter: auto;
+  }
+
+  .attendance-record-table {
+    width: max-content;
+
+    min-width: 760px;
+  }
+
+  .attendance-record-table thead th {
+    padding:
+      10px
+      9px;
+
+    font-size: 0.54rem;
+  }
+
+  .attendance-record-table tbody td {
+    min-height: 0;
+
+    padding:
+      10px
+      9px;
+
+    font-size: 0.65rem;
+  }
+
+  .attendance-record-col-no {
+    width: 46px;
+  }
+
+  .attendance-record-col-number {
+    width: 118px;
+  }
+
+  .attendance-record-col-student {
+    min-width: 210px;
+  }
+
+  .attendance-record-col-rate {
+    min-width: 150px;
+  }
+
+  .attendance-record-student {
+    gap: 8px;
+  }
+
+  .attendance-record-student > div:first-child {
+    width: 30px;
+    height: 30px;
+
+    flex-basis: 30px;
+
+    border-radius: 7px;
+  }
+
+  .attendance-record-student strong {
+    font-size: 0.68rem;
+  }
+
+  .attendance-record-student span {
+    font-size: 0.54rem;
+  }
+
+  .attendance-record-pill {
+    min-width: 31px;
+    height: 27px;
+
+    padding-inline: 6px;
+
+    font-size: 0.64rem;
+  }
+
+  .attendance-record-rate {
+    min-width: 140px;
+
+    grid-template-columns:
+      minmax(60px, auto)
+      minmax(60px, 1fr);
+
+    gap: 7px;
+  }
+
+  .attendance-record-rate strong {
+    font-size: 0.68rem;
+  }
+
+  .attendance-record-rate > div:first-child span {
+    font-size: 0.52rem;
+  }
+
+  .attendance-record-review {
+    min-height: 25px;
+
+    padding-inline: 7px;
+
+    font-size: 0.56rem;
+  }
+
+  /* =======================================================
+     NOTE
+  ======================================================= */
+
+  .attendance-record-note {
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding:
+      10px
+      11px;
+
+    font-size: 0.58rem;
+  }
+
+  .attendance-record-note > div {
+    gap: 7px;
+  }
+
+  .attendance-record-note p {
+    max-width: none;
+
+    font-size: 0.58rem;
+
+    line-height: 1.5;
+  }
+
+  .attendance-record-note > span {
+    max-width: 100%;
+
+    overflow-wrap: anywhere;
+
+    white-space: normal;
+  }
+
+  /* =======================================================
+     PAGINATION
+  ======================================================= */
+
+  .attendance-record-pagination {
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 9px;
+
+    padding:
+      11px
+      12px;
+  }
+
+  .attendance-record-pagination p {
+    font-size: 0.62rem;
+  }
+
+  .attendance-record-pagination > div {
+    width: 100%;
+
+    justify-content: space-between;
+
+    gap: 6px;
+  }
+
+  .attendance-record-pagination > div > span {
+    flex: 1;
+
+    text-align: center;
+
+    font-size: 0.61rem;
+  }
+
+  .attendance-record-pagination button {
+    min-height: 34px;
+
+    padding-inline: 9px;
+
+    font-size: 0.62rem;
+  }
+
+  /* =======================================================
+     LOADING / EMPTY
+  ======================================================= */
+
+  .attendance-record-loading,
+  .attendance-record-empty {
+    min-height: 230px;
+
+    padding:
+      28px
+      16px;
+  }
+
+  .attendance-record-loading strong,
+  .attendance-record-empty strong {
+    font-size: 0.8rem;
+  }
+
+  .attendance-record-loading p,
+  .attendance-record-empty p {
+    font-size: 0.66rem;
+  }
+
+  .attendance-record-empty > div {
+    width: 46px;
+    height: 46px;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 430px) {
+  .attendance-detail-page {
+    padding:
+      10px
+      8px
+      26px;
+  }
+
+  .attendance-record-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-export-button {
+    min-height: 45px;
+  }
+
+  .attendance-record-header {
+    padding:
+      15px
+      12px;
+  }
+
+  .attendance-record-brand {
+    gap: 8px;
+  }
+
+  .attendance-record-logos img {
+    width: 31px;
+    height: 31px;
+  }
+
+  .attendance-record-school span {
+    font-size: 0.43rem;
+  }
+
+  .attendance-record-school strong {
+    font-size: 0.74rem;
+  }
+
+  .attendance-record-school small {
+    font-size: 0.51rem;
+  }
+
+  .attendance-record-section-block {
+    padding:
+      15px
+      12px
+      13px;
+  }
+
+  .attendance-record-section-block h1 {
+    font-size:
+      clamp(
+        1.18rem,
+        7.2vw,
+        1.5rem
+      );
+  }
+
+  .attendance-record-health {
+    padding:
+      12px;
+  }
+
+  .attendance-record-health > strong {
+    font-size: 1.35rem;
+  }
+
+  .attendance-record-summary {
+    gap: 7px;
+  }
+
+  .attendance-record-stat {
+    min-height: 66px;
+
+    padding:
+      9px
+      8px;
+  }
+
+  .attendance-record-stat-icon {
+    width: 28px;
+    height: 28px;
+
+    flex-basis: 28px;
+  }
+
+  .attendance-record-sheet-header {
+    padding:
+      14px
+      11px;
+  }
+
+  .attendance-record-sheet-meta > div {
+    padding:
+      7px
+      4px;
+  }
+
+  .attendance-record-filters,
+  .attendance-record-filters-daily {
+    padding:
+      9px
+      8px;
+  }
+
+  .attendance-record-pagination {
+    padding:
+      10px;
+  }
+}
+
+/* =========================================================
+   LANDSCAPE PHONE
+========================================================= */
+
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
+  .attendance-record-identity {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(190px, 0.65fr) !important;
+  }
+
+  .attendance-record-health {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    border-top: 0;
+
+    border-left:
+      1px solid
+      var(--record-border);
+  }
+
+  .attendance-record-health > strong {
+    margin-top: 6px;
+
+    text-align: left;
+  }
+
+  .attendance-record-health > div {
+    margin-top: 8px;
+  }
+
+  .attendance-record-summary {
+    grid-template-columns:
+      repeat(5, minmax(0, 1fr));
+  }
+
+  .attendance-record-stat:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}
+
+/* =========================================================
+   PRINT PROTECTION
+========================================================= */
+
+@media print {
+  .attendance-detail-page,
+  .attendance-record-header,
+  .attendance-record-identity,
+  .attendance-record-health,
+  .attendance-record-summary,
+  .attendance-record-sheet,
+  .attendance-record-table-wrap,
+  .attendance-record-table {
+    max-width: none;
+  }
+}
