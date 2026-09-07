@@ -28,7 +28,7 @@ import "../../styles/common/notifications.css";
    CONSTANTS
 ========================================================= */
 
-const NOTIFICATION_SYNC_INTERVAL_MS = 60_000;
+const NOTIFICATION_SYNC_INTERVAL_MS = 30_000;
 
 const TOPBAR_NOTIFICATION_LIMIT = 5;
 
@@ -211,20 +211,36 @@ function AdviserTopbar({
      cache so active consumers can synchronize immediately.
   ======================================================= */
 
-  useEffect(() => {
-    const synchronizeTransfers = () => {
-      void queryClient.invalidateQueries({
-        queryKey: queryKeys.adviser.transfers.pendingCount(),
-      });
-    };
+ useEffect(() => {
+  const synchronizeTransfers = () => {
+    /*
+     * Refresh transfer badge.
+     */
+    void queryClient.invalidateQueries({
+      queryKey: queryKeys.adviser.transfers.pendingCount(),
+    });
 
-    window.addEventListener(TRANSFER_UPDATED_EVENT, synchronizeTransfers);
+    /*
+     * A transfer update may also create a notification,
+     * so refresh the notification summary immediately.
+     */
+    void queryClient.invalidateQueries({
+      queryKey: queryKeys.adviser.notifications.all(),
+    });
+  };
 
-    return () => {
-      window.removeEventListener(TRANSFER_UPDATED_EVENT, synchronizeTransfers);
-    };
-  }, [queryClient]);
+  window.addEventListener(
+    TRANSFER_UPDATED_EVENT,
+    synchronizeTransfers,
+  );
 
+  return () => {
+    window.removeEventListener(
+      TRANSFER_UPDATED_EVENT,
+      synchronizeTransfers,
+    );
+  };
+}, [queryClient]);
   useEffect(() => {
     const synchronizeNotifications = () => {
       void queryClient.invalidateQueries({
