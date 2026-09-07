@@ -3,6 +3,7 @@ package com.example.attendancemanagementbackend.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Entity
 @Table(
@@ -142,6 +143,13 @@ public class Notification {
 
     /* =========================================================
        TIMESTAMPS
+
+       IMPORTANT:
+       Notification timestamps are stored as UTC LocalDateTime.
+
+       The API response layer should convert these values to
+       timezone-aware Instant values before sending them to
+       the frontend.
     ========================================================= */
 
     @Column(
@@ -183,6 +191,7 @@ public class Notification {
             String referenceId,
             String deduplicationKey
     ) {
+
         this.recipient =
                 recipient;
 
@@ -212,9 +221,21 @@ public class Notification {
     @PrePersist
     public void prePersist() {
 
+        /*
+         * Always store notification creation time in UTC.
+         *
+         * This avoids server-timezone differences between:
+         * - local development
+         * - Docker
+         * - Render
+         * - other deployment environments
+         */
         if (createdAt == null) {
+
             createdAt =
-                    LocalDateTime.now();
+                    LocalDateTime.now(
+                            ZoneOffset.UTC
+                    );
         }
     }
 
@@ -225,13 +246,18 @@ public class Notification {
     public void markRead(
             LocalDateTime now
     ) {
+
         if (readAt == null) {
-            readAt = now;
+
+            readAt =
+                    now;
         }
     }
 
     public void markUnread() {
-        readAt = null;
+
+        readAt =
+                null;
     }
 
     /* =========================================================
@@ -241,8 +267,11 @@ public class Notification {
     public void softDelete(
             LocalDateTime now
     ) {
+
         if (deletedAt == null) {
-            deletedAt = now;
+
+            deletedAt =
+                    now;
         }
     }
 
@@ -251,46 +280,57 @@ public class Notification {
     ========================================================= */
 
     public String getId() {
+
         return id;
     }
 
     public User getRecipient() {
+
         return recipient;
     }
 
     public NotificationType getType() {
+
         return type;
     }
 
     public String getTitle() {
+
         return title;
     }
 
     public String getMessage() {
+
         return message;
     }
 
     public NotificationReferenceType getReferenceType() {
+
         return referenceType;
     }
 
     public String getReferenceId() {
+
         return referenceId;
     }
 
     public String getDeduplicationKey() {
+
         return deduplicationKey;
     }
 
     public LocalDateTime getCreatedAt() {
+
         return createdAt;
     }
 
     public LocalDateTime getReadAt() {
+
         return readAt;
     }
 
     public LocalDateTime getDeletedAt() {
+
         return deletedAt;
     }
 }

@@ -28,8 +28,11 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -37,6 +40,13 @@ import java.util.List;
 
 @Service
 public class NotificationService {
+
+    /* =========================================================
+       TIME
+    ========================================================= */
+
+    private static final ZoneId SCHOOL_TIME_ZONE =
+            ZoneId.of("Asia/Manila");
 
     /* =========================================================
        DEPENDENCIES
@@ -412,7 +422,9 @@ public class NotificationService {
         if (fromDate != null) {
 
             LocalDateTime fromAt =
-                    fromDate.atStartOfDay();
+                    schoolDateStartAsUtc(
+                            fromDate
+                    );
 
             specification =
                     specification.and(
@@ -450,9 +462,9 @@ public class NotificationService {
         if (toDate != null) {
 
             LocalDateTime toAtExclusive =
-                    toDate
-                            .plusDays(1)
-                            .atStartOfDay();
+                    schoolDateStartAsUtc(
+                            toDate.plusDays(1)
+                    );
 
             specification =
                     specification.and(
@@ -536,7 +548,7 @@ public class NotificationService {
                 );
 
         notification.markRead(
-                LocalDateTime.now()
+                utcNow()
         );
 
         Notification savedNotification =
@@ -600,7 +612,7 @@ public class NotificationService {
                 .markSelectedRead(
                         userId,
                         ids,
-                        LocalDateTime.now()
+                        utcNow()
                 );
     }
 
@@ -641,7 +653,7 @@ public class NotificationService {
         return notificationRepository
                 .markAllRead(
                         userId,
-                        LocalDateTime.now()
+                        utcNow()
                 );
     }
 
@@ -686,7 +698,7 @@ public class NotificationService {
                 .markReadByDeduplicationKey(
                         normalizedRecipientId,
                         normalizedDeduplicationKey,
-                        LocalDateTime.now()
+                        utcNow()
                 );
     }
 
@@ -711,7 +723,7 @@ public class NotificationService {
                 );
 
         notification.softDelete(
-                LocalDateTime.now()
+                utcNow()
         );
 
         notificationRepository.save(
@@ -742,7 +754,7 @@ public class NotificationService {
                 .softDeleteSelected(
                         userId,
                         ids,
-                        LocalDateTime.now()
+                        utcNow()
                 );
     }
 
@@ -761,7 +773,7 @@ public class NotificationService {
         return notificationRepository
                 .softDeleteAllRead(
                         userId,
-                        LocalDateTime.now()
+                        utcNow()
                 );
     }
 
@@ -780,7 +792,7 @@ public class NotificationService {
         return notificationRepository
                 .softDeleteAll(
                         userId,
-                        LocalDateTime.now()
+                        utcNow()
                 );
     }
 
@@ -812,13 +824,15 @@ public class NotificationService {
                 getAuthenticatedUserId();
 
         LocalDateTime beforeAt =
-                date.atStartOfDay();
+                schoolDateStartAsUtc(
+                        date
+                );
 
         return notificationRepository
                 .softDeleteBefore(
                         userId,
                         beforeAt,
-                        LocalDateTime.now()
+                        utcNow()
                 );
     }
 
@@ -906,9 +920,51 @@ public class NotificationService {
                 notification.getReferenceType(),
                 notification.getReferenceId(),
                 notification.getReadAt() != null,
-                notification.getReadAt(),
-                notification.getCreatedAt()
+                toUtcInstant(
+                        notification.getReadAt()
+                ),
+                toUtcInstant(
+                        notification.getCreatedAt()
+                )
         );
+    }
+
+    /* =========================================================
+       UTC / SCHOOL DATE HELPERS
+    ========================================================= */
+
+    private LocalDateTime utcNow() {
+
+        return LocalDateTime.now(
+                ZoneOffset.UTC
+        );
+    }
+
+    private Instant toUtcInstant(
+            LocalDateTime value
+    ) {
+
+        if (value == null) {
+            return null;
+        }
+
+        return value.toInstant(
+                ZoneOffset.UTC
+        );
+    }
+
+    private LocalDateTime schoolDateStartAsUtc(
+            LocalDate date
+    ) {
+
+        return date
+                .atStartOfDay(
+                        SCHOOL_TIME_ZONE
+                )
+                .withZoneSameInstant(
+                        ZoneOffset.UTC
+                )
+                .toLocalDateTime();
     }
 
     /* =========================================================

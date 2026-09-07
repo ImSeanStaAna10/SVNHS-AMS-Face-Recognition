@@ -3,7 +3,7 @@ package com.example.attendancemanagementbackend.dto.notification;
 import com.example.attendancemanagementbackend.entity.NotificationReferenceType;
 import com.example.attendancemanagementbackend.entity.NotificationType;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record NotificationResponse(
 
@@ -21,9 +21,9 @@ public record NotificationResponse(
 
         boolean read,
 
-        LocalDateTime readAt,
+        Instant readAt,
 
-        LocalDateTime createdAt
+        Instant createdAt
 
 ) {
 }
